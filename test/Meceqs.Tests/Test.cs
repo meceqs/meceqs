@@ -23,11 +23,11 @@ namespace Meceqs.Tests
             }
         }
 
-        private IMessageConsumer GetMediator(IServiceCollection services)
+        private IMessageConsumerMediator GetMediator(IServiceCollection services)
         {
             var serviceProvider = services.BuildServiceProvider();
 
-            return new DefaultMessageConsumer(serviceProvider);
+            return new DefaultMessageConsumerMediator(serviceProvider);
         }
 
         private MessageEnvelope<TMessage> GetEnvelope<TMessage>() where TMessage : IMessage, new()
@@ -50,7 +50,7 @@ namespace Meceqs.Tests
             var envelope = GetEnvelope<MyCommand>();
 
             // Act
-            await mediator.ConsumeAsync(envelope, CancellationToken.None);
+            await mediator.SendAsync(envelope, CancellationToken.None);
 
             // Assert
             await handler.Received(1).ConsumeAsync(Arg.Any<ConsumeContext<MyCommand>>());

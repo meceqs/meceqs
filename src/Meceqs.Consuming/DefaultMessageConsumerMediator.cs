@@ -4,18 +4,18 @@ using System.Threading.Tasks;
 
 namespace Meceqs.Consuming
 {
-    public class DefaultMessageConsumer : IMessageConsumer
+    public class DefaultMessageConsumerMediator : IMessageConsumerMediator
     {
         private readonly IConsumerResolver _consumerResolver;
         private readonly IConsumeContextFactory _consumeContextFactory;
         private readonly IConsumerInvoker _consumerInvoker;
 
-        public DefaultMessageConsumer(IServiceProvider serviceProvider)
+        public DefaultMessageConsumerMediator(IServiceProvider serviceProvider)
             : this(new DefaultConsumerResolver(serviceProvider), new DefaultConsumeContextFactory(), new DefaultConsumerInvoker())
         {
         }
 
-        public DefaultMessageConsumer(
+        public DefaultMessageConsumerMediator(
             IConsumerResolver consumerResolver,
             IConsumeContextFactory consumeContextFactory,
             IConsumerInvoker consumerInvoker)
@@ -34,7 +34,7 @@ namespace Meceqs.Consuming
             _consumerInvoker = consumerInvoker;
         }
 
-        public async Task<TResult> ConsumeAsync<TMessage, TResult>(
+        public async Task<TResult> SendAsync<TMessage, TResult>(
             MessageEnvelope<TMessage> envelope,
             CancellationToken cancellation = default(CancellationToken)) where TMessage : IMessage
         {
