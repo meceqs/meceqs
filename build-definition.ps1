@@ -19,7 +19,7 @@ Properties {
     # A list of projects for which NuGet packages should be created
     $NugetLibraries = @( `
         "src/Meceqs.ContractAbbstractions", `
-        "src/Meceqs.Consuming", `
+        "src/Meceqs.Handling", `
         "src/Meceqs.Sending" )
 }
 
