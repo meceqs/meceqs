@@ -2,13 +2,13 @@
 
 namespace Meceqs
 {
-    public class MessageEnvelope
+    public class MessageEnvelope<TMessage> : IMessageEnvelope where TMessage : IMessage
     {
         public MessageHeaders Headers { get; set; } = new MessageHeaders();
 
         public Guid MessageId { get; set; }
 
-        public IMessage Message { get; set; }
+        public TMessage Message { get; set; }
 
         public string MessageName { get; set; }
 
@@ -17,7 +17,7 @@ namespace Meceqs
         public Guid CorrelationId { get; set; }
 
 
-        public MessageEnvelope(Guid messageId, IMessage message)
+        public MessageEnvelope(Guid messageId, TMessage message)
         {
             if (messageId == Guid.Empty)
                 throw new ArgumentNullException(nameof(messageId));
@@ -39,19 +39,6 @@ namespace Meceqs
         public void SetHeader(string headerName, object value)
         {
             Headers.SetValue(headerName, value);
-        }
-    }
-
-    public class MessageEnvelope<TMessage> : MessageEnvelope where TMessage : IMessage
-    {
-        public new TMessage Message
-        {
-            get { return (TMessage)base.Message; }
-            set { base.Message = value; }
-        }
-
-        public MessageEnvelope(Guid messageId, TMessage message) : base(messageId, message)
-        {
         }
     }
 }

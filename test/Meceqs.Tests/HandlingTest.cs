@@ -37,7 +37,7 @@ namespace Meceqs.Tests
         }
 
         [Fact]
-        public async void FailingTest()
+        public async Task FailingTest()
         {
             // Arrange
 
