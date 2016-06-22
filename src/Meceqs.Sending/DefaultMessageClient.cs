@@ -1,27 +1,35 @@
 using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Meceqs.Sending
 {
     public class DefaultMessageClient : IMessageClient
     {
-        private readonly ISendContextBuilderFactory _sendContextBuilderFactory;
+        private readonly ISendTransport _sendTransport;
+        private readonly IMessageCorrelator _messageCorrelator;
 
-        public DefaultMessageClient(ISendContextBuilderFactory sendContextBuilderFactory)
+        public DefaultMessageClient(ISendTransport sendContextSender)
+            : this(sendContextSender, new DefaultMessageCorrelator())
         {
-            _sendContextBuilderFactory = sendContextBuilderFactory;
         }
 
-        public ISendContextBuilder CreateMessage(Guid messageId, IMessage message, CancellationToken cancellation)
+        public DefaultMessageClient(ISendTransport sendTransport, IMessageCorrelator messageCorrelator)
         {
-            var envelope = new MessageEnvelope(messageId, message);
-            return _sendContextBuilderFactory.Create(this, envelope, cancellation);
+            if (sendTransport == null)
+                throw new ArgumentNullException(nameof(sendTransport));
+
+            if (messageCorrelator == null)
+                throw new ArgumentNullException(nameof(messageCorrelator));
+
+            _sendTransport = sendTransport;
+            _messageCorrelator = messageCorrelator;
         }
 
-        public Task<TResult> SendAsync<TResult>(SendContext context)
+        public IMessageEnvelopeSender<TMessage> ForMessage<TMessage>(Guid messageId, TMessage message)
+            where TMessage : IMessage
         {
-            throw new NotImplementedException();
+            var envelope = new MessageEnvelope<TMessage>(messageId, message);
+
+            return new DefaultMessageEnvelopeSender<TMessage>(_sendTransport, _messageCorrelator, envelope);
         }
     }
 }

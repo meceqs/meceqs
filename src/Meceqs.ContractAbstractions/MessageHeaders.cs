@@ -22,7 +22,7 @@ namespace Meceqs
 
     public static class MessageValueConverter
     {
-        public static string DateTimeFormat = "yyyy-MM-ddThh:mm:ss";
+        public static string DateTimeFormat = "yyyy-MM-ddTHH:mm:ss";
         public static string ConvertToInvariantString(object value)
         {
             if (value == null)

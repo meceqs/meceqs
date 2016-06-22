@@ -1,6 +1,6 @@
 using System;
-using System.Threading;
 using Meceqs.Sending;
+using NSubstitute;
 using Xunit;
 
 namespace Meceqs.Tests
@@ -36,31 +36,45 @@ namespace Meceqs.Tests
         //             throw new ArgumentNullException(nameof(httpContext));
 
         //         var builder = _messageClient.CreateMessage(messageId, message, httpContext.RequestAborted);
-                
+
         //         builder.SendContext.Message.CorrelationId = httpContext.Request.TraceIdentifier;
         //     }
         // }
 
+        private MessageEnvelope GetEnvelope(IMessage msg)
+        {
+            return new MessageEnvelope(Guid.NewGuid(), msg);
+        }
+
+        private IMessageClient GetMessageClient(ISendTransport sender)
+        {
+            sender = sender ?? Substitute.For<ISendTransport>();
+            return new DefaultMessageClient(sender);
+        }
+
+        [Fact]
         public async void Test()
         {
             // assume we are in a message handler who processes MyCommand
-            MessageEnvelope<MyCommand> cmd = new MessageEnvelope<MyCommand>(Guid.NewGuid(), new MyCommand());
+            var sourceCmd = GetEnvelope(new MyCommand());
 
             // ... processing happens here ...
 
             // ... and results in an event!
             var evt = new MyEvent();
+            var id = Guid.NewGuid(); // Could come from somewhere else (e.g a client)
 
             // Now we want to send the event
 
-            IMessageClient client = null;
+            var sender = Substitute.For<ISendTransport>();
+            var messageClient = GetMessageClient(sender); // gets injected by DI 
 
-            Guid id = Guid.NewGuid(); // Could come from somewhere else (e.g a client)
+            string result = await messageClient.ForEvent(id, evt, sourceCmd)
 
-            string result = await client.CreateMessage(id, evt, CancellationToken.None /* e.g. HttpContext.RequestAborted */)
+                //.SetCancellationToken(HttpContext.RequestAborted) // a decorator would do that
 
                 // Copy tracing stuff from a source message
-                .CorrelateWith(cmd)
+                //.CorrelateWith(cmd) // if not specified in the Create*-method
 
                 // Headers which will be part of the sent message
                 .SetHeader("CreationReason", "DummyValue")
@@ -71,7 +85,10 @@ namespace Meceqs.Tests
 
                 // sends the message and assumes the result will be of the given type.
                 .SendAsync<string>();
+
+            // Assert
+
+            await sender.ReceivedWithAnyArgs(1).SendAsync<MyCommand, string>(Arg.Any<SendContext<MyCommand>>());
         }
     }
-    
 }

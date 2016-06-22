@@ -3,29 +3,33 @@ using System.Threading;
 
 namespace Meceqs.Sending
 {
-    public class SendContext
+    public class SendContext<TMessage> where TMessage : IMessage
     {
-        public CancellationToken Cancellation { get; set; }
+        private readonly SendProperties _sendProperties;
 
-        public MessageEnvelope Envelope { get; set; }
+        public CancellationToken Cancellation { get; }
 
-        public SendProperties SendProperties { get; set; } = new SendProperties();
+        public MessageEnvelope<TMessage> Envelope { get; }
 
-        public SendContext(MessageEnvelope envelope, CancellationToken cancellation)
+        public SendContext(MessageEnvelope<TMessage> envelope, SendProperties sendProperties, CancellationToken? cancellation)
         {
             if (envelope == null)
                 throw new ArgumentNullException(nameof(envelope));
 
+            _sendProperties = sendProperties ?? new SendProperties();
             Envelope = envelope;
-            Cancellation = cancellation;
+            Cancellation = cancellation ?? CancellationToken.None;
         }
 
-        public void SetSendProperty(string key, object value)
+        public T GetSendProperty<T>(string key)
         {
-            if (!string.IsNullOrWhiteSpace(key))
+            object value;
+            if (key != null && _sendProperties.TryGetValue(key, out value))
             {
-                SendProperties[key] = value;
+                return (T)Convert.ChangeType(value, typeof(T));
             }
+
+            return default(T);
         }
     }
 }
