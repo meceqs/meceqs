@@ -19,7 +19,7 @@ namespace Meceqs.Sending
             return sender.ForMessage<TCommand>(cmd, messageId);
         }
 
-        public static ISendBuilder<TEvent> ForEvent<TEvent>(this IMessageSender sender, TEvent @event, Guid messageId, IMessageEnvelope sourceMessage)
+        public static ISendBuilder<TEvent> ForEvent<TEvent>(this IMessageSender sender, TEvent @event, Guid messageId, Envelope sourceMessage)
             where TEvent : IEvent
         {
             if (sender == null)

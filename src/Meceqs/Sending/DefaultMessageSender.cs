@@ -1,37 +1,44 @@
 using System;
-using Meceqs.Sending.TypedSend;
+using Meceqs.Sending.Transport;
 
 namespace Meceqs.Sending
 {
     public class DefaultMessageSender : IMessageSender
     {
-        private readonly ISendTransport _sendTransport;
+        private readonly IEnvelopeFactory _envelopeFactory;
         private readonly IMessageCorrelator _messageCorrelator;
+        private readonly ISendTransportMediator _transportMediator;
 
         public DefaultMessageSender(IServiceProvider serviceProvider)
-            : this(new TypedSendTransport(serviceProvider), new DefaultMessageCorrelator())
+            : this(new DefaultEnvelopeFactory(), new DefaultMessageCorrelator(), new DefaultSendTransportMediator(serviceProvider))
         {
         }
 
-        public DefaultMessageSender(ISendTransport sendTransport, IMessageCorrelator messageCorrelator)
+        public DefaultMessageSender(
+            IEnvelopeFactory envelopeFactory,
+            IMessageCorrelator messageCorrelator,
+            ISendTransportMediator transportMediator)
         {
-            if (sendTransport == null)
-                throw new ArgumentNullException(nameof(sendTransport));
+            if (envelopeFactory == null)
+                throw new ArgumentNullException(nameof(envelopeFactory));
 
             if (messageCorrelator == null)
                 throw new ArgumentNullException(nameof(messageCorrelator));
 
-            _sendTransport = sendTransport;
+            if (transportMediator == null)
+                throw new ArgumentNullException(nameof(transportMediator));
+
+            _envelopeFactory = envelopeFactory;
+            _transportMediator = transportMediator;
             _messageCorrelator = messageCorrelator;
         }
 
         public ISendBuilder<TMessage> ForMessage<TMessage>(TMessage message, Guid messageId)
             where TMessage : IMessage
         {
-            var envelope = new MessageEnvelope<TMessage>(message, messageId);
+            var envelope = _envelopeFactory.Create<TMessage>(message, messageId, new MessageHeaders());
 
-            return new DefaultSendBuilder<TMessage>(envelope, _messageCorrelator)
-                .UseTransport(_sendTransport);
+            return new DefaultSendBuilder<TMessage>(envelope, _messageCorrelator, _transportMediator);
         }
     }
 }

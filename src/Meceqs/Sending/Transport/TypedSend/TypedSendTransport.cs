@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace Meceqs.Sending.TypedSend
+namespace Meceqs.Sending.Transport.TypedSend
 {
     public class TypedSendTransport : ISendTransport
     {

@@ -19,7 +19,8 @@ Properties {
     # A list of projects for which NuGet packages should be created
     $NugetLibraries = @(
         "src/Meceqs.ContractAbstractions",
-        "src/Meceqs"
+        "src/Meceqs",
+        "src/Meceqs.AspNetCore"
     )
 }
 

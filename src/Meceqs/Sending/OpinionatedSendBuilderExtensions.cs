@@ -21,7 +21,7 @@ namespace Meceqs.Sending
             if (sender == null)
                 throw new ArgumentNullException(nameof(sender));
 
-            return sender.SetSendProperty("PartitionKey", partitionKey);
+            return sender.SetContextItem("PartitionKey", partitionKey);
         }
     }
 }

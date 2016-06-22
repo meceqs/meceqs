@@ -6,7 +6,7 @@ namespace Meceqs.Handling
 {
     public interface IMessageHandlingMediator
     {
-        Task<TResult> HandleAsync<TMessage, TResult>(MessageEnvelope<TMessage> envelope, CancellationToken cancellation)
+        Task<TResult> HandleAsync<TMessage, TResult>(Envelope<TMessage> envelope, CancellationToken cancellation)
             where TMessage : IMessage;
     }
 
@@ -14,7 +14,7 @@ namespace Meceqs.Handling
     {
         public static async Task HandleAsync<TMessage>(
             this IMessageHandlingMediator mediator,
-            MessageEnvelope<TMessage> envelope,
+            Envelope<TMessage> envelope,
             CancellationToken cancellation) where TMessage : IMessage
         {
             if (mediator == null)

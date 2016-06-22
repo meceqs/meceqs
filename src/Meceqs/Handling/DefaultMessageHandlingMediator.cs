@@ -27,24 +27,26 @@ namespace Meceqs.Handling
         }
 
         public async Task<TResult> HandleAsync<TMessage, TResult>(
-            MessageEnvelope<TMessage> envelope,
+            Envelope<TMessage> envelope,
             CancellationToken cancellation = default(CancellationToken)) where TMessage : IMessage
         {
             if (envelope == null)
                 throw new ArgumentNullException(nameof(envelope));
 
-            // Find matching handler
+            // There's no point in processing a message if the most basic values are missing.
+            envelope.EnsureValid();
+
             var handler = _handlerResolver.Resolve<TMessage, TResult>();
             if (handler == null)
             {
                 throw new InvalidOperationException($"No handler found for '{typeof(TMessage)}/{typeof(TResult)}'");
             }
 
-            // Create context for invocation
             var handleContext = new HandleContext<TMessage>(envelope, cancellation);
 
-            // Offload invocation to another component to allow users to use decorators
-            var result = await _handlerInvoker.InvokeAsync(handler, handleContext);
+            // Having another component which actually calls the handler
+            // allows people to use decorators that already know about the correct handler.
+            var result = await _handlerInvoker.InvokeHandleAsync(handler, handleContext);
 
             return result;
         }

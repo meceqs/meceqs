@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Meceqs.Sending;
+using Meceqs.Sending.Transport;
 using NSubstitute;
 using Xunit;
 
@@ -9,54 +10,52 @@ namespace Meceqs.Tests.Sending
 {
     public class SendBuilderTest
     {
-        private MessageEnvelope<TMessage> GetEnvelope<TMessage>(TMessage message = null, Guid? id = null)
+        private Envelope<TMessage> GetEnvelope<TMessage>(TMessage message = null, Guid? id = null)
             where TMessage : class, IMessage, new()
         {
             message = message ?? new TMessage();
 
-            return new MessageEnvelope<TMessage>(message, id ?? Guid.NewGuid());
+            return new DefaultEnvelopeFactory().Create(message, id ?? Guid.NewGuid());
         }
 
-        private ISendBuilder<TMessage> GetBuilder<TMessage>(MessageEnvelope<TMessage> envelope = null, IMessageCorrelator correlator = null)
-            where TMessage : class, IMessage, new()
+        private ISendBuilder<TMessage> GetBuilder<TMessage>(
+            Envelope<TMessage> envelope = null,
+            IMessageCorrelator correlator = null,
+            ISendTransportMediator transportMediator = null) where TMessage : class, IMessage, new()
         {
             envelope = envelope ?? GetEnvelope<TMessage>();
-
             correlator = correlator ?? new DefaultMessageCorrelator();
-            return new DefaultSendBuilder<TMessage>(envelope, correlator);
+            transportMediator = transportMediator ?? Substitute.For<ISendTransportMediator>();
+
+            return new DefaultSendBuilder<TMessage>(envelope, correlator, transportMediator);
         }
 
         [Fact]
         public void Throws_if_parameters_are_missing()
         {
             // Arrange
-            Assert.Throws<ArgumentNullException>(() => new DefaultSendBuilder<SimpleMessage>(null, new DefaultMessageCorrelator()));
-            Assert.Throws<ArgumentNullException>(() => new DefaultSendBuilder<SimpleMessage>(GetEnvelope<SimpleMessage>(), null));
-        }
-
-        [Fact]
-        public async Task Throws_on_Send_if_Transport_is_missing()
-        {
-            // Arrange
-            var builder = GetBuilder<SimpleMessage>();
+            var envelope = GetEnvelope<SimpleMessage>();
+            var correlator = new DefaultMessageCorrelator();
+            var transportMediator = Substitute.For<ISendTransportMediator>();
 
             // Act & Assert
-            await Assert.ThrowsAsync<InvalidOperationException>(async () => await builder.SendAsync());
+            Assert.Throws<ArgumentNullException>(() => new DefaultSendBuilder<SimpleMessage>(null, correlator, transportMediator));
+            Assert.Throws<ArgumentNullException>(() => new DefaultSendBuilder<SimpleMessage>(envelope, null, transportMediator));
+            Assert.Throws<ArgumentNullException>(() => new DefaultSendBuilder<SimpleMessage>(envelope, correlator, null));
         }
 
         [Fact]
-        public async Task Uses_given_transport_for_Send()
+        public async Task Calls_TransportMediator()
         {
             // Arrange
-            var builder = GetBuilder<SimpleMessage>();
-            var transport = Substitute.For<ISendTransport>();
+            var transportMediator = Substitute.For<ISendTransportMediator>();
+            var builder = GetBuilder<SimpleMessage>(transportMediator: transportMediator);
 
             // Act
-            await builder.UseTransport(transport)
-                .SendAsync();
+            await builder.SendAsync();
 
             // Assert
-            await transport.Received(1).SendAsync<SimpleMessage, VoidType>(Arg.Any<SendContext<SimpleMessage>>());
+            await transportMediator.Received(1).SendAsync<SimpleMessage, VoidType>(Arg.Any<SendContext<SimpleMessage>>());
         }
 
         [Fact]
@@ -96,7 +95,7 @@ namespace Meceqs.Tests.Sending
             var builder = GetBuilder<SimpleMessage>();
 
             // Act
-            builder.SetSendProperty("Key", "Value");
+            builder.SetContextItem("Key", "Value");
             var context = builder.BuildSendContext();
 
             // Assert

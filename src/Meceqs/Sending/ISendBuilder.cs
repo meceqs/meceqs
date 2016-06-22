@@ -5,15 +5,13 @@ namespace Meceqs.Sending
 {
     public interface ISendBuilder<TMessage> where TMessage : IMessage
     {
-        ISendBuilder<TMessage> UseTransport(ISendTransport sendTransport);
-
-        ISendBuilder<TMessage> CorrelateWith(IMessageEnvelope source);
+        ISendBuilder<TMessage> CorrelateWith(Envelope source);
 
         ISendBuilder<TMessage> SetCancellationToken(CancellationToken cancellation);
 
         ISendBuilder<TMessage> SetHeader(string headerName, object value);
 
-        ISendBuilder<TMessage> SetSendProperty(string key, object value);
+        ISendBuilder<TMessage> SetContextItem(string key, object value);
 
         SendContext<TMessage> BuildSendContext();
 

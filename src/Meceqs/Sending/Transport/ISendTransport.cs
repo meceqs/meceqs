@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace Meceqs.Sending
+namespace Meceqs.Sending.Transport
 {
     public interface ISendTransport
     {

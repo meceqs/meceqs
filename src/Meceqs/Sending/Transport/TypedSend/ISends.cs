@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace Meceqs.Sending.TypedSend
+namespace Meceqs.Sending.Transport.TypedSend
 {
     public interface ISends<TMessage, TResult> where TMessage : IMessage
     {

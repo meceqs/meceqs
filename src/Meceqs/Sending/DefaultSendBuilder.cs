@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Meceqs.Internal;
+using Meceqs.Sending.Transport;
 
 namespace Meceqs.Sending
 {
@@ -9,15 +10,17 @@ namespace Meceqs.Sending
         where TMessage : IMessage
     {
         private readonly IMessageCorrelator _messageCorrelator;
+        private readonly ISendTransportMediator _transportMediator;
 
-        private readonly MessageEnvelope<TMessage> _envelope;
+        private readonly Envelope<TMessage> _envelope;
+        private readonly ContextData _sendContextData = new ContextData();
 
-        private readonly ContextData _sendProperties = new ContextData();
+        private CancellationToken _cancellation = CancellationToken.None;
 
-        private ISendTransport _sendTransport;
-        private CancellationToken? _cancellation;
-
-        public DefaultSendBuilder(MessageEnvelope<TMessage> envelope, IMessageCorrelator messageCorrelator)
+        public DefaultSendBuilder(
+            Envelope<TMessage> envelope,
+            IMessageCorrelator messageCorrelator,
+            ISendTransportMediator transportMediator)
         {
             if (envelope == null)
                 throw new ArgumentNullException(nameof(envelope));
@@ -25,20 +28,15 @@ namespace Meceqs.Sending
             if (messageCorrelator == null)
                 throw new ArgumentNullException(nameof(messageCorrelator));
 
+            if (transportMediator == null)
+                throw new ArgumentNullException(nameof(transportMediator));
+
             _envelope = envelope;
             _messageCorrelator = messageCorrelator;
+            _transportMediator = transportMediator;
         }
 
-        public ISendBuilder<TMessage> UseTransport(ISendTransport sendTransport)
-        {
-            if (sendTransport == null)
-                throw new ArgumentNullException(nameof(sendTransport));
-
-            _sendTransport = sendTransport;
-            return this;
-        }
-
-        public ISendBuilder<TMessage> CorrelateWith(IMessageEnvelope source)
+        public ISendBuilder<TMessage> CorrelateWith(Envelope source)
         {
             _messageCorrelator.CorrelateSourceWithTarget(source, _envelope);
             return this;
@@ -56,15 +54,15 @@ namespace Meceqs.Sending
             return this;
         }
 
-        public ISendBuilder<TMessage> SetSendProperty(string key, object value)
+        public ISendBuilder<TMessage> SetContextItem(string key, object value)
         {
-            _sendProperties.Set(key, value);
+            _sendContextData.Set(key, value);
             return this;
         }
 
         public SendContext<TMessage> BuildSendContext()
         {
-            return new SendContext<TMessage>(_envelope, _sendProperties, _cancellation);
+            return new SendContext<TMessage>(_envelope, _sendContextData, _cancellation);
         }
 
         public async Task SendAsync()
@@ -74,11 +72,8 @@ namespace Meceqs.Sending
 
         public async Task<TResult> SendAsync<TResult>()
         {
-            if (_sendTransport == null)
-                throw new InvalidOperationException($"{nameof(UseTransport)} was not called.");
-
             var sendContext = BuildSendContext();
-            return await _sendTransport.SendAsync<TMessage, TResult>(sendContext);
+            return await _transportMediator.SendAsync<TMessage, TResult>(sendContext);
         }
     }
 }

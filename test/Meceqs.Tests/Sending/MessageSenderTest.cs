@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Meceqs.Sending;
+using Meceqs.Sending.Transport;
 using NSubstitute;
 using Xunit;
 
@@ -9,27 +10,32 @@ namespace Meceqs.Tests.Sending
 {
     public class MessageSenderTest
     {
-        private IMessageSender GetSender(ISendTransport sendTransport = null, IMessageCorrelator messageCorrelator = null)
+        private IMessageSender GetSender(IMessageCorrelator messageCorrelator = null, ISendTransportMediator transportMediator = null)
         {
-            sendTransport = sendTransport ?? Substitute.For<ISendTransport>();
             messageCorrelator = messageCorrelator ?? new DefaultMessageCorrelator();
+            transportMediator = transportMediator ?? Substitute.For<ISendTransportMediator>();
 
-            return new DefaultMessageSender(sendTransport, messageCorrelator);
+            return new DefaultMessageSender(new DefaultEnvelopeFactory(), messageCorrelator, transportMediator);
         }
 
-        private MessageEnvelope<TMessage> GetEnvelope<TMessage>(TMessage message = null, Guid? id = null)
+        private Envelope<TMessage> GetEnvelope<TMessage>(TMessage message = null, Guid? id = null)
             where TMessage : class, IMessage, new()
         {
             message = message ?? new TMessage();
 
-            return new MessageEnvelope<TMessage>(message, id ?? Guid.NewGuid());
+            return new DefaultEnvelopeFactory().Create(message, id ?? Guid.NewGuid());
         }
 
         [Fact]
         public void Throws_if_parameters_are_missing()
         {
-            Assert.Throws<ArgumentNullException>(() => new DefaultMessageSender(null, Substitute.For<IMessageCorrelator>()));
-            Assert.Throws<ArgumentNullException>(() => new DefaultMessageSender(Substitute.For<ISendTransport>(), null));
+            var envelopeFactory = Substitute.For<IEnvelopeFactory>();
+            var correlator = Substitute.For<IMessageCorrelator>();
+            var transportMediator = Substitute.For<ISendTransportMediator>();
+
+            Assert.Throws<ArgumentNullException>(() => new DefaultMessageSender(null, correlator, transportMediator));
+            Assert.Throws<ArgumentNullException>(() => new DefaultMessageSender(envelopeFactory, null, transportMediator));
+            Assert.Throws<ArgumentNullException>(() => new DefaultMessageSender(envelopeFactory, correlator, null));
         }
 
         [Fact]
@@ -39,15 +45,15 @@ namespace Meceqs.Tests.Sending
             var sourceCmd = GetEnvelope<SimpleCommand>();
             var resultEvent = new SimpleEvent();
 
-            var transport = Substitute.For<ISendTransport>();
-            var sender = GetSender(transport);
+            var transportMediator = Substitute.For<ISendTransportMediator>();
+            var sender = GetSender(transportMediator: transportMediator);
 
             // Act
             string result = await sender.ForEvent(resultEvent, Guid.NewGuid(), sourceCmd)
                 .SendAsync<string>();
 
             // Assert
-            await transport.ReceivedWithAnyArgs(1).SendAsync<SimpleEvent, string>(Arg.Any<SendContext<SimpleEvent>>());
+            await transportMediator.ReceivedWithAnyArgs(1).SendAsync<SimpleEvent, string>(Arg.Any<SendContext<SimpleEvent>>());
         }
 
         [Fact]
@@ -62,25 +68,25 @@ namespace Meceqs.Tests.Sending
             var resultEvent = new SimpleEvent();
             var resultEventId = Guid.NewGuid();
 
-            var transport = Substitute.For<ISendTransport>();
+            var transportMediator = Substitute.For<ISendTransportMediator>();
 
-            var sender = GetSender(transport);
+            var sender = GetSender(transportMediator: transportMediator);
             var cancellationSource = new CancellationTokenSource();
 
             SendContext<SimpleEvent> sendContext = null;
-            await transport.SendAsync<SimpleEvent, string>(Arg.Do<SendContext<SimpleEvent>>(x => sendContext = x));
+            await transportMediator.SendAsync<SimpleEvent, string>(Arg.Do<SendContext<SimpleEvent>>(x => sendContext = x));
 
             // Act
 
             string result = await sender.ForEvent(resultEvent, resultEventId, sourceCmd)
                 .SetCancellationToken(cancellationSource.Token)
                 .SetHeader("Key", "Value")
-                .SetSendProperty("SendKey", "SendValue")
+                .SetContextItem("SendKey", "SendValue")
                 .SendAsync<string>();
 
             // Assert
 
-            await transport.ReceivedWithAnyArgs(1).SendAsync<SimpleEvent, string>(Arg.Any<SendContext<SimpleEvent>>());
+            await transportMediator.ReceivedWithAnyArgs(1).SendAsync<SimpleEvent, string>(Arg.Any<SendContext<SimpleEvent>>());
 
             Assert.NotNull(sendContext);
             Assert.Equal(resultEventId, sendContext.Envelope.MessageId);

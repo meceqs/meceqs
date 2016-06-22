@@ -30,10 +30,10 @@ namespace Meceqs.Tests
             return new DefaultMessageHandlingMediator(serviceProvider);
         }
 
-        private MessageEnvelope<TMessage> GetEnvelope<TMessage>() where TMessage : IMessage, new()
+        private Envelope<TMessage> GetEnvelope<TMessage>() where TMessage : IMessage, new()
         {
             var msg = new TMessage();
-            return new MessageEnvelope<TMessage>(msg, Guid.NewGuid());
+            return new DefaultEnvelopeFactory().Create(msg, Guid.NewGuid());
         }
 
         [Fact]

@@ -1,6 +1,5 @@
 using System;
 using Meceqs.Sending;
-using NSubstitute;
 using Xunit;
 
 namespace Meceqs.Tests.Sending
@@ -12,12 +11,12 @@ namespace Meceqs.Tests.Sending
             return new DefaultMessageCorrelator();
         }
 
-        private MessageEnvelope<TMessage> GetEnvelope<TMessage>(TMessage message = null)
+        private Envelope<TMessage> GetEnvelope<TMessage>(TMessage message = null)
             where TMessage : class, IMessage, new()
         {
             message = message ?? new TMessage();
 
-            return new MessageEnvelope<TMessage>(message, Guid.NewGuid());
+            return new DefaultEnvelopeFactory().Create(message, Guid.NewGuid());
         }
 
         [Fact]
@@ -25,10 +24,11 @@ namespace Meceqs.Tests.Sending
         {
             // Arrange
             var correlator = GetCorrelator();
+            var envelope = GetEnvelope<SimpleMessage>();
 
             // Act & Assert
-            correlator.CorrelateSourceWithTarget(null, Substitute.For<IMessageEnvelope>());
-            correlator.CorrelateSourceWithTarget(Substitute.For<IMessageEnvelope>(), null);
+            correlator.CorrelateSourceWithTarget(null, envelope);
+            correlator.CorrelateSourceWithTarget(envelope, null);
         }
 
         [Fact]

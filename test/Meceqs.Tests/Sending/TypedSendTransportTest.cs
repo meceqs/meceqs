@@ -1,8 +1,10 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Meceqs.Internal;
 using Meceqs.Sending;
-using Meceqs.Sending.TypedSend;
+using Meceqs.Sending.Transport;
+using Meceqs.Sending.Transport.TypedSend;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using Xunit;
@@ -21,8 +23,8 @@ namespace Meceqs.Tests.Sending
         private SendContext<TMessage> GetSendContext<TMessage>()
             where TMessage : class, IMessage, new()
         {
-            var envelope = new MessageEnvelope<TMessage>(new TMessage(), Guid.NewGuid());
-            return new SendContext<TMessage>(envelope, new ContextData(), null);
+            var envelope = new DefaultEnvelopeFactory().Create(new TMessage(), Guid.NewGuid());
+            return new SendContext<TMessage>(envelope, new ContextData(), CancellationToken.None);
         }
 
         [Fact]
