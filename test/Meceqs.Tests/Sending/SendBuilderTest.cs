@@ -14,7 +14,7 @@ namespace Meceqs.Tests.Sending
         {
             message = message ?? new TMessage();
 
-            return new MessageEnvelope<TMessage>(id ?? Guid.NewGuid(), message);
+            return new MessageEnvelope<TMessage>(message, id ?? Guid.NewGuid());
         }
 
         private ISendBuilder<TMessage> GetBuilder<TMessage>(MessageEnvelope<TMessage> envelope = null, IMessageCorrelator correlator = null)

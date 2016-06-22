@@ -33,7 +33,7 @@ namespace Meceqs.Tests
         private MessageEnvelope<TMessage> GetEnvelope<TMessage>() where TMessage : IMessage, new()
         {
             var msg = new TMessage();
-            return new MessageEnvelope<TMessage>(Guid.NewGuid(), msg);
+            return new MessageEnvelope<TMessage>(msg, Guid.NewGuid());
         }
 
         [Fact]

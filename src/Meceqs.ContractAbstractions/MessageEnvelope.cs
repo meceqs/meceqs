@@ -17,16 +17,16 @@ namespace Meceqs
         public Guid CorrelationId { get; set; }
 
 
-        public MessageEnvelope(Guid messageId, TMessage message)
+        public MessageEnvelope(TMessage message, Guid messageId)
         {
-            if (messageId == Guid.Empty)
-                throw new ArgumentNullException(nameof(messageId));
-
             if (message == null)
                 throw new ArgumentNullException(nameof(message));
 
-            MessageId = messageId;
+            if (messageId == Guid.Empty)
+                throw new ArgumentNullException(nameof(messageId));
+
             Message = message;
+            MessageId = messageId;
 
             Type messageType = message.GetType();
             MessageName = messageType.Name;

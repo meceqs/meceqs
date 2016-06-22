@@ -17,7 +17,7 @@ namespace Meceqs.Tests.Sending
         {
             message = message ?? new TMessage();
 
-            return new MessageEnvelope<TMessage>(Guid.NewGuid(), message);
+            return new MessageEnvelope<TMessage>(message, Guid.NewGuid());
         }
 
         [Fact]
