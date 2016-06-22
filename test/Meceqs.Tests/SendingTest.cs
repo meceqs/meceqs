@@ -43,7 +43,7 @@ namespace Meceqs.Tests
 
         public async void Test()
         {
-            // assume we are in a message consumer who processes MyCommand
+            // assume we are in a message handler who processes MyCommand
             MessageEnvelope<MyCommand> cmd = new MessageEnvelope<MyCommand>(Guid.NewGuid(), new MyCommand());
 
             // ... processing happens here ...

@@ -1,12 +1,12 @@
 using System;
 
-namespace Meceqs.Consuming
+namespace Meceqs.Handling
 {
-    public class DefaultConsumerResolver : IConsumerResolver
+    public class DefaultHandlerResolver : IHandlerResolver
     {
         private readonly IServiceProvider _serviceProvider;
 
-        public DefaultConsumerResolver(IServiceProvider serviceProvider)
+        public DefaultHandlerResolver(IServiceProvider serviceProvider)
         {
             if (serviceProvider == null)
                 throw new ArgumentNullException(nameof(serviceProvider));
@@ -14,10 +14,10 @@ namespace Meceqs.Consuming
             _serviceProvider = serviceProvider;
         }
 
-        public IConsumes<TMessage, TResult> Resolve<TMessage, TResult>() where TMessage : IMessage
+        public IHandles<TMessage, TResult> Resolve<TMessage, TResult>() where TMessage : IMessage
         {
-            var consumer = (IConsumes<TMessage, TResult>)_serviceProvider.GetService(typeof(IConsumes<TMessage, TResult>));
-            return consumer;
+            var handler = (IHandles<TMessage, TResult>)_serviceProvider.GetService(typeof(IHandles<TMessage, TResult>));
+            return handler;
         }
     }
 }

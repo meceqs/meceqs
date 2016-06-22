@@ -1,33 +1,33 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Meceqs.Consuming;
+using Meceqs.Handling;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using Xunit;
 
 namespace Meceqs.Tests
 {
-    public class Test1
+    public class HandlingTest
     {
         public class MyCommand : ICommand
         {
             public string Property { get; set; }
         }
 
-        public class MyCommandHandler : IConsumes<MyCommand, VoidType>
+        public class MyCommandHandler : IHandles<MyCommand, VoidType>
         {
-            public Task<VoidType> ConsumeAsync(ConsumeContext<MyCommand> ctx)
+            public Task<VoidType> HandleAsync(HandleContext<MyCommand> ctx)
             {
                 throw new NotImplementedException();
             }
         }
 
-        private IMessageConsumerMediator GetMediator(IServiceCollection services)
+        private IMessageHandlingMediator GetMediator(IServiceCollection services)
         {
             var serviceProvider = services.BuildServiceProvider();
 
-            return new DefaultMessageConsumerMediator(serviceProvider);
+            return new DefaultMessageHandlingMediator(serviceProvider);
         }
 
         private MessageEnvelope<TMessage> GetEnvelope<TMessage>() where TMessage : IMessage, new()
@@ -41,7 +41,7 @@ namespace Meceqs.Tests
         {
             // Arrange
 
-            var handler = Substitute.For<IConsumes<MyCommand, VoidType>>();
+            var handler = Substitute.For<IHandles<MyCommand, VoidType>>();
 
             var services = new ServiceCollection().AddSingleton(handler);
 
@@ -50,10 +50,10 @@ namespace Meceqs.Tests
             var envelope = GetEnvelope<MyCommand>();
 
             // Act
-            await mediator.SendAsync(envelope, CancellationToken.None);
+            await mediator.HandleAsync(envelope, CancellationToken.None);
 
             // Assert
-            await handler.Received(1).ConsumeAsync(Arg.Any<ConsumeContext<MyCommand>>());
+            await handler.Received(1).HandleAsync(Arg.Any<HandleContext<MyCommand>>());
         }
     }
 }

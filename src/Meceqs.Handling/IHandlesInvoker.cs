@@ -1,10 +1,10 @@
 using System.Threading.Tasks;
 
-namespace Meceqs.Consuming
+namespace Meceqs.Handling
 {
-    public interface IConsumerInvoker
+    public interface IHandlerInvoker
     {
-        Task<TResult> InvokeAsync<TMessage, TResult>(IConsumes<TMessage, TResult> consumer, ConsumeContext<TMessage> context)
+        Task<TResult> InvokeAsync<TMessage, TResult>(IHandles<TMessage, TResult> handler, HandleContext<TMessage> context)
             where TMessage : IMessage;
     }
 }

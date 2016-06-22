@@ -1,13 +1,13 @@
 using System.Threading;
 
-namespace Meceqs.Consuming
+namespace Meceqs.Handling
 {
-    public class DefaultConsumeContextFactory : IConsumeContextFactory
+    public class DefaultHandleContextFactory : IHandleContextFactory
     {
-        public ConsumeContext<TMessage> Create<TMessage>(MessageEnvelope<TMessage> envelope, CancellationToken cancellation)
+        public HandleContext<TMessage> Create<TMessage>(MessageEnvelope<TMessage> envelope, CancellationToken cancellation)
             where TMessage : IMessage
         {
-            return new ConsumeContext<TMessage>(envelope, cancellation);
+            return new HandleContext<TMessage>(envelope, cancellation);
         }
     }
 }

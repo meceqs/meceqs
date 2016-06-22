@@ -1,9 +1,9 @@
 using System.Threading.Tasks;
 
-namespace Meceqs.Consuming
+namespace Meceqs.Handling
 {
-    public interface IConsumes<TMessage, TResult> where TMessage : IMessage
+    public interface IHandles<TMessage, TResult> where TMessage : IMessage
     {
-        Task<TResult> ConsumeAsync(ConsumeContext<TMessage> context);
+        Task<TResult> HandleAsync(HandleContext<TMessage> context);
     }
 }

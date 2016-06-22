@@ -1,10 +1,10 @@
 using System.Threading;
 
-namespace Meceqs.Consuming
+namespace Meceqs.Handling
 {
-    public interface IConsumeContextFactory
+    public interface IHandleContextFactory
     {
-        ConsumeContext<TMessage> Create<TMessage>(MessageEnvelope<TMessage> envelope, CancellationToken cancellation)
+        HandleContext<TMessage> Create<TMessage>(MessageEnvelope<TMessage> envelope, CancellationToken cancellation)
             where TMessage : IMessage;
     }
 }

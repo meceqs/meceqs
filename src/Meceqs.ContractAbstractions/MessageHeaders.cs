@@ -8,7 +8,7 @@ namespace Meceqs
     {
         public void SetValue(string headerName, object value)
         {
-            // Consumers have to be able to deal with missing/empty headers anyway,
+            // Handlers have to be able to deal with missing/empty headers anyway,
             // so there's no point in adding them here.
 
             if (string.IsNullOrWhiteSpace(headerName) || value == null)

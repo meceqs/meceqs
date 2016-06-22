@@ -2,9 +2,9 @@ using System;
 using System.Security.Claims;
 using System.Threading;
 
-namespace Meceqs.Consuming
+namespace Meceqs.Handling
 {
-    public class ConsumeContext<TMessage> where TMessage : IMessage
+    public class HandleContext<TMessage> where TMessage : IMessage
     {
         public CancellationToken Cancellation { get; set; }
 
@@ -16,11 +16,11 @@ namespace Meceqs.Consuming
 
         public ClaimsPrincipal User { get; set; } // TODO @cweiss move this to sample with derived class?
 
-        public ConsumeContext()
+        public HandleContext()
         {
         }
 
-        public ConsumeContext(MessageEnvelope<TMessage> envelope, CancellationToken cancellation)
+        public HandleContext(MessageEnvelope<TMessage> envelope, CancellationToken cancellation)
         {
             if (envelope == null)
                 throw new ArgumentNullException(nameof(envelope));

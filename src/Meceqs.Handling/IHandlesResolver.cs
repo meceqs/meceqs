@@ -1,7 +1,7 @@
-namespace Meceqs.Consuming
+namespace Meceqs.Handling
 {
-    public interface IConsumerResolver
+    public interface IHandlerResolver
     {
-        IConsumes<TMessage, TResult> Resolve<TMessage, TResult>() where TMessage : IMessage;
+        IHandles<TMessage, TResult> Resolve<TMessage, TResult>() where TMessage : IMessage;
     }
 }
