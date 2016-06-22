@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using Meceqs.Internal;
 using Meceqs.Sending;
 using Meceqs.Sending.TypedSend;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,7 +22,7 @@ namespace Meceqs.Tests.Sending
             where TMessage : class, IMessage, new()
         {
             var envelope = new MessageEnvelope<TMessage>(new TMessage(), Guid.NewGuid());
-            return new SendContext<TMessage>(envelope, new SendProperties(), null);
+            return new SendContext<TMessage>(envelope, new ContextData(), null);
         }
 
         [Fact]

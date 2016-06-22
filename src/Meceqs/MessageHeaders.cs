@@ -28,14 +28,14 @@ namespace Meceqs
             if (value == null)
                 return null;
 
-// We want to use a fixed pattern for DateTime
+            // We want to use a fixed pattern for DateTime
             DateTime? dt = value as DateTime?;
             if (dt.HasValue)
             {
                 return dt.Value.ToString(DateTimeFormat);
             }
 
-            return (string) Convert.ChangeType(value, typeof(string), CultureInfo.InvariantCulture);
+            return (string)Convert.ChangeType(value, typeof(string), CultureInfo.InvariantCulture);
         }
 
     }

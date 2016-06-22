@@ -87,7 +87,7 @@ namespace Meceqs.Tests.Sending
             Assert.Equal(resultEvent, sendContext.Envelope.Message);
             Assert.Equal(cancellationSource.Token, sendContext.Cancellation);
             Assert.Equal("Value", sendContext.Envelope.Headers["Key"]);
-            Assert.Equal("SendValue", sendContext.GetSendProperty<string>("SendKey"));
+            Assert.Equal("SendValue", sendContext.GetContextItem<string>("SendKey"));
         }
     }
 }

@@ -1,35 +1,36 @@
 using System;
 using System.Threading;
+using Meceqs.Internal;
 
 namespace Meceqs.Sending
 {
-    public class SendContext<TMessage> where TMessage : IMessage
+    public class SendContext<TMessage> : IHasContextData
+        where TMessage : IMessage
     {
-        private readonly SendProperties _sendProperties;
+        private readonly ContextData _properties;
 
         public CancellationToken Cancellation { get; }
 
         public MessageEnvelope<TMessage> Envelope { get; }
 
-        public SendContext(MessageEnvelope<TMessage> envelope, SendProperties sendProperties, CancellationToken? cancellation)
+        public SendContext(MessageEnvelope<TMessage> envelope, ContextData sendProperties, CancellationToken? cancellation)
         {
             if (envelope == null)
                 throw new ArgumentNullException(nameof(envelope));
 
-            _sendProperties = sendProperties ?? new SendProperties();
             Envelope = envelope;
+            _properties = sendProperties ?? new ContextData();
             Cancellation = cancellation ?? CancellationToken.None;
         }
 
-        public T GetSendProperty<T>(string key)
+        public T GetContextItem<T>(string key)
         {
-            object value;
-            if (key != null && _sendProperties.TryGetValue(key, out value))
-            {
-                return (T)Convert.ChangeType(value, typeof(T));
-            }
+            return _properties.Get<T>(key);
+        }
 
-            return default(T);
+        public void SetContextItem(string key, object value)
+        {
+            _properties.Set(key, value);
         }
     }
 }

@@ -100,7 +100,7 @@ namespace Meceqs.Tests.Sending
             var context = builder.BuildSendContext();
 
             // Assert
-            Assert.Equal("Value", context.GetSendProperty<string>("Key"));
+            Assert.Equal("Value", context.GetContextItem<string>("Key"));
         }
 
         [Fact]

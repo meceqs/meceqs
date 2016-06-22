@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Meceqs.Internal;
 
 namespace Meceqs.Sending
 {
@@ -11,7 +12,7 @@ namespace Meceqs.Sending
 
         private readonly MessageEnvelope<TMessage> _envelope;
 
-        private readonly SendProperties _sendProperties = new SendProperties();
+        private readonly ContextData _sendProperties = new ContextData();
 
         private ISendTransport _sendTransport;
         private CancellationToken? _cancellation;
@@ -57,11 +58,7 @@ namespace Meceqs.Sending
 
         public ISendBuilder<TMessage> SetSendProperty(string key, object value)
         {
-            if (!string.IsNullOrWhiteSpace(key))
-            {
-                _sendProperties[key] = value;
-            }
-
+            _sendProperties.Set(key, value);
             return this;
         }
 
