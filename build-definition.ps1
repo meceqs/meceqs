@@ -17,10 +17,10 @@ Properties {
     $ArtifactsPathNuGet = "nuget"
 
     # A list of projects for which NuGet packages should be created
-    $NugetLibraries = @( `
-        "src/Meceqs.ContractAbstractions", `
-        "src/Meceqs.Handling", `
-        "src/Meceqs.Sending" )
+    $NugetLibraries = @(
+        "src/Meceqs.ContractAbstractions",
+        "src/Meceqs"
+    )
 }
 
 FormatTaskName ("`n" + ("-"*25) + "[{0}]" + ("-"*25) + "`n")

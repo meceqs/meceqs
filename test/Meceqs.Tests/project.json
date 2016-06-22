@@ -8,8 +8,7 @@
   "testRunner": "xunit",
 
   "dependencies": {
-    "Meceqs.Handling": "1.0.0-*",
-    "Meceqs.Sending": "1.0.0-*",
+    "Meceqs": "1.0.0-*",
 
     "Microsoft.Extensions.DependencyInjection": "1.0.0-rc2-final",
     "NSubstitute": "1.10.0",
