@@ -18,14 +18,14 @@ Properties {
 
     # A list of projects for which NuGet packages should be created
     $NugetLibraries = @( `
-        "src/Meceqs.ContractAbbstractions", `
+        "src/Meceqs.ContractAbstractions", `
         "src/Meceqs.Handling", `
         "src/Meceqs.Sending" )
 }
 
 FormatTaskName ("`n" + ("-"*25) + "[{0}]" + ("-"*25) + "`n")
 
-Task Default -depends init, clean, dotnet-install, dotnet-restore, dotnet-build, dotnet-test, dotnet-pack, packageServiceFabric
+Task Default -depends init, clean, dotnet-install, dotnet-restore, dotnet-build, dotnet-test, dotnet-pack
 
 Task init {
 
@@ -80,6 +80,9 @@ Task dotnet-build {
 Task dotnet-test {
 
     $testOutput = Join-Path $ArtifactsPath $ArtifactsPathTests
+    New-Item $testOutput -ItemType Directory -ErrorAction Ignore | Out-Null
+
+    $testsFailed = $false
 
     Get-ChildItem -Filter project.json -Recurse | ForEach-Object {
 
@@ -94,8 +97,15 @@ Task dotnet-test {
             Write-Host "Testing $library"
             Write-Host ""
             
-            exec { dotnet test $_.Directory -c $BuildConfiguration --no-build -xml $testResultOutput }
+            dotnet test $_.Directory -c $BuildConfiguration --no-build -xml $testResultOutput
+            if ($LASTEXITCODE -ne 0) {
+                $testsFailed = $true
+            }
         }
+    }
+
+    if ($testsFailed) {
+        throw "at least one test failed"
     }
 }
 
