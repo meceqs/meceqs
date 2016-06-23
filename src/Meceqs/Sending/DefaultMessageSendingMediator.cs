@@ -31,6 +31,8 @@ namespace Meceqs.Sending
             if (context == null)
                 throw new ArgumentNullException(nameof(context));
 
+            // This doesn't use the ServiceProvider directly because we want to give people the opportunity
+            // to resolve the transport based on the context (e.g. based on a ContextData-value).
             var transport = _transportResolver.Resolve<TMessage>(context);
             if (transport == null)
             {

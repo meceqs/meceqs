@@ -17,7 +17,8 @@ namespace Meceqs.Tests.Handling
                 _callback = callback;
             }
 
-            public async Task<TResult> HandleAsync<TMessage, TResult>(Envelope<TMessage> envelope, CancellationToken cancellation) where TMessage : IMessage
+            public async Task<TResult> HandleAsync<TMessage, TResult>(Envelope<TMessage> envelope, CancellationToken cancellation)
+                where TMessage : IMessage
             {
                 _callback(envelope, typeof(TMessage), typeof(TResult));
 
