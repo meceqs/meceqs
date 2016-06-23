@@ -30,12 +30,6 @@ namespace Meceqs.Tests
             return new DefaultMessageHandlingMediator(serviceProvider);
         }
 
-        private Envelope<TMessage> GetEnvelope<TMessage>() where TMessage : IMessage, new()
-        {
-            var msg = new TMessage();
-            return new DefaultEnvelopeFactory().Create(msg, Guid.NewGuid());
-        }
-
         [Fact]
         public async Task FailingTest()
         {
@@ -47,7 +41,7 @@ namespace Meceqs.Tests
 
             var mediator = GetMediator(services);
 
-            var envelope = GetEnvelope<MyCommand>();
+            var envelope = TestObjects.Envelope<MyCommand>();
 
             // Act
             await mediator.HandleAsync(envelope, CancellationToken.None);

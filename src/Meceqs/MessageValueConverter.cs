@@ -5,8 +5,31 @@ namespace Meceqs
 {
     public static class MessageValueConverter
     {
-        public static string DateTimeFormat = "yyyy-MM-ddTHH:mm:ss";
-        public static string ConvertToInvariantString(object value)
+        public static string DateTimeFormat = "yyyy-MM-ddTHH:mm:ss"; // TODO @cweiss milliseconds
+
+        public static T FromInvariantString<T>(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return default(T);
+
+            Type type = Nullable.GetUnderlyingType(typeof(T)) ?? typeof(T);
+
+            object result = null;
+
+            // We want to use a fixed pattern for DateTime
+            if (type == typeof(DateTime))
+            {
+                result = DateTime.ParseExact(value, DateTimeFormat, CultureInfo.InvariantCulture);
+            }
+            else
+            {
+                result = Convert.ChangeType(value, typeof(T), CultureInfo.InvariantCulture);
+            }
+
+            return (T)result; 
+        }
+
+        public static string ToInvariantString(object value)
         {
             if (value == null)
                 return null;

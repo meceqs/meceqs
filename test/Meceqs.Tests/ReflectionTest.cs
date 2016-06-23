@@ -1,83 +1,71 @@
-// using System;
-// using System.Diagnostics;
-// using System.Reflection;
-// using System.Threading;
-// using System.Threading.Tasks;
-// using Meceqs.Handling;
-// using Xunit;
+using System;
+using System.Diagnostics;
+using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
+using Meceqs.Handling;
+using Xunit;
 
-// namespace Meceqs.Tests
-// {
-//     public class ReflectionTest
-//     {
-//         public class MyCommand : ICommand
-//         {
-//             public string Property { get; set; }
-//         }
+namespace Meceqs.Tests
+{
+    // Make class public to actually run it.
 
-//         public class DummyMediator : IMessageHandlingMediator
-//         {
-//             public async Task<TResult> HandleAsync<TMessage, TResult>(MessageEnvelope<TMessage> envelope, CancellationToken cancellation) where TMessage : IMessage
-//             {
-//                 return await Task.FromResult<TResult>(default(TResult));
-//             }
-//         }
+    internal class ReflectionTest
+    {
+        public class DummyMediator : IMessageHandlingMediator
+        {
+            public async Task<TResult> HandleAsync<TMessage, TResult>(Envelope<TMessage> envelope, CancellationToken cancellation)
+                where TMessage : IMessage
+            {
+                return await Task.FromResult<TResult>(default(TResult));
+            }
+        }
 
-//         private MessageEnvelope<TMessage> GetEnvelope<TMessage>() where TMessage : IMessage, new()
-//         {
-//             var msg = new TMessage();
-//             return new MessageEnvelope<TMessage>(Guid.NewGuid(), msg);
-//         }
+        private async Task RunTimed(string message, int loopCount, Func<Task> action)
+        {
+            Stopwatch sw = Stopwatch.StartNew();
 
-//         private async Task RunTimed(string message, int loopCount, Func<Task> action)
-//         {
-//             Stopwatch sw = Stopwatch.StartNew();
+            for (int i = 0; i < loopCount; i++)
+            {
+                await action();
+            }
 
-//             for (int i = 0; i < loopCount; i++)
-//             {
-//                 await action();
-//             }
+            sw.Stop();
 
-//             sw.Stop();
+            Console.WriteLine($"{message}: {sw.ElapsedMilliseconds} ms");
+        }
 
-//             Console.WriteLine($"{message}: {sw.ElapsedMilliseconds} ms");
-//         }
+        [Fact]
+        public async Task Direct_vs_Dynamic_vs_MethodInfoInvoke()
+        {
+            const int loopCount = 100000;
 
-//         [Fact]
-//         public async Task Reflection()
-//         {
-//             const int loopCount = 100000;
-
-//             IMessageHandlingMediator mediator = new DummyMediator();
-//             //var envelope = GetEnvelope<MyCommand>();
+            IMessageHandlingMediator mediator = new DummyMediator();
+            var envelope = TestObjects.Envelope<SimpleCommand>();
             
-//             // Direct
+            // Direct
             
-//             await RunTimed("Direct", loopCount, async () => 
-//             {
-//                 var envelope = GetEnvelope<MyCommand>();
-//                 await mediator.HandleAsync(envelope, CancellationToken.None);
-//             });
+            await RunTimed("Direct", loopCount, async () => 
+            {
+                await mediator.HandleAsync(envelope, CancellationToken.None);
+            });
 
-//             // dynamic
+            // dynamic
 
-//             await RunTimed("Dynamic", loopCount, async () => 
-//             {
-//                 var dynamicEnvelope = (dynamic) GetEnvelope<MyCommand>();
-//                 await MessageHandlingMediatorExtensions.HandleAsync(mediator, dynamicEnvelope, CancellationToken.None);
-//             });
+            await RunTimed("Dynamic", loopCount, async () => 
+            {
+                var dynamicEnvelope = (dynamic) envelope;
+                await MessageHandlingMediatorExtensions.HandleAsync(mediator, dynamicEnvelope, CancellationToken.None);
+            });
 
-//             // MethodInfo.Invoke
+            // MethodInfo.Invoke
             
-//             MethodInfo handleMethod = typeof(IMessageHandlingMediator).GetMethod(nameof(IMessageHandlingMediator.HandleAsync));
-//             await RunTimed("MethodInfo.Invoke", loopCount, async () => 
-//             {
-//                 var envelope = GetEnvelope<MyCommand>();
-//                 MethodInfo genericHandleMethod = handleMethod.MakeGenericMethod(typeof(MyCommand), typeof(VoidType));
-//                 await (Task) genericHandleMethod.Invoke(mediator, new object[] { envelope, CancellationToken.None });
-//             });
-            
-//             //await mediator.Received(1).HandleAsync<MyCommand, VoidType>(envelope, CancellationToken.None);
-//         }
-//     }
-// }
+            MethodInfo handleMethod = typeof(IMessageHandlingMediator).GetMethod(nameof(IMessageHandlingMediator.HandleAsync));
+            await RunTimed("MethodInfo.Invoke", loopCount, async () => 
+            {
+                MethodInfo genericHandleMethod = handleMethod.MakeGenericMethod(typeof(SimpleCommand), typeof(VoidType));
+                await (Task) genericHandleMethod.Invoke(mediator, new object[] { envelope, CancellationToken.None });
+            });
+        }
+    }
+}

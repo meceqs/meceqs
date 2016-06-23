@@ -2,20 +2,18 @@ using System;
 
 namespace Meceqs.Sending
 {
-    public static class OpinionatedSendBuilderExtensions
+    public static class SendBuilderExtensions
     {
-        // TODO @cweiss do we want something like this?
-
         public static ISendBuilder<TMessage> SetCreationReason<TMessage>(this ISendBuilder<TMessage> sender, string reason)
             where TMessage : IMessage
         {
             if (sender == null)
                 throw new ArgumentNullException(nameof(sender));
 
-            return sender.SetHeader("CreationReason", reason);
+            return sender.SetHeader(MessageHeaderNames.CreationReason, reason);
         }
 
-        public static ISendBuilder<TMessage> SetSendPartitionKey<TMessage>(this ISendBuilder<TMessage> sender, object partitionKey)
+        public static ISendBuilder<TMessage> UsePartitionKey<TMessage>(this ISendBuilder<TMessage> sender, object partitionKey)
             where TMessage : IMessage
         {
             if (sender == null)

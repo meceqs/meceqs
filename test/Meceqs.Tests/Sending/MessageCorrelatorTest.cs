@@ -11,20 +11,12 @@ namespace Meceqs.Tests.Sending
             return new DefaultMessageCorrelator();
         }
 
-        private Envelope<TMessage> GetEnvelope<TMessage>(TMessage message = null)
-            where TMessage : class, IMessage, new()
-        {
-            message = message ?? new TMessage();
-
-            return new DefaultEnvelopeFactory().Create(message, Guid.NewGuid());
-        }
-
         [Fact]
         public void Doesnt_throw_if_parameter_is_null()
         {
             // Arrange
             var correlator = GetCorrelator();
-            var envelope = GetEnvelope<SimpleMessage>();
+            var envelope = TestObjects.Envelope<SimpleMessage>();
 
             // Act & Assert
             correlator.CorrelateSourceWithTarget(null, envelope);
@@ -39,10 +31,10 @@ namespace Meceqs.Tests.Sending
             var correlator = GetCorrelator();
             var correlationId = Guid.NewGuid();
 
-            var source = GetEnvelope<SimpleMessage>();
+            var source = TestObjects.Envelope<SimpleMessage>();
             source.CorrelationId = correlationId;
 
-            var target = GetEnvelope<SimpleMessage>();
+            var target = TestObjects.Envelope<SimpleMessage>();
 
             // Act
             correlator.CorrelateSourceWithTarget(source, target);

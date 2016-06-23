@@ -4,9 +4,6 @@ namespace Meceqs
 {
     public abstract class Envelope
     {
-        // This class has public setters for all properties
-        // so that it can be deserialized.
-
         public MessageHeaders Headers { get; set; } = new MessageHeaders();
 
         public Guid MessageId { get; set; }

@@ -1,17 +1,19 @@
 using System;
 using System.Threading.Tasks;
 using Meceqs.Sending;
-using Meceqs.Sending.Transport;
 using Microsoft.AspNetCore.Http;
 
 namespace Meceqs.AspNetCore
 {
-    public class AspNetCoreSendTransportMediator : ISendTransportMediator
+    public class AspNetCoreSendingMediator : IMessageSendingMediator
     {
-        private readonly ISendTransportMediator _inner;
+        public const string HeaderSourceRequestId = "SourceRequestId";
+        public const string HeaderSourceRequestPath = "SourceRequestPath";
+
+        private readonly IMessageSendingMediator _inner;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public AspNetCoreSendTransportMediator(ISendTransportMediator inner, IHttpContextAccessor httpContextAccessor)
+        public AspNetCoreSendingMediator(IMessageSendingMediator inner, IHttpContextAccessor httpContextAccessor)
         {
             if (inner == null)
                 throw new ArgumentNullException(nameof(inner));
@@ -25,10 +27,16 @@ namespace Meceqs.AspNetCore
 
         public async Task<TResult> SendAsync<TMessage, TResult>(SendContext<TMessage> context) where TMessage : IMessage
         {
-            // Makes sure pending cancellations are propagated to the transport
-            context.Cancellation = _httpContextAccessor.HttpContext.RequestAborted;
+            var httpContext = _httpContextAccessor.HttpContext;
 
-            // TODO @cweiss CorrelationId, Trace Headers (Request-Url, etc), User?
+            // Makes sure pending cancellations are propagated to the transport
+            context.Cancellation = httpContext.RequestAborted;
+
+            // ASP.NET Core specific tracing headers
+            context.Envelope.SetHeader(HeaderSourceRequestId, httpContext.TraceIdentifier);
+            context.Envelope.SetHeader(HeaderSourceRequestPath, httpContext.Request.Path);
+
+            // TODO @cweiss CorrelationId, User?
 
             return await _inner.SendAsync<TMessage, TResult>(context);
         }

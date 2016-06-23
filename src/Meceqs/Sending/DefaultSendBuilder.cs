@@ -2,7 +2,6 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Meceqs.Internal;
-using Meceqs.Sending.Transport;
 
 namespace Meceqs.Sending
 {
@@ -10,7 +9,7 @@ namespace Meceqs.Sending
         where TMessage : IMessage
     {
         private readonly IMessageCorrelator _messageCorrelator;
-        private readonly ISendTransportMediator _transportMediator;
+        private readonly IMessageSendingMediator _sendingMediator;
 
         private readonly Envelope<TMessage> _envelope;
         private readonly ContextData _sendContextData = new ContextData();
@@ -20,7 +19,7 @@ namespace Meceqs.Sending
         public DefaultSendBuilder(
             Envelope<TMessage> envelope,
             IMessageCorrelator messageCorrelator,
-            ISendTransportMediator transportMediator)
+            IMessageSendingMediator sendingMediator)
         {
             if (envelope == null)
                 throw new ArgumentNullException(nameof(envelope));
@@ -28,12 +27,12 @@ namespace Meceqs.Sending
             if (messageCorrelator == null)
                 throw new ArgumentNullException(nameof(messageCorrelator));
 
-            if (transportMediator == null)
-                throw new ArgumentNullException(nameof(transportMediator));
+            if (sendingMediator == null)
+                throw new ArgumentNullException(nameof(sendingMediator));
 
             _envelope = envelope;
             _messageCorrelator = messageCorrelator;
-            _transportMediator = transportMediator;
+            _sendingMediator = sendingMediator;
         }
 
         public ISendBuilder<TMessage> CorrelateWith(Envelope source)
@@ -73,7 +72,7 @@ namespace Meceqs.Sending
         public async Task<TResult> SendAsync<TResult>()
         {
             var sendContext = BuildSendContext();
-            return await _transportMediator.SendAsync<TMessage, TResult>(sendContext);
+            return await _sendingMediator.SendAsync<TMessage, TResult>(sendContext);
         }
     }
 }

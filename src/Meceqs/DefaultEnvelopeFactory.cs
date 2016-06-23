@@ -1,9 +1,20 @@
 using System;
+using Microsoft.Extensions.Options;
 
 namespace Meceqs
 {
     public class DefaultEnvelopeFactory : IEnvelopeFactory
     {
+        private readonly ApplicationInfo _applicationInfo;
+
+        public DefaultEnvelopeFactory(IOptions<ApplicationInfo> applicationInfo)
+        {
+            if (applicationInfo == null)
+                throw new ArgumentNullException(nameof(applicationInfo));
+
+            _applicationInfo = applicationInfo.Value;
+        }
+
         public Envelope<TMessage> Create<TMessage>(TMessage message, Guid messageId, MessageHeaders headers = null)
             where TMessage : IMessage
         {
@@ -12,7 +23,7 @@ namespace Meceqs
 
             Type messageType = message.GetType();
 
-            return new Envelope<TMessage>
+            var envelope = new Envelope<TMessage>
             {
                 Headers = headers ?? new MessageHeaders(),
 
@@ -25,6 +36,12 @@ namespace Meceqs
                 // should be overwritten, if message is correlated with other message
                 CorrelationId = Guid.NewGuid()
             };
+
+            envelope.Headers.SetValue(MessageHeaderNames.CreatedOnUtc, DateTime.UtcNow);
+            envelope.Headers.SetValue(MessageHeaderNames.SourceApplication, _applicationInfo.ApplicationName);
+            envelope.Headers.SetValue(MessageHeaderNames.SourceHost, _applicationInfo.HostName);
+
+            return envelope;
         }
     }
 }

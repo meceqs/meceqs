@@ -1,19 +1,20 @@
 using System;
 using System.Threading.Tasks;
+using Meceqs.Sending.Transport;
 
-namespace Meceqs.Sending.Transport
+namespace Meceqs.Sending
 {
-    public class DefaultSendTransportMediator : ISendTransportMediator
+    public class DefaultMessageSendingMediator : IMessageSendingMediator
     {
         private readonly ISendTransportResolver _transportResolver;
         private readonly ISendTransportInvoker _transportInvoker;
 
-        public DefaultSendTransportMediator(IServiceProvider serviceProvider)
+        public DefaultMessageSendingMediator(IServiceProvider serviceProvider)
             : this(new DefaultSendTransportResolver(serviceProvider), new DefaultSendTransportInvoker())
         {
         }
 
-        public DefaultSendTransportMediator(ISendTransportResolver transportResolver, ISendTransportInvoker transportInvoker)
+        public DefaultMessageSendingMediator(ISendTransportResolver transportResolver, ISendTransportInvoker transportInvoker)
         {
             if (transportResolver == null)
                 throw new ArgumentNullException(nameof(transportResolver));

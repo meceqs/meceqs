@@ -1,5 +1,4 @@
 using System;
-using Meceqs.Sending.Transport;
 
 namespace Meceqs.Sending
 {
@@ -7,17 +6,12 @@ namespace Meceqs.Sending
     {
         private readonly IEnvelopeFactory _envelopeFactory;
         private readonly IMessageCorrelator _messageCorrelator;
-        private readonly ISendTransportMediator _transportMediator;
-
-        public DefaultMessageSender(IServiceProvider serviceProvider)
-            : this(new DefaultEnvelopeFactory(), new DefaultMessageCorrelator(), new DefaultSendTransportMediator(serviceProvider))
-        {
-        }
+        private readonly IMessageSendingMediator _sendingMediator;
 
         public DefaultMessageSender(
             IEnvelopeFactory envelopeFactory,
             IMessageCorrelator messageCorrelator,
-            ISendTransportMediator transportMediator)
+            IMessageSendingMediator sendingMediator)
         {
             if (envelopeFactory == null)
                 throw new ArgumentNullException(nameof(envelopeFactory));
@@ -25,12 +19,12 @@ namespace Meceqs.Sending
             if (messageCorrelator == null)
                 throw new ArgumentNullException(nameof(messageCorrelator));
 
-            if (transportMediator == null)
-                throw new ArgumentNullException(nameof(transportMediator));
+            if (sendingMediator == null)
+                throw new ArgumentNullException(nameof(sendingMediator));
 
             _envelopeFactory = envelopeFactory;
-            _transportMediator = transportMediator;
             _messageCorrelator = messageCorrelator;
+            _sendingMediator = sendingMediator;
         }
 
         public ISendBuilder<TMessage> ForMessage<TMessage>(TMessage message, Guid messageId)
@@ -38,7 +32,7 @@ namespace Meceqs.Sending
         {
             var envelope = _envelopeFactory.Create<TMessage>(message, messageId, new MessageHeaders());
 
-            return new DefaultSendBuilder<TMessage>(envelope, _messageCorrelator, _transportMediator);
+            return new DefaultSendBuilder<TMessage>(envelope, _messageCorrelator, _sendingMediator);
         }
     }
 }

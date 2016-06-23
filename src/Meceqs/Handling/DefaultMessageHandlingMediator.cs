@@ -1,28 +1,29 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Meceqs.Handling
 {
     public class DefaultMessageHandlingMediator : IMessageHandlingMediator
     {
-        private readonly IHandlerResolver _handlerResolver;
+        private readonly IServiceProvider _serviceProvider;
         private readonly IHandlerInvoker _handlerInvoker;
 
         public DefaultMessageHandlingMediator(IServiceProvider serviceProvider)
-            : this(new DefaultHandlerResolver(serviceProvider), new DefaultHandlerInvoker())
+            : this(serviceProvider, new DefaultHandlerInvoker())
         {
         }
 
-        public DefaultMessageHandlingMediator(IHandlerResolver handlerResolver, IHandlerInvoker handlerInvoker)
+        public DefaultMessageHandlingMediator(IServiceProvider serviceProvider, IHandlerInvoker handlerInvoker)
         {
-            if (handlerResolver == null)
-                throw new ArgumentNullException(nameof(handlerResolver));
+            if (serviceProvider == null)
+                throw new ArgumentNullException(nameof(serviceProvider));
 
             if (handlerInvoker == null)
                 throw new ArgumentNullException(nameof(handlerInvoker));
 
-            _handlerResolver = handlerResolver;
+            _serviceProvider = serviceProvider;
             _handlerInvoker = handlerInvoker;
         }
 
@@ -36,11 +37,7 @@ namespace Meceqs.Handling
             // There's no point in processing a message if the most basic values are missing.
             envelope.EnsureValid();
 
-            var handler = _handlerResolver.Resolve<TMessage, TResult>();
-            if (handler == null)
-            {
-                throw new InvalidOperationException($"No handler found for '{typeof(TMessage)}/{typeof(TResult)}'");
-            }
+            var handler = _serviceProvider.GetRequiredService<IHandles<TMessage, TResult>>();
 
             var handleContext = new HandleContext<TMessage>(envelope, cancellation);
 

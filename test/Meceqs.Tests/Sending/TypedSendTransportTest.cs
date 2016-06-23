@@ -1,4 +1,3 @@
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Meceqs.Internal;
@@ -23,7 +22,7 @@ namespace Meceqs.Tests.Sending
         private SendContext<TMessage> GetSendContext<TMessage>()
             where TMessage : class, IMessage, new()
         {
-            var envelope = new DefaultEnvelopeFactory().Create(new TMessage(), Guid.NewGuid());
+            var envelope = TestObjects.Envelope<TMessage>();
             return new SendContext<TMessage>(envelope, new ContextData(), CancellationToken.None);
         }
 

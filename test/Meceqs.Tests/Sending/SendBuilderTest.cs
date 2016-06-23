@@ -2,7 +2,6 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Meceqs.Sending;
-using Meceqs.Sending.Transport;
 using NSubstitute;
 using Xunit;
 
@@ -10,37 +9,29 @@ namespace Meceqs.Tests.Sending
 {
     public class SendBuilderTest
     {
-        private Envelope<TMessage> GetEnvelope<TMessage>(TMessage message = null, Guid? id = null)
-            where TMessage : class, IMessage, new()
-        {
-            message = message ?? new TMessage();
-
-            return new DefaultEnvelopeFactory().Create(message, id ?? Guid.NewGuid());
-        }
-
         private ISendBuilder<TMessage> GetBuilder<TMessage>(
             Envelope<TMessage> envelope = null,
             IMessageCorrelator correlator = null,
-            ISendTransportMediator transportMediator = null) where TMessage : class, IMessage, new()
+            IMessageSendingMediator sendingMediator = null) where TMessage : class, IMessage, new()
         {
-            envelope = envelope ?? GetEnvelope<TMessage>();
+            envelope = envelope ?? TestObjects.Envelope<TMessage>();
             correlator = correlator ?? new DefaultMessageCorrelator();
-            transportMediator = transportMediator ?? Substitute.For<ISendTransportMediator>();
+            sendingMediator = sendingMediator ?? Substitute.For<IMessageSendingMediator>();
 
-            return new DefaultSendBuilder<TMessage>(envelope, correlator, transportMediator);
+            return new DefaultSendBuilder<TMessage>(envelope, correlator, sendingMediator);
         }
 
         [Fact]
         public void Throws_if_parameters_are_missing()
         {
             // Arrange
-            var envelope = GetEnvelope<SimpleMessage>();
+            var envelope = TestObjects.Envelope<SimpleMessage>();
             var correlator = new DefaultMessageCorrelator();
-            var transportMediator = Substitute.For<ISendTransportMediator>();
+            var sendingMediator = Substitute.For<IMessageSendingMediator>();
 
             // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => new DefaultSendBuilder<SimpleMessage>(null, correlator, transportMediator));
-            Assert.Throws<ArgumentNullException>(() => new DefaultSendBuilder<SimpleMessage>(envelope, null, transportMediator));
+            Assert.Throws<ArgumentNullException>(() => new DefaultSendBuilder<SimpleMessage>(null, correlator, sendingMediator));
+            Assert.Throws<ArgumentNullException>(() => new DefaultSendBuilder<SimpleMessage>(envelope, null, sendingMediator));
             Assert.Throws<ArgumentNullException>(() => new DefaultSendBuilder<SimpleMessage>(envelope, correlator, null));
         }
 
@@ -48,26 +39,26 @@ namespace Meceqs.Tests.Sending
         public async Task Calls_TransportMediator()
         {
             // Arrange
-            var transportMediator = Substitute.For<ISendTransportMediator>();
-            var builder = GetBuilder<SimpleMessage>(transportMediator: transportMediator);
+            var sendingMediator = Substitute.For<IMessageSendingMediator>();
+            var builder = GetBuilder<SimpleMessage>(sendingMediator: sendingMediator);
 
             // Act
             await builder.SendAsync();
 
             // Assert
-            await transportMediator.Received(1).SendAsync<SimpleMessage, VoidType>(Arg.Any<SendContext<SimpleMessage>>());
+            await sendingMediator.Received(1).SendAsync<SimpleMessage, VoidType>(Arg.Any<SendContext<SimpleMessage>>());
         }
 
         [Fact]
         public void Calls_Correlator()
         {
             // Arrange
-            var envelope = GetEnvelope<SimpleMessage>();
+            var envelope = TestObjects.Envelope<SimpleMessage>();
             var correlator = Substitute.For<IMessageCorrelator>();
             var builder = GetBuilder<SimpleMessage>(envelope, correlator);
 
             // Act
-            var sourceMsg = GetEnvelope<SimpleCommand>();
+            var sourceMsg = TestObjects.Envelope<SimpleCommand>();
             builder.CorrelateWith(sourceMsg);
 
             // Assert
@@ -121,7 +112,7 @@ namespace Meceqs.Tests.Sending
         public void Saves_Envelope_In_Context()
         {
             // Arrange
-            var envelope = GetEnvelope<SimpleMessage>();
+            var envelope = TestObjects.Envelope<SimpleMessage>();
             var builder = GetBuilder<SimpleMessage>(envelope);
 
             // Act
