@@ -27,7 +27,7 @@ namespace Meceqs.Handling
             _handlerInvoker = handlerInvoker;
         }
 
-        public async Task<TResult> HandleAsync<TMessage, TResult>(
+        public Task<TResult> HandleAsync<TMessage, TResult>(
             Envelope<TMessage> envelope,
             CancellationToken cancellation = default(CancellationToken)) where TMessage : IMessage
         {
@@ -43,9 +43,7 @@ namespace Meceqs.Handling
 
             // Having another component which actually calls the handler
             // allows people to use decorators that already know about the correct handler.
-            var result = await _handlerInvoker.InvokeHandleAsync(handler, handleContext);
-
-            return result;
+            return _handlerInvoker.InvokeHandleAsync(handler, handleContext);
         }
     }
 }

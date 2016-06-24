@@ -12,7 +12,7 @@ namespace Meceqs.Handling
 
     public static class MessageHandlingMediatorExtensions
     {
-        public static async Task HandleAsync<TMessage>(
+        public static Task HandleAsync<TMessage>(
             this IMessageHandlingMediator mediator,
             Envelope<TMessage> envelope,
             CancellationToken cancellation) where TMessage : IMessage
@@ -20,7 +20,7 @@ namespace Meceqs.Handling
             if (mediator == null)
                 throw new ArgumentNullException(nameof(mediator));
 
-            await mediator.HandleAsync<TMessage, VoidType>(envelope, cancellation);
+            return mediator.HandleAsync<TMessage, VoidType>(envelope, cancellation);
         }
     }
 }

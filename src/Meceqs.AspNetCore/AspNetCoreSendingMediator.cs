@@ -25,7 +25,7 @@ namespace Meceqs.AspNetCore
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<TResult> SendAsync<TMessage, TResult>(SendContext<TMessage> context) where TMessage : IMessage
+        public Task<TResult> SendAsync<TMessage, TResult>(SendContext<TMessage> context) where TMessage : IMessage
         {
             var httpContext = _httpContextAccessor.HttpContext;
 
@@ -38,7 +38,7 @@ namespace Meceqs.AspNetCore
 
             // TODO @cweiss CorrelationId, User?
 
-            return await _inner.SendAsync<TMessage, TResult>(context);
+            return _inner.SendAsync<TMessage, TResult>(context);
         }
     }
 }

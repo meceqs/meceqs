@@ -64,15 +64,15 @@ namespace Meceqs.Sending
             return new SendContext<TMessage>(_envelope, _sendContextData, _cancellation);
         }
 
-        public async Task SendAsync()
+        public Task SendAsync()
         {
-            await SendAsync<VoidType>();
+            return SendAsync<VoidType>();
         }
 
-        public async Task<TResult> SendAsync<TResult>()
+        public Task<TResult> SendAsync<TResult>()
         {
             var sendContext = BuildSendContext();
-            return await _sendingMediator.SendAsync<TMessage, TResult>(sendContext);
+            return _sendingMediator.SendAsync<TMessage, TResult>(sendContext);
         }
     }
 }

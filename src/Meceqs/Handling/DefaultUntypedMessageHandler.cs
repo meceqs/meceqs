@@ -16,7 +16,7 @@ namespace Meceqs.Handling
             _mediator = mediator;
         }
 
-        public async Task HandleAsync(Envelope envelope, CancellationToken cancellation)
+        public Task HandleAsync(Envelope envelope, CancellationToken cancellation)
         {
             // This trick with "dynamic" has "good enough" performance for now. It could probably be optimized further,
             // but it's already a lot faster than regular reflection.
@@ -26,7 +26,7 @@ namespace Meceqs.Handling
 
             // Method is called via static class so that the runtime isn't confused about which HandleAsync-method to use.
             // It would throw an exception because there's also one that expects a result-type.
-            await MessageHandlingMediatorExtensions.HandleAsync(_mediator, dynamicEnvelope, CancellationToken.None);
+            return MessageHandlingMediatorExtensions.HandleAsync(_mediator, dynamicEnvelope, CancellationToken.None);
         }
     }
 }

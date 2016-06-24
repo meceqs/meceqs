@@ -5,7 +5,7 @@ namespace Meceqs
 {
     public static class MessageValueConverter
     {
-        public static string DateTimeFormat = "yyyy-MM-ddTHH:mm:ss"; // TODO @cweiss milliseconds
+        public static string DateTimeFormat = "yyyy-MM-ddTHH:mm:ss.fffZ"; // TODO @cweiss ISO 8601 - make this configurable
 
         public static T FromInvariantString<T>(string value)
         {
@@ -26,7 +26,7 @@ namespace Meceqs
                 result = Convert.ChangeType(value, typeof(T), CultureInfo.InvariantCulture);
             }
 
-            return (T)result; 
+            return (T)result;
         }
 
         public static string ToInvariantString(object value)

@@ -26,7 +26,7 @@ namespace Meceqs.Sending
             _transportInvoker = transportInvoker;
         }
 
-        public async Task<TResult> SendAsync<TMessage, TResult>(SendContext<TMessage> context) where TMessage : IMessage
+        public Task<TResult> SendAsync<TMessage, TResult>(SendContext<TMessage> context) where TMessage : IMessage
         {
             if (context == null)
                 throw new ArgumentNullException(nameof(context));
@@ -41,9 +41,7 @@ namespace Meceqs.Sending
 
             // Having another component which actually calls the transport
             // allows people to use decorators that already know about the correct transport.
-            var result = await _transportInvoker.InvokeSendAsync<TMessage, TResult>(transport, context);
-
-            return result;
+            return _transportInvoker.InvokeSendAsync<TMessage, TResult>(transport, context);
         }
     }
 }

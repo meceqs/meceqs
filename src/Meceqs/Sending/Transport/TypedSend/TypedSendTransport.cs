@@ -15,7 +15,7 @@ namespace Meceqs.Sending.Transport.TypedSend
             _serviceProvider = serviceProvider;
         }
 
-        public async Task<TResult> SendAsync<TMessage, TResult>(SendContext<TMessage> context) where TMessage : IMessage
+        public Task<TResult> SendAsync<TMessage, TResult>(SendContext<TMessage> context) where TMessage : IMessage
         {
             var sendHandler = (ISends<TMessage, TResult>)_serviceProvider.GetService(typeof(ISends<TMessage, TResult>));
             if (sendHandler == null)
@@ -23,7 +23,7 @@ namespace Meceqs.Sending.Transport.TypedSend
                 throw new InvalidOperationException($"No implementation found for '{typeof(TMessage)}/{typeof(TResult)}'");
             }
 
-            return await sendHandler.SendAsync(context);
+            return sendHandler.SendAsync(context);
         }
     }
 }
