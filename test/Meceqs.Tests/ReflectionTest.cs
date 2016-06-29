@@ -12,7 +12,7 @@ namespace Meceqs.Tests
 
     internal class ReflectionTest
     {
-        public class DummyMediator : IMessageHandlingMediator
+        public class DummyMediator : IEnvelopeHandler
         {
             public async Task<TResult> HandleAsync<TMessage, TResult>(Envelope<TMessage> envelope, CancellationToken cancellation)
                 where TMessage : IMessage
@@ -40,7 +40,7 @@ namespace Meceqs.Tests
         {
             const int loopCount = 100000;
 
-            IMessageHandlingMediator mediator = new DummyMediator();
+            IEnvelopeHandler mediator = new DummyMediator();
             var envelope = TestObjects.Envelope<SimpleCommand>();
             
             // Direct
@@ -55,12 +55,12 @@ namespace Meceqs.Tests
             await RunTimed("Dynamic", loopCount, async () => 
             {
                 var dynamicEnvelope = (dynamic) envelope;
-                await MessageHandlingMediatorExtensions.HandleAsync(mediator, dynamicEnvelope, CancellationToken.None);
+                await EnvelopeHandlerExtensions.HandleAsync(mediator, dynamicEnvelope, CancellationToken.None);
             });
 
             // MethodInfo.Invoke
             
-            MethodInfo handleMethod = typeof(IMessageHandlingMediator).GetMethod(nameof(IMessageHandlingMediator.HandleAsync));
+            MethodInfo handleMethod = typeof(IEnvelopeHandler).GetMethod(nameof(IEnvelopeHandler.HandleAsync));
             await RunTimed("MethodInfo.Invoke", loopCount, async () => 
             {
                 MethodInfo genericHandleMethod = handleMethod.MakeGenericMethod(typeof(SimpleCommand), typeof(VoidType));

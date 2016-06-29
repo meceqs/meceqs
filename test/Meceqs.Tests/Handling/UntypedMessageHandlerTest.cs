@@ -8,11 +8,11 @@ namespace Meceqs.Tests.Handling
 {
     public class UntypedMessageHandlerTest
     {
-        public class CallbackMediator : IMessageHandlingMediator
+        public class CallbackEnvelopeHandler : IEnvelopeHandler
         {
             private readonly Action<Envelope, Type, Type> _callback;
 
-            public CallbackMediator(Action<Envelope, Type, Type> callback)
+            public CallbackEnvelopeHandler(Action<Envelope, Type, Type> callback)
             {
                 _callback = callback;
             }
@@ -26,19 +26,14 @@ namespace Meceqs.Tests.Handling
             }
         }
 
-        private IUntypedMessageHandler GetUntypedMessageHandler(Action<Envelope, Type, Type> callback)
-        {
-            return new DefaultUntypedMessageHandler(new CallbackMediator(callback));
-        }
-
         [Fact]
         public async Task Calls_mediator_with_correct_types()
         {
-            var envelope = TestObjects.Envelope<SimpleMessage>();
+            Envelope envelope = TestObjects.Envelope<SimpleMessage>();
 
             bool mediatorCalled = false;
 
-            var untypedHandler = GetUntypedMessageHandler((actualEnvelope, messageType, returnType) =>
+            var envelopeHandler = new CallbackEnvelopeHandler((actualEnvelope, messageType, returnType) =>
             {
                 mediatorCalled = true;
 
@@ -47,7 +42,7 @@ namespace Meceqs.Tests.Handling
                 Assert.Same(envelope, actualEnvelope);
             });
 
-            await untypedHandler.HandleAsync(envelope, CancellationToken.None);
+            await envelopeHandler.HandleUntypedAsync(envelope, CancellationToken.None);
 
             Assert.True(mediatorCalled);
         }

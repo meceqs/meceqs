@@ -23,11 +23,11 @@ namespace Meceqs.Tests
             }
         }
 
-        private IMessageHandlingMediator GetMediator(IServiceCollection services)
+        private IEnvelopeHandler GetMediator(IServiceCollection services)
         {
             var serviceProvider = services.BuildServiceProvider();
 
-            return new DefaultMessageHandlingMediator(serviceProvider);
+            return new DefaultEnvelopeHandler(serviceProvider);
         }
 
         [Fact]

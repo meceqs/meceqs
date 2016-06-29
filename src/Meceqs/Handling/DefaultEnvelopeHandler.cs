@@ -5,31 +5,30 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Meceqs.Handling
 {
-    public class DefaultMessageHandlingMediator : IMessageHandlingMediator
+    public class DefaultEnvelopeHandler : IEnvelopeHandler
     {
         private readonly IServiceProvider _serviceProvider;
-        private readonly IHandlerInvoker _handlerInvoker;
+        private readonly IHandleInvoker _handleInvoker;
 
-        public DefaultMessageHandlingMediator(IServiceProvider serviceProvider)
-            : this(serviceProvider, new DefaultHandlerInvoker())
+        public DefaultEnvelopeHandler(IServiceProvider serviceProvider)
+            : this(serviceProvider, new DefaultHandleInvoker())
         {
         }
 
-        public DefaultMessageHandlingMediator(IServiceProvider serviceProvider, IHandlerInvoker handlerInvoker)
+        public DefaultEnvelopeHandler(IServiceProvider serviceProvider, IHandleInvoker handleInvoker)
         {
             if (serviceProvider == null)
                 throw new ArgumentNullException(nameof(serviceProvider));
 
-            if (handlerInvoker == null)
-                throw new ArgumentNullException(nameof(handlerInvoker));
+            if (handleInvoker == null)
+                throw new ArgumentNullException(nameof(handleInvoker));
 
             _serviceProvider = serviceProvider;
-            _handlerInvoker = handlerInvoker;
+            _handleInvoker = handleInvoker;
         }
 
-        public Task<TResult> HandleAsync<TMessage, TResult>(
-            Envelope<TMessage> envelope,
-            CancellationToken cancellation = default(CancellationToken)) where TMessage : IMessage
+        public Task<TResult> HandleAsync<TMessage, TResult>(Envelope<TMessage> envelope, CancellationToken cancellation)
+            where TMessage : IMessage
         {
             if (envelope == null)
                 throw new ArgumentNullException(nameof(envelope));
@@ -37,13 +36,13 @@ namespace Meceqs.Handling
             // There's no point in processing a message if the most basic values are missing.
             envelope.EnsureValid();
 
-            var handler = _serviceProvider.GetRequiredService<IHandles<TMessage, TResult>>();
+            var handle = _serviceProvider.GetRequiredService<IHandles<TMessage, TResult>>();
 
             var handleContext = new HandleContext<TMessage>(envelope, cancellation);
 
             // Having another component which actually calls the handler
             // allows people to use decorators that already know about the correct handler.
-            return _handlerInvoker.InvokeHandleAsync(handler, handleContext);
+            return _handleInvoker.InvokeHandleAsync(handle, handleContext);
         }
     }
 }
