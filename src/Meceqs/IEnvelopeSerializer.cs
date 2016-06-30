@@ -6,6 +6,6 @@ namespace Meceqs
     {
         string Serialize(Envelope envelope);
 
-        Envelope Deserialize(string serializedEnvelope, Type messageType);
+        Envelope Deserialize(string serializedEnvelope, Type envelopeType);
     }
 }
