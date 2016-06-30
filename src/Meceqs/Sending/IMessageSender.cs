@@ -13,8 +13,7 @@ namespace Meceqs.Sending
         public static ISendBuilder<TCommand> ForCommand<TCommand>(this IMessageSender sender, TCommand cmd, Guid messageId)
             where TCommand : ICommand
         {
-            if (sender == null)
-                throw new ArgumentNullException(nameof(sender));
+            Check.NotNull(sender, nameof(sender));
 
             return sender.ForMessage<TCommand>(cmd, messageId);
         }
@@ -22,11 +21,8 @@ namespace Meceqs.Sending
         public static ISendBuilder<TEvent> ForEvent<TEvent>(this IMessageSender sender, TEvent @event, Guid messageId, Envelope sourceMessage)
             where TEvent : IEvent
         {
-            if (sender == null)
-                throw new ArgumentNullException(nameof(sender));
-
-            if (sourceMessage == null)
-                throw new ArgumentNullException(nameof(sourceMessage));
+            Check.NotNull(sender, nameof(sender));
+            Check.NotNull(sourceMessage, nameof(sourceMessage));
 
             return sender.ForMessage(@event, messageId)
                 .CorrelateWith(sourceMessage);
@@ -35,8 +31,7 @@ namespace Meceqs.Sending
         public static ISendBuilder<TQuery> ForQuery<TQuery>(this IMessageSender sender, TQuery query, Guid? messageId = null)
             where TQuery : IQuery
         {
-            if (sender == null)
-                throw new ArgumentNullException(nameof(sender));
+            Check.NotNull(sender, nameof(sender));
 
             Guid id = messageId ?? Guid.NewGuid();
 

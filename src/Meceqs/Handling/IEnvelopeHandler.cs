@@ -1,4 +1,3 @@
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,16 +14,14 @@ namespace Meceqs.Handling
         public static Task HandleAsync<TMessage>(this IEnvelopeHandler envelopeHandler, Envelope<TMessage> envelope, CancellationToken cancellation)
             where TMessage : IMessage
         {
-            if (envelopeHandler == null)
-                throw new ArgumentNullException(nameof(envelopeHandler));
+            Check.NotNull(envelopeHandler, nameof(envelopeHandler));
 
             return envelopeHandler.HandleAsync<TMessage, VoidType>(envelope, cancellation);
         }
 
         public static Task HandleUntypedAsync(this IEnvelopeHandler envelopeHandler, Envelope envelope, CancellationToken cancellation)
         {
-            if (envelopeHandler == null)
-                throw new ArgumentNullException(nameof(envelopeHandler));
+            Check.NotNull(envelopeHandler, nameof(envelopeHandler));
 
             // This trick with "dynamic" has "good enough" performance for now. It could probably be optimized further,
             // but it's already a lot faster than regular reflection.

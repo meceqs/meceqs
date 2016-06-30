@@ -1,4 +1,3 @@
-using System;
 using System.Threading;
 
 namespace Meceqs.Internal
@@ -15,8 +14,7 @@ namespace Meceqs.Internal
 
         protected ContextBase(Envelope<TMessage> envelope, ContextData contextData, CancellationToken cancellation)
         {
-            if (envelope == null)
-                throw new ArgumentNullException(nameof(envelope));
+            Check.NotNull(envelope, nameof(envelope));
 
             Envelope = envelope;
             _data = contextData ?? new ContextData();

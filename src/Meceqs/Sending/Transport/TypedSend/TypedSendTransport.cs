@@ -9,8 +9,7 @@ namespace Meceqs.Sending.Transport.TypedSend
 
         public TypedSendTransport(IServiceProvider serviceProvider)
         {
-            if (serviceProvider == null)
-                throw new ArgumentNullException(nameof(serviceProvider));
+            Check.NotNull(serviceProvider, nameof(serviceProvider));
 
             _serviceProvider = serviceProvider;
         }

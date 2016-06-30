@@ -9,8 +9,7 @@ namespace Meceqs
 
         public DefaultEnvelopeFactory(IOptions<ApplicationInfo> applicationInfo)
         {
-            if (applicationInfo == null)
-                throw new ArgumentNullException(nameof(applicationInfo));
+            Check.NotNull(applicationInfo, nameof(applicationInfo));
 
             _applicationInfo = applicationInfo.Value;
         }
@@ -18,8 +17,7 @@ namespace Meceqs
         public Envelope<TMessage> Create<TMessage>(TMessage message, Guid messageId, MessageHeaders headers = null)
             where TMessage : IMessage
         {
-            if (message == null)
-                throw new ArgumentNullException(nameof(message));
+            Check.NotNull(message, nameof(message));
 
             Type messageType = message.GetType();
 

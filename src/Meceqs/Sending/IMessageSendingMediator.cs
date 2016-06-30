@@ -1,4 +1,3 @@
-using System;
 using System.Threading.Tasks;
 
 namespace Meceqs.Sending
@@ -13,8 +12,7 @@ namespace Meceqs.Sending
         public static Task SendAsync<TMessage>(this IMessageSendingMediator mediator, SendContext<TMessage> context)
             where TMessage : IMessage
         {
-            if (mediator == null)
-                throw new ArgumentNullException(nameof(mediator));
+            Check.NotNull(mediator, nameof(mediator));
 
             return mediator.SendAsync<TMessage, VoidType>(context);
         }

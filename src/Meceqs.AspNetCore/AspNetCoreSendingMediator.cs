@@ -1,4 +1,3 @@
-using System;
 using System.Threading.Tasks;
 using Meceqs.Sending;
 using Microsoft.AspNetCore.Http;
@@ -15,11 +14,8 @@ namespace Meceqs.AspNetCore
 
         public AspNetCoreSendingMediator(IMessageSendingMediator inner, IHttpContextAccessor httpContextAccessor)
         {
-            if (inner == null)
-                throw new ArgumentNullException(nameof(inner));
-
-            if (httpContextAccessor == null)
-                throw new ArgumentNullException(nameof(httpContextAccessor));
+            Check.NotNull(inner, nameof(inner));
+            Check.NotNull(httpContextAccessor, nameof(httpContextAccessor));
 
             _inner = inner;
             _httpContextAccessor = httpContextAccessor;
@@ -27,6 +23,8 @@ namespace Meceqs.AspNetCore
 
         public Task<TResult> SendAsync<TMessage, TResult>(SendContext<TMessage> context) where TMessage : IMessage
         {
+            Check.NotNull(context, nameof(context));
+
             var httpContext = _httpContextAccessor.HttpContext;
 
             // Makes sure pending cancellations are propagated to the transport

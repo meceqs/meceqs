@@ -13,14 +13,9 @@ namespace Meceqs.Sending
             IMessageCorrelator messageCorrelator,
             IMessageSendingMediator sendingMediator)
         {
-            if (envelopeFactory == null)
-                throw new ArgumentNullException(nameof(envelopeFactory));
-
-            if (messageCorrelator == null)
-                throw new ArgumentNullException(nameof(messageCorrelator));
-
-            if (sendingMediator == null)
-                throw new ArgumentNullException(nameof(sendingMediator));
+            Check.NotNull(envelopeFactory, nameof(envelopeFactory));
+            Check.NotNull(messageCorrelator, nameof(messageCorrelator));
+            Check.NotNull(sendingMediator, nameof(sendingMediator));
 
             _envelopeFactory = envelopeFactory;
             _messageCorrelator = messageCorrelator;

@@ -1,5 +1,3 @@
-using System;
-
 namespace Meceqs.Sending
 {
     public static class SendBuilderExtensions
@@ -7,8 +5,7 @@ namespace Meceqs.Sending
         public static ISendBuilder<TMessage> SetCreationReason<TMessage>(this ISendBuilder<TMessage> sender, string reason)
             where TMessage : IMessage
         {
-            if (sender == null)
-                throw new ArgumentNullException(nameof(sender));
+            Check.NotNull(sender, nameof(sender));
 
             return sender.SetHeader(MessageHeaderNames.CreationReason, reason);
         }
@@ -16,8 +13,7 @@ namespace Meceqs.Sending
         public static ISendBuilder<TMessage> UsePartitionKey<TMessage>(this ISendBuilder<TMessage> sender, object partitionKey)
             where TMessage : IMessage
         {
-            if (sender == null)
-                throw new ArgumentNullException(nameof(sender));
+            Check.NotNull(sender, nameof(sender));
 
             return sender.SetContextItem("PartitionKey", partitionKey);
         }

@@ -16,11 +16,8 @@ namespace Meceqs.Sending
 
         public DefaultMessageSendingMediator(ISendTransportResolver transportResolver, ISendTransportInvoker transportInvoker)
         {
-            if (transportResolver == null)
-                throw new ArgumentNullException(nameof(transportResolver));
-
-            if (transportInvoker == null)
-                throw new ArgumentNullException(nameof(transportInvoker));
+            Check.NotNull(transportResolver, nameof(transportResolver));
+            Check.NotNull(transportInvoker, nameof(transportInvoker));
 
             _transportResolver = transportResolver;
             _transportInvoker = transportInvoker;
@@ -28,8 +25,7 @@ namespace Meceqs.Sending
 
         public Task<TResult> SendAsync<TMessage, TResult>(SendContext<TMessage> context) where TMessage : IMessage
         {
-            if (context == null)
-                throw new ArgumentNullException(nameof(context));
+            Check.NotNull(context, nameof(context));
 
             // This doesn't use the ServiceProvider directly because we want to give people the opportunity
             // to resolve the transport based on the context (e.g. based on a ContextData-value).

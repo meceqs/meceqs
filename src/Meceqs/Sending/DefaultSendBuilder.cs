@@ -1,4 +1,3 @@
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Meceqs.Internal;
@@ -21,14 +20,9 @@ namespace Meceqs.Sending
             IMessageCorrelator messageCorrelator,
             IMessageSendingMediator sendingMediator)
         {
-            if (envelope == null)
-                throw new ArgumentNullException(nameof(envelope));
-
-            if (messageCorrelator == null)
-                throw new ArgumentNullException(nameof(messageCorrelator));
-
-            if (sendingMediator == null)
-                throw new ArgumentNullException(nameof(sendingMediator));
+            Check.NotNull(envelope, nameof(envelope));
+            Check.NotNull(messageCorrelator, nameof(messageCorrelator));
+            Check.NotNull(sendingMediator, nameof(sendingMediator));
 
             _envelope = envelope;
             _messageCorrelator = messageCorrelator;

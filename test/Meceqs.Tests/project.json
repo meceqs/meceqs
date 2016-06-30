@@ -10,6 +10,7 @@
   "dependencies": {
     "Meceqs": "1.0.0-*",
     "Meceqs.AzureServiceBus": "1.0.0-*",
+    "Meceqs.Serializer.Json": "1.0.0-*",
 
     "Microsoft.Extensions.DependencyInjection": "1.0.0",
     "NSubstitute": "1.10.0",

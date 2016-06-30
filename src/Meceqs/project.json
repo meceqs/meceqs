@@ -8,17 +8,19 @@
   "dependencies": {
     "Meceqs.ContractAbstractions": "1.0.0-*",
 
-    "NETStandard.Library": "1.6.0",
-    "Microsoft.CSharp": "4.0.1",
-    "System.ComponentModel": "4.0.1",
-    "System.Security.Claims": "4.0.1",
-
     "Microsoft.Extensions.DependencyInjection.Abstractions": "1.0.0",
     "Microsoft.Extensions.Logging.Abstractions": "1.0.0",
     "Microsoft.Extensions.Options": "1.0.0"
   },
 
   "frameworks": {
-    "netstandard1.3": { }
+    "netstandard1.3": {
+      "dependencies": {
+        "Microsoft.CSharp": "4.0.1",
+        "NETStandard.Library": "1.6.0",
+        "System.ComponentModel": "4.0.1",
+        "System.Security.Claims": "4.0.1"
+      }
+    }
   }
 }

@@ -4,5 +4,6 @@ namespace Meceqs.AzureServiceBus.Internal
     {
         public const int BrokeredMessageHandleStarting = 1;
         public const int BrokeredMessageHandleFinished = 2;
+        public const int BrokeredMessageHandleFailed = 3;
     }
 }

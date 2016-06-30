@@ -14,7 +14,7 @@ namespace Meceqs.Tests.AzureServiceBus
             BrokeredMessage brokeredMessage = new BrokeredMessage(sentEnvelope);
 
             // Act
-            var converter = new DefaultBrokeredMessageConverter();
+            var converter = new DefaultBrokeredMessageConverter(null, null);
             var receivedEnvelope = converter.ConvertToEnvelope(brokeredMessage);
 
             // Assert

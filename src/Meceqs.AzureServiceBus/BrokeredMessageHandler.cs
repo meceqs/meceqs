@@ -16,11 +16,8 @@ namespace Meceqs.AzureServiceBus
 
         public BrokeredMessageHandler(ILoggerFactory loggerFactory, IServiceScopeFactory serviceScopeFactory)
         {
-            if (loggerFactory == null)
-                throw new ArgumentNullException(nameof(loggerFactory));
-
-            if (serviceScopeFactory == null)
-                throw new ArgumentNullException(nameof(serviceScopeFactory));
+            Check.NotNull(loggerFactory, nameof(loggerFactory));
+            Check.NotNull(serviceScopeFactory, nameof(serviceScopeFactory));
 
             _logger = loggerFactory.CreateLogger<BrokeredMessageHandler>();
             _serviceScopeFactory = serviceScopeFactory;
@@ -28,8 +25,7 @@ namespace Meceqs.AzureServiceBus
 
         public async Task HandleAsync(BrokeredMessage brokeredMessage, CancellationToken cancellation)
         {
-            if (brokeredMessage == null)
-                throw new ArgumentNullException(nameof(brokeredMessage));
+            Check.NotNull(brokeredMessage, nameof(brokeredMessage));
 
             // Make sure each log message contains data about the currently processed message.
             using (_logger.BrokeredMessageScope(brokeredMessage))
@@ -49,7 +45,8 @@ namespace Meceqs.AzureServiceBus
                 catch (Exception ex)
                 {
                     success = false;
-                    _logger.LogError(0, ex, "Exception occured while handling message");
+
+                    _logger.HandleFailed(brokeredMessage, ex);
 
                     await brokeredMessage.AbandonAsync();
                 }

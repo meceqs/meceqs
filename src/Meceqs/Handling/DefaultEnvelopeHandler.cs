@@ -17,11 +17,8 @@ namespace Meceqs.Handling
 
         public DefaultEnvelopeHandler(IServiceProvider serviceProvider, IHandleInvoker handleInvoker)
         {
-            if (serviceProvider == null)
-                throw new ArgumentNullException(nameof(serviceProvider));
-
-            if (handleInvoker == null)
-                throw new ArgumentNullException(nameof(handleInvoker));
+            Check.NotNull(serviceProvider, nameof(serviceProvider));
+            Check.NotNull(handleInvoker, nameof(handleInvoker));
 
             _serviceProvider = serviceProvider;
             _handleInvoker = handleInvoker;
@@ -30,8 +27,7 @@ namespace Meceqs.Handling
         public Task<TResult> HandleAsync<TMessage, TResult>(Envelope<TMessage> envelope, CancellationToken cancellation)
             where TMessage : IMessage
         {
-            if (envelope == null)
-                throw new ArgumentNullException(nameof(envelope));
+            Check.NotNull(envelope, nameof(envelope));
 
             // There's no point in processing a message if the most basic values are missing.
             envelope.EnsureValid();

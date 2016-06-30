@@ -30,6 +30,11 @@ namespace Microsoft.Extensions.Logging
             }
         }
 
+        public static void HandleFailed(this ILogger logger, BrokeredMessage message, Exception ex)
+        {
+            logger.LogError(LoggerEventIds.BrokeredMessageHandleFailed, ex, "Handle failed with exception");
+        }
+
         public static void HandleFinished(this ILogger logger, bool success, long startTimestamp, long currentTimestamp)
         {
             // Don't log if Information logging wasn't enabled at start or end of request as time will be wildly wrong.
