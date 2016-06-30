@@ -31,6 +31,7 @@ namespace Meceqs.AzureServiceBus
             if (brokeredMessage == null)
                 throw new ArgumentNullException(nameof(brokeredMessage));
 
+            // Make sure each log message contains data about the currently processed message.
             using (_logger.BrokeredMessageScope(brokeredMessage))
             {
                 _logger.HandleStarting(brokeredMessage);

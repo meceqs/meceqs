@@ -28,7 +28,7 @@ namespace Meceqs.Handling
 
             // This trick with "dynamic" has "good enough" performance for now. It could probably be optimized further,
             // but it's already a lot faster than regular reflection.
-            // (see ReflectionTest.cs in test project for a benchmark test)
+            // (see "Meceqs.Tests.Performance" in test project for a benchmark test)
 
             var dynamicEnvelope = (dynamic)envelope;
 

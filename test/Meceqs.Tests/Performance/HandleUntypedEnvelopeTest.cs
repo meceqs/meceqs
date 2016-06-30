@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 using Meceqs.Handling;
 using Xunit;
 
-namespace Meceqs.Tests
+namespace Meceqs.Tests.Performance
 {
     // Make class public to actually run it.
 
-    internal class ReflectionTest
+    internal class HandleUntypedEnvelopeTest
     {
         public class DummyMediator : IEnvelopeHandler
         {
@@ -45,7 +45,7 @@ namespace Meceqs.Tests
             
             // Direct
             
-            await RunTimed("Direct", loopCount, async () => 
+            await RunTimed("Direct Typed", loopCount, async () => 
             {
                 await mediator.HandleAsync(envelope, CancellationToken.None);
             });

@@ -1,11 +1,9 @@
-using System;
-
 namespace Meceqs
 {
     public interface IEnvelopeSerializer
     {
         byte[] Serialize(Envelope envelope);
 
-        Envelope Deserialize(byte[] serializedObject, Type messageType);
+        Envelope Deserialize(byte[] serializedObject, string messageType);
     }
 }
