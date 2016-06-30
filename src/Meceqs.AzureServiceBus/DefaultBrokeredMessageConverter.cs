@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Text;
 using Microsoft.ServiceBus.Messaging;
 
 namespace Meceqs.AzureServiceBus
@@ -23,14 +22,18 @@ namespace Meceqs.AzureServiceBus
         {
             Check.NotNull(envelope, nameof(envelope));
 
-            string serializedEnvelope = _envelopeSerializer.Serialize(envelope);
-            MemoryStream payloadStream = new MemoryStream(Encoding.UTF8.GetBytes(serializedEnvelope));
+            byte[] serializedEnvelope = _envelopeSerializer.Serialize(envelope);
+            MemoryStream payloadStream = new MemoryStream(serializedEnvelope);
 
             BrokeredMessage brokeredMessage = new BrokeredMessage(payloadStream, ownsStream: true);
 
-            // TODO @cweiss write used serializer into properties to allow consumers to select the correct deserializer.
+            // Content-Type is written to both locations to be consistent with other transports that only have header-dictionaries.
+            brokeredMessage.ContentType = _envelopeSerializer.ContentType;
+            brokeredMessage.Properties[TransportHeaderNames.ContentType] = _envelopeSerializer.ContentType;
 
-            brokeredMessage.ContentType = envelope.MessageType;
+            brokeredMessage.Properties[TransportHeaderNames.MessageId] = envelope.MessageId;
+            brokeredMessage.Properties[TransportHeaderNames.MessageName] = envelope.MessageName;
+            brokeredMessage.Properties[TransportHeaderNames.MessageType] = envelope.MessageType;
 
             return brokeredMessage;
         }
@@ -43,7 +46,7 @@ namespace Meceqs.AzureServiceBus
             string messageType = brokeredMessage.ContentType;
             Type envelopeType = _envelopeTypeConverter.ConvertToEnvelopeType(messageType);
 
-            string serializedEnvelope = brokeredMessage.GetBody<string>();
+            Stream serializedEnvelope = brokeredMessage.GetBody<Stream>();
 
             return _envelopeSerializer.Deserialize(serializedEnvelope, envelopeType);
         }

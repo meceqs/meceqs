@@ -1,11 +1,14 @@
 using System;
+using System.IO;
 
 namespace Meceqs
 {
     public interface IEnvelopeSerializer
     {
-        string Serialize(Envelope envelope);
+        string ContentType { get; }
 
-        Envelope Deserialize(string serializedEnvelope, Type envelopeType);
+        byte[] Serialize(Envelope envelope);
+
+        Envelope Deserialize(Stream serializedEnvelope, Type envelopeType);
     }
 }
