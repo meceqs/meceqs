@@ -6,16 +6,16 @@ namespace Meceqs.AzureServiceBus
 {
     public class DefaultBrokeredMessageConverter : IBrokeredMessageConverter
     {
-        private readonly IEnvelopeTypeConverter _envelopeTypeConverter;
         private readonly IEnvelopeSerializer _envelopeSerializer;
+        private readonly IEnvelopeTypeLoader _envelopeTypeLoader;
 
-        public DefaultBrokeredMessageConverter(IEnvelopeTypeConverter envelopeTypeConverter, IEnvelopeSerializer envelopeSerializer)
+        public DefaultBrokeredMessageConverter(IEnvelopeSerializer envelopeSerializer, IEnvelopeTypeLoader envelopeTypeLoader)
         {
-            Check.NotNull(envelopeTypeConverter, nameof(envelopeTypeConverter));
             Check.NotNull(envelopeSerializer, nameof(envelopeSerializer));
+            Check.NotNull(envelopeTypeLoader, nameof(envelopeTypeLoader));
 
-            _envelopeTypeConverter = envelopeTypeConverter;
             _envelopeSerializer = envelopeSerializer;
+            _envelopeTypeLoader = envelopeTypeLoader;
         }
 
         public BrokeredMessage ConvertToBrokeredMessage(Envelope envelope)
@@ -43,8 +43,8 @@ namespace Meceqs.AzureServiceBus
             Check.NotNull(brokeredMessage, nameof(brokeredMessage));
 
             // TODO @cweiss validations?
-            string messageType = brokeredMessage.ContentType;
-            Type envelopeType = _envelopeTypeConverter.ConvertToEnvelopeType(messageType);
+            string messageType = (string)brokeredMessage.Properties[TransportHeaderNames.MessageType];
+            Type envelopeType = _envelopeTypeLoader.LoadEnvelopeType(messageType);
 
             Stream serializedEnvelope = brokeredMessage.GetBody<Stream>();
 

@@ -5,7 +5,7 @@ using Xunit;
 
 namespace Meceqs.Tests.Performance
 {
-    public class TypedMethodOnExistingObjectTest
+    internal class TypedMethodOnExistingObjectTest
     {
         public class BrokeredMessage
         {

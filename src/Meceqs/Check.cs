@@ -15,5 +15,14 @@ namespace Meceqs
                 throw new ArgumentNullException(parameterName);
             }
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void NotEmpty(Guid value, string parameterName)
+        {
+            if (value == Guid.Empty)
+            {
+                throw new ArgumentNullException(parameterName);
+            }
+        }
     }
 }

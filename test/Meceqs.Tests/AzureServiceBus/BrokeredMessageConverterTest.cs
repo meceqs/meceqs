@@ -4,7 +4,7 @@ using Xunit;
 
 namespace Meceqs.Tests.AzureServiceBus
 {
-    public class DefaultBrokeredMessageConverterTest
+    public class BrokeredMessageConverterTest
     {
         [Fact]
         public void bla()

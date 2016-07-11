@@ -18,6 +18,7 @@ namespace Meceqs
             where TMessage : IMessage
         {
             Check.NotNull(message, nameof(message));
+            Check.NotEmpty(messageId, nameof(messageId));
 
             Type messageType = message.GetType();
 
@@ -35,9 +36,9 @@ namespace Meceqs
                 CorrelationId = Guid.NewGuid()
             };
 
-            envelope.Headers.SetValue(MessageHeaderNames.CreatedOnUtc, DateTime.UtcNow);
-            envelope.Headers.SetValue(MessageHeaderNames.SourceApplication, _applicationInfo.ApplicationName);
-            envelope.Headers.SetValue(MessageHeaderNames.SourceHost, _applicationInfo.HostName);
+            envelope.SetHeader(MessageHeaderNames.CreatedOnUtc, DateTime.UtcNow);
+            envelope.SetHeader(MessageHeaderNames.SourceApplication, _applicationInfo.ApplicationName);
+            envelope.SetHeader(MessageHeaderNames.SourceHost, _applicationInfo.HostName);
 
             return envelope;
         }

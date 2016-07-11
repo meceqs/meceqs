@@ -6,18 +6,18 @@ namespace Meceqs.AzureServiceBus
 {
     public class DefaultEventDataConverter : IEventDataConverter
     {
-        
 
-        private readonly IEnvelopeTypeConverter _envelopeTypeConverter;
+
         private readonly IEnvelopeSerializer _envelopeSerializer;
+        private readonly IEnvelopeTypeLoader _envelopeTypeLoader;
 
-        public DefaultEventDataConverter(IEnvelopeTypeConverter envelopeTypeConverter, IEnvelopeSerializer envelopeSerializer)
+        public DefaultEventDataConverter(IEnvelopeSerializer envelopeSerializer, IEnvelopeTypeLoader envelopeTypeLoader)
         {
-            Check.NotNull(envelopeTypeConverter, nameof(envelopeTypeConverter));
             Check.NotNull(envelopeSerializer, nameof(envelopeSerializer));
+            Check.NotNull(envelopeTypeLoader, nameof(envelopeTypeLoader));
 
-            _envelopeTypeConverter = envelopeTypeConverter;
             _envelopeSerializer = envelopeSerializer;
+            _envelopeTypeLoader = envelopeTypeLoader;
         }
 
         public EventData ConvertToEventData(Envelope envelope)
@@ -43,7 +43,7 @@ namespace Meceqs.AzureServiceBus
 
             // TODO @cweiss validations?
             string messageType = (string)eventData.Properties[TransportHeaderNames.MessageType];
-            Type envelopeType = _envelopeTypeConverter.ConvertToEnvelopeType(messageType);
+            Type envelopeType = _envelopeTypeLoader.LoadEnvelopeType(messageType);
 
             Stream serializedEnvelope = eventData.GetBodyStream();
 
