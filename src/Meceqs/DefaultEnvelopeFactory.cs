@@ -1,5 +1,4 @@
 using System;
-using Microsoft.Extensions.Options;
 
 namespace Meceqs
 {
@@ -7,11 +6,11 @@ namespace Meceqs
     {
         private readonly ApplicationInfo _applicationInfo;
 
-        public DefaultEnvelopeFactory(IOptions<ApplicationInfo> applicationInfo)
+        public DefaultEnvelopeFactory(ApplicationInfo applicationInfo)
         {
             Check.NotNull(applicationInfo, nameof(applicationInfo));
 
-            _applicationInfo = applicationInfo.Value;
+            _applicationInfo = applicationInfo;
         }
 
         public Envelope<TMessage> Create<TMessage>(TMessage message, Guid messageId, MessageHeaders headers = null)

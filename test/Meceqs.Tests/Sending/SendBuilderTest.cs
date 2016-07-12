@@ -46,7 +46,7 @@ namespace Meceqs.Tests.Sending
             await builder.SendAsync();
 
             // Assert
-            await sendingMediator.Received(1).SendAsync<SimpleMessage, VoidType>(Arg.Any<SendContext<SimpleMessage>>());
+            await sendingMediator.Received(1).SendAsync<SimpleMessage, VoidType>(Arg.Any<MessageContext<SimpleMessage>>());
         }
 
         [Fact]
@@ -73,7 +73,7 @@ namespace Meceqs.Tests.Sending
 
             // Act
             builder.SetHeader("Key", "Value");
-            var context = builder.BuildSendContext();
+            var context = builder.BuildContext();
 
             // Assert
             Assert.Equal("Value", context.Envelope.Headers["Key"]);
@@ -87,7 +87,7 @@ namespace Meceqs.Tests.Sending
 
             // Act
             builder.SetContextItem("Key", "Value");
-            var context = builder.BuildSendContext();
+            var context = builder.BuildContext();
 
             // Assert
             Assert.Equal("Value", context.GetContextItem<string>("Key"));
@@ -102,7 +102,7 @@ namespace Meceqs.Tests.Sending
 
             // Act
             builder.SetCancellationToken(cancellationSource.Token);
-            var context = builder.BuildSendContext();
+            var context = builder.BuildContext();
 
             // Assert
             Assert.Equal(cancellationSource.Token, context.Cancellation);
@@ -116,7 +116,7 @@ namespace Meceqs.Tests.Sending
             var builder = GetBuilder<SimpleMessage>(envelope);
 
             // Act
-            var context = builder.BuildSendContext();
+            var context = builder.BuildContext();
 
             // Assert
             Assert.Equal(envelope, context.Envelope);

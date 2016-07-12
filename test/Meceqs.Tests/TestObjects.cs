@@ -1,5 +1,4 @@
 using System;
-using Microsoft.Extensions.Options;
 
 namespace Meceqs.Tests
 {
@@ -12,7 +11,7 @@ namespace Meceqs.Tests
 
         public static IEnvelopeFactory EnvelopeFactory()
         {
-            return new DefaultEnvelopeFactory(Options.Create(ApplicationInfo()));
+            return new DefaultEnvelopeFactory(ApplicationInfo());
         }
 
         public static Envelope<TMessage> Envelope<TMessage>(TMessage message = null, Guid? id = null)

@@ -6,30 +6,23 @@ namespace Meceqs.Sending
 {
     public class DefaultMessageSendingMediator : IMessageSendingMediator
     {
-        private readonly ISendTransportResolver _transportResolver;
+        private readonly ISendTransportFactory _transportFactory;
         private readonly ISendTransportInvoker _transportInvoker;
 
-        public DefaultMessageSendingMediator(IServiceProvider serviceProvider)
-            : this(new DefaultSendTransportResolver(serviceProvider), new DefaultSendTransportInvoker())
+        public DefaultMessageSendingMediator(ISendTransportFactory transportFactory, ISendTransportInvoker transportInvoker)
         {
-        }
-
-        public DefaultMessageSendingMediator(ISendTransportResolver transportResolver, ISendTransportInvoker transportInvoker)
-        {
-            Check.NotNull(transportResolver, nameof(transportResolver));
+            Check.NotNull(transportFactory, nameof(transportFactory));
             Check.NotNull(transportInvoker, nameof(transportInvoker));
 
-            _transportResolver = transportResolver;
+            _transportFactory = transportFactory;
             _transportInvoker = transportInvoker;
         }
 
-        public Task<TResult> SendAsync<TMessage, TResult>(SendContext<TMessage> context) where TMessage : IMessage
+        public Task<TResult> SendAsync<TMessage, TResult>(MessageContext<TMessage> context) where TMessage : IMessage
         {
             Check.NotNull(context, nameof(context));
 
-            // This doesn't use the ServiceProvider directly because we want to give people the opportunity
-            // to resolve the transport based on the context (e.g. based on a ContextData-value).
-            var transport = _transportResolver.Resolve<TMessage>(context);
+            var transport = _transportFactory.CreateSendTransport<TMessage>(context);
             if (transport == null)
             {
                 throw new InvalidOperationException($"No transport found for '{typeof(TMessage)}'");

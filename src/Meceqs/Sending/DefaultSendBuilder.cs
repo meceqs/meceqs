@@ -1,6 +1,5 @@
 using System.Threading;
 using System.Threading.Tasks;
-using Meceqs.Internal;
 
 namespace Meceqs.Sending
 {
@@ -11,7 +10,7 @@ namespace Meceqs.Sending
         private readonly IMessageSendingMediator _sendingMediator;
 
         private readonly Envelope<TMessage> _envelope;
-        private readonly ContextData _sendContextData = new ContextData();
+        private readonly MessageContextData _contextData = new MessageContextData();
 
         private CancellationToken _cancellation = CancellationToken.None;
 
@@ -49,13 +48,13 @@ namespace Meceqs.Sending
 
         public ISendBuilder<TMessage> SetContextItem(string key, object value)
         {
-            _sendContextData.Set(key, value);
+            _contextData.Set(key, value);
             return this;
         }
 
-        public SendContext<TMessage> BuildSendContext()
+        public MessageContext<TMessage> BuildContext()
         {
-            return new SendContext<TMessage>(_envelope, _sendContextData, _cancellation);
+            return new MessageContext<TMessage>(_envelope, _contextData, _cancellation);
         }
 
         public Task SendAsync()
@@ -65,8 +64,8 @@ namespace Meceqs.Sending
 
         public Task<TResult> SendAsync<TResult>()
         {
-            var sendContext = BuildSendContext();
-            return _sendingMediator.SendAsync<TMessage, TResult>(sendContext);
+            var context = BuildContext();
+            return _sendingMediator.SendAsync<TMessage, TResult>(context);
         }
     }
 }

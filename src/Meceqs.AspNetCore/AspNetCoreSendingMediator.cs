@@ -21,7 +21,7 @@ namespace Meceqs.AspNetCore
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public Task<TResult> SendAsync<TMessage, TResult>(SendContext<TMessage> context) where TMessage : IMessage
+        public Task<TResult> SendAsync<TMessage, TResult>(MessageContext<TMessage> context) where TMessage : IMessage
         {
             Check.NotNull(context, nameof(context));
 

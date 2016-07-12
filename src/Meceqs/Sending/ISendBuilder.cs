@@ -13,7 +13,7 @@ namespace Meceqs.Sending
 
         ISendBuilder<TMessage> SetContextItem(string key, object value);
 
-        SendContext<TMessage> BuildSendContext();
+        MessageContext<TMessage> BuildContext();
 
         Task SendAsync();
 

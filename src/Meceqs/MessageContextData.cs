@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 
-namespace Meceqs.Internal
+namespace Meceqs
 {
-    public class ContextData : Dictionary<string, object>
+    public class MessageContextData : Dictionary<string, object>
     {
         public void Set(string key, object value)
         {

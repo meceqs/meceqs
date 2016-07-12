@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Reflection;
 using Xunit;
 
@@ -9,12 +8,10 @@ namespace Meceqs.Tests
     {
         private IEnvelopeTypeLoader GetEnvelopeTypeLoader()
         {
-            var assemblies = new List<Assembly>
-            {
-                Assembly.GetExecutingAssembly()
-            };
+            var typeLoader = new DefaultEnvelopeTypeLoader();
+            typeLoader.AddContractAssemblies(Assembly.GetExecutingAssembly());
 
-            return new DefaultEnvelopeTypeLoader(assemblies);
+            return typeLoader;
         }
 
         [Fact]

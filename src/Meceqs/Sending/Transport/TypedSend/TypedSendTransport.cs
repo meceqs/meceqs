@@ -5,24 +5,24 @@ namespace Meceqs.Sending.Transport.TypedSend
 {
     public class TypedSendTransport : ISendTransport
     {
-        private readonly IServiceProvider _serviceProvider;
+        private readonly ISenderFactory _senderFactory;
 
-        public TypedSendTransport(IServiceProvider serviceProvider)
+        public TypedSendTransport(ISenderFactory senderFactory)
         {
-            Check.NotNull(serviceProvider, nameof(serviceProvider));
+            Check.NotNull(senderFactory, nameof(senderFactory));
 
-            _serviceProvider = serviceProvider;
+            _senderFactory = senderFactory;
         }
 
-        public Task<TResult> SendAsync<TMessage, TResult>(SendContext<TMessage> context) where TMessage : IMessage
+        public Task<TResult> SendAsync<TMessage, TResult>(MessageContext<TMessage> context) where TMessage : IMessage
         {
-            var sendHandler = (ISends<TMessage, TResult>)_serviceProvider.GetService(typeof(ISends<TMessage, TResult>));
-            if (sendHandler == null)
+            var sender = _senderFactory.CreateSender<TMessage, TResult>();
+            if (sender == null)
             {
-                throw new InvalidOperationException($"No implementation found for '{typeof(TMessage)}/{typeof(TResult)}'");
+                throw new InvalidOperationException($"No sender found for '{typeof(TMessage)}/{typeof(TResult)}'");
             }
 
-            return sendHandler.SendAsync(context);
+            return sender.SendAsync(context);
         }
     }
 }

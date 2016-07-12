@@ -1,9 +1,8 @@
 using System.Threading;
 using System.Threading.Tasks;
-using Meceqs.Internal;
-using Meceqs.Sending;
 using Meceqs.Sending.Transport;
 using Meceqs.Sending.Transport.TypedSend;
+using Meceqs.ServiceProviderIntegration;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using Xunit;
@@ -15,22 +14,23 @@ namespace Meceqs.Tests.Sending
         private ISendTransport GetTransport(IServiceCollection services)
         {
             var serviceProvider = services.BuildServiceProvider();
+            var serviceProviderFactory = new ServiceProviderFactory(serviceProvider);
 
-            return new TypedSendTransport(serviceProvider);
+            return new TypedSendTransport(serviceProviderFactory);
         }
 
-        private SendContext<TMessage> GetSendContext<TMessage>()
+        private MessageContext<TMessage> GetSendContext<TMessage>()
             where TMessage : class, IMessage, new()
         {
             var envelope = TestObjects.Envelope<TMessage>();
-            return new SendContext<TMessage>(envelope, new ContextData(), CancellationToken.None);
+            return new MessageContext<TMessage>(envelope, new MessageContextData(), CancellationToken.None);
         }
 
         [Fact]
         public async Task Calls_Matching_Handler()
         {
             // Arrange
-            var handler = Substitute.For<ISends<SimpleMessage, string>>();
+            var handler = Substitute.For<ISender<SimpleMessage, string>>();
             var services = new ServiceCollection().AddSingleton(handler);
             var transport = GetTransport(services);
 

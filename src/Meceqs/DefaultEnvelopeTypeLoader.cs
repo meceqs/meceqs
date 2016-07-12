@@ -8,15 +8,22 @@ namespace Meceqs
 {
     public class DefaultEnvelopeTypeLoader : IEnvelopeTypeLoader
     {
-        private readonly IList<Assembly> _contractAssemblies;
+        private readonly IList<Assembly> _contractAssemblies = new List<Assembly>();
 
         private readonly ConcurrentDictionary<string, Type> _typeCache = new ConcurrentDictionary<string, Type>();
 
-        public DefaultEnvelopeTypeLoader(IList<Assembly> contractAssemblies)
+        public void AddContractAssemblies(params Assembly[] assemblies)
         {
-            Check.NotNull(contractAssemblies, nameof(contractAssemblies));
+            // Building the list of assemblies is expected to be done at startup and therefore
+            // doesn't need to be thread-safe.
 
-            _contractAssemblies = contractAssemblies;
+            foreach (var assembly in assemblies)
+            {
+                if (!_contractAssemblies.Contains(assembly))
+                {
+                    _contractAssemblies.Add(assembly);
+                }
+            }
         }
 
         public Type LoadEnvelopeType(string messageType)

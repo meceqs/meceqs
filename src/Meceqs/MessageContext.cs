@@ -1,10 +1,10 @@
 using System.Threading;
 
-namespace Meceqs.Internal
+namespace Meceqs
 {
-    public abstract class ContextBase<TMessage> where TMessage : IMessage
+    public class MessageContext<TMessage> where TMessage : IMessage
     {
-        private readonly ContextData _data;
+        private readonly MessageContextData _data;
 
         public CancellationToken Cancellation { get; set; } // setter allows decorators to change the token (for whatever reason).
 
@@ -12,12 +12,12 @@ namespace Meceqs.Internal
 
         public TMessage Message => Envelope.Message; // just for easier access to the property
 
-        protected ContextBase(Envelope<TMessage> envelope, ContextData contextData, CancellationToken cancellation)
+        public MessageContext(Envelope<TMessage> envelope, MessageContextData contextData, CancellationToken cancellation)
         {
             Check.NotNull(envelope, nameof(envelope));
 
             Envelope = envelope;
-            _data = contextData ?? new ContextData();
+            _data = contextData ?? new MessageContextData();
             Cancellation = cancellation;
         }
 

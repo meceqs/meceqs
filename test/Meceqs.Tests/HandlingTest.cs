@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Meceqs.Handling;
+using Meceqs.ServiceProviderIntegration;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using Xunit;
@@ -15,9 +16,9 @@ namespace Meceqs.Tests
             public string Property { get; set; }
         }
 
-        public class MyCommandHandler : IHandles<MyCommand, VoidType>
+        public class MyCommandHandler : IHandler<MyCommand, VoidType>
         {
-            public Task<VoidType> HandleAsync(HandleContext<MyCommand> ctx)
+            public Task<VoidType> HandleAsync(MessageContext<MyCommand> ctx)
             {
                 throw new NotImplementedException();
             }
@@ -26,8 +27,9 @@ namespace Meceqs.Tests
         private IEnvelopeHandler GetMediator(IServiceCollection services)
         {
             var serviceProvider = services.BuildServiceProvider();
-
-            return new DefaultEnvelopeHandler(serviceProvider);
+            
+            var handlerFactory = new ServiceProviderFactory(serviceProvider);
+            return new DefaultEnvelopeHandler(handlerFactory, new DefaultHandlerInvoker());
         }
 
         [Fact]
@@ -35,7 +37,7 @@ namespace Meceqs.Tests
         {
             // Arrange
 
-            var handler = Substitute.For<IHandles<MyCommand, VoidType>>();
+            var handler = Substitute.For<IHandler<MyCommand, VoidType>>();
 
             var services = new ServiceCollection().AddSingleton(handler);
 
@@ -47,7 +49,7 @@ namespace Meceqs.Tests
             await mediator.HandleAsync(envelope, CancellationToken.None);
 
             // Assert
-            await handler.Received(1).HandleAsync(Arg.Any<HandleContext<MyCommand>>());
+            await handler.Received(1).HandleAsync(Arg.Any<MessageContext<MyCommand>>());
         }
     }
 }

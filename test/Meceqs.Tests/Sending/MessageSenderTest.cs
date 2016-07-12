@@ -44,7 +44,7 @@ namespace Meceqs.Tests.Sending
                 .SendAsync<string>();
 
             // Assert
-            await sendingMediator.ReceivedWithAnyArgs(1).SendAsync<SimpleEvent, string>(Arg.Any<SendContext<SimpleEvent>>());
+            await sendingMediator.ReceivedWithAnyArgs(1).SendAsync<SimpleEvent, string>(Arg.Any<MessageContext<SimpleEvent>>());
         }
 
         [Fact]
@@ -64,8 +64,8 @@ namespace Meceqs.Tests.Sending
             var sender = GetSender(sendingMediator: sendingMediator);
             var cancellationSource = new CancellationTokenSource();
 
-            SendContext<SimpleEvent> sendContext = null;
-            await sendingMediator.SendAsync<SimpleEvent, string>(Arg.Do<SendContext<SimpleEvent>>(x => sendContext = x));
+            MessageContext<SimpleEvent> sendContext = null;
+            await sendingMediator.SendAsync<SimpleEvent, string>(Arg.Do<MessageContext<SimpleEvent>>(x => sendContext = x));
 
             // Act
 
@@ -77,7 +77,7 @@ namespace Meceqs.Tests.Sending
 
             // Assert
 
-            await sendingMediator.ReceivedWithAnyArgs(1).SendAsync<SimpleEvent, string>(Arg.Any<SendContext<SimpleEvent>>());
+            await sendingMediator.ReceivedWithAnyArgs(1).SendAsync<SimpleEvent, string>(Arg.Any<MessageContext<SimpleEvent>>());
 
             Assert.NotNull(sendContext);
             Assert.Equal(resultEventId, sendContext.Envelope.MessageId);
