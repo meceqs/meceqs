@@ -1,16 +1,17 @@
 using System;
+using Microsoft.Extensions.Options;
 
 namespace Meceqs
 {
     public class DefaultEnvelopeFactory : IEnvelopeFactory
     {
-        private readonly ApplicationInfo _applicationInfo;
+        private readonly MeceqsOptions _options;
 
-        public DefaultEnvelopeFactory(ApplicationInfo applicationInfo)
+        public DefaultEnvelopeFactory(IOptions<MeceqsOptions> options)
         {
-            Check.NotNull(applicationInfo, nameof(applicationInfo));
+            Check.NotNull(options, nameof(options));
 
-            _applicationInfo = applicationInfo;
+            _options = options.Value;
         }
 
         public Envelope<TMessage> Create<TMessage>(TMessage message, Guid messageId, MessageHeaders headers = null)
@@ -35,9 +36,10 @@ namespace Meceqs
                 CorrelationId = Guid.NewGuid()
             };
 
-            envelope.SetHeader(MessageHeaderNames.CreatedOnUtc, DateTime.UtcNow);
-            envelope.SetHeader(MessageHeaderNames.SourceApplication, _applicationInfo.ApplicationName);
-            envelope.SetHeader(MessageHeaderNames.SourceHost, _applicationInfo.HostName);
+            envelope.SetHeader(MessageHeaderNames.CreatedOnUtc, DateTime.UtcNow); // TODO @cweiss IClock?
+
+            envelope.SetHeader(MessageHeaderNames.SourceApplication, _options.ApplicationName);
+            envelope.SetHeader(MessageHeaderNames.SourceHost, _options.HostName);
 
             return envelope;
         }

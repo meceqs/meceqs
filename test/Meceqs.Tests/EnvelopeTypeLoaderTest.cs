@@ -1,5 +1,6 @@
 using System;
 using System.Reflection;
+using Microsoft.Extensions.Options;
 using Xunit;
 
 namespace Meceqs.Tests
@@ -8,8 +9,9 @@ namespace Meceqs.Tests
     {
         private IEnvelopeTypeLoader GetEnvelopeTypeLoader()
         {
-            var typeLoader = new DefaultEnvelopeTypeLoader();
-            typeLoader.AddContractAssemblies(Assembly.GetExecutingAssembly());
+            var options = new MeceqsOptions();
+            options.ContractAssemblies.Add(Assembly.GetExecutingAssembly());
+            var typeLoader = new DefaultEnvelopeTypeLoader(Options.Create(options));
 
             return typeLoader;
         }

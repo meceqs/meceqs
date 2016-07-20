@@ -1,17 +1,18 @@
 using System;
+using Microsoft.Extensions.Options;
 
 namespace Meceqs.Tests
 {
     public class TestObjects
     {
-        public static ApplicationInfo ApplicationInfo()
+        public static MeceqsOptions MeceqsOptions()
         {
-            return new ApplicationInfo { ApplicationName = "TestApp", HostName = "TestMachine" };
+            return new MeceqsOptions { ApplicationName = "TestApp", HostName = "TestMachine" };
         }
 
         public static IEnvelopeFactory EnvelopeFactory()
         {
-            return new DefaultEnvelopeFactory(ApplicationInfo());
+            return new DefaultEnvelopeFactory(Options.Create(MeceqsOptions()));
         }
 
         public static Envelope<TMessage> Envelope<TMessage>(TMessage message = null, Guid? id = null)
