@@ -1,4 +1,4 @@
-namespace Meceqs.Sending.Transport.TypedSend
+namespace Meceqs.Sending.TypedSend
 {
     public interface ISenderFactory
     {

@@ -1,6 +1,6 @@
 namespace Meceqs.Sending
 {
-    public interface IMessageCorrelator
+    public interface IEnvelopeCorrelator
     {
         void CorrelateSourceWithTarget(Envelope source, Envelope target);
     }

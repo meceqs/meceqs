@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using Meceqs.Handling;
 using Microsoft.ServiceBus.Messaging;
 
 namespace Meceqs.AzureServiceBus

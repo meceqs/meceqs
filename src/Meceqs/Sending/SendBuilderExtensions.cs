@@ -2,20 +2,18 @@ namespace Meceqs.Sending
 {
     public static class SendBuilderExtensions
     {
-        public static ISendBuilder<TMessage> SetCreationReason<TMessage>(this ISendBuilder<TMessage> sender, string reason)
-            where TMessage : IMessage
+        public static ISendBuilder SetCreationReason(this ISendBuilder sendBuilder, string reason)
         {
-            Check.NotNull(sender, nameof(sender));
+            Check.NotNull(sendBuilder, nameof(sendBuilder));
 
-            return sender.SetHeader(MessageHeaderNames.CreationReason, reason);
+            return sendBuilder.SetHeader(MessageHeaderNames.CreationReason, reason);
         }
 
-        public static ISendBuilder<TMessage> UsePartitionKey<TMessage>(this ISendBuilder<TMessage> sender, object partitionKey)
-            where TMessage : IMessage
+        public static ISendBuilder UsePartitionKey(this ISendBuilder sendBuilder, object partitionKey)
         {
-            Check.NotNull(sender, nameof(sender));
+            Check.NotNull(sendBuilder, nameof(sendBuilder));
 
-            return sender.SetContextItem("PartitionKey", partitionKey);
+            return sendBuilder.SetContextItem("PartitionKey", partitionKey);
         }
     }
 }

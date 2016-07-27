@@ -1,6 +1,5 @@
 using System;
 using System.Threading.Tasks;
-using Meceqs.Sending.Transport;
 
 namespace Meceqs.Sending
 {
@@ -18,19 +17,19 @@ namespace Meceqs.Sending
             _transportInvoker = transportInvoker;
         }
 
-        public Task<TResult> SendAsync<TMessage, TResult>(MessageContext<TMessage> context) where TMessage : IMessage
+        public Task<TResult> SendAsync<TResult>(MessageContext context)
         {
             Check.NotNull(context, nameof(context));
 
-            var transport = _transportFactory.CreateSendTransport<TMessage>(context);
+            var transport = _transportFactory.CreateSendTransport(context);
             if (transport == null)
             {
-                throw new InvalidOperationException($"No transport found for '{typeof(TMessage)}'");
+                throw new InvalidOperationException($"No transport found for message type '{context.Message.GetType()}'");
             }
 
             // Having another component which actually calls the transport
             // allows people to use decorators that already know about the correct transport.
-            return _transportInvoker.InvokeSendAsync<TMessage, TResult>(transport, context);
+            return _transportInvoker.InvokeSendAsync<TResult>(transport, context);
         }
     }
 }

@@ -1,6 +1,6 @@
 using System;
 
-namespace Meceqs
+namespace Meceqs.Handling
 {
     public interface IEnvelopeTypeLoader
     {

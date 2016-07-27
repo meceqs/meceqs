@@ -37,8 +37,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IHandlerInvoker, DefaultHandlerInvoker>();
 
             // Sending
-            services.AddSingleton<IMessageCorrelator, DefaultMessageCorrelator>();
-            services.AddTransient<IMessageSender, DefaultMessageSender>();
+            services.AddSingleton<IEnvelopeCorrelator, DefaultEnvelopeCorrelator>();
+            services.AddTransient<IMeceqsSender, DefaultMeceqsSender>();
             services.AddTransient<IMessageSendingMediator, DefaultMessageSendingMediator>();
 
             return new MeceqsBuilder(services);

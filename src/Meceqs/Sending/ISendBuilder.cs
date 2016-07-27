@@ -3,17 +3,15 @@ using System.Threading.Tasks;
 
 namespace Meceqs.Sending
 {
-    public interface ISendBuilder<TMessage> where TMessage : IMessage
+    public interface ISendBuilder
     {
-        ISendBuilder<TMessage> CorrelateWith(Envelope source);
+        ISendBuilder CorrelateWith(Envelope source);
 
-        ISendBuilder<TMessage> SetCancellationToken(CancellationToken cancellation);
+        ISendBuilder SetCancellationToken(CancellationToken cancellation);
 
-        ISendBuilder<TMessage> SetHeader(string headerName, object value);
+        ISendBuilder SetHeader(string headerName, object value);
 
-        ISendBuilder<TMessage> SetContextItem(string key, object value);
-
-        MessageContext<TMessage> BuildContext();
+        ISendBuilder SetContextItem(string key, object value);
 
         Task SendAsync();
 

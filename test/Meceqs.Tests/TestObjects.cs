@@ -1,4 +1,5 @@
 using System;
+using Meceqs.Sending;
 using Microsoft.Extensions.Options;
 
 namespace Meceqs.Tests
@@ -20,7 +21,7 @@ namespace Meceqs.Tests
         {
             message = message ?? new TMessage();
 
-            return EnvelopeFactory().Create(message, id ?? Guid.NewGuid());
+            return (Envelope<TMessage>)EnvelopeFactory().Create(message, id ?? Guid.NewGuid());
         }
     }
 }

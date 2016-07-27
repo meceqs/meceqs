@@ -4,11 +4,11 @@ using Xunit;
 
 namespace Meceqs.Tests.Sending
 {
-    public class MessageCorrelatorTest
+    public class EnvelopeCorrelatorTest
     {
-        private IMessageCorrelator GetCorrelator()
+        private IEnvelopeCorrelator GetCorrelator()
         {
-            return new DefaultMessageCorrelator();
+            return new DefaultEnvelopeCorrelator();
         }
 
         [Fact]

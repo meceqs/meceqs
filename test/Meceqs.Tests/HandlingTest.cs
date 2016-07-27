@@ -2,7 +2,6 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Meceqs.Handling;
-using Meceqs.ServiceProviderIntegration;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using Xunit;
@@ -28,7 +27,7 @@ namespace Meceqs.Tests
         {
             var serviceProvider = services.BuildServiceProvider();
             
-            var handlerFactory = new ServiceProviderFactory(serviceProvider);
+            var handlerFactory = new DefaultHandlerFactory(serviceProvider);
             return new DefaultEnvelopeHandler(handlerFactory, new DefaultHandlerInvoker());
         }
 

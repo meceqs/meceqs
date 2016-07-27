@@ -1,8 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
-using Meceqs.Sending.Transport;
-using Meceqs.Sending.Transport.TypedSend;
-using Meceqs.ServiceProviderIntegration;
+using Meceqs.Sending;
+using Meceqs.Sending.TypedSend;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using Xunit;
@@ -14,9 +13,9 @@ namespace Meceqs.Tests.Sending
         private ISendTransport GetTransport(IServiceCollection services)
         {
             var serviceProvider = services.BuildServiceProvider();
-            var serviceProviderFactory = new ServiceProviderFactory(serviceProvider);
+            var senderFactory = new DefaultSenderFactory(serviceProvider);
 
-            return new TypedSendTransport(serviceProviderFactory);
+            return new TypedSendTransport(new DefaultTypedSendInvoker(), senderFactory);
         }
 
         private MessageContext<TMessage> GetSendContext<TMessage>()
@@ -37,7 +36,7 @@ namespace Meceqs.Tests.Sending
             var sendContext = GetSendContext<SimpleMessage>();
 
             // Act
-            string result = await transport.SendAsync<SimpleMessage, string>(sendContext);
+            string result = await transport.SendAsync<string>(sendContext);
 
             // Assert
             await handler.Received(1).SendAsync(sendContext);

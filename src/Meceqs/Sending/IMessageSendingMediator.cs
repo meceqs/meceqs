@@ -4,17 +4,16 @@ namespace Meceqs.Sending
 {
     public interface IMessageSendingMediator
     {
-        Task<TResult> SendAsync<TMessage, TResult>(MessageContext<TMessage> context) where TMessage : IMessage;
+        Task<TResult> SendAsync<TResult>(MessageContext context);
     }
 
     public static class MessageSendingMediatorExtensions
     {
-        public static Task SendAsync<TMessage>(this IMessageSendingMediator mediator, MessageContext<TMessage> context)
-            where TMessage : IMessage
+        public static Task SendAsync(this IMessageSendingMediator mediator, MessageContext context)
         {
             Check.NotNull(mediator, nameof(mediator));
 
-            return mediator.SendAsync<TMessage, VoidType>(context);
+            return mediator.SendAsync<VoidType>(context);
         }
     }
 }

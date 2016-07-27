@@ -9,24 +9,26 @@ namespace Meceqs.Tests.Sending
 {
     public class MessageSenderTest
     {
-        private IMessageSender GetSender(IMessageCorrelator messageCorrelator = null, IMessageSendingMediator sendingMediator = null)
+        private IMeceqsSender GetSender(IEnvelopeCorrelator envelopeCorrelator = null, IMessageSendingMediator sendingMediator = null)
         {
-            messageCorrelator = messageCorrelator ?? new DefaultMessageCorrelator();
+            envelopeCorrelator = envelopeCorrelator ?? new DefaultEnvelopeCorrelator();
             sendingMediator = sendingMediator ?? Substitute.For<IMessageSendingMediator>();
 
-            return new DefaultMessageSender(TestObjects.EnvelopeFactory(), messageCorrelator, sendingMediator);
+            return new DefaultMeceqsSender(TestObjects.EnvelopeFactory(), envelopeCorrelator, new DefaultMessageContextFactory(), sendingMediator);
         }
 
         [Fact]
         public void Throws_if_parameters_are_missing()
         {
             var envelopeFactory = Substitute.For<IEnvelopeFactory>();
-            var correlator = Substitute.For<IMessageCorrelator>();
+            var correlator = Substitute.For<IEnvelopeCorrelator>();
+            var messageContextFactory = Substitute.For<IMessageContextFactory>();
             var sendingMediator = Substitute.For<IMessageSendingMediator>();
 
-            Assert.Throws<ArgumentNullException>(() => new DefaultMessageSender(null, correlator, sendingMediator));
-            Assert.Throws<ArgumentNullException>(() => new DefaultMessageSender(envelopeFactory, null, sendingMediator));
-            Assert.Throws<ArgumentNullException>(() => new DefaultMessageSender(envelopeFactory, correlator, null));
+            Assert.Throws<ArgumentNullException>(() => new DefaultMeceqsSender(null, correlator, messageContextFactory, sendingMediator));
+            Assert.Throws<ArgumentNullException>(() => new DefaultMeceqsSender(envelopeFactory, null, messageContextFactory, sendingMediator));
+            Assert.Throws<ArgumentNullException>(() => new DefaultMeceqsSender(envelopeFactory, correlator, null, sendingMediator));
+            Assert.Throws<ArgumentNullException>(() => new DefaultMeceqsSender(envelopeFactory, correlator, messageContextFactory, null));
         }
 
         [Fact]
@@ -44,7 +46,7 @@ namespace Meceqs.Tests.Sending
                 .SendAsync<string>();
 
             // Assert
-            await sendingMediator.ReceivedWithAnyArgs(1).SendAsync<SimpleEvent, string>(Arg.Any<MessageContext<SimpleEvent>>());
+            await sendingMediator.ReceivedWithAnyArgs(1).SendAsync<string>(Arg.Any<MessageContext<SimpleEvent>>());
         }
 
         [Fact]
@@ -65,7 +67,7 @@ namespace Meceqs.Tests.Sending
             var cancellationSource = new CancellationTokenSource();
 
             MessageContext<SimpleEvent> sendContext = null;
-            await sendingMediator.SendAsync<SimpleEvent, string>(Arg.Do<MessageContext<SimpleEvent>>(x => sendContext = x));
+            await sendingMediator.SendAsync<string>(Arg.Do<MessageContext<SimpleEvent>>(x => sendContext = x));
 
             // Act
 
@@ -77,7 +79,7 @@ namespace Meceqs.Tests.Sending
 
             // Assert
 
-            await sendingMediator.ReceivedWithAnyArgs(1).SendAsync<SimpleEvent, string>(Arg.Any<MessageContext<SimpleEvent>>());
+            await sendingMediator.ReceivedWithAnyArgs(1).SendAsync<string>(Arg.Any<MessageContext<SimpleEvent>>());
 
             Assert.NotNull(sendContext);
             Assert.Equal(resultEventId, sendContext.Envelope.MessageId);

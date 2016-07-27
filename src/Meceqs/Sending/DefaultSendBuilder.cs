@@ -1,60 +1,69 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Meceqs.Sending
 {
-    public class DefaultSendBuilder<TMessage> : ISendBuilder<TMessage>
-        where TMessage : IMessage
+    public class DefaultSendBuilder : ISendBuilder
     {
-        private readonly IMessageCorrelator _messageCorrelator;
+        private readonly IEnvelopeCorrelator _envelopeCorrelator;
+        private readonly IMessageContextFactory _messageContextFactory;
         private readonly IMessageSendingMediator _sendingMediator;
 
-        private readonly Envelope<TMessage> _envelope;
+        private readonly IList<Envelope> _envelopes;
         private readonly MessageContextData _contextData = new MessageContextData();
 
         private CancellationToken _cancellation = CancellationToken.None;
 
         public DefaultSendBuilder(
-            Envelope<TMessage> envelope,
-            IMessageCorrelator messageCorrelator,
+            IList<Envelope> envelopes,
+            IEnvelopeCorrelator envelopeCorrelator,
+            IMessageContextFactory messageContextFactory,
             IMessageSendingMediator sendingMediator)
         {
-            Check.NotNull(envelope, nameof(envelope));
-            Check.NotNull(messageCorrelator, nameof(messageCorrelator));
+            Check.NotNull(envelopes, nameof(envelopes));
+            Check.NotNull(envelopeCorrelator, nameof(envelopeCorrelator));
+            Check.NotNull(messageContextFactory, nameof(messageContextFactory));
             Check.NotNull(sendingMediator, nameof(sendingMediator));
 
-            _envelope = envelope;
-            _messageCorrelator = messageCorrelator;
+            _envelopes = envelopes;
+            _envelopeCorrelator = envelopeCorrelator;
+            _messageContextFactory = messageContextFactory;
             _sendingMediator = sendingMediator;
         }
 
-        public ISendBuilder<TMessage> CorrelateWith(Envelope source)
+        public ISendBuilder CorrelateWith(Envelope source)
         {
-            _messageCorrelator.CorrelateSourceWithTarget(source, _envelope);
+            foreach (var envelope in _envelopes)
+            {
+                _envelopeCorrelator.CorrelateSourceWithTarget(source, envelope);
+            }
+
             return this;
         }
 
-        public ISendBuilder<TMessage> SetCancellationToken(CancellationToken cancellation)
+        public ISendBuilder SetCancellationToken(CancellationToken cancellation)
         {
             _cancellation = cancellation;
             return this;
         }
 
-        public ISendBuilder<TMessage> SetHeader(string headerName, object value)
+        public ISendBuilder SetHeader(string headerName, object value)
         {
-            _envelope.SetHeader(headerName, value);
+            foreach (var envelope in _envelopes)
+            {
+                envelope.SetHeader(headerName, value);
+            }
+
             return this;
         }
 
-        public ISendBuilder<TMessage> SetContextItem(string key, object value)
+        public ISendBuilder SetContextItem(string key, object value)
         {
             _contextData.Set(key, value);
             return this;
-        }
-
-        public MessageContext<TMessage> BuildContext()
-        {
-            return new MessageContext<TMessage>(_envelope, _contextData, _cancellation);
         }
 
         public Task SendAsync()
@@ -62,10 +71,34 @@ namespace Meceqs.Sending
             return SendAsync<VoidType>();
         }
 
-        public Task<TResult> SendAsync<TResult>()
+        public async Task<TResult> SendAsync<TResult>()
         {
-            var context = BuildContext();
-            return _sendingMediator.SendAsync<TMessage, TResult>(context);
+            // TODO @cweiss does this make sense?
+
+            if (_envelopes.Count == 0)
+            {
+                // TODO @cweiss Should this throw an exception instead?
+                return await Task.FromResult(default(TResult));
+            }
+            else if (_envelopes.Count == 1)
+            {
+                var envelope = _envelopes.First();
+                var context = _messageContextFactory.Create(envelope, _contextData, _cancellation);
+                return await _sendingMediator.SendAsync<TResult>(context);
+            }
+            else
+            {
+                if (typeof(TResult) != typeof(VoidType))
+                    throw new InvalidOperationException("SendAsync with many envelopes can only be used with return-type 'VoidType'");
+
+                foreach (var envelope in _envelopes)
+                {
+                    var context = _messageContextFactory.Create(envelope, _contextData, _cancellation);
+                    await _sendingMediator.SendAsync<TResult>(context);
+                }
+
+                return await Task.FromResult(default(TResult));
+            }
         }
     }
 }

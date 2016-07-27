@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Meceqs.Sending;
@@ -9,30 +10,34 @@ namespace Meceqs.Tests.Sending
 {
     public class SendBuilderTest
     {
-        private ISendBuilder<TMessage> GetBuilder<TMessage>(
+        private ISendBuilder GetBuilder<TMessage>(
             Envelope<TMessage> envelope = null,
-            IMessageCorrelator correlator = null,
+            IEnvelopeCorrelator correlator = null,
             IMessageSendingMediator sendingMediator = null) where TMessage : class, IMessage, new()
         {
             envelope = envelope ?? TestObjects.Envelope<TMessage>();
-            correlator = correlator ?? new DefaultMessageCorrelator();
+            correlator = correlator ?? new DefaultEnvelopeCorrelator();
             sendingMediator = sendingMediator ?? Substitute.For<IMessageSendingMediator>();
 
-            return new DefaultSendBuilder<TMessage>(envelope, correlator, sendingMediator);
+            var envelopes = new List<Envelope> { envelope };
+
+            return new DefaultSendBuilder(envelopes, correlator, new DefaultMessageContextFactory(), sendingMediator);
         }
 
         [Fact]
         public void Throws_if_parameters_are_missing()
         {
             // Arrange
-            var envelope = TestObjects.Envelope<SimpleMessage>();
-            var correlator = new DefaultMessageCorrelator();
+            var envelopes = new List<Envelope>();
+            var correlator = new DefaultEnvelopeCorrelator();
+            var messageContextFactory = new DefaultMessageContextFactory();
             var sendingMediator = Substitute.For<IMessageSendingMediator>();
 
             // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => new DefaultSendBuilder<SimpleMessage>(null, correlator, sendingMediator));
-            Assert.Throws<ArgumentNullException>(() => new DefaultSendBuilder<SimpleMessage>(envelope, null, sendingMediator));
-            Assert.Throws<ArgumentNullException>(() => new DefaultSendBuilder<SimpleMessage>(envelope, correlator, null));
+            Assert.Throws<ArgumentNullException>(() => new DefaultSendBuilder(null, correlator, messageContextFactory, sendingMediator));
+            Assert.Throws<ArgumentNullException>(() => new DefaultSendBuilder(envelopes, null, messageContextFactory, sendingMediator));
+            Assert.Throws<ArgumentNullException>(() => new DefaultSendBuilder(envelopes, correlator, null, sendingMediator));
+            Assert.Throws<ArgumentNullException>(() => new DefaultSendBuilder(envelopes, correlator, messageContextFactory, null));
         }
 
         [Fact]
@@ -46,7 +51,7 @@ namespace Meceqs.Tests.Sending
             await builder.SendAsync();
 
             // Assert
-            await sendingMediator.Received(1).SendAsync<SimpleMessage, VoidType>(Arg.Any<MessageContext<SimpleMessage>>());
+            await sendingMediator.Received(1).SendAsync<VoidType>(Arg.Any<MessageContext<SimpleMessage>>());
         }
 
         [Fact]
@@ -54,7 +59,7 @@ namespace Meceqs.Tests.Sending
         {
             // Arrange
             var envelope = TestObjects.Envelope<SimpleMessage>();
-            var correlator = Substitute.For<IMessageCorrelator>();
+            var correlator = Substitute.For<IEnvelopeCorrelator>();
             var builder = GetBuilder<SimpleMessage>(envelope, correlator);
 
             // Act
@@ -66,60 +71,101 @@ namespace Meceqs.Tests.Sending
         }
 
         [Fact]
-        public void Saves_Header_In_Envelope()
+        public async Task Saves_Header_In_Envelope()
         {
             // Arrange
-            var builder = GetBuilder<SimpleMessage>();
+
+            int called = 0;
+            var mediator = Substitute.For<IMessageSendingMediator>();
+            mediator.When(x => x.SendAsync(Arg.Any<MessageContext>()))
+                .Do(x => {
+                    called++;
+
+                    Assert.Equal("Value", x.Arg<MessageContext>().Envelope.Headers["Key"]);
+                });
+
+            var builder = GetBuilder<SimpleMessage>(sendingMediator: mediator);
 
             // Act
             builder.SetHeader("Key", "Value");
-            var context = builder.BuildContext();
+            await builder.SendAsync();
 
             // Assert
-            Assert.Equal("Value", context.Envelope.Headers["Key"]);
+            Assert.Equal(1, called);
         }
 
         [Fact]
-        public void Saves_SendProperty_In_Context()
+        public async Task Saves_SendProperty_In_Context()
         {
             // Arrange
-            var builder = GetBuilder<SimpleMessage>();
+            int called = 0;
+            var mediator = Substitute.For<IMessageSendingMediator>();
+            mediator.When(x => x.SendAsync(Arg.Any<MessageContext>()))
+                .Do(x => {
+                    called++;
+
+                    Assert.Equal("Value", x.Arg<MessageContext>().GetContextItem<string>("Key"));
+                });
+
+            var builder = GetBuilder<SimpleMessage>(sendingMediator: mediator);
 
             // Act
             builder.SetContextItem("Key", "Value");
-            var context = builder.BuildContext();
+            await builder.SendAsync();
 
             // Assert
-            Assert.Equal("Value", context.GetContextItem<string>("Key"));
+            Assert.Equal(1, called);
         }
 
         [Fact]
-        public void Saves_CancellationToken_In_Context()
+        public async Task Saves_CancellationToken_In_Context()
         {
             // Arrange
-            var builder = GetBuilder<SimpleMessage>();
+            
             var cancellationSource = new CancellationTokenSource();
 
+            int called = 0;
+            var mediator = Substitute.For<IMessageSendingMediator>();
+            mediator.When(x => x.SendAsync(Arg.Any<MessageContext>()))
+                .Do(x => {
+                    called++;
+
+                    Assert.Equal(cancellationSource.Token, x.Arg<MessageContext>().Cancellation);
+                });
+
+            var builder = GetBuilder<SimpleMessage>(sendingMediator: mediator);
+            
             // Act
             builder.SetCancellationToken(cancellationSource.Token);
-            var context = builder.BuildContext();
+            await builder.SendAsync();
 
             // Assert
-            Assert.Equal(cancellationSource.Token, context.Cancellation);
+            Assert.Equal(1, called);
         }
 
         [Fact]
-        public void Saves_Envelope_In_Context()
+        public async Task Saves_Envelope_In_Context()
         {
             // Arrange
+
             var envelope = TestObjects.Envelope<SimpleMessage>();
-            var builder = GetBuilder<SimpleMessage>(envelope);
+
+            int called = 0;
+            var mediator = Substitute.For<IMessageSendingMediator>();
+            mediator.When(x => x.SendAsync(Arg.Any<MessageContext>()))
+                .Do(x => {
+                    called++;
+
+                    Assert.Equal(envelope, x.Arg<MessageContext>().Envelope);
+                });
+
+            var builder = GetBuilder<SimpleMessage>(envelope: envelope, sendingMediator: mediator);
 
             // Act
-            var context = builder.BuildContext();
+            await builder.SendAsync();
 
             // Assert
-            Assert.Equal(envelope, context.Envelope);
+            Assert.Equal(1, called);
         }
     }
 }
