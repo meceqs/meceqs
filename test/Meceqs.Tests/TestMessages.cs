@@ -12,4 +12,8 @@ namespace Meceqs.Tests
     public class SimpleEvent : IEvent
     {
     }
+
+    public class SimpleResult
+    {
+    }
 }

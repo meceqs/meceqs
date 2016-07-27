@@ -22,7 +22,7 @@ namespace Meceqs.Sending.TypedSend
             Check.NotNull(context, nameof(context));
 
             // ISenderFactory and ISender expect generic types so we have to use reflection.
-            // The calls are outsourced to a separate invoker to make sure that component 
+            // The calls are outsourced to a separate invoker to make sure that it 
             // can be optimized independently.
 
             Type messageType = context.Message.GetType();
