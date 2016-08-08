@@ -30,8 +30,9 @@ namespace Microsoft.Extensions.DependencyInjection
             // TODO @cweiss check lifecycles!
 
             // Core
-            services.AddTransient<IEnvelopeFactory, DefaultEnvelopeFactory>();
+            services.AddSingleton<IMessageContextFactory, DefaultMessageContextFactory>();
             services.AddSingleton<IEnvelopeTypeLoader, DefaultEnvelopeTypeLoader>();
+            services.AddTransient<IEnvelopeFactory, DefaultEnvelopeFactory>();
 
             // Handling
             services.AddTransient<IEnvelopeHandler, DefaultEnvelopeHandler>();

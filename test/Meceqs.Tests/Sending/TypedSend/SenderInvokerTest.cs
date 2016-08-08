@@ -120,6 +120,18 @@ namespace Meceqs.Tests.Sending.TypedSend
         }
 
         [Fact]
+        public async Task InvokeSendAsync_throws_if_sender_isnt_ISender()
+        {
+            // Arrange
+            var invoker = GetInvoker();
+            var sender = new SimpleMessage(); // some object other than ISender<,>
+            var context = GetMessageContext<SimpleMessage>();
+
+            // Act & Assert
+            await Assert.ThrowsAsync<InvalidCastException>(() => invoker.InvokeSendAsync<int>(sender, context));
+        }
+
+        [Fact]
         public async Task InvokeSendAsync_throws_for_wrong_ResultType()
         {
             // Arrange
