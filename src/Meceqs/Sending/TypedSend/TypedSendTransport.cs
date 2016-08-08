@@ -5,16 +5,20 @@ namespace Meceqs.Sending.TypedSend
 {
     public class TypedSendTransport : ISendTransport
     {
-        private readonly ITypedSendInvoker _typedSendInvoker;
         private readonly ISenderFactory _senderFactory;
+        private readonly ISenderFactoryInvoker _senderFactoryInvoker;
+        private readonly ISenderInvoker _senderInvoker;
 
-        public TypedSendTransport(ITypedSendInvoker typedSendInvoker, ISenderFactory senderFactory)
+
+        public TypedSendTransport(ISenderFactory senderFactory, ISenderFactoryInvoker senderFactoryInvoker, ISenderInvoker senderInvoker)
         {
-            Check.NotNull(typedSendInvoker, nameof(typedSendInvoker));
             Check.NotNull(senderFactory, nameof(senderFactory));
+            Check.NotNull(senderFactoryInvoker, nameof(senderFactoryInvoker));
+            Check.NotNull(senderInvoker, nameof(senderInvoker));
 
-            _typedSendInvoker = typedSendInvoker;
             _senderFactory = senderFactory;
+            _senderFactoryInvoker = senderFactoryInvoker;
+            _senderInvoker = senderInvoker;
         }
 
         public Task<TResult> SendAsync<TResult>(MessageContext context)
@@ -22,20 +26,20 @@ namespace Meceqs.Sending.TypedSend
             Check.NotNull(context, nameof(context));
 
             // ISenderFactory and ISender expect generic types so we have to use reflection.
-            // The calls are outsourced to a separate invoker to make sure that it 
+            // The calls are outsourced to separate invokers to make sure that they 
             // can be optimized independently.
 
             Type messageType = context.Message.GetType();
             Type resultType = typeof(TResult);
 
-            object sender = _typedSendInvoker.InvokeCreateSender(_senderFactory, messageType, resultType);
-            
+            object sender = _senderFactoryInvoker.InvokeCreateSender(_senderFactory, messageType, resultType);
+
             if (sender == null)
             {
                 throw new InvalidOperationException($"No sender found for '{messageType.Name}/{resultType.Name}'");
             }
 
-            return _typedSendInvoker.InvokeSendAsync<TResult>(sender, context);
+            return _senderInvoker.InvokeSendAsync<TResult>(sender, context);
         }
     }
 }

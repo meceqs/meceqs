@@ -1,41 +1,15 @@
 using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Meceqs.Sending.TypedSend;
 using NSubstitute;
 using Xunit;
 
 namespace Meceqs.Tests.Sending.TypedSend
 {
-    public class TypedSendInvokerTest
+    public class SenderFactoryInvokerTest
     {
-        private class SimpleMessageStringSender : ISender<SimpleMessage, string>
+        private ISenderFactoryInvoker GetInvoker()
         {
-            private readonly string _result;
-
-            public SimpleMessageStringSender(string result)
-            {
-                _result = result;
-            }
-
-            public Task<string> SendAsync(MessageContext<SimpleMessage> context)
-            {
-                return Task.FromResult(_result);
-            }
-        }
-
-        private ITypedSendInvoker GetInvoker()
-        {
-            return new DefaultTypedSendInvoker();
-        }
-
-        private MessageContext GetMessageContext<TMessage>()
-            where TMessage : class, IMessage, new()
-        {
-            var envelope = TestObjects.Envelope<TMessage>();
-            var messageContextData = new MessageContextData();
-
-            return new MessageContext<TMessage>(envelope, messageContextData, CancellationToken.None);
+            return new DefaultSenderFactoryInvoker();
         }
 
         [Fact]
@@ -126,23 +100,6 @@ namespace Meceqs.Tests.Sending.TypedSend
             senderFactory.Received(1).CreateSender<SimpleMessage, string>();
             senderFactory.Received(1).CreateSender<SimpleMessage, VoidType>();
             senderFactory.Received(2).CreateSender<SimpleCommand, SimpleResult>();
-        }
-
-        [Fact]
-        public async Task SendAsync_succeeds()
-        {
-            // Arrange
-            
-            var invoker = GetInvoker();
-            
-            var sender = new SimpleMessageStringSender("result");
-            var messageContext = GetMessageContext<SimpleMessage>();
-
-            // Act
-            string result = await invoker.InvokeSendAsync<string>(sender, messageContext);
-
-            // Assert
-            Assert.Equal("result", result);
         }
     }
 }

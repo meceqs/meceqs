@@ -9,15 +9,15 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             var assembly = typeof(TType).GetTypeInfo().Assembly;
 
-            return builder.AddContractAssembly(assembly);
+            return builder.AddContractAssemblies(assembly);
         }
 
-        public static IMeceqsBuilder AddContractAssembly(this IMeceqsBuilder builder, Assembly assembly)
+        public static IMeceqsBuilder AddContractAssemblies(this IMeceqsBuilder builder, params Assembly[] assemblies)
         {
             Check.NotNull(builder, nameof(builder));
-            Check.NotNull(assembly, nameof(assembly));
+            Check.NotNull(assemblies, nameof(assemblies));
 
-            builder.Services.Configure<MeceqsOptions>(options => options.ContractAssemblies.Add(assembly));
+            builder.Services.Configure<MeceqsOptions>(options => options.ContractAssemblies.AddRange(assemblies));
             
             return builder;
         }

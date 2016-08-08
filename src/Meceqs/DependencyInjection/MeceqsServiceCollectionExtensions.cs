@@ -3,6 +3,7 @@ using Meceqs;
 using Meceqs.DependencyInjection;
 using Meceqs.Handling;
 using Meceqs.Sending;
+using Meceqs.Sending.TypedSend;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -40,6 +41,11 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IEnvelopeCorrelator, DefaultEnvelopeCorrelator>();
             services.AddTransient<IMeceqsSender, DefaultMeceqsSender>();
             services.AddTransient<IMessageSendingMediator, DefaultMessageSendingMediator>();
+
+            // Sending/TypedSend
+            services.AddSingleton<ISenderFactoryInvoker, DefaultSenderFactoryInvoker>();
+            services.AddSingleton<ISenderInvoker, DefaultSenderInvoker>();
+            services.AddTransient<ISenderFactory, DefaultSenderFactory>();
 
             return new MeceqsBuilder(services);
         }

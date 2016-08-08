@@ -4,21 +4,24 @@ namespace Meceqs.Sending
 {
     public class DefaultSendTransportFactory : ISendTransportFactory
     {
-        private readonly ITypedSendInvoker _typedSendInvoker;
         private readonly ISenderFactory _senderFactory;
+        private readonly ISenderFactoryInvoker _senderFactoryInvoker;
+        private readonly ISenderInvoker _senderInvoker;
 
-        public DefaultSendTransportFactory(ITypedSendInvoker typedSendInvoker, ISenderFactory senderFactory)
+        public DefaultSendTransportFactory(ISenderFactory senderFactory, ISenderFactoryInvoker senderFactoryInvoker, ISenderInvoker senderInvoker)
         {
-            Check.NotNull(typedSendInvoker, nameof(typedSendInvoker));
             Check.NotNull(senderFactory, nameof(senderFactory));
+            Check.NotNull(senderFactoryInvoker, nameof(senderFactoryInvoker));
+            Check.NotNull(senderInvoker, nameof(senderInvoker));
 
-            _typedSendInvoker = typedSendInvoker;
             _senderFactory = senderFactory;
+            _senderFactoryInvoker = senderFactoryInvoker;
+            _senderInvoker = senderInvoker;
         }
 
         public ISendTransport CreateSendTransport(MessageContext context)
         {
-            return new TypedSendTransport(_typedSendInvoker, _senderFactory);
+            return new TypedSendTransport(_senderFactory, _senderFactoryInvoker, _senderInvoker);
         }
     }
 }

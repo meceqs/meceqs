@@ -4,7 +4,6 @@ using Meceqs.Sending;
 using Meceqs.Sending.TypedSend;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
-using Xunit;
 
 namespace Meceqs.Tests.Sending
 {
@@ -15,7 +14,7 @@ namespace Meceqs.Tests.Sending
             var serviceProvider = services.BuildServiceProvider();
             var senderFactory = new DefaultSenderFactory(serviceProvider);
 
-            return new TypedSendTransport(new DefaultTypedSendInvoker(), senderFactory);
+            return new TypedSendTransport(senderFactory, new DefaultSenderFactoryInvoker(), new DefaultSenderInvoker());
         }
 
         private MessageContext<TMessage> GetSendContext<TMessage>()

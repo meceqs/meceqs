@@ -2,17 +2,16 @@ using System;
 using System.Collections.Concurrent;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Threading.Tasks;
 
 namespace Meceqs.Sending.TypedSend
 {
-    public class DefaultTypedSendInvoker : ITypedSendInvoker
+    public class DefaultSenderFactoryInvoker : ISenderFactoryInvoker
     {
         private static readonly MethodInfo _genericCreateSenderMethod = typeof(ISenderFactory).GetTypeInfo().GetDeclaredMethod(nameof(ISenderFactory.CreateSender));
 
         private readonly ConcurrentDictionary<Tuple<Type, Type>, Func<ISenderFactory, object>> _createSenderDelegateCache;
 
-        public DefaultTypedSendInvoker()
+        public DefaultSenderFactoryInvoker()
         {
             _createSenderDelegateCache = new ConcurrentDictionary<Tuple<Type, Type>, Func<ISenderFactory, object>>();
         }
@@ -23,6 +22,15 @@ namespace Meceqs.Sending.TypedSend
             Check.NotNull(messageType, nameof(messageType));
             Check.NotNull(resultType, nameof(resultType));
 
+            Func<ISenderFactory, object> createSenderDelegate = GetOrAddCreateSenderDelegate(messageType, resultType);
+
+            object sender = createSenderDelegate(senderFactory);
+
+            return sender;
+        }
+
+        private Func<ISenderFactory, object> GetOrAddCreateSenderDelegate(Type messageType, Type resultType)
+        {
             var cacheKey = new Tuple<Type, Type>(messageType, resultType);
 
             Func<ISenderFactory, object> createSenderDelegate = _createSenderDelegateCache.GetOrAdd(cacheKey, x =>
@@ -37,7 +45,7 @@ namespace Meceqs.Sending.TypedSend
                 // http://www.marccostello.com/newing-up-t/
 
                 // The untyped CreateSender-method must be converted to a message-specific typed version
-                MethodInfo typedCreateSenderMethod = _genericCreateSenderMethod.MakeGenericMethod(messageType, resultType);
+                MethodInfo typedCreateSenderMethod = _genericCreateSenderMethod.MakeGenericMethod(x.Item1, x.Item2);
 
                 // Declaration of the object on which the method should be called
                 var instance = Expression.Parameter(typeof(ISenderFactory), "instance");
@@ -53,23 +61,7 @@ namespace Meceqs.Sending.TypedSend
                 return typedDelegate;
             });
 
-            object sender = createSenderDelegate(senderFactory);
-
-            return sender;
-        }
-
-        public Task<TResult> InvokeSendAsync<TResult>(object sender, MessageContext context)
-        {
-            Check.NotNull(sender, nameof(sender));
-            Check.NotNull(context, nameof(context));
-
-            //MethodInfo sendMethod = typeof(ISender<,>).GetTypeInfo().GetDeclaredMethod(nameof(ISender<IMessage, VoidType>.SendAsync));
-
-            //return (Task<TResult>)sendMethod.Invoke(sender, new[] { context });
-
-            dynamic dynamicSender = (dynamic)sender;
-
-            return (Task<TResult>)dynamicSender.SendAsync(context);
+            return createSenderDelegate;
         }
     }
 }
