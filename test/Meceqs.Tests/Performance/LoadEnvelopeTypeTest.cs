@@ -19,7 +19,7 @@ namespace Meceqs.Tests.Performance
 
             sw.Stop();
 
-            Console.WriteLine($"{message}: {sw.ElapsedMilliseconds} ms");
+            Console.WriteLine($"{GetType().Name}/{message}: {sw.ElapsedMilliseconds} ms");
         }
 
         [Fact]
@@ -43,7 +43,7 @@ namespace Meceqs.Tests.Performance
                 Type envelopeType = typeof(Envelope<>).MakeGenericType(typeOfMessage);
             });
 
-            // Reflection
+            // Cached Reflection
 
             ConcurrentDictionary<string, Type> cache = new ConcurrentDictionary<string, Type>();
 

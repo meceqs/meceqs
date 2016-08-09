@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Reflection;
 using Xunit;
@@ -27,7 +28,7 @@ namespace Meceqs.Tests.Performance
 
             sw.Stop();
 
-            Console.WriteLine($"{message}: {sw.ElapsedMilliseconds} ms");
+            Console.WriteLine($"{GetType().Name}/{message}: {sw.ElapsedMilliseconds} ms");
         }
 
         [Fact]
@@ -36,6 +37,9 @@ namespace Meceqs.Tests.Performance
             const int loopCount = 100000;
 
             BrokeredMessage message = new BrokeredMessage();
+            var resultType = typeof(string);
+
+            MethodInfo getBodyMethod = typeof(BrokeredMessage).GetMethod(nameof(BrokeredMessage.GetBody));
 
             // Direct
 
@@ -46,23 +50,32 @@ namespace Meceqs.Tests.Performance
 
             // MethodInfo.Invoke
 
-            MethodInfo getBodyMethod1 = typeof(BrokeredMessage).GetMethod(nameof(BrokeredMessage.GetBody));
+            var methodCache = new ConcurrentDictionary<Type, MethodInfo>();
+
             RunTimed("MethodInfo.Invoke", loopCount, () =>
             {
-
-                MethodInfo genericHandleMethod = getBodyMethod1.MakeGenericMethod(typeof(string));
-                string s = (string)genericHandleMethod.Invoke(message, new object[] { });
+                var method = methodCache.GetOrAdd(resultType, x => {
+                    MethodInfo typedHandleMethod = getBodyMethod.MakeGenericMethod(x);
+                    return typedHandleMethod;
+                });
+                
+                string s = (string)method.Invoke(message, new object[] { });
             });
 
             // MethodInfo Delegate
 
-            MethodInfo getBodyMethod2 = typeof(BrokeredMessage).GetMethod(nameof(BrokeredMessage.GetBody));
-            MethodInfo getBodyMethodString = getBodyMethod2.MakeGenericMethod(typeof(string));
-            Func<BrokeredMessage, object> delString = (Func<BrokeredMessage, object>) Delegate.CreateDelegate(typeof(Func<BrokeredMessage, object>), null, getBodyMethodString, true);
+            var delegateCache = new ConcurrentDictionary<Type, Func<BrokeredMessage, object>>();
 
             RunTimed("MethodInfo Delegate", loopCount, () =>
             {
-                string s = (string) delString(message);
+                var del = delegateCache.GetOrAdd(resultType, x =>
+                {
+                    MethodInfo typedHandleMethod = getBodyMethod.MakeGenericMethod(x);
+                    Func<BrokeredMessage, object> compiledDel = (Func<BrokeredMessage, object>) typedHandleMethod.CreateDelegate(typeof(Func<BrokeredMessage, object>), null);
+                    return compiledDel;
+                });
+
+                string s = (string) del(message);
             });
         }
     }

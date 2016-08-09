@@ -48,7 +48,7 @@ namespace Meceqs.Test.Performance
 
             sw.Stop();
 
-            Console.WriteLine($"{message}: {sw.ElapsedMilliseconds} ms");
+            Console.WriteLine($"{GetType().Name}/{message}: {sw.ElapsedMilliseconds} ms");
         }
 
         private void RunTimed(string message, int loopCount, Action action)
@@ -62,7 +62,7 @@ namespace Meceqs.Test.Performance
 
             sw.Stop();
 
-            Console.WriteLine($"{message}: {sw.ElapsedMilliseconds} ms");
+            Console.WriteLine($"{GetType().Name}/{message}: {sw.ElapsedMilliseconds} ms");
         }
 
         [Fact]
