@@ -1,0 +1,17 @@
+{
+  "version": "1.0.0-*",
+
+  "buildOptions": {
+    "warningsAsErrors": true
+  },
+
+  "frameworks": {
+    "netstandard1.0": {
+      "dependencies": {
+        "Meceqs.ContractAbstractions": "1.0.0-*",
+        "System.Collections": "4.0.11",
+        "System.Runtime": "4.1.0"
+      }
+    }
+  }
+}

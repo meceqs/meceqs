@@ -7,9 +7,9 @@ namespace Meceqs.Tests.Sending.TypedSend
 {
     public class SenderFactoryInvokerTest
     {
-        private ISenderFactoryInvoker GetInvoker()
+        private IHandlerFactoryInvoker GetInvoker()
         {
-            return new DefaultSenderFactoryInvoker();
+            return new DefaultHandlerFactoryInvoker();
         }
 
         [Fact]
@@ -17,12 +17,12 @@ namespace Meceqs.Tests.Sending.TypedSend
         {
             // Arrange
             var invoker = GetInvoker();
-            var senderFactory = Substitute.For<ISenderFactory>();
+            var senderFactory = Substitute.For<IHandlerFactory>();
 
             // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => invoker.InvokeCreateSender(null, typeof(SimpleMessage), typeof(VoidType)));
-            Assert.Throws<ArgumentNullException>(() => invoker.InvokeCreateSender(senderFactory, null, typeof(VoidType)));
-            Assert.Throws<ArgumentNullException>(() => invoker.InvokeCreateSender(senderFactory, typeof(SimpleMessage), null));
+            Assert.Throws<ArgumentNullException>(() => invoker.InvokeCreateHandler(null, typeof(SimpleMessage), typeof(VoidType)));
+            Assert.Throws<ArgumentNullException>(() => invoker.InvokeCreateHandler(senderFactory, null, typeof(VoidType)));
+            Assert.Throws<ArgumentNullException>(() => invoker.InvokeCreateHandler(senderFactory, typeof(SimpleMessage), null));
         }
 
         [Fact]
@@ -30,13 +30,13 @@ namespace Meceqs.Tests.Sending.TypedSend
         {
             // Arrange
             var invoker = GetInvoker();
-            var senderFactory = Substitute.For<ISenderFactory>();
+            var senderFactory = Substitute.For<IHandlerFactory>();
 
             // Act
-            invoker.InvokeCreateSender(senderFactory, typeof(SimpleMessage), typeof(VoidType));
+            invoker.InvokeCreateHandler(senderFactory, typeof(SimpleMessage), typeof(VoidType));
 
             // Assert
-            senderFactory.Received(1).CreateSender<SimpleMessage, VoidType>();
+            senderFactory.Received(1).CreateHandler<SimpleMessage, VoidType>();
         }
 
         [Fact]
@@ -44,13 +44,13 @@ namespace Meceqs.Tests.Sending.TypedSend
         {
             // Arrange
             var invoker = GetInvoker();
-            var senderFactory = Substitute.For<ISenderFactory>();
+            var senderFactory = Substitute.For<IHandlerFactory>();
 
             // Act
-            invoker.InvokeCreateSender(senderFactory, typeof(SimpleMessage), typeof(string));
+            invoker.InvokeCreateHandler(senderFactory, typeof(SimpleMessage), typeof(string));
 
             // Assert
-            senderFactory.Received(1).CreateSender<SimpleMessage, string>();
+            senderFactory.Received(1).CreateHandler<SimpleMessage, string>();
         }
 
         [Fact]
@@ -58,13 +58,13 @@ namespace Meceqs.Tests.Sending.TypedSend
         {
             // Arrange
             var invoker = GetInvoker();
-            var senderFactory = Substitute.For<ISenderFactory>();
+            var senderFactory = Substitute.For<IHandlerFactory>();
 
             // Act
-            invoker.InvokeCreateSender(senderFactory, typeof(SimpleMessage), typeof(SimpleResult));
+            invoker.InvokeCreateHandler(senderFactory, typeof(SimpleMessage), typeof(SimpleResult));
 
             // Assert
-            senderFactory.Received(1).CreateSender<SimpleMessage, SimpleResult>();
+            senderFactory.Received(1).CreateHandler<SimpleMessage, SimpleResult>();
         }
 
         [Fact]
@@ -72,15 +72,15 @@ namespace Meceqs.Tests.Sending.TypedSend
         {
             // Arrange
             var invoker = GetInvoker();
-            var senderFactory = Substitute.For<ISenderFactory>();
+            var senderFactory = Substitute.For<IHandlerFactory>();
 
             // Act
-            invoker.InvokeCreateSender(senderFactory, typeof(SimpleMessage), typeof(SimpleResult));
-            invoker.InvokeCreateSender(senderFactory, typeof(SimpleMessage), typeof(SimpleResult));
-            invoker.InvokeCreateSender(senderFactory, typeof(SimpleMessage), typeof(SimpleResult));
+            invoker.InvokeCreateHandler(senderFactory, typeof(SimpleMessage), typeof(SimpleResult));
+            invoker.InvokeCreateHandler(senderFactory, typeof(SimpleMessage), typeof(SimpleResult));
+            invoker.InvokeCreateHandler(senderFactory, typeof(SimpleMessage), typeof(SimpleResult));
 
             // Assert
-            senderFactory.Received(3).CreateSender<SimpleMessage, SimpleResult>();
+            senderFactory.Received(3).CreateHandler<SimpleMessage, SimpleResult>();
         }
 
         [Fact]
@@ -88,18 +88,18 @@ namespace Meceqs.Tests.Sending.TypedSend
         {
             // Arrange
             var invoker = GetInvoker();
-            var senderFactory = Substitute.For<ISenderFactory>();
+            var senderFactory = Substitute.For<IHandlerFactory>();
 
             // Act
-            invoker.InvokeCreateSender(senderFactory, typeof(SimpleMessage), typeof(string));
-            invoker.InvokeCreateSender(senderFactory, typeof(SimpleCommand), typeof(SimpleResult));
-            invoker.InvokeCreateSender(senderFactory, typeof(SimpleMessage), typeof(VoidType));
-            invoker.InvokeCreateSender(senderFactory, typeof(SimpleCommand), typeof(SimpleResult));
+            invoker.InvokeCreateHandler(senderFactory, typeof(SimpleMessage), typeof(string));
+            invoker.InvokeCreateHandler(senderFactory, typeof(SimpleCommand), typeof(SimpleResult));
+            invoker.InvokeCreateHandler(senderFactory, typeof(SimpleMessage), typeof(VoidType));
+            invoker.InvokeCreateHandler(senderFactory, typeof(SimpleCommand), typeof(SimpleResult));
 
             // Assert
-            senderFactory.Received(1).CreateSender<SimpleMessage, string>();
-            senderFactory.Received(1).CreateSender<SimpleMessage, VoidType>();
-            senderFactory.Received(2).CreateSender<SimpleCommand, SimpleResult>();
+            senderFactory.Received(1).CreateHandler<SimpleMessage, string>();
+            senderFactory.Received(1).CreateHandler<SimpleMessage, VoidType>();
+            senderFactory.Received(2).CreateHandler<SimpleCommand, SimpleResult>();
         }
     }
 }

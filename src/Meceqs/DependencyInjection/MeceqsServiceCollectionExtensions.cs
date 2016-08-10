@@ -1,9 +1,9 @@
 using System;
 using Meceqs;
 using Meceqs.DependencyInjection;
-using Meceqs.Handling;
-using Meceqs.Sending;
-using Meceqs.Sending.TypedSend;
+using Meceqs.Filters.TypedHandling;
+using Meceqs.Filters.TypedHandling.Internal;
+using Meceqs.Pipeline;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -13,40 +13,27 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             Check.NotNull(services, nameof(services));
 
-            var options = new MeceqsOptions();
-
             if (setupAction != null)
             {
-                setupAction(options);
+                services.Configure<MeceqsOptions>(setupAction);
             }
 
-            return services.AddMeceqs(options);
+            return services.AddMeceqs();
         }
 
-        public static IMeceqsBuilder AddMeceqs(this IServiceCollection services, MeceqsOptions options)
+        public static IMeceqsBuilder AddMeceqs(this IServiceCollection services)
         {
             Check.NotNull(services, nameof(services));
 
+            // TODO @cweiss Options?
             // TODO @cweiss check lifecycles!
 
             // Core
-            services.AddSingleton<IMessageContextFactory, DefaultMessageContextFactory>();
             services.AddSingleton<IEnvelopeTypeLoader, DefaultEnvelopeTypeLoader>();
-            services.AddTransient<IEnvelopeFactory, DefaultEnvelopeFactory>();
 
-            // Handling
-            services.AddTransient<IEnvelopeHandler, DefaultEnvelopeHandler>();
-            services.AddTransient<IHandlerInvoker, DefaultHandlerInvoker>();
-
-            // Sending
-            services.AddSingleton<IEnvelopeCorrelator, DefaultEnvelopeCorrelator>();
-            services.AddTransient<IMeceqsSender, DefaultMeceqsSender>();
-            services.AddTransient<IMessageSendingMediator, DefaultMessageSendingMediator>();
-
-            // Sending/TypedSend
-            services.AddSingleton<ISenderFactoryInvoker, DefaultSenderFactoryInvoker>();
-            services.AddSingleton<ISenderInvoker, DefaultSenderInvoker>();
-            services.AddTransient<ISenderFactory, DefaultSenderFactory>();
+            // Pipeline
+            services.AddSingleton<IFilterContextFactory, DefaultFilterContextFactory>();
+            services.AddTransient<IPipelineBuilder, DefaultPipelineBuilder>();
 
             return new MeceqsBuilder(services);
         }

@@ -1,20 +1,26 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Meceqs
 {
+    public class Envelope<TMessage> : Envelope where TMessage : IMessage
+    {
+        public new TMessage Message
+        {
+            get { return (TMessage)base.Message; }
+            set { base.Message = value; }
+        }
+    }
+
     public abstract class Envelope
     {
-        public MessageHeaders Headers { get; set; } = new MessageHeaders();
-
-        public Guid MessageId { get; set; }
-
         public IMessage Message { get; set; }
-
+        public Guid MessageId { get; set; }
         public string MessageName { get; set; }
-
         public string MessageType { get; set; }
-
-        public Guid CorrelationId { get; set; }
+        public MessageHeaders Headers { get; set; } = new MessageHeaders();
+        public Guid CorrelationId { get; set; } // TODO !! rename (ConversationId, TraceIdentifier, ...)
+        public List<MessageHistoryEntry> MessageHistory { get; set; } = new List<MessageHistoryEntry>();
 
         public void SetHeader(string headerName, object value)
         {
@@ -26,29 +32,10 @@ namespace Meceqs
             if (Headers == null)
                 Headers = new MessageHeaders();
 
-            if (Message == null)
-                throw new ArgumentNullException(nameof(Message));
-
-            if (MessageId == Guid.Empty)
-                throw new ArgumentNullException(nameof(MessageId));
-
-            if (string.IsNullOrWhiteSpace(MessageName))
-                throw new ArgumentNullException(nameof(MessageName));
-
-            if (string.IsNullOrEmpty(MessageType))
-                throw new ArgumentNullException(nameof(MessageType));
-
-            if (CorrelationId == Guid.Empty)
-                throw new ArgumentNullException(nameof(CorrelationId));
-        }
-    }
-
-    public class Envelope<TMessage> : Envelope where TMessage : IMessage
-    {
-        public new TMessage Message
-        {
-            get { return (TMessage)base.Message; }
-            set { base.Message = value; }
+            Check.NotNull(Message, nameof(Message));
+            Check.NotEmpty(MessageId, nameof(MessageId));
+            Check.NotNullOrWhiteSpace(MessageName, nameof(MessageName));
+            Check.NotNullOrWhiteSpace(MessageType, nameof(MessageType));
         }
     }
 }

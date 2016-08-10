@@ -1,0 +1,19 @@
+{
+  "version": "1.0.0-*",
+
+  "buildOptions": {
+    "warningsAsErrors": true
+  },
+
+  "frameworks": {
+    "netstandard1.3": {
+      "dependencies": {
+        "CustomerContext.Contracts": "1.0.0-*",
+
+        "Meceqs": "1.0.0-*",
+
+        "Newtonsoft.Json": "9.0.1"
+      }
+    }
+  }
+}

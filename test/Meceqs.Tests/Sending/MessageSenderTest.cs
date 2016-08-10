@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Meceqs.Internal;
 using Meceqs.Sending;
 using NSubstitute;
 using Xunit;
@@ -9,12 +10,12 @@ namespace Meceqs.Tests.Sending
 {
     public class MessageSenderTest
     {
-        private IMeceqsSender GetSender(IEnvelopeCorrelator envelopeCorrelator = null, IMessageSendingMediator sendingMediator = null)
+        private IMessageSender GetSender(IEnvelopeCorrelator envelopeCorrelator = null, IMessageSendingMediator sendingMediator = null)
         {
             envelopeCorrelator = envelopeCorrelator ?? new DefaultEnvelopeCorrelator();
             sendingMediator = sendingMediator ?? Substitute.For<IMessageSendingMediator>();
 
-            return new DefaultMeceqsSender(TestObjects.EnvelopeFactory(), envelopeCorrelator, new DefaultMessageContextFactory(), sendingMediator);
+            return new DefaultMessageSender(TestObjects.EnvelopeFactory(), envelopeCorrelator, new DefaultMessageContextFactory(), sendingMediator);
         }
 
         [Fact]
@@ -25,10 +26,10 @@ namespace Meceqs.Tests.Sending
             var messageContextFactory = Substitute.For<IMessageContextFactory>();
             var sendingMediator = Substitute.For<IMessageSendingMediator>();
 
-            Assert.Throws<ArgumentNullException>(() => new DefaultMeceqsSender(null, correlator, messageContextFactory, sendingMediator));
-            Assert.Throws<ArgumentNullException>(() => new DefaultMeceqsSender(envelopeFactory, null, messageContextFactory, sendingMediator));
-            Assert.Throws<ArgumentNullException>(() => new DefaultMeceqsSender(envelopeFactory, correlator, null, sendingMediator));
-            Assert.Throws<ArgumentNullException>(() => new DefaultMeceqsSender(envelopeFactory, correlator, messageContextFactory, null));
+            Assert.Throws<ArgumentNullException>(() => new DefaultMessageSender(null, correlator, messageContextFactory, sendingMediator));
+            Assert.Throws<ArgumentNullException>(() => new DefaultMessageSender(envelopeFactory, null, messageContextFactory, sendingMediator));
+            Assert.Throws<ArgumentNullException>(() => new DefaultMessageSender(envelopeFactory, correlator, null, sendingMediator));
+            Assert.Throws<ArgumentNullException>(() => new DefaultMessageSender(envelopeFactory, correlator, messageContextFactory, null));
         }
 
         [Fact]

@@ -1,5 +1,5 @@
 using System;
-using System.Threading;
+using Meceqs.Internal;
 using Xunit;
 
 namespace Meceqs.Tests
@@ -16,12 +16,8 @@ namespace Meceqs.Tests
         {
             // Arrange
             var factory = GetFactory();
-            var envelope = TestObjects.Envelope<SimpleMessage>();
-            var messageContextData = new MessageContextData();
-            var cancellation = CancellationToken.None;
 
-            Assert.Throws<ArgumentNullException>(() => factory.Create(null, messageContextData, cancellation));
-            Assert.Throws<ArgumentNullException>(() => factory.Create(envelope, null, cancellation));
+            Assert.Throws<ArgumentNullException>(() => factory.Create(null));
         }
     }
 }

@@ -17,6 +17,15 @@ namespace Meceqs
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void NotNullOrWhiteSpace(string value, string parameterName)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                throw new ArgumentNullException(parameterName);
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void NotEmpty(Guid value, string parameterName)
         {
             if (value == Guid.Empty)
