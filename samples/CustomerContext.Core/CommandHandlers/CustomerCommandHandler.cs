@@ -5,6 +5,7 @@ using CustomerContext.Core.Repositories;
 using Meceqs.Filters.TypedHandling;
 using Meceqs.Sending;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace CustomerContext.Core.CommandHandlers
 {
@@ -23,11 +24,13 @@ namespace CustomerContext.Core.CommandHandlers
             _sender = sender;
         }
 
-        public async Task<CreateCustomerResult> HandleAsync(HandleContext<CreateCustomerCommand> ctx)
+        public async Task<CreateCustomerResult> HandleAsync(HandleContext<CreateCustomerCommand> context)
         {
-            _logger.LogInformation("MessageName:{MessageName} MessageId:{MessageId}", ctx.Message.GetType(), ctx.Envelope.MessageId);
+            _logger.LogInformation("MessageName:{MessageName} MessageId:{MessageId}", context.Message.GetType(), context.Envelope.MessageId);
 
-            var cmd = ctx.Message;
+            _logger.LogInformation("Envelope:{Envelope}", JsonConvert.SerializeObject(context.Envelope));
+
+            var cmd = context.Message;
 
             var customer = new Customer(cmd.FirstName, cmd.LastName);
 
@@ -37,7 +40,7 @@ namespace CustomerContext.Core.CommandHandlers
 
             var events = customer.GetChanges();
             
-            await _sender.ForEvents(events, ctx.Envelope).SendAsync();
+            await _sender.ForEvents(events, context.Envelope).SendAsync();
             
             customer.ClearChanges();
 

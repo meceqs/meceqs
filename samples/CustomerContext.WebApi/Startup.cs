@@ -47,6 +47,9 @@ namespace CustomerContext.WebApi
                 {
                     var builder = options.Channel.PipelineBuilder;
 
+                    // make sure, MessageType, MessageName, etc are correctly set
+                    builder.UseEnvelopeSanitizer();
+
                     // attach CancellationToken, RequestServices, MessageHistory
                     builder.UseAspNetCore();
 
