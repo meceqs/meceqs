@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Meceqs.Internal;
 using Meceqs.Sending;
 using NSubstitute;
 using Xunit;
@@ -11,7 +10,7 @@ namespace Meceqs.Tests.Sending
 {
     public class SendBuilderTest
     {
-        private ISendBuilder GetBuilder<TMessage>(
+        private IFluentSender GetBuilder<TMessage>(
             Envelope<TMessage> envelope = null,
             IEnvelopeCorrelator correlator = null,
             IMessageSendingMediator sendingMediator = null) where TMessage : class, IMessage, new()

@@ -4,7 +4,6 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
 using Meceqs.Pipeline;
-using Meceqs.Sending.TypedSend;
 using Meceqs.Tests;
 using Xunit;
 

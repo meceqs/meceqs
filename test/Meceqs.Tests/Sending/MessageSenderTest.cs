@@ -1,7 +1,6 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Meceqs.Internal;
 using Meceqs.Sending;
 using NSubstitute;
 using Xunit;

@@ -14,29 +14,29 @@ namespace CustomerContext.WebApi.Controllers
         // Note: [FromBody] is not necessary, because we use a global convention (BindComplexTypeFromBodyConvention)
         // Note: Checking for ModelState.IsValid is not necessary, because we use a global filter (RejectInvalidModelStateActionFilter)
 
-        private readonly IEnvelopeConsumer _consumer;
+        private readonly IMessageConsumer _messageConsumer;
 
-        public CustomerController(IEnvelopeConsumer consumer)
+        public CustomerController(IMessageConsumer messageConsumer)
         {
-            _consumer = consumer;
+            _messageConsumer = messageConsumer;
         }
 
         [HttpPost]
         public Task<CreateCustomerResult> CreateCustomer(Envelope<CreateCustomerCommand> envelope)
         {
-            return _consumer.ForEnvelope(envelope).ConsumeAsync<CreateCustomerResult>();
+            return _messageConsumer.ForEnvelope(envelope).ConsumeAsync<CreateCustomerResult>();
         }
 
         [HttpPost]
         public Task<FindCustomersResult> FindCustomers(Envelope<FindCustomersQuery> envelope)
         {
-            return _consumer.ForEnvelope(envelope).ConsumeAsync<FindCustomersResult>();
+            return _messageConsumer.ForEnvelope(envelope).ConsumeAsync<FindCustomersResult>();
         }
 
         [HttpPost]
         public Task<CustomerDto> GetCustomer(Envelope<GetCustomerQuery> envelope)
         {
-            return _consumer.ForEnvelope(envelope).ConsumeAsync<CustomerDto>();
+            return _messageConsumer.ForEnvelope(envelope).ConsumeAsync<CustomerDto>();
         }
     }
 }

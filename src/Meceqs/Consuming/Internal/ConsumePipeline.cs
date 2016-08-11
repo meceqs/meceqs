@@ -3,15 +3,15 @@ using Microsoft.Extensions.Options;
 
 namespace Meceqs.Consuming.Internal
 {
-    public class DefaultConsumePipeline : IConsumePipeline
+    public class ConsumePipeline : IConsumePipeline
     {
         public IPipeline Pipeline { get; }
 
-        public DefaultConsumePipeline(IOptions<ConsumeOptions> options)
+        public ConsumePipeline(IOptions<ConsumeOptions> options)
         {
             Check.NotNull(options, nameof(options));
 
-            Pipeline = new DefaultPipeline(options.Value.Pipeline);
+            Pipeline = options.Value.Pipeline.GetPipeline();
         }
     }
 }

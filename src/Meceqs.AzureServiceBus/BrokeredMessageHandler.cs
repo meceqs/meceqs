@@ -66,7 +66,7 @@ namespace Meceqs.AzureServiceBus
             using (IServiceScope scope = _serviceScopeFactory.CreateScope())
             {
                 var brokeredMessageConverter = scope.ServiceProvider.GetRequiredService<IBrokeredMessageConverter>();
-                var envelopeConsumer = scope.ServiceProvider.GetRequiredService<IEnvelopeConsumer>();
+                var envelopeConsumer = scope.ServiceProvider.GetRequiredService<IMessageConsumer>();
 
                 Envelope envelope = brokeredMessageConverter.ConvertToEnvelope(brokeredMessage);
 

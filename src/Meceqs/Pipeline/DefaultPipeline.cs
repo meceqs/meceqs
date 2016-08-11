@@ -7,21 +7,22 @@ namespace Meceqs.Pipeline
     public class DefaultPipeline : IPipeline
     {
         private readonly FilterDelegate _pipeline;
+        private readonly string _pipelineName;
 
-        public DefaultPipeline(PipelineOptions options)
+        public DefaultPipeline(FilterDelegate pipeline, string pipelineName)
         {
-            Check.NotNull(options, nameof(options));
-            Check.NotNull(options.Builder, $"{nameof(options)}.{nameof(options.Builder)}");
+            Check.NotNull(pipeline, nameof(pipeline));
 
-            _pipeline = options.Pipeline;
+            _pipeline = pipeline;
+            _pipelineName = pipelineName;
         }
 
-        public Task SendAsync(IList<FilterContext> contexts)
+        public Task ProcessAsync(IList<FilterContext> contexts)
         {
-            return SendAsync<VoidType>(contexts);
+            return ProcessAsync<VoidType>(contexts);
         }
 
-        public async Task<TResult> SendAsync<TResult>(IList<FilterContext> contexts)
+        public async Task<TResult> ProcessAsync<TResult>(IList<FilterContext> contexts)
         {
             // TODO @cweiss does this make sense?
 
@@ -31,7 +32,7 @@ namespace Meceqs.Pipeline
             }
             else if (contexts.Count == 1)
             {
-                return await SendAsync<TResult>(contexts[0]);
+                return await ProcessAsync<TResult>(contexts[0]);
             }
             else
             {
@@ -40,17 +41,18 @@ namespace Meceqs.Pipeline
 
                 foreach (var context in contexts)
                 {
-                    await SendAsync<TResult>(context);
+                    await ProcessAsync<TResult>(context);
                 }
 
                 return await Task.FromResult(default(TResult));
             }
         }
 
-        private async Task<TResult> SendAsync<TResult>(FilterContext context)
+        private async Task<TResult> ProcessAsync<TResult>(FilterContext context)
         {
             Check.NotNull(context, nameof(context));
 
+            context.PipelineName = _pipelineName;
             context.ExpectedResultType = typeof(TResult);
 
             await _pipeline(context);

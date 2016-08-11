@@ -5,8 +5,8 @@ namespace Meceqs.Pipeline
 {
     public interface IPipeline
     {
-        Task SendAsync(IList<FilterContext> contexts);
+        Task ProcessAsync(IList<FilterContext> contexts);
 
-        Task<TResult> SendAsync<TResult>(IList<FilterContext> filterContexts);
+        Task<TResult> ProcessAsync<TResult>(IList<FilterContext> filterContexts);
     }
 }

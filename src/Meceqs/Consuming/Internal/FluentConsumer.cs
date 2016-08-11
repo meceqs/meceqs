@@ -4,80 +4,53 @@ using System.Threading;
 using System.Threading.Tasks;
 using Meceqs.Pipeline;
 
-namespace Meceqs.Sending.Internal
+namespace Meceqs.Consuming.Internal
 {
-    public class DefaultSendBuilder : ISendBuilder
+    public class FluentConsumer : IFluentConsumer
     {
-        private const string PipelineName = "Send";
-
-        private readonly IEnvelopeCorrelator _envelopeCorrelator;
         private readonly IFilterContextFactory _filterContextFactory;
         private readonly IPipeline _pipeline;
-
         private readonly IList<Envelope> _envelopes;
         private readonly FilterContextItems _contextItems = new FilterContextItems();
 
         private CancellationToken _cancellation = CancellationToken.None;
 
-        public DefaultSendBuilder(
+        public FluentConsumer(
             IList<Envelope> envelopes,
-            IEnvelopeCorrelator envelopeCorrelator,
             IFilterContextFactory filterContextFactory,
             IPipeline pipeline)
         {
             Check.NotNull(envelopes, nameof(envelopes));
-            Check.NotNull(envelopeCorrelator, nameof(envelopeCorrelator));
             Check.NotNull(filterContextFactory, nameof(filterContextFactory));
             Check.NotNull(pipeline, nameof(pipeline));
 
             _envelopes = envelopes;
-            _envelopeCorrelator = envelopeCorrelator;
             _filterContextFactory = filterContextFactory;
             _pipeline = pipeline;
         }
 
-        public ISendBuilder CorrelateWith(Envelope source)
-        {
-            foreach (var envelope in _envelopes)
-            {
-                _envelopeCorrelator.CorrelateSourceWithTarget(source, envelope);
-            }
-
-            return this;
-        }
-
-        public ISendBuilder SetCancellationToken(CancellationToken cancellation)
+        public IFluentConsumer SetCancellationToken(CancellationToken cancellation)
         {
             _cancellation = cancellation;
             return this;
         }
 
-        public ISendBuilder SetHeader(string headerName, object value)
-        {
-            foreach (var envelope in _envelopes)
-            {
-                envelope.SetHeader(headerName, value);
-            }
-
-            return this;
-        }
-
-        public ISendBuilder SetContextItem(string key, object value)
+        public IFluentConsumer SetContextItem(string key, object value)
         {
             _contextItems.Set(key, value);
             return this;
         }
 
-        public Task SendAsync()
+        public Task ConsumeAsync()
         {
-            return SendAsync<VoidType>();
+            return ConsumeAsync<VoidType>();
         }
 
-        public Task<TResult> SendAsync<TResult>()
+        public Task<TResult> ConsumeAsync<TResult>()
         {
             var filterContexts = _envelopes.Select(CreateFilterContext).ToList();
-            
-            return _pipeline.SendAsync<TResult>(filterContexts);
+
+            return _pipeline.ProcessAsync<TResult>(filterContexts);
         }
 
         private FilterContext CreateFilterContext(Envelope envelope)
@@ -85,7 +58,6 @@ namespace Meceqs.Sending.Internal
             var context = _filterContextFactory.CreateFilterContext(envelope);
 
             context.Cancellation = _cancellation;
-            context.PipelineName = PipelineName;
 
             if (_contextItems.Count > 0)
             {

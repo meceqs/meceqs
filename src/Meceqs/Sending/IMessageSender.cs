@@ -5,10 +5,10 @@ namespace Meceqs.Sending
 {
     public interface IMessageSender
     {
-        ISendBuilder ForMessage(IMessage message);
+        IFluentSender ForMessage(IMessage message);
 
-        ISendBuilder ForMessage(IMessage message, Guid messageId);
+        IFluentSender ForMessage(IMessage message, Guid messageId);
 
-        ISendBuilder ForMessages(IList<IMessage> messages);
+        IFluentSender ForMessages(IList<IMessage> messages);
     }
 }

@@ -4,14 +4,14 @@ using Meceqs.Pipeline;
 
 namespace Meceqs.Sending.Internal
 {
-    public class DefaultMessageSender : IMessageSender
+    public class MessageSender : IMessageSender
     {
         private readonly IEnvelopeFactory _envelopeFactory;
         private readonly IEnvelopeCorrelator _envelopeCorrelator;
         private readonly IFilterContextFactory _filterContextFactory;
         private readonly IPipeline _pipeline;
 
-        public DefaultMessageSender(
+        public MessageSender(
             IEnvelopeFactory envelopeFactory,
             IEnvelopeCorrelator envelopeCorrelator,
             IFilterContextFactory filterContextFactory,
@@ -28,12 +28,12 @@ namespace Meceqs.Sending.Internal
             _pipeline = sendPipeline.Pipeline;
         }
 
-        public ISendBuilder ForMessage(IMessage message)
+        public IFluentSender ForMessage(IMessage message)
         {
             return ForMessage(message, Guid.NewGuid());
         }
 
-        public ISendBuilder ForMessage(IMessage message, Guid messageId)
+        public IFluentSender ForMessage(IMessage message, Guid messageId)
         {
             Check.NotNull(message, nameof(message));
             Check.NotEmpty(messageId, nameof(messageId));
@@ -42,10 +42,10 @@ namespace Meceqs.Sending.Internal
 
             var envelopes = new List<Envelope> { envelope };
 
-            return new DefaultSendBuilder(envelopes, _envelopeCorrelator, _filterContextFactory, _pipeline);
+            return new FluentSender(envelopes, _envelopeCorrelator, _filterContextFactory, _pipeline);
         }
 
-        public ISendBuilder ForMessages(IList<IMessage> messages)
+        public IFluentSender ForMessages(IList<IMessage> messages)
         {
             Check.NotNull(messages, nameof(messages));
 
@@ -57,7 +57,7 @@ namespace Meceqs.Sending.Internal
                 var envelope = _envelopeFactory.Create(message, messageId);
             }
 
-            return new DefaultSendBuilder(envelopes, _envelopeCorrelator, _filterContextFactory, _pipeline);
+            return new FluentSender(envelopes, _envelopeCorrelator, _filterContextFactory, _pipeline);
         }
     }
 }

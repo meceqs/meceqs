@@ -3,15 +3,15 @@ using Microsoft.Extensions.Options;
 
 namespace Meceqs.Sending.Internal
 {
-    public class DefaultSendPipeline : ISendPipeline
+    public class SendPipeline : ISendPipeline
     {
         public IPipeline Pipeline { get; }
 
-        public DefaultSendPipeline(IOptions<SendOptions> options)
+        public SendPipeline(IOptions<SendOptions> options)
         {
             Check.NotNull(options, nameof(options));
 
-            Pipeline = new DefaultPipeline(options.Value.Pipeline);
+            Pipeline = options.Value.Pipeline.GetPipeline();
         }
     }
 }

@@ -24,8 +24,10 @@ namespace Meceqs.Pipeline
             return this;
         }
 
-        public FilterDelegate Build()
+        public IPipeline Build(string pipelineName)
         {
+            Check.NotNullOrWhiteSpace(pipelineName, nameof(pipelineName));
+
             FilterDelegate pipeline = context =>
             {
                 // TODO what should happen if there's no terminating filter?
@@ -37,7 +39,7 @@ namespace Meceqs.Pipeline
                 pipeline = filter(pipeline);
             }
 
-            return pipeline;
+            return new DefaultPipeline(pipeline, pipelineName);
         }
     }
 }

@@ -1,8 +1,6 @@
 using System;
 using Meceqs;
 using Meceqs.DependencyInjection;
-using Meceqs.Filters.TypedHandling;
-using Meceqs.Filters.TypedHandling.Internal;
 using Meceqs.Pipeline;
 
 namespace Microsoft.Extensions.DependencyInjection

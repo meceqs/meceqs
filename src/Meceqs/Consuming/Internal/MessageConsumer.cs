@@ -3,12 +3,12 @@ using Meceqs.Pipeline;
 
 namespace Meceqs.Consuming.Internal
 {
-    public class DefaultEnvelopeConsumer : IEnvelopeConsumer
+    public class MessageConsumer : IMessageConsumer
     {
         private readonly IFilterContextFactory _filterContextFactory;
         private readonly IPipeline _pipeline;
 
-        public DefaultEnvelopeConsumer(
+        public MessageConsumer(
             IFilterContextFactory filterContextFactory,
             IConsumePipeline consumePipeline)
         {
@@ -19,7 +19,7 @@ namespace Meceqs.Consuming.Internal
             _pipeline = consumePipeline.Pipeline;
         }
 
-        public IConsumeBuilder ForEnvelope(Envelope envelope)
+        public IFluentConsumer ForEnvelope(Envelope envelope)
         {
             Check.NotNull(envelope, nameof(envelope));
 
@@ -28,11 +28,11 @@ namespace Meceqs.Consuming.Internal
             return ForEnvelopes(envelopes);
         }
 
-        public IConsumeBuilder ForEnvelopes(IList<Envelope> envelopes)
+        public IFluentConsumer ForEnvelopes(IList<Envelope> envelopes)
         {
             Check.NotNull(envelopes, nameof(envelopes));
 
-            return new DefaultConsumeBuilder(envelopes, _filterContextFactory, _pipeline);
+            return new FluentConsumer(envelopes, _filterContextFactory, _pipeline);
         }
     }
 }

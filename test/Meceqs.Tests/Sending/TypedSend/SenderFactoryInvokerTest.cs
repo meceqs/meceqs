@@ -1,5 +1,4 @@
 using System;
-using Meceqs.Sending.TypedSend;
 using NSubstitute;
 using Xunit;
 

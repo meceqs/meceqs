@@ -1,7 +1,6 @@
 using System;
 using System.Threading.Tasks;
 using Meceqs.Pipeline;
-using Meceqs.Sending.TypedSend;
 using Xunit;
 
 namespace Meceqs.Tests.Sending.TypedSend

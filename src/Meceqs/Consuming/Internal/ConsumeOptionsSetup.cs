@@ -15,6 +15,7 @@ namespace Meceqs.Consuming.Internal
         public void Configure(ConsumeOptions options)
         {
             options.Pipeline.Builder = _pipelineBuilder;
+            options.Pipeline.Name = "Consume";
         }
     }
 }
