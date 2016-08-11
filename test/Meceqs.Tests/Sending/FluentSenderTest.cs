@@ -80,7 +80,7 @@ namespace Meceqs.Tests.Sending
 
             int called = 0;
             var pipeline = Substitute.For<IPipeline>();
-            pipeline.WhenForAnyArgs(x => x.ProcessAsync(null))
+            pipeline.WhenForAnyArgs(x => x.ProcessAsync<VoidType>(null))
                 .Do(x => {
                     called++;
 
@@ -104,7 +104,7 @@ namespace Meceqs.Tests.Sending
             // Arrange
             int called = 0;
             var pipeline = Substitute.For<IPipeline>();
-            pipeline.WhenForAnyArgs(x => x.ProcessAsync(null))
+            pipeline.WhenForAnyArgs(x => x.ProcessAsync<VoidType>(null))
                 .Do(x => {
                     called++;
                     
@@ -131,7 +131,7 @@ namespace Meceqs.Tests.Sending
 
             int called = 0;
             var pipeline = Substitute.For<IPipeline>();
-            pipeline.WhenForAnyArgs(x => x.ProcessAsync(null))
+            pipeline.WhenForAnyArgs(x => x.ProcessAsync<VoidType>(null))
                 .Do(x => {
                     called++;
 
@@ -158,7 +158,7 @@ namespace Meceqs.Tests.Sending
 
             int called = 0;
             var pipeline = Substitute.For<IPipeline>();
-            pipeline.WhenForAnyArgs(x => x.ProcessAsync(null))
+            pipeline.WhenForAnyArgs(x => x.ProcessAsync<VoidType>(null))
                 .Do(x => {
                     called++;
 
