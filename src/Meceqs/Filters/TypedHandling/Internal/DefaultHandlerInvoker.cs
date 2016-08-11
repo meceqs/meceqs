@@ -110,16 +110,12 @@ namespace Meceqs.Filters.TypedHandling.Internal
 
                 // Create expression
 
-                // Declaration of the object on which the method should be called
                 var instance = Expression.Parameter(typeof(Task), "instance");
-
-                // Declaration of the actual method call
-                var methodCall = Expression.Call(
-                    Expression.Convert(instance, taskResultType),
-                    getMethod);
+                var getCall = Expression.Call(Expression.Convert(instance, taskResultType), getMethod);
+                var castedResult = Expression.Convert(getCall, typeof(object));
 
                 // Compiles declaration into actual delegate
-                var typedDelegate = Expression.Lambda<Func<Task, object>>(methodCall, instance).Compile();
+                var typedDelegate = Expression.Lambda<Func<Task, object>>(castedResult, instance).Compile();
 
                 return typedDelegate;
             });

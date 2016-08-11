@@ -17,7 +17,7 @@ namespace Meceqs.Tests.Sending
             envelopeCorrelator = envelopeCorrelator ?? new DefaultEnvelopeCorrelator();
             sendPipeline = sendPipeline ?? Substitute.For<ISendPipeline>();
 
-            return new MessageSender(TestObjects.EnvelopeFactory(), envelopeCorrelator, new DefaultFilterContextFactory(), sendPipeline);
+            return new MessageSender(new DefaultEnvelopeFactory(), envelopeCorrelator, new DefaultFilterContextFactory(), sendPipeline);
         }
 
         [Fact]

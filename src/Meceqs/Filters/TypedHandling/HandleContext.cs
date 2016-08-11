@@ -1,3 +1,5 @@
+using System;
+using System.Reflection;
 using Meceqs.Pipeline;
 
 namespace Meceqs.Filters.TypedHandling
@@ -19,6 +21,11 @@ namespace Meceqs.Filters.TypedHandling
         public Envelope Envelope { get; }
 
         public IMessage Message { get; }
+
+        public IHandles Handler { get; set; }
+        public Type HandlerType { get; set; }
+
+        public MethodInfo HandleMethod { get; set; }
 
         protected HandleContext(Envelope envelope, IMessage message)
         {

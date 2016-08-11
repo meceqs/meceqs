@@ -38,10 +38,10 @@ namespace CustomerContext.WebApi
             services.AddTransient<IHandles<GetCustomerQuery, CustomerDto>, CustomerQueryHandler>();
             services.AddSingleton<ICustomerRepository, InMemoryCustomerRepository>();
 
-            // Meceqs
             services.AddMeceqs()
                 .AddAspNetCore()
                 .AddTypedHandling()
+                .AddTypedHandlingInterceptor<SampleHandleInterceptor>() // knows about the executing handler
                 .AddConsumer(options =>
                 {
                     options.Pipeline.Builder

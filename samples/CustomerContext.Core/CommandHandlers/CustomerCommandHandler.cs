@@ -27,6 +27,7 @@ namespace CustomerContext.Core.CommandHandlers
             _sender = sender;
         }
 
+        [CustomLogic /* this attribute can be read by an IHandleInterceptor */]
         public async Task<CreateCustomerResult> HandleAsync(HandleContext<CreateCustomerCommand> context)
         {
             _logger.LogInformation("MessageName:{MessageName} MessageId:{MessageId}", context.Message.GetType(), context.Envelope.MessageId);

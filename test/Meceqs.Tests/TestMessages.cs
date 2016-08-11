@@ -15,5 +15,6 @@ namespace Meceqs.Tests
 
     public class SimpleResult
     {
+        public string Text { get; set; }
     }
 }

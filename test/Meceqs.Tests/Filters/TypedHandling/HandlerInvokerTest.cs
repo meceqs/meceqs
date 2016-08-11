@@ -14,44 +14,6 @@ namespace Meceqs.Tests.Filters.TypedHandling
             return new DefaultHandlerInvoker();
         }
 
-        private class SimpleMessageStringHandler : IHandles<SimpleMessage, string>
-        {
-            private readonly string _result;
-
-            public SimpleMessageStringHandler(string result)
-            {
-                _result = result;
-            }
-
-            public Task<string> HandleAsync(HandleContext<SimpleMessage> context)
-            {
-                return Task.FromResult(_result);
-            }
-        }
-
-        private class SimpleMessageSimpleResultHandler : IHandles<SimpleMessage, SimpleResult>
-        {
-            private readonly SimpleResult _result;
-
-            public SimpleMessageSimpleResultHandler(SimpleResult result)
-            {
-                _result = result;
-            }
-
-            public Task<SimpleResult> HandleAsync(HandleContext<SimpleMessage> context)
-            {
-                return Task.FromResult(_result);
-            }
-        }
-
-        private class SimpleMessageNoResultHandler : IHandles<SimpleMessage>
-        {
-            public Task HandleAsync(HandleContext<SimpleMessage> context)
-            {
-                return Task.CompletedTask;
-            }
-        }
-
         private FilterContext<TMessage> GetFilterContext<TMessage>(Type resultType)
             where TMessage : class, IMessage, new()
         {
@@ -76,8 +38,8 @@ namespace Meceqs.Tests.Filters.TypedHandling
         {
             // Arrange
             var invoker = GetInvoker();
-            var handler = new SimpleMessageStringHandler("result");
-            var resultType = typeof(string);
+            var handler = new SimpleMessageIntHandler(1);
+            var resultType = typeof(int);
             var context = GetHandleContext<SimpleMessage>(resultType);
 
             // Act & Assert
@@ -86,19 +48,19 @@ namespace Meceqs.Tests.Filters.TypedHandling
         }
 
         [Fact]
-        public async Task Succeeds_for_SimpleMessage_and_string()
+        public async Task Succeeds_for_SimpleMessage_and_int()
         {
             // Arrange
             var invoker = GetInvoker();
-            var handler = new SimpleMessageStringHandler("result");
-            var resultType = typeof(string);
+            var handler = new SimpleMessageIntHandler(1);
+            var resultType = typeof(int);
             var context = GetHandleContext<SimpleMessage>(resultType);
 
             // Act
-            string result = (string)await invoker.InvokeHandleAsync(handler, context, resultType);
+            int result = (int)await invoker.InvokeHandleAsync(handler, context, resultType);
 
             // Assert
-            Assert.Equal("result", result);
+            Assert.Equal(1, result);
         }
 
         [Fact]
@@ -106,7 +68,8 @@ namespace Meceqs.Tests.Filters.TypedHandling
         {
             // Arrange
             var invoker = GetInvoker();
-            var handler = new SimpleMessageNoResultHandler();
+            bool handlerCalled = false;
+            var handler = new SimpleMessageNoResultHandler(() => handlerCalled = true);
             Type resultType = null;
             var context = GetHandleContext<SimpleMessage>(resultType);
 
@@ -114,6 +77,7 @@ namespace Meceqs.Tests.Filters.TypedHandling
             object result = await invoker.InvokeHandleAsync(handler, context, resultType);
 
             // Assert
+            Assert.True(handlerCalled);
             Assert.Null(result);
         }
 
@@ -139,8 +103,8 @@ namespace Meceqs.Tests.Filters.TypedHandling
         {
             // Arrange
             var invoker = GetInvoker();
-            var handler = new SimpleMessageStringHandler("result");
-            var resultType = typeof(int);
+            var handler = new SimpleMessageIntHandler();
+            var resultType = typeof(string);
             var context = GetHandleContext<SimpleMessage>(resultType);
 
             // Act & Assert
@@ -152,8 +116,8 @@ namespace Meceqs.Tests.Filters.TypedHandling
         {
             // Arrange
             var invoker = GetInvoker();
-            var handler = new SimpleMessageStringHandler("result");
-            var resultType = typeof(string);
+            var handler = new SimpleMessageIntHandler();
+            var resultType = typeof(int);
             var context = GetHandleContext<SimpleCommand>(resultType);
 
             // Act & Assert

@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 
 namespace CustomerContext.Core.QueryHandlers
 {
+    [CustomLogic /* this attribute can be read by an IHandleInterceptor */]
     public class CustomerQueryHandler :
         IHandles<FindCustomersQuery, FindCustomersResult>,
         IHandles<GetCustomerQuery, CustomerDto>
