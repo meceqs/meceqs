@@ -38,18 +38,17 @@ namespace Meceqs.Tests.Sending
         public async Task Calls_Pipeline()
         {
             // Arrange
-            var sourceCmd = TestObjects.Envelope<SimpleCommand>();
             var resultEvent = new SimpleEvent();
 
             var sendPipeline = Substitute.For<ISendPipeline>();
             var sender = GetSender(sendPipeline: sendPipeline);
 
             // Act
-            string result = await sender.ForEvent(resultEvent, Guid.NewGuid(), sourceCmd)
+            string result = await sender.ForMessage(resultEvent)
                 .SendAsync<string>();
 
             // Assert
-            await sendPipeline.Pipeline.ReceivedWithAnyArgs(1).ProcessAsync<string>(null);
+            await sendPipeline.Pipeline.Received(1).ProcessAsync<string>(Arg.Any<IList<FilterContext>>());
         }
 
         [Fact]
@@ -82,7 +81,7 @@ namespace Meceqs.Tests.Sending
 
             // Assert
 
-            await sendPipeline.Pipeline.ReceivedWithAnyArgs(1).ProcessAsync<string>(null);
+            await sendPipeline.Pipeline.Received(1).ProcessAsync<string>(Arg.Any<IList<FilterContext>>());
 
             Assert.NotNull(filterContexts);
             Assert.Equal(1, filterContexts.Count);

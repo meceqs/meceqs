@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Meceqs.Pipeline;
@@ -54,7 +53,7 @@ namespace Meceqs.Tests.Sending
             await sender.SendAsync();
 
             // Assert
-            await pipeline.ReceivedWithAnyArgs(1).ProcessAsync<VoidType>(null);
+            await pipeline.Received(1).ProcessAsync(Arg.Any<FilterContext>());
         }
 
         [Fact]
@@ -80,11 +79,11 @@ namespace Meceqs.Tests.Sending
 
             int called = 0;
             var pipeline = Substitute.For<IPipeline>();
-            pipeline.WhenForAnyArgs(x => x.ProcessAsync<VoidType>(null))
+            pipeline.When(x => x.ProcessAsync(Arg.Any<FilterContext>()))
                 .Do(x => {
                     called++;
 
-                    var ctx = (FilterContext) x.Arg<IList<FilterContext>>().First();
+                    var ctx = x.Arg<FilterContext>();
                     Assert.Equal("Value", ctx.Envelope.Headers["Key"]);
                 });
 
@@ -104,11 +103,11 @@ namespace Meceqs.Tests.Sending
             // Arrange
             int called = 0;
             var pipeline = Substitute.For<IPipeline>();
-            pipeline.WhenForAnyArgs(x => x.ProcessAsync<VoidType>(null))
+            pipeline.When(x => x.ProcessAsync(Arg.Any<FilterContext>()))
                 .Do(x => {
                     called++;
                     
-                    var ctx = (FilterContext) x.Arg<IList<FilterContext>>().First();
+                    var ctx = x.Arg<FilterContext>();
                     Assert.Equal("Value", ctx.GetContextItem<string>("Key"));
                 });
 
@@ -131,11 +130,11 @@ namespace Meceqs.Tests.Sending
 
             int called = 0;
             var pipeline = Substitute.For<IPipeline>();
-            pipeline.WhenForAnyArgs(x => x.ProcessAsync<VoidType>(null))
+            pipeline.When(x => x.ProcessAsync(Arg.Any<FilterContext>()))
                 .Do(x => {
                     called++;
 
-                    var ctx = (FilterContext) x.Arg<IList<FilterContext>>().First();
+                    var ctx = x.Arg<FilterContext>();
                     Assert.Equal(cancellationSource.Token, ctx.Cancellation);
                 });
 
@@ -158,11 +157,11 @@ namespace Meceqs.Tests.Sending
 
             int called = 0;
             var pipeline = Substitute.For<IPipeline>();
-            pipeline.WhenForAnyArgs(x => x.ProcessAsync<VoidType>(null))
+            pipeline.When(x => x.ProcessAsync(Arg.Any<FilterContext>()))
                 .Do(x => {
                     called++;
 
-                    var ctx = (FilterContext) x.Arg<IList<FilterContext>>().First();
+                    var ctx = x.Arg<FilterContext>();
                     Assert.Equal(envelope, ctx.Envelope);
                 });
 

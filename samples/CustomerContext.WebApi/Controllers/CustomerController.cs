@@ -28,6 +28,12 @@ namespace CustomerContext.WebApi.Controllers
         }
 
         [HttpPost]
+        public Task ChangeName(Envelope<ChangeNameCommand> envelope)
+        {
+            return _messageConsumer.ForEnvelope(envelope).ConsumeAsync();
+        }
+
+        [HttpPost]
         public Task<FindCustomersResult> FindCustomers(Envelope<FindCustomersQuery> envelope)
         {
             return _messageConsumer.ForEnvelope(envelope).ConsumeAsync<FindCustomersResult>();

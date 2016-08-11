@@ -17,47 +17,59 @@ namespace Meceqs.Pipeline
             _pipelineName = pipelineName;
         }
 
-        public Task ProcessAsync(IList<FilterContext> contexts)
-        {
-            return ProcessAsync<VoidType>(contexts);
-        }
-
-        public async Task<TResult> ProcessAsync<TResult>(IList<FilterContext> contexts)
-        {
-            // TODO @cweiss does this make sense?
-
-            if (contexts.Count == 0)
-            {
-                return await Task.FromResult(default(TResult));
-            }
-            else if (contexts.Count == 1)
-            {
-                return await ProcessAsync<TResult>(contexts[0]);
-            }
-            else
-            {
-                if (typeof(TResult) != typeof(VoidType))
-                    throw new InvalidOperationException("SendAsync with many contexts can only be used with return-type 'VoidType'");
-
-                foreach (var context in contexts)
-                {
-                    await ProcessAsync<TResult>(context);
-                }
-
-                return await Task.FromResult(default(TResult));
-            }
-        }
-
-        private async Task<TResult> ProcessAsync<TResult>(FilterContext context)
+        public Task ProcessAsync(FilterContext context)
         {
             Check.NotNull(context, nameof(context));
 
-            context.PipelineName = _pipelineName;
+            EnrichContext(context);
+            return _pipeline(context);
+        }
+
+        public async Task ProcessAsync(IList<FilterContext> contexts)
+        {
+            Check.NotNull(contexts, nameof(contexts));
+
+            foreach (var context in contexts)
+            {
+                EnrichContext(context);
+                await _pipeline(context);
+            }
+        }
+
+        public async Task<TResult> ProcessAsync<TResult>(FilterContext context)
+        {
+            Check.NotNull(context, nameof(context));
+
+            EnrichContext(context);
+
             context.ExpectedResultType = typeof(TResult);
 
             await _pipeline(context);
 
             return (TResult)context.Result;
+        }
+
+        public Task<TResult> ProcessAsync<TResult>(IList<FilterContext> contexts)
+        {
+            Check.NotNull(contexts, nameof(contexts));
+
+            if (contexts.Count == 0)
+            {
+                return Task.FromResult(default(TResult));
+            }
+            else if (contexts.Count == 1)
+            {
+                return ProcessAsync<TResult>(contexts[0]);
+            }
+            else
+            {
+                throw new NotSupportedException($"'{nameof(ProcessAsync)}' with a result-type can only be called for a single envelope");
+            }
+        }
+
+        private void EnrichContext(FilterContext context)
+        {
+            context.PipelineName = _pipelineName;
         }
     }
 }

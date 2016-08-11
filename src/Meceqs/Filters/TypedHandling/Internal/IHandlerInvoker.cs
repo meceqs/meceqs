@@ -5,6 +5,6 @@ namespace Meceqs.Filters.TypedHandling.Internal
 {
     public interface IHandlerInvoker
     {
-        Task<object> InvokeHandleAsync(object handler, HandleContext handleContext, Type resultType);
+        Task<object> InvokeHandleAsync(IHandles handler, HandleContext handleContext, Type resultType);
     }
 }

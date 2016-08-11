@@ -1,7 +1,9 @@
+using System;
 using System.Threading.Tasks;
 using CustomerContext.Contracts.Commands;
 using CustomerContext.Core.Domain;
 using CustomerContext.Core.Repositories;
+using Meceqs;
 using Meceqs.Filters.TypedHandling;
 using Meceqs.Sending;
 using Microsoft.Extensions.Logging;
@@ -9,8 +11,9 @@ using Newtonsoft.Json;
 
 namespace CustomerContext.Core.CommandHandlers
 {
-    public class CustomerCommandHandler
-        : IHandles<CreateCustomerCommand, CreateCustomerResult>
+    public class CustomerCommandHandler :
+        IHandles<CreateCustomerCommand, CreateCustomerResult>,
+        IHandles<ChangeNameCommand>
     {
         private readonly ILogger _logger;
         private readonly ICustomerRepository _customerRepository;
@@ -36,15 +39,33 @@ namespace CustomerContext.Core.CommandHandlers
 
             _customerRepository.Add(customer);
 
-            // save events
-
-            var events = customer.GetChanges();
-            
-            await _sender.ForEvents(events, context.Envelope).SendAsync();
-            
-            customer.ClearChanges();
+            await SaveAndClearEvents(customer, context.Envelope);
 
             return new CreateCustomerResult { CustomerId = customer.Id };
+        }
+
+        public async Task HandleAsync(HandleContext<ChangeNameCommand> context)
+        {
+            _logger.LogInformation("Envelope:{Envelope}", JsonConvert.SerializeObject(context.Envelope));
+
+            var cmd = context.Message;
+
+            var customer = _customerRepository.GetById(cmd.CustomerId);
+            if (customer == null)
+                throw new InvalidOperationException("customer not found");
+
+            customer.ChangeName(cmd.FirstName, cmd.LastName);
+
+            await SaveAndClearEvents(customer, context.Envelope);
+        }
+
+        private async Task SaveAndClearEvents(Customer customer, Envelope sourceMessage)
+        {
+            var events = customer.GetChanges();
+
+            await _sender.ForEvents(events, sourceMessage).SendAsync();
+
+            customer.ClearChanges();
         }
     }
 }

@@ -7,7 +7,7 @@ using Xunit;
 
 namespace Meceqs.Tests.Filters.TypedHandling
 {
-    public class SenderInvokerTest
+    public class HandlerInvokerTest
     {
         private IHandlerInvoker GetInvoker()
         {
@@ -44,29 +44,29 @@ namespace Meceqs.Tests.Filters.TypedHandling
             }
         }
 
-        private class SimpleMessageVoidTypeHandler : IHandles<SimpleMessage, VoidType>
+        private class SimpleMessageNoResultHandler : IHandles<SimpleMessage>
         {
-            public Task<VoidType> HandleAsync(HandleContext<SimpleMessage> context)
+            public Task HandleAsync(HandleContext<SimpleMessage> context)
             {
-                return Task.FromResult(VoidType.Value);
+                return Task.CompletedTask;
             }
         }
 
-        private FilterContext<TMessage> GetFilterContext<TMessage, TResult>()
+        private FilterContext<TMessage> GetFilterContext<TMessage>(Type resultType)
             where TMessage : class, IMessage, new()
         {
             var envelope = TestObjects.Envelope<TMessage>();
 
             var filterContext = new FilterContext<TMessage>(envelope);
-            filterContext.ExpectedResultType = typeof(TResult);
+            filterContext.ExpectedResultType = resultType;
 
             return filterContext;
         }
 
-        private HandleContext<TMessage> GetHandleContext<TMessage, TResult>(FilterContext<TMessage> filterContext = null)
+        private HandleContext<TMessage> GetHandleContext<TMessage>(Type resultType, FilterContext<TMessage> filterContext = null)
             where TMessage : class, IMessage, new()
         {
-            filterContext = filterContext ?? GetFilterContext<TMessage, TResult>();
+            filterContext = filterContext ?? GetFilterContext<TMessage>(resultType);
 
             return new HandleContext<TMessage>(filterContext);
         }
@@ -76,14 +76,13 @@ namespace Meceqs.Tests.Filters.TypedHandling
         {
             // Arrange
             var invoker = GetInvoker();
-            var sender = new SimpleMessageStringHandler("result");
-            var context = GetHandleContext<SimpleMessage, string>();
+            var handler = new SimpleMessageStringHandler("result");
             var resultType = typeof(string);
+            var context = GetHandleContext<SimpleMessage>(resultType);
 
             // Act & Assert
             await Assert.ThrowsAsync<ArgumentNullException>(() => invoker.InvokeHandleAsync(null, context, resultType));
-            await Assert.ThrowsAsync<ArgumentNullException>(() => invoker.InvokeHandleAsync(sender, null, resultType));
-            await Assert.ThrowsAsync<ArgumentNullException>(() => invoker.InvokeHandleAsync(sender, context, null));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => invoker.InvokeHandleAsync(handler, null, resultType));
         }
 
         [Fact]
@@ -91,31 +90,31 @@ namespace Meceqs.Tests.Filters.TypedHandling
         {
             // Arrange
             var invoker = GetInvoker();
-            var sender = new SimpleMessageStringHandler("result");
-            var context = GetHandleContext<SimpleMessage, string>();
+            var handler = new SimpleMessageStringHandler("result");
             var resultType = typeof(string);
+            var context = GetHandleContext<SimpleMessage>(resultType);
 
             // Act
-            string result = (string)await invoker.InvokeHandleAsync(sender, context, resultType);
+            string result = (string)await invoker.InvokeHandleAsync(handler, context, resultType);
 
             // Assert
             Assert.Equal("result", result);
         }
 
         [Fact]
-        public async Task Succeeds_for_SimpleMessage_and_VoidType()
+        public async Task Succeeds_for_SimpleMessage_without_result()
         {
             // Arrange
             var invoker = GetInvoker();
-            var sender = new SimpleMessageVoidTypeHandler();
-            var context = GetHandleContext<SimpleMessage, VoidType>();
-            var resultType = typeof(VoidType);
+            var handler = new SimpleMessageNoResultHandler();
+            Type resultType = null;
+            var context = GetHandleContext<SimpleMessage>(resultType);
 
             // Act
-            VoidType result = (VoidType)await invoker.InvokeHandleAsync(sender, context, resultType);
+            object result = await invoker.InvokeHandleAsync(handler, context, resultType);
 
             // Assert
-            Assert.Equal(VoidType.Value, result);
+            Assert.Null(result);
         }
 
         [Fact]
@@ -124,28 +123,15 @@ namespace Meceqs.Tests.Filters.TypedHandling
             // Arrange
             var invoker = GetInvoker();
             var expectedResult = new SimpleResult();
-            var sender = new SimpleMessageSimpleResultHandler(expectedResult);
-            var context = GetHandleContext<SimpleMessage, SimpleResult>();
+            var handler = new SimpleMessageSimpleResultHandler(expectedResult);
             var resultType = typeof(SimpleResult);
+            var context = GetHandleContext<SimpleMessage>(resultType);
 
             // Act
-            SimpleResult result = (SimpleResult)await invoker.InvokeHandleAsync(sender, context, resultType);
+            SimpleResult result = (SimpleResult)await invoker.InvokeHandleAsync(handler, context, resultType);
 
             // Assert
             Assert.Equal(expectedResult, result);
-        }
-
-        [Fact]
-        public async Task Throws_if_handler_isnt_IHandles()
-        {
-            // Arrange
-            var invoker = GetInvoker();
-            var sender = new SimpleMessage(); // some object other than IHandles<,>
-            var context = GetHandleContext<SimpleMessage, int>();
-            var resultType = typeof(int);
-
-            // Act & Assert
-            await Assert.ThrowsAsync<InvalidCastException>(() => invoker.InvokeHandleAsync(sender, context, resultType));
         }
 
         [Fact]
@@ -153,12 +139,12 @@ namespace Meceqs.Tests.Filters.TypedHandling
         {
             // Arrange
             var invoker = GetInvoker();
-            var sender = new SimpleMessageStringHandler("result");
-            var context = GetHandleContext<SimpleMessage, int>();
+            var handler = new SimpleMessageStringHandler("result");
             var resultType = typeof(int);
+            var context = GetHandleContext<SimpleMessage>(resultType);
 
             // Act & Assert
-            await Assert.ThrowsAsync<InvalidCastException>(() => invoker.InvokeHandleAsync(sender, context, resultType));
+            await Assert.ThrowsAsync<InvalidCastException>(() => invoker.InvokeHandleAsync(handler, context, resultType));
         }
 
         [Fact]
@@ -166,12 +152,12 @@ namespace Meceqs.Tests.Filters.TypedHandling
         {
             // Arrange
             var invoker = GetInvoker();
-            var sender = new SimpleMessageStringHandler("result");
-            var context = GetHandleContext<SimpleCommand, string>();
+            var handler = new SimpleMessageStringHandler("result");
             var resultType = typeof(string);
+            var context = GetHandleContext<SimpleCommand>(resultType);
 
             // Act & Assert
-            await Assert.ThrowsAsync<InvalidCastException>(() => invoker.InvokeHandleAsync(sender, context, resultType));
+            await Assert.ThrowsAsync<InvalidCastException>(() => invoker.InvokeHandleAsync(handler, context, resultType));
         }
     }
 }

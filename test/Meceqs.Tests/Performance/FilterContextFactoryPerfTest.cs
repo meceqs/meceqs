@@ -10,7 +10,7 @@ using Xunit;
 namespace Meceqs.Tests.Performance
 {
     // Make class public to actually run it.
-    public class FilterContextFactoryPerfTest
+    internal class FilterContextFactoryPerfTest
     {
         private void RunTimed(string message, int loopCount, Action action)
         {

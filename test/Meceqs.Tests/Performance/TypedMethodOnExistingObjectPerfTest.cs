@@ -7,7 +7,7 @@ using Xunit;
 namespace Meceqs.Tests.Performance
 {
     // Make class public to actually run it.
-    public class TypedMethodOnExistingObjectTest
+    internal class TypedMethodOnExistingObjectPerfTest
     {
         public class BrokeredMessage
         {

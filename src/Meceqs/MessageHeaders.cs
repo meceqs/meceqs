@@ -1,19 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace Meceqs
 {
-    public class MessageHeaders : Dictionary<string, string>
+    public class MessageHeaders : Dictionary<string, object>
     {
         public T GetValue<T>(string headerName)
         {
             if (string.IsNullOrWhiteSpace(headerName))
                 throw new ArgumentNullException(nameof(headerName));
 
-            string value;
+            object value;
             if (TryGetValue(headerName, out value))
             {
-                return MessageValueConverter.FromInvariantString<T>(value);
+                return (T)Convert.ChangeType(value, typeof(T), CultureInfo.InvariantCulture);
             }
 
             return default(T);
@@ -27,7 +28,7 @@ namespace Meceqs
             if (string.IsNullOrWhiteSpace(headerName) || value == null)
                 return;
 
-            this[headerName] = MessageValueConverter.ToInvariantString(value);
+            this[headerName] = value;
         }
     }
 }

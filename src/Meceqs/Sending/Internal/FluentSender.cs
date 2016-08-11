@@ -8,12 +8,11 @@ namespace Meceqs.Sending.Internal
 {
     public class FluentSender : IFluentSender
     {
+        private readonly IList<Envelope> _envelopes;
+        private readonly FilterContextItems _contextItems = new FilterContextItems();
         private readonly IEnvelopeCorrelator _envelopeCorrelator;
         private readonly IFilterContextFactory _filterContextFactory;
         private readonly IPipeline _pipeline;
-
-        private readonly IList<Envelope> _envelopes;
-        private readonly FilterContextItems _contextItems = new FilterContextItems();
 
         private CancellationToken _cancellation = CancellationToken.None;
 
@@ -68,13 +67,26 @@ namespace Meceqs.Sending.Internal
 
         public Task SendAsync()
         {
-            return SendAsync<VoidType>();
+            var filterContexts = _envelopes.Select(CreateFilterContext).ToList();
+
+            if (filterContexts.Count == 0)
+            {
+                return Task.CompletedTask;
+            }
+            else if (filterContexts.Count == 1)
+            {
+                return _pipeline.ProcessAsync(filterContexts[0]);
+            }
+            else
+            {
+                return _pipeline.ProcessAsync(filterContexts);
+            }
         }
 
         public Task<TResult> SendAsync<TResult>()
         {
             var filterContexts = _envelopes.Select(CreateFilterContext).ToList();
-            
+
             return _pipeline.ProcessAsync<TResult>(filterContexts);
         }
 

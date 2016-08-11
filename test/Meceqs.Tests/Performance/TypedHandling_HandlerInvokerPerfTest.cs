@@ -11,7 +11,7 @@ using Xunit;
 namespace Meceqs.Test.Performance
 {
     // Make class public to actually run it.
-    public class TypedHandling_HandlerInvokerPerfTest
+    internal class TypedHandling_HandlerInvokerPerfTest
     {
         private class SimpleMessageStringHandler : IHandles<SimpleMessage, string>
         {

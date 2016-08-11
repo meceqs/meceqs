@@ -35,7 +35,6 @@ namespace Meceqs.Filters.TypedHandling
         public async Task Invoke(FilterContext filterContext)
         {
             Check.NotNull(filterContext, nameof(filterContext));
-            Check.NotNull(filterContext.ExpectedResultType, $"{nameof(filterContext)}.{nameof(filterContext.ExpectedResultType)}");
 
             // IHandlerFactory and IHandler expect generic types so we have to use reflection.
             // The calls are outsourced to separate invokers to make sure that they 
@@ -44,7 +43,7 @@ namespace Meceqs.Filters.TypedHandling
             Type messageType = filterContext.Message.GetType();
             Type resultType = filterContext.ExpectedResultType;
 
-            object handler = _handlerFactoryInvoker.InvokeCreateHandler(_handlerFactory, messageType, resultType);
+            IHandles handler = _handlerFactoryInvoker.InvokeCreateHandler(_handlerFactory, messageType, resultType);
 
             if (handler == null)
             {

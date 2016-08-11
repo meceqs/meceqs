@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Text;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace Meceqs.Serialization.Json
 {
@@ -13,6 +14,7 @@ namespace Meceqs.Serialization.Json
 
         private static readonly JsonSerializerSettings _defaultSettings = new JsonSerializerSettings
         {
+            ContractResolver = new CamelCasePropertyNamesContractResolver(),
             NullValueHandling = NullValueHandling.Ignore
         };
 

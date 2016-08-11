@@ -26,5 +26,13 @@ namespace CustomerContext.Core.Domain
 
             _changes.Add(new CustomerCreatedEvent(Id, FirstName, LastName));
         }
+
+        public void ChangeName(string firstName, string lastName)
+        {
+            FirstName = firstName;
+            LastName = lastName;
+
+            _changes.Add(new CustomerNameChangedEvent(Id, FirstName, LastName));
+        }
     }
 }
