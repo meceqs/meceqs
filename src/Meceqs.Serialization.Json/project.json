@@ -1,4 +1,4 @@
-{
+﻿{
   "version": "1.0.0-*",
 
   "buildOptions": {
@@ -9,11 +9,13 @@
     "Meceqs": "1.0.0-*",
     "Meceqs.Serialization": "1.0.0-*",
 
-    "WindowsAzure.ServiceBus": "3.0.1"
+    "Newtonsoft.Json": "9.0.1"
   },
 
   "frameworks": {
-    "net46": {
+    "netstandard1.3": {
+      "dependencies": {
+      }
     }
   }
 }

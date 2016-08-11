@@ -5,7 +5,7 @@ namespace Meceqs
 {
     public class MessageHistoryEntry
     {
-        public string Channel { get; set; }
+        public string Pipeline { get; set; }
         public string Host { get; set; }
         public string Endpoint { get; set; }
         public DateTime CreatedOnUtc { get; set; }

@@ -1,7 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Meceqs.Handling;
+using Meceqs.Consuming;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.ServiceBus.Messaging;
@@ -37,7 +37,7 @@ namespace Meceqs.AzureServiceBus
 
                 try
                 {
-                    await ResolveServicesAndInvokeMediator(brokeredMessage, cancellation);
+                    await ResolveServicesAndInvokeConsumer(brokeredMessage, cancellation);
 
                     await brokeredMessage.CompleteAsync();
                     success = true;
@@ -57,7 +57,7 @@ namespace Meceqs.AzureServiceBus
             }
         }
 
-        private async Task ResolveServicesAndInvokeMediator(BrokeredMessage brokeredMessage, CancellationToken cancellation)
+        private async Task ResolveServicesAndInvokeConsumer(BrokeredMessage brokeredMessage, CancellationToken cancellation)
         {
             // Handling a message from an underlying transport is similar to handling a HTTP-request.
             // We must make sure, processing of one message doesn't have an effect on other messages.
@@ -66,11 +66,13 @@ namespace Meceqs.AzureServiceBus
             using (IServiceScope scope = _serviceScopeFactory.CreateScope())
             {
                 var brokeredMessageConverter = scope.ServiceProvider.GetRequiredService<IBrokeredMessageConverter>();
-                var handlingMediator = scope.ServiceProvider.GetRequiredService<IEnvelopeHandler>();
+                var envelopeConsumer = scope.ServiceProvider.GetRequiredService<IEnvelopeConsumer>();
 
                 Envelope envelope = brokeredMessageConverter.ConvertToEnvelope(brokeredMessage);
 
-                await handlingMediator.HandleUntypedAsync(envelope, cancellation);
+                await envelopeConsumer.ForEnvelope(envelope)
+                    .SetCancellationToken(cancellation)
+                    .ConsumeAsync();
             }
         }
     }

@@ -6,17 +6,17 @@ namespace Meceqs.Consuming.Internal
     public class DefaultEnvelopeConsumer : IEnvelopeConsumer
     {
         private readonly IFilterContextFactory _filterContextFactory;
-        private readonly IConsumeChannel _consumeChannel;
+        private readonly IPipeline _pipeline;
 
         public DefaultEnvelopeConsumer(
             IFilterContextFactory filterContextFactory,
-            IConsumeChannel consumeChannel)
+            IConsumePipeline consumePipeline)
         {
             Check.NotNull(filterContextFactory, nameof(filterContextFactory));
-            Check.NotNull(consumeChannel, nameof(consumeChannel));
+            Check.NotNull(consumePipeline, nameof(consumePipeline));
 
             _filterContextFactory = filterContextFactory;
-            _consumeChannel = consumeChannel;
+            _pipeline = consumePipeline.Pipeline;
         }
 
         public IConsumeBuilder ForEnvelope(Envelope envelope)
@@ -32,7 +32,7 @@ namespace Meceqs.Consuming.Internal
         {
             Check.NotNull(envelopes, nameof(envelopes));
 
-            return new DefaultConsumeBuilder(envelopes, _filterContextFactory, _consumeChannel.Channel);
+            return new DefaultConsumeBuilder(envelopes, _filterContextFactory, _pipeline);
         }
     }
 }

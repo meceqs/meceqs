@@ -2,17 +2,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Meceqs.Channels;
 using Meceqs.Pipeline;
 
 namespace Meceqs.Consuming.Internal
 {
     public class DefaultConsumeBuilder : IConsumeBuilder
     {
-        private const string ChannelName = "Consume";
+        private const string PipelineName = "Consume";
 
         private readonly IFilterContextFactory _filterContextFactory;
-        private readonly IChannel _channel;
+        private readonly IPipeline _pipeline;
         private readonly IList<Envelope> _envelopes;
         private readonly FilterContextItems _contextItems = new FilterContextItems();
 
@@ -21,15 +20,15 @@ namespace Meceqs.Consuming.Internal
         public DefaultConsumeBuilder(
             IList<Envelope> envelopes,
             IFilterContextFactory filterContextFactory,
-            IChannel channel)
+            IPipeline pipeline)
         {
             Check.NotNull(envelopes, nameof(envelopes));
             Check.NotNull(filterContextFactory, nameof(filterContextFactory));
-            Check.NotNull(channel, nameof(channel));
+            Check.NotNull(pipeline, nameof(pipeline));
 
             _envelopes = envelopes;
             _filterContextFactory = filterContextFactory;
-            _channel = channel;
+            _pipeline = pipeline;
         }
 
         public IConsumeBuilder SetCancellationToken(CancellationToken cancellation)
@@ -53,7 +52,7 @@ namespace Meceqs.Consuming.Internal
         {
             var filterContexts = _envelopes.Select(CreateFilterContext).ToList();
 
-            return _channel.SendAsync<TResult>(filterContexts);
+            return _pipeline.SendAsync<TResult>(filterContexts);
         }
 
         private FilterContext CreateFilterContext(Envelope envelope)
@@ -61,7 +60,7 @@ namespace Meceqs.Consuming.Internal
             var context = _filterContextFactory.CreateFilterContext(envelope);
 
             context.Cancellation = _cancellation;
-            context.ChannelName = ChannelName;
+            context.PipelineName = PipelineName;
 
             if (_contextItems.Count > 0)
             {

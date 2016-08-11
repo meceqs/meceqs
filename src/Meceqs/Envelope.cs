@@ -10,17 +10,50 @@ namespace Meceqs
             get { return (TMessage)base.Message; }
             set { base.Message = value; }
         }
+
+        public Envelope()
+        {
+        }
+
+        public Envelope(TMessage message, Guid messageId)
+            : base(message, messageId)
+        {
+        }
     }
 
     public abstract class Envelope
     {
         public IMessage Message { get; set; }
         public Guid MessageId { get; set; }
-        public string MessageName { get; set; }
         public string MessageType { get; set; }
+        public string MessageName { get; set; }
+        public Guid? CorrelationId { get; set; } // TODO !! rename (ConversationId, TraceIdentifier, ...)
+        public DateTime? CreatedOnUtc { get; set; }
         public MessageHeaders Headers { get; set; } = new MessageHeaders();
-        public Guid CorrelationId { get; set; } // TODO !! rename (ConversationId, TraceIdentifier, ...)
         public List<MessageHistoryEntry> MessageHistory { get; set; } = new List<MessageHistoryEntry>();
+
+        protected Envelope() 
+        {
+        }
+
+        protected Envelope(IMessage message, Guid messageId)
+        {
+            Check.NotNull(message, nameof(message));
+            Check.NotEmpty(messageId, nameof(messageId));
+
+            Type messageType = message.GetType();
+
+            Message = message;
+            MessageName = messageType.Name;
+            MessageType = messageType.FullName;
+
+            MessageId = messageId;
+
+            // should be overwritten, if message is correlated with other message
+            CorrelationId = Guid.NewGuid();
+
+            CreatedOnUtc = DateTime.UtcNow;
+        }
 
         public void SetHeader(string headerName, object value)
         {

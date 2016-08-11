@@ -1,9 +1,9 @@
-using Meceqs.Channels;
+using Meceqs.Pipeline;
 
 namespace Meceqs.Consuming
 {
     public class ConsumeOptions
     {
-        public ChannelOptions Channel { get; set; } = new ChannelOptions();
+        public PipelineOptions Pipeline { get; set; } = new PipelineOptions();
     }
 }

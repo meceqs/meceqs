@@ -1,15 +1,14 @@
 using System.Threading;
-using Meceqs.Pipeline;
 
-namespace Meceqs.Channels
+namespace Meceqs.Pipeline
 {
-    public class ChannelOptions
+    public class PipelineOptions
     {
         private FilterDelegate _pipeline = null;
         private bool _pipelineInitialized = false;
         private object _pipelineLock = new object();
 
-        public IPipelineBuilder PipelineBuilder { get; set; }
+        public IPipelineBuilder Builder { get; set; }
 
         public FilterDelegate Pipeline
         {
@@ -19,7 +18,7 @@ namespace Meceqs.Channels
                     ref _pipeline,
                     ref _pipelineInitialized,
                     ref _pipelineLock,
-                    PipelineBuilder.Build
+                    Builder.Build
                 );
             }
         }

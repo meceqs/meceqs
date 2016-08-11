@@ -9,23 +9,23 @@ namespace Meceqs.Sending.Internal
         private readonly IEnvelopeFactory _envelopeFactory;
         private readonly IEnvelopeCorrelator _envelopeCorrelator;
         private readonly IFilterContextFactory _filterContextFactory;
-        private readonly ISendChannel _sendChannel;
+        private readonly IPipeline _pipeline;
 
         public DefaultMessageSender(
             IEnvelopeFactory envelopeFactory,
             IEnvelopeCorrelator envelopeCorrelator,
             IFilterContextFactory filterContextFactory,
-            ISendChannel sendChannel)
+            ISendPipeline sendPipeline)
         {
             Check.NotNull(envelopeFactory, nameof(envelopeFactory));
             Check.NotNull(envelopeCorrelator, nameof(envelopeCorrelator));
             Check.NotNull(filterContextFactory, nameof(filterContextFactory));
-            Check.NotNull(sendChannel, nameof(sendChannel));
+            Check.NotNull(sendPipeline, nameof(sendPipeline));
 
             _envelopeFactory = envelopeFactory;
             _envelopeCorrelator = envelopeCorrelator;
             _filterContextFactory = filterContextFactory;
-            _sendChannel = sendChannel;
+            _pipeline = sendPipeline.Pipeline;
         }
 
         public ISendBuilder ForMessage(IMessage message)
@@ -42,7 +42,7 @@ namespace Meceqs.Sending.Internal
 
             var envelopes = new List<Envelope> { envelope };
 
-            return new DefaultSendBuilder(envelopes, _envelopeCorrelator, _filterContextFactory, _sendChannel.Channel);
+            return new DefaultSendBuilder(envelopes, _envelopeCorrelator, _filterContextFactory, _pipeline);
         }
 
         public ISendBuilder ForMessages(IList<IMessage> messages)
@@ -57,7 +57,7 @@ namespace Meceqs.Sending.Internal
                 var envelope = _envelopeFactory.Create(message, messageId);
             }
 
-            return new DefaultSendBuilder(envelopes, _envelopeCorrelator, _filterContextFactory, _sendChannel.Channel);
+            return new DefaultSendBuilder(envelopes, _envelopeCorrelator, _filterContextFactory, _pipeline);
         }
     }
 }

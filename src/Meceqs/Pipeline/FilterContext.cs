@@ -31,7 +31,7 @@ namespace Meceqs.Pipeline
 
         public CancellationToken Cancellation { get; set; }
 
-        public string ChannelName { get; set; }
+        public string PipelineName { get; set; }
 
         protected FilterContext(Envelope envelope)
         {

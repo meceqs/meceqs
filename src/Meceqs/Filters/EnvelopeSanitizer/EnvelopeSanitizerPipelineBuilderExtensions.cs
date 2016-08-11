@@ -4,7 +4,7 @@ using Meceqs.Pipeline;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
-    public static class SanitizeEnvelopePipelineBuilderExtensions
+    public static class EnvelopeSanitizerPipelineBuilderExtensions
     {
         public static IPipelineBuilder UseEnvelopeSanitizer(this IPipelineBuilder builder)
         {

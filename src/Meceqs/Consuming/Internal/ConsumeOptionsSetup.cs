@@ -14,7 +14,7 @@ namespace Meceqs.Consuming.Internal
 
         public void Configure(ConsumeOptions options)
         {
-            options.Channel.PipelineBuilder = _pipelineBuilder;
+            options.Pipeline.Builder = _pipelineBuilder;
         }
     }
 }

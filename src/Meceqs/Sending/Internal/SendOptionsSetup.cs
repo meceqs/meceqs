@@ -14,7 +14,7 @@ namespace Meceqs.Sending.Internal
 
         public void Configure(SendOptions options)
         {
-            options.Channel.PipelineBuilder = _pipelineBuilder;
+            options.Pipeline.Builder = _pipelineBuilder;
         }
     }
 }

@@ -1,10 +1,9 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Meceqs.Pipeline;
 
-namespace Meceqs.Channels
+namespace Meceqs.Pipeline
 {
-    public interface IChannel
+    public interface IPipeline
     {
         Task SendAsync(IList<FilterContext> contexts);
 

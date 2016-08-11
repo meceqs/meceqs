@@ -15,10 +15,9 @@ namespace Microsoft.Extensions.DependencyInjection
             builder.Services.AddTransient<IConfigureOptions<SendOptions>, SendOptionsSetup>();
             builder.Services.Configure(setupAction);
 
-            builder.Services.AddSingleton<ISendChannel, DefaultSendChannel>();
+            builder.Services.AddSingleton<ISendPipeline, DefaultSendPipeline>();
             builder.Services.AddTransient<IMessageSender, DefaultMessageSender>();
 
-            builder.Services.AddTransient<IEnvelopeFactory, DefaultEnvelopeFactory>();
             builder.Services.AddSingleton<IEnvelopeCorrelator, DefaultEnvelopeCorrelator>();
 
             return builder;

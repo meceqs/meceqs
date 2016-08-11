@@ -15,7 +15,7 @@ namespace Microsoft.Extensions.DependencyInjection
             builder.Services.AddTransient<IConfigureOptions<ConsumeOptions>, ConsumeOptionsSetup>();
             builder.Services.Configure(setupAction);
 
-            builder.Services.AddSingleton<IConsumeChannel, DefaultConsumeChannel>();
+            builder.Services.AddSingleton<IConsumePipeline, DefaultConsumePipeline>();
             builder.Services.AddTransient<IEnvelopeConsumer, DefaultEnvelopeConsumer>();
 
             return builder;

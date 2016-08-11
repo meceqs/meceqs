@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 
-namespace Meceqs
+namespace Meceqs.Serialization
 {
     public interface IEnvelopeSerializer
     {

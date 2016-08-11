@@ -29,7 +29,7 @@ namespace Microsoft.Extensions.DependencyInjection
             // TODO @cweiss check lifecycles!
 
             // Core
-            services.AddSingleton<IEnvelopeTypeLoader, DefaultEnvelopeTypeLoader>();
+            services.AddTransient<IEnvelopeFactory, DefaultEnvelopeFactory>();
 
             // Pipeline
             services.AddSingleton<IFilterContextFactory, DefaultFilterContextFactory>();

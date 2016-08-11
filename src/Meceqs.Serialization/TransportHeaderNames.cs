@@ -1,4 +1,4 @@
-namespace Meceqs
+namespace Meceqs.Serialization
 {
     public static class TransportHeaderNames
     {

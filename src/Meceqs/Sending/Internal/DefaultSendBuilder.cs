@@ -2,18 +2,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Meceqs.Channels;
 using Meceqs.Pipeline;
 
 namespace Meceqs.Sending.Internal
 {
     public class DefaultSendBuilder : ISendBuilder
     {
-        private const string ChannelName = "Send";
+        private const string PipelineName = "Send";
 
         private readonly IEnvelopeCorrelator _envelopeCorrelator;
         private readonly IFilterContextFactory _filterContextFactory;
-        private readonly IChannel _channel;
+        private readonly IPipeline _pipeline;
 
         private readonly IList<Envelope> _envelopes;
         private readonly FilterContextItems _contextItems = new FilterContextItems();
@@ -24,17 +23,17 @@ namespace Meceqs.Sending.Internal
             IList<Envelope> envelopes,
             IEnvelopeCorrelator envelopeCorrelator,
             IFilterContextFactory filterContextFactory,
-            IChannel channel)
+            IPipeline pipeline)
         {
             Check.NotNull(envelopes, nameof(envelopes));
             Check.NotNull(envelopeCorrelator, nameof(envelopeCorrelator));
             Check.NotNull(filterContextFactory, nameof(filterContextFactory));
-            Check.NotNull(channel, nameof(channel));
+            Check.NotNull(pipeline, nameof(pipeline));
 
             _envelopes = envelopes;
             _envelopeCorrelator = envelopeCorrelator;
             _filterContextFactory = filterContextFactory;
-            _channel = channel;
+            _pipeline = pipeline;
         }
 
         public ISendBuilder CorrelateWith(Envelope source)
@@ -78,7 +77,7 @@ namespace Meceqs.Sending.Internal
         {
             var filterContexts = _envelopes.Select(CreateFilterContext).ToList();
             
-            return _channel.SendAsync<TResult>(filterContexts);
+            return _pipeline.SendAsync<TResult>(filterContexts);
         }
 
         private FilterContext CreateFilterContext(Envelope envelope)
@@ -86,7 +85,7 @@ namespace Meceqs.Sending.Internal
             var context = _filterContextFactory.CreateFilterContext(envelope);
 
             context.Cancellation = _cancellation;
-            context.ChannelName = ChannelName;
+            context.PipelineName = PipelineName;
 
             if (_contextItems.Count > 0)
             {

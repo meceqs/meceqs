@@ -1,18 +1,17 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Meceqs.Pipeline;
 
-namespace Meceqs.Channels
+namespace Meceqs.Pipeline
 {
-    public class DefaultChannel : IChannel
+    public class DefaultPipeline : IPipeline
     {
         private readonly FilterDelegate _pipeline;
 
-        public DefaultChannel(ChannelOptions options)
+        public DefaultPipeline(PipelineOptions options)
         {
             Check.NotNull(options, nameof(options));
-            Check.NotNull(options.PipelineBuilder, $"{nameof(options)}.{nameof(options.PipelineBuilder)}");
+            Check.NotNull(options.Builder, $"{nameof(options)}.{nameof(options.Builder)}");
 
             _pipeline = options.Pipeline;
         }

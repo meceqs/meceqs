@@ -27,9 +27,19 @@ namespace Meceqs.Filters.EnvelopeSanitizer
             context.Envelope.MessageName = messageType.Name;
             context.Envelope.MessageType = messageType.FullName;
 
-            if (context.Envelope.CorrelationId == Guid.Empty)
+            if (context.Envelope.MessageId == Guid.Empty)
+            {
+                context.Envelope.MessageId = Guid.NewGuid();
+            }
+
+            if (!context.Envelope.CorrelationId.HasValue || context.Envelope.CorrelationId.Value == Guid.Empty)
             {
                 context.Envelope.CorrelationId = Guid.NewGuid();
+            }
+
+            if (!context.Envelope.CreatedOnUtc.HasValue)
+            {
+                context.Envelope.CreatedOnUtc = DateTime.UtcNow;
             }
 
             return _next(context);

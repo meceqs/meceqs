@@ -6,7 +6,6 @@ using CustomerContext.Core.QueryHandlers;
 using CustomerContext.Core.Repositories;
 using CustomerContext.WebApi.Infrastructure;
 using Meceqs.Filters.TypedHandling;
-using Meceqs.Pipeline;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -45,7 +44,7 @@ namespace CustomerContext.WebApi
                 .AddTypedHandling()
                 .AddConsumer(options =>
                 {
-                    var builder = options.Channel.PipelineBuilder;
+                    var builder = options.Pipeline.Builder;
 
                     // make sure, MessageType, MessageName, etc are correctly set
                     builder.UseEnvelopeSanitizer();
@@ -61,7 +60,7 @@ namespace CustomerContext.WebApi
                 })
                 .AddSender(options =>
                 {
-                    var builder = options.Channel.PipelineBuilder;
+                    var builder = options.Pipeline.Builder;
 
                     builder.UseAspNetCore();
 

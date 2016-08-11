@@ -42,7 +42,7 @@ namespace Meceqs.AspNetCore
             
             var historyEntry = new MessageHistoryEntry
             {
-                Channel = context.ChannelName,
+                Pipeline = context.PipelineName,
                 Host = HostName,
                 Endpoint = EndpointName,
                 CreatedOnUtc = DateTime.UtcNow
