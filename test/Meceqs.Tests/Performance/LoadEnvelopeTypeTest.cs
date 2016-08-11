@@ -6,7 +6,7 @@ using Xunit;
 namespace Meceqs.Tests.Performance
 {
     // Make class public to actually run it.
-    internal class LoadEnvelopeTypeTest
+    public class LoadEnvelopeTypeTest
     {
         private void RunTimed(string message, int loopCount, Action action)
         {

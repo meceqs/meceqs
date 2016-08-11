@@ -1,27 +1,30 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Meceqs.Pipeline;
 using Meceqs.Sending;
+using Meceqs.Sending.Internal;
 using NSubstitute;
 using Xunit;
 
 namespace Meceqs.Tests.Sending
 {
-    public class SendBuilderTest
+    public class FluentSenderTest
     {
-        private IFluentSender GetBuilder<TMessage>(
+        private IFluentSender GetFluentSender<TMessage>(
             Envelope<TMessage> envelope = null,
             IEnvelopeCorrelator correlator = null,
-            IMessageSendingMediator sendingMediator = null) where TMessage : class, IMessage, new()
+            IPipeline pipeline = null) where TMessage : class, IMessage, new()
         {
             envelope = envelope ?? TestObjects.Envelope<TMessage>();
             correlator = correlator ?? new DefaultEnvelopeCorrelator();
-            sendingMediator = sendingMediator ?? Substitute.For<IMessageSendingMediator>();
+            pipeline = pipeline ?? Substitute.For<IPipeline>();
 
             var envelopes = new List<Envelope> { envelope };
 
-            return new DefaultSendBuilder(envelopes, correlator, new DefaultMessageContextFactory(), sendingMediator);
+            return new FluentSender(envelopes, correlator, new DefaultFilterContextFactory(), pipeline);
         }
 
         [Fact]
@@ -30,28 +33,28 @@ namespace Meceqs.Tests.Sending
             // Arrange
             var envelopes = new List<Envelope>();
             var correlator = new DefaultEnvelopeCorrelator();
-            var messageContextFactory = new DefaultMessageContextFactory();
-            var sendingMediator = Substitute.For<IMessageSendingMediator>();
+            var filterContextFactory = new DefaultFilterContextFactory();
+            var pipeline = Substitute.For<IPipeline>();
 
             // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => new DefaultSendBuilder(null, correlator, messageContextFactory, sendingMediator));
-            Assert.Throws<ArgumentNullException>(() => new DefaultSendBuilder(envelopes, null, messageContextFactory, sendingMediator));
-            Assert.Throws<ArgumentNullException>(() => new DefaultSendBuilder(envelopes, correlator, null, sendingMediator));
-            Assert.Throws<ArgumentNullException>(() => new DefaultSendBuilder(envelopes, correlator, messageContextFactory, null));
+            Assert.Throws<ArgumentNullException>(() => new FluentSender(null, correlator, filterContextFactory, pipeline));
+            Assert.Throws<ArgumentNullException>(() => new FluentSender(envelopes, null, filterContextFactory, pipeline));
+            Assert.Throws<ArgumentNullException>(() => new FluentSender(envelopes, correlator, null, pipeline));
+            Assert.Throws<ArgumentNullException>(() => new FluentSender(envelopes, correlator, filterContextFactory, null));
         }
 
         [Fact]
-        public async Task Calls_TransportMediator()
+        public async Task Calls_Pipeline()
         {
             // Arrange
-            var sendingMediator = Substitute.For<IMessageSendingMediator>();
-            var builder = GetBuilder<SimpleMessage>(sendingMediator: sendingMediator);
+            var pipeline = Substitute.For<IPipeline>();
+            var sender = GetFluentSender<SimpleMessage>(pipeline: pipeline);
 
             // Act
-            await builder.SendAsync();
+            await sender.SendAsync();
 
             // Assert
-            await sendingMediator.Received(1).SendAsync<VoidType>(Arg.Any<MessageContext<SimpleMessage>>());
+            await pipeline.ReceivedWithAnyArgs(1).ProcessAsync<VoidType>(null);
         }
 
         [Fact]
@@ -60,11 +63,11 @@ namespace Meceqs.Tests.Sending
             // Arrange
             var envelope = TestObjects.Envelope<SimpleMessage>();
             var correlator = Substitute.For<IEnvelopeCorrelator>();
-            var builder = GetBuilder<SimpleMessage>(envelope, correlator);
+            var sender = GetFluentSender<SimpleMessage>(envelope, correlator);
 
             // Act
             var sourceMsg = TestObjects.Envelope<SimpleCommand>();
-            builder.CorrelateWith(sourceMsg);
+            sender.CorrelateWith(sourceMsg);
 
             // Assert
             correlator.Received(1).CorrelateSourceWithTarget(sourceMsg, envelope);
@@ -76,15 +79,16 @@ namespace Meceqs.Tests.Sending
             // Arrange
 
             int called = 0;
-            var mediator = Substitute.For<IMessageSendingMediator>();
-            mediator.When(x => x.SendAsync(Arg.Any<MessageContext>()))
+            var pipeline = Substitute.For<IPipeline>();
+            pipeline.WhenForAnyArgs(x => x.ProcessAsync(null))
                 .Do(x => {
                     called++;
 
-                    Assert.Equal("Value", x.Arg<MessageContext>().Envelope.Headers["Key"]);
+                    var ctx = (FilterContext) x.Arg<IList<FilterContext>>().First();
+                    Assert.Equal("Value", ctx.Envelope.Headers["Key"]);
                 });
 
-            var builder = GetBuilder<SimpleMessage>(sendingMediator: mediator);
+            var builder = GetFluentSender<SimpleMessage>(pipeline: pipeline);
 
             // Act
             builder.SetHeader("Key", "Value");
@@ -99,19 +103,20 @@ namespace Meceqs.Tests.Sending
         {
             // Arrange
             int called = 0;
-            var mediator = Substitute.For<IMessageSendingMediator>();
-            mediator.When(x => x.SendAsync(Arg.Any<MessageContext>()))
+            var pipeline = Substitute.For<IPipeline>();
+            pipeline.WhenForAnyArgs(x => x.ProcessAsync(null))
                 .Do(x => {
                     called++;
-
-                    Assert.Equal("Value", x.Arg<MessageContext>().GetContextItem<string>("Key"));
+                    
+                    var ctx = (FilterContext) x.Arg<IList<FilterContext>>().First();
+                    Assert.Equal("Value", ctx.GetContextItem<string>("Key"));
                 });
 
-            var builder = GetBuilder<SimpleMessage>(sendingMediator: mediator);
+            var sender = GetFluentSender<SimpleMessage>(pipeline: pipeline);
 
             // Act
-            builder.SetContextItem("Key", "Value");
-            await builder.SendAsync();
+            sender.SetContextItem("Key", "Value");
+            await sender.SendAsync();
 
             // Assert
             Assert.Equal(1, called);
@@ -125,15 +130,16 @@ namespace Meceqs.Tests.Sending
             var cancellationSource = new CancellationTokenSource();
 
             int called = 0;
-            var mediator = Substitute.For<IMessageSendingMediator>();
-            mediator.When(x => x.SendAsync(Arg.Any<MessageContext>()))
+            var pipeline = Substitute.For<IPipeline>();
+            pipeline.WhenForAnyArgs(x => x.ProcessAsync(null))
                 .Do(x => {
                     called++;
 
-                    Assert.Equal(cancellationSource.Token, x.Arg<MessageContext>().Cancellation);
+                    var ctx = (FilterContext) x.Arg<IList<FilterContext>>().First();
+                    Assert.Equal(cancellationSource.Token, ctx.Cancellation);
                 });
 
-            var builder = GetBuilder<SimpleMessage>(sendingMediator: mediator);
+            var builder = GetFluentSender<SimpleMessage>(pipeline: pipeline);
             
             // Act
             builder.SetCancellationToken(cancellationSource.Token);
@@ -151,18 +157,19 @@ namespace Meceqs.Tests.Sending
             var envelope = TestObjects.Envelope<SimpleMessage>();
 
             int called = 0;
-            var mediator = Substitute.For<IMessageSendingMediator>();
-            mediator.When(x => x.SendAsync(Arg.Any<MessageContext>()))
+            var pipeline = Substitute.For<IPipeline>();
+            pipeline.WhenForAnyArgs(x => x.ProcessAsync(null))
                 .Do(x => {
                     called++;
 
-                    Assert.Equal(envelope, x.Arg<MessageContext>().Envelope);
+                    var ctx = (FilterContext) x.Arg<IList<FilterContext>>().First();
+                    Assert.Equal(envelope, ctx.Envelope);
                 });
 
-            var builder = GetBuilder<SimpleMessage>(envelope: envelope, sendingMediator: mediator);
+            var sender = GetFluentSender<SimpleMessage>(envelope: envelope, pipeline: pipeline);
 
             // Act
-            await builder.SendAsync();
+            await sender.SendAsync();
 
             // Assert
             Assert.Equal(1, called);

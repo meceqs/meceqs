@@ -37,8 +37,8 @@ namespace Meceqs.Pipeline
             var ctorDelegate = _cachedConstructorDelegates.GetOrAdd(messageType, x =>
             {
                 // Resolve types
-                Type typedEnvelopeType = typeof(Envelope<>).MakeGenericType(messageType);
-                Type typedFilterContextType = typeof(FilterContext<>).MakeGenericType(messageType);
+                Type typedEnvelopeType = typeof(Envelope<>).MakeGenericType(x);
+                Type typedFilterContextType = typeof(FilterContext<>).MakeGenericType(x);
                 
                 ConstructorInfo constructor = typedFilterContextType.GetTypeInfo().DeclaredConstructors.First();
 

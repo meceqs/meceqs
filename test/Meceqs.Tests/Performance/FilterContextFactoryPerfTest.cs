@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Threading;
+using Meceqs.Pipeline;
 using Xunit;
 
 namespace Meceqs.Tests.Performance
@@ -32,18 +32,20 @@ namespace Meceqs.Tests.Performance
             const int loopCount = 100000;
 
             var envelope = TestObjects.Envelope<SimpleMessage>();
-            var contextData = new FilterContextItems();
-            var cancellation = CancellationToken.None;
-
             var messageType = typeof(SimpleMessage);
-
-            var typedMessageContext = typeof(MessageContext<>).MakeGenericType(messageType);
 
             // Activator.CreateInstance
 
+            var typeCache = new ConcurrentDictionary<Type, Type>();
+
             RunTimed("Activator.CreateInstance", loopCount, () =>
             {
-                MessageContext result = (MessageContext)Activator.CreateInstance(typedMessageContext, envelope, contextData, cancellation);
+                var typedFilterContextType = typeCache.GetOrAdd(messageType, x =>
+                {
+                    return typeof(FilterContext<>).MakeGenericType(x);
+                });
+
+                FilterContext result = (FilterContext)Activator.CreateInstance(typedFilterContextType, envelope);
             });
 
             // ConstructorInfo.Invoke
@@ -54,42 +56,40 @@ namespace Meceqs.Tests.Performance
             {
                 var ctor = constructorCache.GetOrAdd(messageType, x =>
                 {
-
-                    var typedMessageContext1 = typeof(MessageContext<>).MakeGenericType(x);
-                    var constructor = typedMessageContext1.GetTypeInfo().DeclaredConstructors.First();
+                    var typedFilterContextType = typeof(FilterContext<>).MakeGenericType(x);
+                    var constructor = typedFilterContextType.GetTypeInfo().DeclaredConstructors.First();
 
                     return constructor;
                 });
 
-                MessageContext result = (MessageContext)ctor.Invoke(new object[] { envelope, contextData, cancellation });
+                FilterContext result = (FilterContext)ctor.Invoke(new object[] { envelope });
             });
 
             // Compiled expression
 
-            var delegateCache = new ConcurrentDictionary<Type, Func<Envelope, MessageContextData, CancellationToken, MessageContext>>();
+            var delegateCache = new ConcurrentDictionary<Type, Func<Envelope, FilterContext>>();
 
             RunTimed("Expression.Lambda", loopCount, () =>
             {
-                var del = delegateCache.GetOrAdd(messageType, x =>
+                var ctorDelegate = delegateCache.GetOrAdd(messageType, x =>
                 {
-                    var typedMessageContext1 = typeof(MessageContext<>).MakeGenericType(x);
-                    var constructor = typedMessageContext1.GetTypeInfo().DeclaredConstructors.First();
-
                     Type typedEnvelopeType = typeof(Envelope<>).MakeGenericType(x);
+                    Type typedFilterContextType = typeof(FilterContext<>).MakeGenericType(x);
+
+                    ConstructorInfo constructor = typedFilterContextType.GetTypeInfo().DeclaredConstructors.First();
+
                     var envelopeParam = Expression.Parameter(typeof(Envelope), "envelope");
                     var castedEnvelopeParam = Expression.Convert(envelopeParam, typedEnvelopeType);
-                    var contextDataParam = Expression.Parameter(typeof(MessageContextData), "contextData");
-                    var cancellationParam = Expression.Parameter(typeof(CancellationToken), "cancellation");
 
-                    var ctorDelegate = Expression.Lambda<Func<Envelope, MessageContextData, CancellationToken, MessageContext>>(
-                        Expression.New(constructor, castedEnvelopeParam, contextDataParam, cancellationParam),
-                        envelopeParam, contextDataParam, cancellationParam
+                    var compiledDelegate = Expression.Lambda<Func<Envelope, FilterContext>>(
+                        Expression.New(constructor, castedEnvelopeParam),
+                        envelopeParam
                     ).Compile();
 
-                    return ctorDelegate;
+                    return compiledDelegate;
                 });
 
-                MessageContext result = del(envelope, contextData, cancellation);
+                FilterContext result = ctorDelegate(envelope);
             });
         }
     }

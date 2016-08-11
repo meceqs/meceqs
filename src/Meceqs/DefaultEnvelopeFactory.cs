@@ -44,7 +44,7 @@ namespace Meceqs
 
                 // parameters for constructor
                 var messageParam = Expression.Parameter(typeof(IMessage), "message");
-                var castedMessageParam = Expression.Convert(messageParam, typedEnvelopeType);
+                var castedMessageParam = Expression.Convert(messageParam, messageType);
                 var messageIdParam = Expression.Parameter(typeof(Guid), "messageId");
 
                 // Create constructor call
