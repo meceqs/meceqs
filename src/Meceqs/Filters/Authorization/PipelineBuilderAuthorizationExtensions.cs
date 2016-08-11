@@ -1,6 +1,8 @@
+using Meceqs;
 using Meceqs.Filters.Authorization;
+using Meceqs.Pipeline;
 
-namespace Meceqs.Pipeline
+namespace Microsoft.Extensions.DependencyInjection
 {
     public static class PipelineBuilderAuthorizationExtensions
     {

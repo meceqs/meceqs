@@ -44,27 +44,18 @@ namespace CustomerContext.WebApi
                 .AddTypedHandling()
                 .AddConsumer(options =>
                 {
-                    var builder = options.Pipeline.Builder;
-
-                    // make sure, MessageType, MessageName, etc are correctly set
-                    builder.UseEnvelopeSanitizer();
-
-                    // attach CancellationToken, RequestServices, MessageHistory
-                    builder.UseAspNetCore();
-
-                    // builder.UseAuthorization();
-                    // builder.UseDataAnnotationsValidator();
-
-                    // forward to IHandles<TMessage, TResult>
-                    builder.UseTypedHandling();
+                    options.Pipeline.Builder
+                        .UseEnvelopeSanitizer() // make sure, MessageType, MessageName, etc are set correctly
+                        .UseAspNetCore()        // attach CancellationToken, RequestServices, MessageHistory
+                        //.UseAuthorization()
+                        //.UseDataAnnotationsValidator()
+                        .UseTypedHandling();    // forward to IHandles<TMessage, TResult>
                 })
                 .AddSender(options =>
                 {
-                    var builder = options.Pipeline.Builder;
-
-                    builder.UseAspNetCore();
-
-                    builder.UseTypedHandling();
+                    options.Pipeline.Builder
+                        .UseAspNetCore()
+                        .UseTypedHandling();
                 });
 
             services.AddMvc(options =>

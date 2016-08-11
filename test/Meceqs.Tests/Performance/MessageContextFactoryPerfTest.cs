@@ -10,7 +10,7 @@ using Xunit;
 namespace Meceqs.Tests.Performance
 {
     // Make class public to actually run it.
-    internal class MessageContextFactoryPerfTest
+    public class FilterContextFactoryPerfTest
     {
         private void RunTimed(string message, int loopCount, Action action)
         {
@@ -32,7 +32,7 @@ namespace Meceqs.Tests.Performance
             const int loopCount = 100000;
 
             var envelope = TestObjects.Envelope<SimpleMessage>();
-            var contextData = new MessageContextData();
+            var contextData = new FilterContextItems();
             var cancellation = CancellationToken.None;
 
             var messageType = typeof(SimpleMessage);

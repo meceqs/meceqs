@@ -1,7 +1,8 @@
 using System;
 using System.Threading.Tasks;
+using Meceqs.Pipeline;
 
-namespace Meceqs.Pipeline
+namespace Microsoft.Extensions.DependencyInjection
 {
     public static class PipelineBuilderUseExtensions
     {

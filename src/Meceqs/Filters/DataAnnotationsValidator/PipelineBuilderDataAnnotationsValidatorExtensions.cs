@@ -1,6 +1,8 @@
+using Meceqs;
 using Meceqs.Filters.DataAnnotationsValidator;
+using Meceqs.Pipeline;
 
-namespace Meceqs.Pipeline
+namespace Microsoft.Extensions.DependencyInjection
 {
     public static class PipelineBuilderDataAnnotationsValidatorExtensions
     {

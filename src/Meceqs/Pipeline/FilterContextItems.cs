@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Meceqs
+namespace Meceqs.Pipeline
 {
     public class FilterContextItems : Dictionary<string, object>
     {

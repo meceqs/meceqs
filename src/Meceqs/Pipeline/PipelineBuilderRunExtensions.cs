@@ -1,4 +1,6 @@
-namespace Meceqs.Pipeline
+using Meceqs.Pipeline;
+
+namespace Microsoft.Extensions.DependencyInjection
 {
     public static class PipelineBuilderRunExtensions
     {

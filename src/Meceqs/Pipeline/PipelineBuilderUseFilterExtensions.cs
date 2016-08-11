@@ -3,9 +3,9 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
+using Meceqs.Pipeline;
 
-namespace Meceqs.Pipeline
+namespace Microsoft.Extensions.DependencyInjection
 {
     /// <summary>
     /// Extension methods for adding a typed filter.
