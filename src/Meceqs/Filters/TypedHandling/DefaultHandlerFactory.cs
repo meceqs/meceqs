@@ -16,12 +16,12 @@ namespace Meceqs.Filters.TypedHandling
 
         public IHandles<TMessage> CreateHandler<TMessage>() where TMessage : class
         {
-            return _serviceProvider.GetRequiredService<IHandles<TMessage>>();
+            return _serviceProvider.GetService<IHandles<TMessage>>();
         }
 
         public IHandles<TMessage, TResult> CreateHandler<TMessage, TResult>() where TMessage : class
         {
-            return _serviceProvider.GetRequiredService<IHandles<TMessage, TResult>>();
+            return _serviceProvider.GetService<IHandles<TMessage, TResult>>();
         }
     }
 }

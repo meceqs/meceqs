@@ -9,6 +9,7 @@ namespace Meceqs.Filters.TypedHandling
 {
     public class TypedHandlingFilter
     {
+        private readonly FilterDelegate _next;
         private readonly IHandlerFactory _handlerFactory;
         private readonly IHandlerFactoryInvoker _handlerFactoryInvoker;
         private readonly IHandleContextFactory _handleContextFactory;
@@ -25,14 +26,14 @@ namespace Meceqs.Filters.TypedHandling
             IEnumerable<IHandleInterceptor> handleInterceptors,
             IHandlerInvoker handlerInvoker)
         {
-            // next is not stored because this is a terminal filter!
-
+            Check.NotNull(next, nameof(next));
             Check.NotNull(handlerFactory, nameof(handlerFactory));
             Check.NotNull(handlerFactoryInvoker, nameof(handlerFactoryInvoker));
             Check.NotNull(handleContextFactory, nameof(handleContextFactory));
             Check.NotNull(handleMethodResolver, nameof(handleMethodResolver));
             Check.NotNull(handlerInvoker, nameof(handlerInvoker));
 
+            _next = next;
             _handlerFactory = handlerFactory;
             _handlerFactoryInvoker = handlerFactoryInvoker;
             _handleContextFactory = handleContextFactory;
@@ -55,7 +56,9 @@ namespace Meceqs.Filters.TypedHandling
 
             if (handler == null)
             {
-                throw new InvalidOperationException($"No handler found for '{messageType.Name}/{resultType.Name}'");
+                // let some other filter decide whether unhandled messages should throw or not.
+                await _next(filterContext);
+                return;
             }
 
             HandleContext handleContext = _handleContextFactory.CreateHandleContext(filterContext);
