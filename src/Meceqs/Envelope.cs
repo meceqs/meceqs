@@ -30,7 +30,7 @@ namespace Meceqs
         public Guid? CorrelationId { get; set; } // TODO !! rename (ConversationId, TraceIdentifier, ...)
         public DateTime? CreatedOnUtc { get; set; }
         public MessageHeaders Headers { get; set; } = new MessageHeaders();
-        public List<MessageHistoryEntry> MessageHistory { get; set; } = new List<MessageHistoryEntry>();
+        public List<MessageHistoryEntry> History { get; set; } = new List<MessageHistoryEntry>();
 
         protected Envelope() 
         {

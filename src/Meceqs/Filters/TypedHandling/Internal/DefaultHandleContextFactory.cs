@@ -24,7 +24,7 @@ namespace Meceqs.Filters.TypedHandling.Internal
         {
             Check.NotNull(filterContext, nameof(filterContext));
 
-            Type messageType = filterContext.Message.GetType();
+            Type messageType = filterContext.MessageType;
 
             var ctorDelegate = GetOrAddConstructorDelegate(messageType);
 

@@ -17,9 +17,11 @@ namespace Meceqs.Filters.EnvelopeSanitizer
 
         public Task Invoke(FilterContext context)
         {
+            Check.NotNull(context, nameof(context));
+
             // TODO @cweiss is this a good solution?
 
-            Type messageType = context.Message.GetType();
+            Type messageType = context.MessageType;
 
             // if the envelope is not deserialized in a statically typed way (e.g. through ASP.NET MVC ModelBinding),
             // the values for MessageName and -Type could be wrong or missing. (e.g. because the request was made with Fiddler)

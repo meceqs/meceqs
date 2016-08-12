@@ -22,7 +22,7 @@ namespace Meceqs.Filters.Authorization
         {
             Check.NotNull(context, nameof(context));
 
-            Type messageType = context.Message.GetType();
+            Type messageType = context.MessageType;
 
             await _authorizationProvider.AuthorizeAsync(messageType);
 

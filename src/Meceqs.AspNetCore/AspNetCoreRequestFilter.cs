@@ -49,7 +49,7 @@ namespace Meceqs.AspNetCore
             historyEntry.Properties.Add(HistoryPropertyRequestId, httpContext.TraceIdentifier);
             historyEntry.Properties.Add(HistoryPropertyRequestPath, httpContext.Request.Path.Value);
 
-            context.Envelope.MessageHistory.Add(historyEntry);
+            context.Envelope.History.Add(historyEntry);
 
             return _next(context);
         }

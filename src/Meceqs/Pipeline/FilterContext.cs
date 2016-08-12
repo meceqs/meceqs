@@ -22,6 +22,8 @@ namespace Meceqs.Pipeline
 
         public IMessage Message => Envelope.Message; // just for faster access to the message
 
+        public Type MessageType => Envelope.Message.GetType();
+
         public Type ExpectedResultType { get; set; }
 
         public object Result { get; set; }

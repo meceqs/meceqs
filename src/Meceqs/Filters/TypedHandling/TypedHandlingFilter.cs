@@ -48,7 +48,7 @@ namespace Meceqs.Filters.TypedHandling
             // Since the public interfaces from this filter expect generic types, we can't call them directly.
             // Separate services are responsible for invoking them by using e.g. reflection.
 
-            Type messageType = filterContext.Message.GetType();
+            Type messageType = filterContext.MessageType;
             Type resultType = filterContext.ExpectedResultType;
 
             IHandles handler = _handlerFactoryInvoker.InvokeCreateHandler(_handlerFactory, messageType, resultType);

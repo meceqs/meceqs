@@ -7,7 +7,7 @@ namespace Meceqs.Filters.Auditing
 {
     public class AuditingFilter
     {
-        public static string NameIdentifierHeaderName = "CreatedBy";
+        public static string HeaderNameUserId = "CreatedBy";
 
         private readonly FilterDelegate _next;
 
@@ -24,14 +24,14 @@ namespace Meceqs.Filters.Auditing
 
             if (context.User != null)
             {
-                var currentId = context.Envelope.Headers.Get<string>(NameIdentifierHeaderName);
-                if (currentId == null)
+                var userIdFromEnvelope = context.Envelope.Headers.Get<string>(HeaderNameUserId);
+                if (userIdFromEnvelope == null)
                 {
-                    var nameIdentifierClaim = context.User.Claims?.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier);
+                    var userIdFromClaim = context.User.Claims?.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier);
 
-                    if (nameIdentifierClaim != null)
+                    if (userIdFromClaim != null)
                     {
-                        context.Envelope.Headers.Set(NameIdentifierHeaderName, nameIdentifierClaim.Value);
+                        context.Envelope.Headers.Set(HeaderNameUserId, userIdFromClaim.Value);
                     }
                 }
             }
