@@ -1,8 +1,6 @@
-using Meceqs;
-
 namespace CustomerContext.Contracts.Commands
 {
-    public class CreateCustomerCommand : ICommand
+    public class CreateCustomerCommand
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }

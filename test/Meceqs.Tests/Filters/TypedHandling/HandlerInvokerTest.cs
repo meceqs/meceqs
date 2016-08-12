@@ -15,7 +15,7 @@ namespace Meceqs.Tests.Filters.TypedHandling
         }
 
         private FilterContext<TMessage> GetFilterContext<TMessage>(Type resultType)
-            where TMessage : class, IMessage, new()
+            where TMessage : class, new()
         {
             var envelope = TestObjects.Envelope<TMessage>();
 
@@ -26,7 +26,7 @@ namespace Meceqs.Tests.Filters.TypedHandling
         }
 
         private HandleContext<TMessage> GetHandleContext<TMessage>(Type resultType, FilterContext<TMessage> filterContext = null)
-            where TMessage : class, IMessage, new()
+            where TMessage : class, new()
         {
             filterContext = filterContext ?? GetFilterContext<TMessage>(resultType);
 

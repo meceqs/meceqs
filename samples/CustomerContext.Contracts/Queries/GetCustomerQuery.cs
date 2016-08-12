@@ -1,9 +1,8 @@
 using System;
-using Meceqs;
 
 namespace CustomerContext.Contracts.Queries
 {
-    public class GetCustomerQuery : IQuery
+    public class GetCustomerQuery
     {
         public Guid CustomerId { get; set; }
     }

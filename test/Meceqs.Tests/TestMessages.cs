@@ -1,15 +1,15 @@
 namespace Meceqs.Tests
 {
-    public class SimpleMessage : IMessage
+    public class SimpleMessage
     {
         public string SomeKey { get; set; }
     }
 
-    public class SimpleCommand : ICommand
+    public class SimpleCommand
     {
     }
 
-    public class SimpleEvent : IEvent
+    public class SimpleEvent
     {
     }
 

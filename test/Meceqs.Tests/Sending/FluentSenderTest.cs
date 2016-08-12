@@ -15,7 +15,7 @@ namespace Meceqs.Tests.Sending
         private IFluentSender GetFluentSender<TMessage>(
             Envelope<TMessage> envelope = null,
             IEnvelopeCorrelator correlator = null,
-            IPipeline pipeline = null) where TMessage : class, IMessage, new()
+            IPipeline pipeline = null) where TMessage : class, new()
         {
             envelope = envelope ?? TestObjects.Envelope<TMessage>();
             correlator = correlator ?? new DefaultEnvelopeCorrelator();

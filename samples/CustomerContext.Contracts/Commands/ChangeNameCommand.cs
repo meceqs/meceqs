@@ -1,9 +1,8 @@
 using System;
-using Meceqs;
 
 namespace CustomerContext.Contracts.Commands
 {
-    public class ChangeNameCommand : ICommand
+    public class ChangeNameCommand
     {
         public Guid CustomerId { get; set; }
         public string FirstName { get; set; }

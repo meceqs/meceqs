@@ -14,12 +14,12 @@ namespace Meceqs.Filters.TypedHandling
             _serviceProvider = serviceProvider;
         }
 
-        public IHandles<TMessage> CreateHandler<TMessage>() where TMessage : IMessage
+        public IHandles<TMessage> CreateHandler<TMessage>() where TMessage : class
         {
             return _serviceProvider.GetRequiredService<IHandles<TMessage>>();
         }
 
-        public IHandles<TMessage, TResult> CreateHandler<TMessage, TResult>() where TMessage : IMessage
+        public IHandles<TMessage, TResult> CreateHandler<TMessage, TResult>() where TMessage : class
         {
             return _serviceProvider.GetRequiredService<IHandles<TMessage, TResult>>();
         }

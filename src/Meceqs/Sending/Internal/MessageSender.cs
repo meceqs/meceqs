@@ -28,12 +28,12 @@ namespace Meceqs.Sending.Internal
             _pipeline = sendPipeline.Pipeline;
         }
 
-        public IFluentSender ForMessage(IMessage message)
+        public IFluentSender ForMessage<TMessage>(TMessage message) where TMessage : class
         {
             return ForMessage(message, Guid.NewGuid());
         }
 
-        public IFluentSender ForMessage(IMessage message, Guid messageId)
+        public IFluentSender ForMessage<TMessage>(TMessage message, Guid messageId) where TMessage : class
         {
             Check.NotNull(message, nameof(message));
             Check.NotEmpty(messageId, nameof(messageId));
@@ -45,7 +45,7 @@ namespace Meceqs.Sending.Internal
             return new FluentSender(envelopes, _envelopeCorrelator, _filterContextFactory, _pipeline);
         }
 
-        public IFluentSender ForMessages(IList<IMessage> messages)
+        public IFluentSender ForMessages<TMessage>(IList<TMessage> messages) where TMessage : class
         {
             Check.NotNull(messages, nameof(messages));
 

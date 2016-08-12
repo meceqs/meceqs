@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using CustomerContext.Contracts.Events;
-using Meceqs;
 
 namespace CustomerContext.Core.Domain
 {

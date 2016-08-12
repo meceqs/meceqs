@@ -73,7 +73,8 @@ namespace Meceqs.Tests.Sending
 
             // Act
 
-            string result = await sender.ForEvent(resultEvent, resultEventId, sourceCmd)
+            string result = await sender.ForMessage(resultEvent, resultEventId)
+                .CorrelateWith(sourceCmd)
                 .SetCancellationToken(cancellationSource.Token)
                 .SetHeader("Key", "Value")
                 .SetContextItem("SendKey", "SendValue")

@@ -4,7 +4,7 @@ using System.Threading;
 
 namespace Meceqs.Pipeline
 {
-    public class FilterContext<TMessage> : FilterContext where TMessage : IMessage
+    public class FilterContext<TMessage> : FilterContext where TMessage : class
     {
         public new Envelope<TMessage> Envelope => (Envelope<TMessage>)base.Envelope;
 
@@ -20,7 +20,7 @@ namespace Meceqs.Pipeline
     {
         public Envelope Envelope { get; }
 
-        public IMessage Message => Envelope.Message; // just for faster access to the message
+        public object Message => Envelope.Message; // just for faster access to the message
 
         public Type MessageType => Envelope.Message.GetType();
 

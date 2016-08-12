@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Meceqs
 {
-    public class Envelope<TMessage> : Envelope where TMessage : IMessage
+    public class Envelope<TMessage> : Envelope where TMessage : class
     {
         public new TMessage Message
         {
@@ -23,7 +23,7 @@ namespace Meceqs
 
     public abstract class Envelope
     {
-        public IMessage Message { get; set; }
+        public object Message { get; set; }
         public Guid MessageId { get; set; }
         public string MessageType { get; set; }
         public string MessageName { get; set; }
@@ -36,7 +36,7 @@ namespace Meceqs
         {
         }
 
-        protected Envelope(IMessage message, Guid messageId)
+        protected Envelope(object message, Guid messageId)
         {
             Check.NotNull(message, nameof(message));
             Check.NotEmpty(messageId, nameof(messageId));

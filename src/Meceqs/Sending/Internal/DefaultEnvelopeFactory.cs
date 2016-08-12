@@ -8,14 +8,14 @@ namespace Meceqs.Sending.Internal
 {
     public class DefaultEnvelopeFactory : IEnvelopeFactory
     {
-        private readonly ConcurrentDictionary<Type, Func<IMessage, Guid, Envelope>> _cachedConstructorDelegates;
+        private readonly ConcurrentDictionary<Type, Func<object, Guid, Envelope>> _cachedConstructorDelegates;
 
         public DefaultEnvelopeFactory()
         {
-            _cachedConstructorDelegates = new ConcurrentDictionary<Type, Func<IMessage, Guid, Envelope>>();
+            _cachedConstructorDelegates = new ConcurrentDictionary<Type, Func<object, Guid, Envelope>>();
         }
 
-        public Envelope Create(IMessage message, Guid messageId)
+        public Envelope Create(object message, Guid messageId)
         {
             Check.NotNull(message, nameof(message));
             Check.NotEmpty(messageId, nameof(messageId));
@@ -29,7 +29,7 @@ namespace Meceqs.Sending.Internal
             return envelope;
         }
 
-        private Func<IMessage, Guid, Envelope> GetOrAddConstructorDelegate(Type messageType)
+        private Func<object, Guid, Envelope> GetOrAddConstructorDelegate(Type messageType)
         {
             var ctorDelegate = _cachedConstructorDelegates.GetOrAdd(messageType, x =>
             {
@@ -43,12 +43,12 @@ namespace Meceqs.Sending.Internal
                 // Create Expression
 
                 // parameters for constructor
-                var messageParam = Expression.Parameter(typeof(IMessage), "message");
+                var messageParam = Expression.Parameter(typeof(object), "message");
                 var castedMessageParam = Expression.Convert(messageParam, messageType);
                 var messageIdParam = Expression.Parameter(typeof(Guid), "messageId");
 
                 // Create constructor call
-                var compiledDelegate = Expression.Lambda<Func<IMessage, Guid, Envelope>>(
+                var compiledDelegate = Expression.Lambda<Func<object, Guid, Envelope>>(
                     Expression.New(constructor, castedMessageParam, messageIdParam),
                     messageParam, messageIdParam
                 ).Compile();

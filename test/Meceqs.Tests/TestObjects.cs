@@ -12,7 +12,7 @@ namespace Meceqs.Tests
         }
 
         public static Envelope<TMessage> Envelope<TMessage>(TMessage message = null, Guid? id = null)
-            where TMessage : class, IMessage, new()
+            where TMessage : class, new()
         {
             message = message ?? new TMessage();
 

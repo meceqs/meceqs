@@ -4,6 +4,6 @@ namespace Meceqs.Sending
 {
     public interface IEnvelopeFactory
     {
-        Envelope Create(IMessage message, Guid messageId);
+        Envelope Create(object message, Guid messageId);
     }
 }

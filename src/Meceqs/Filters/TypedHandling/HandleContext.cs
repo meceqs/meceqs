@@ -4,7 +4,7 @@ using Meceqs.Pipeline;
 
 namespace Meceqs.Filters.TypedHandling
 {
-    public class HandleContext<TMessage> : HandleContext where TMessage : IMessage
+    public class HandleContext<TMessage> : HandleContext where TMessage : class
     {
         public new Envelope<TMessage> Envelope => (Envelope<TMessage>)base.Envelope;
 
@@ -20,14 +20,14 @@ namespace Meceqs.Filters.TypedHandling
     {
         public Envelope Envelope { get; }
 
-        public IMessage Message { get; }
+        public object Message { get; }
 
         public IHandles Handler { get; set; }
         public Type HandlerType { get; set; }
 
         public MethodInfo HandleMethod { get; set; }
 
-        protected HandleContext(Envelope envelope, IMessage message)
+        protected HandleContext(Envelope envelope, object message)
         {
             Check.NotNull(envelope, nameof(envelope));
             Check.NotNull(message, nameof(message));

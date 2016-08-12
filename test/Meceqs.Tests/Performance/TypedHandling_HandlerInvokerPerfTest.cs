@@ -29,7 +29,7 @@ namespace Meceqs.Test.Performance
         }
 
         private HandleContext<TMessage> GetHandleContext<TMessage, TResult>()
-            where TMessage : class, IMessage, new()
+            where TMessage : class, new()
         {
             var envelope = TestObjects.Envelope<TMessage>();
 

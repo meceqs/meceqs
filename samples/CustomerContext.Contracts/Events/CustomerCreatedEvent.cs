@@ -1,5 +1,4 @@
 using System;
-using Meceqs;
 
 namespace CustomerContext.Contracts.Events
 {
