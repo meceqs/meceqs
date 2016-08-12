@@ -48,7 +48,6 @@ namespace CustomerContext.WebApi
                         .UseEnvelopeSanitizer()     // make sure, MessageType, MessageName, etc are set correctly
                         .UseAspNetCoreRequest()     // attach User, RequestServices, MessageHistory, ...
                         .UseAuditing()              // add user id to message if not present
-                        //.UseDataAnnotationsValidator()
                         .UseTypedHandling();        // forward to IHandles<TMessage, TResult>
                 })
                 .AddSender(options =>

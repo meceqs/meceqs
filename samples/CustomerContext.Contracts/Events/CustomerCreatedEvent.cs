@@ -2,7 +2,7 @@ using System;
 
 namespace CustomerContext.Contracts.Events
 {
-    public class CustomerCreatedEvent : IEvent
+    public class CustomerCreatedEvent : ICustomerEvent
     {
         public Guid CustomerId { get; set; }
         public string FirstName { get; set; }

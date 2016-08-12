@@ -6,8 +6,8 @@ namespace CustomerContext.Core.Domain
 {
     public class Customer
     {
-        private readonly IList<IEvent> _changes = new List<IEvent>();
-        public IList<IEvent> GetChanges() => _changes;
+        private readonly IList<ICustomerEvent> _changes = new List<ICustomerEvent>();
+        public IList<ICustomerEvent> GetChanges() => _changes;
         public void ClearChanges() => _changes.Clear();
 
 
