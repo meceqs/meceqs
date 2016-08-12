@@ -1,4 +1,5 @@
 using System;
+using System.Security.Claims;
 using System.Threading;
 
 namespace Meceqs.Pipeline
@@ -17,8 +18,6 @@ namespace Meceqs.Pipeline
 
     public abstract class FilterContext
     {
-        private readonly FilterContextItems _items = new FilterContextItems();
-
         public Envelope Envelope { get; }
 
         public IMessage Message => Envelope.Message; // just for faster access to the message
@@ -27,27 +26,21 @@ namespace Meceqs.Pipeline
 
         public object Result { get; set; }
 
-        public IServiceProvider RequestServices { get; set; }
-
         public CancellationToken Cancellation { get; set; }
 
+        public FilterContextItems Items { get; } = new FilterContextItems();
+
         public string PipelineName { get; set; }
+
+        public IServiceProvider RequestServices { get; set; }
+
+        public ClaimsPrincipal User { get; set; }
 
         protected FilterContext(Envelope envelope)
         {
             Check.NotNull(envelope, nameof(envelope));
 
             Envelope = envelope;
-        }
-
-        public T GetContextItem<T>(string key)
-        {
-            return _items.Get<T>(key);
-        }
-
-        public void SetContextItem(string key, object value)
-        {
-            _items.Set(key, value);
         }
     }
 }

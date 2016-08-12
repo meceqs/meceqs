@@ -6,7 +6,7 @@ namespace Meceqs
 {
     public class MessageHeaders : Dictionary<string, object>
     {
-        public T GetValue<T>(string headerName)
+        public T Get<T>(string headerName)
         {
             if (string.IsNullOrWhiteSpace(headerName))
                 throw new ArgumentNullException(nameof(headerName));
@@ -20,7 +20,7 @@ namespace Meceqs
             return default(T);
         }
 
-        public void SetValue(string headerName, object value)
+        public void Set(string headerName, object value)
         {
             // Handlers have to be able to deal with missing/empty headers anyway,
             // so there's no point in adding them here.

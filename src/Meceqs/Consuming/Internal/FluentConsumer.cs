@@ -71,14 +71,7 @@ namespace Meceqs.Consuming.Internal
             var context = _filterContextFactory.CreateFilterContext(envelope);
 
             context.Cancellation = _cancellation;
-
-            if (_contextItems.Count > 0)
-            {
-                foreach (var kvp in _contextItems)
-                {
-                    context.SetContextItem(kvp.Key, kvp.Value);
-                }
-            }
+            context.Items.Add(_contextItems);
 
             return context;
         }

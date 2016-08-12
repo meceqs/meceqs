@@ -108,7 +108,7 @@ namespace Meceqs.Tests.Sending
                     called++;
                     
                     var ctx = x.Arg<FilterContext>();
-                    Assert.Equal("Value", ctx.GetContextItem<string>("Key"));
+                    Assert.Equal("Value", ctx.Items.Get<string>("Key"));
                 });
 
             var sender = GetFluentSender<SimpleMessage>(pipeline: pipeline);

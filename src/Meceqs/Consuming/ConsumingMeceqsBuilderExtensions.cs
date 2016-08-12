@@ -1,5 +1,6 @@
 using System;
 using Meceqs;
+using Meceqs.Configuration;
 using Meceqs.Consuming;
 using Meceqs.Consuming.Internal;
 using Microsoft.Extensions.Options;

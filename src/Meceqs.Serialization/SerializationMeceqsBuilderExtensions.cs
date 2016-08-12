@@ -1,5 +1,6 @@
 using System.Reflection;
 using Meceqs;
+using Meceqs.Configuration;
 using Meceqs.Serialization;
 
 namespace Microsoft.Extensions.DependencyInjection

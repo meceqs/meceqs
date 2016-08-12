@@ -1,4 +1,6 @@
 using System;
+using Meceqs.Sending;
+using Meceqs.Sending.Internal;
 
 namespace Meceqs.Tests
 {

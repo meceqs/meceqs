@@ -1,13 +1,13 @@
 using System;
 using Meceqs;
-using Meceqs.DependencyInjection;
+using Meceqs.Configuration;
 using Meceqs.Pipeline;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
     public static class MeceqsServiceCollectionExtensions
     {
-        public static IMeceqsBuilder AddMeceqs(this IServiceCollection services, Action<MeceqsOptions> setupAction)
+        public static IMeceqsBuilder AddMeceqs(this IServiceCollection services, Action<MeceqsOptions> setupAction = null)
         {
             Check.NotNull(services, nameof(services));
 
@@ -15,19 +15,6 @@ namespace Microsoft.Extensions.DependencyInjection
             {
                 services.Configure<MeceqsOptions>(setupAction);
             }
-
-            return services.AddMeceqs();
-        }
-
-        public static IMeceqsBuilder AddMeceqs(this IServiceCollection services)
-        {
-            Check.NotNull(services, nameof(services));
-
-            // TODO @cweiss Options?
-            // TODO @cweiss check lifecycles!
-
-            // Core
-            services.AddTransient<IEnvelopeFactory, DefaultEnvelopeFactory>();
 
             // Pipeline
             services.AddSingleton<IFilterContextFactory, DefaultFilterContextFactory>();

@@ -45,16 +45,17 @@ namespace CustomerContext.WebApi
                 .AddConsumer(options =>
                 {
                     options.Pipeline.Builder
-                        .UseEnvelopeSanitizer() // make sure, MessageType, MessageName, etc are set correctly
-                        .UseAspNetCore()        // attach CancellationToken, RequestServices, MessageHistory
-                        //.UseAuthorization()
+                        .UseEnvelopeSanitizer()     // make sure, MessageType, MessageName, etc are set correctly
+                        .UseAspNetCoreRequest()     // attach User, RequestServices, MessageHistory, ...
+                        .UseAuditing()              // add user id to message if not present
                         //.UseDataAnnotationsValidator()
-                        .UseTypedHandling();    // forward to IHandles<TMessage, TResult>
+                        .UseTypedHandling();        // forward to IHandles<TMessage, TResult>
                 })
                 .AddSender(options =>
                 {
                     options.Pipeline.Builder
-                        .UseAspNetCore()
+                        .UseAspNetCoreRequest()
+                        .UseAuditing()              // add user id to message if not present
                         .UseTypedHandling();
                 });
 

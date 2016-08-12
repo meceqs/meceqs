@@ -1,24 +1,33 @@
-using System;
 using System.Collections.Generic;
 
 namespace Meceqs.Pipeline
 {
-    public class FilterContextItems : Dictionary<string, object>
+    public class FilterContextItems : Dictionary<object, object>
     {
-        public void Set(string key, object value)
+        public void Add(FilterContextItems other)
         {
-            if (!string.IsNullOrWhiteSpace(key))
+            if (other == null || other.Count == 0)
+                return;
+
+            foreach (var kvp in other)
+            {
+                Set(kvp.Key, kvp.Value);
+            }
+        }
+
+        public void Set(object key, object value)
+        {
+            if (key != null)
             {
                 this[key] = value;
             }
         }
 
-        public T Get<T>(string key)
+        public T Get<T>(object key)
         {
-            object value;
-            if (key != null && TryGetValue(key, out value))
+            if (key != null)
             {
-                return (T)Convert.ChangeType(value, typeof(T));
+                return (T)this[key];
             }
 
             return default(T);

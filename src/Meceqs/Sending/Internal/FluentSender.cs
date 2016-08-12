@@ -53,7 +53,7 @@ namespace Meceqs.Sending.Internal
         {
             foreach (var envelope in _envelopes)
             {
-                envelope.SetHeader(headerName, value);
+                envelope.Headers.Set(headerName, value);
             }
 
             return this;
@@ -95,14 +95,7 @@ namespace Meceqs.Sending.Internal
             var context = _filterContextFactory.CreateFilterContext(envelope);
 
             context.Cancellation = _cancellation;
-
-            if (_contextItems.Count > 0)
-            {
-                foreach (var kvp in _contextItems)
-                {
-                    context.SetContextItem(kvp.Key, kvp.Value);
-                }
-            }
+            context.Items.Add(_contextItems);
 
             return context;
         }

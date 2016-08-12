@@ -1,4 +1,5 @@
 using Meceqs;
+using Meceqs.Configuration;
 using Meceqs.Filters.TypedHandling;
 using Meceqs.Filters.TypedHandling.Internal;
 

@@ -1,4 +1,5 @@
 using Meceqs;
+using Meceqs.Configuration;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 

@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace Meceqs.AspNetCore
 {
-    public class AspNetCoreFilter
+    public class AspNetCoreRequestFilter
     {
         public const string HistoryPropertyRequestId = "RequestId";
         public const string HistoryPropertyRequestPath = "RequestPath";
@@ -17,7 +17,7 @@ namespace Meceqs.AspNetCore
         private readonly FilterDelegate _next;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public AspNetCoreFilter(FilterDelegate next, IHttpContextAccessor httpContextAccessor)
+        public AspNetCoreRequestFilter(FilterDelegate next, IHttpContextAccessor httpContextAccessor)
         {
             Check.NotNull(next, nameof(next));
             Check.NotNull(httpContextAccessor, nameof(httpContextAccessor));
@@ -32,14 +32,12 @@ namespace Meceqs.AspNetCore
 
             var httpContext = _httpContextAccessor.HttpContext;
 
-            // Makes sure pending cancellations are propagated to later filters
             context.Cancellation = httpContext.RequestAborted;
-
-            // Allow later filters to use scoped services
             context.RequestServices = httpContext.RequestServices;
+            context.User = httpContext.User;
 
             // attach diagnostic information to each event
-            
+
             var historyEntry = new MessageHistoryEntry
             {
                 Pipeline = context.PipelineName,
@@ -47,6 +45,7 @@ namespace Meceqs.AspNetCore
                 Endpoint = EndpointName,
                 CreatedOnUtc = DateTime.UtcNow
             };
+
             historyEntry.Properties.Add(HistoryPropertyRequestId, httpContext.TraceIdentifier);
             historyEntry.Properties.Add(HistoryPropertyRequestPath, httpContext.Request.Path.Value);
 

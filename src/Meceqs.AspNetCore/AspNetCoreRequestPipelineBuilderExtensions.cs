@@ -4,13 +4,13 @@ using Meceqs.Pipeline;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
-    public static class AspNetCorePipelineBuilderExtensions
+    public static class AspNetCoreRequestPipelineBuilderExtensions
     {
-        public static IPipelineBuilder UseAspNetCore(this IPipelineBuilder builder)
+        public static IPipelineBuilder UseAspNetCoreRequest(this IPipelineBuilder builder)
         {
             Check.NotNull(builder, nameof(builder));
 
-            builder.UseFilter<AspNetCoreFilter>();
+            builder.UseFilter<AspNetCoreRequestFilter>();
 
             return builder;
         }

@@ -1,5 +1,6 @@
 using System;
 using Meceqs;
+using Meceqs.Configuration;
 using Meceqs.Sending;
 using Meceqs.Sending.Internal;
 using Microsoft.Extensions.Options;
@@ -14,6 +15,8 @@ namespace Microsoft.Extensions.DependencyInjection
 
             builder.Services.AddTransient<IConfigureOptions<SendOptions>, SendOptionsSetup>();
             builder.Services.Configure(setupAction);
+
+            builder.Services.AddSingleton<IEnvelopeFactory, DefaultEnvelopeFactory>();
 
             builder.Services.AddSingleton<ISendPipeline, SendPipeline>();
             builder.Services.AddTransient<IMessageSender, MessageSender>();

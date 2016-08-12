@@ -55,11 +55,6 @@ namespace Meceqs
             CreatedOnUtc = DateTime.UtcNow;
         }
 
-        public void SetHeader(string headerName, object value)
-        {
-            Headers.SetValue(headerName, value);
-        }
-
         public void EnsureValid()
         {
             if (Headers == null)

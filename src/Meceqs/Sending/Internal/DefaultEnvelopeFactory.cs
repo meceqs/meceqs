@@ -4,7 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace Meceqs
+namespace Meceqs.Sending.Internal
 {
     public class DefaultEnvelopeFactory : IEnvelopeFactory
     {
