@@ -1,7 +1,6 @@
 using System;
 using Meceqs;
 using Meceqs.Configuration;
-using Meceqs.Pipeline;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -15,10 +14,6 @@ namespace Microsoft.Extensions.DependencyInjection
             {
                 services.Configure<MeceqsOptions>(setupAction);
             }
-
-            // Pipeline
-            services.AddSingleton<IFilterContextFactory, DefaultFilterContextFactory>();
-            services.AddTransient<IPipelineBuilder, DefaultPipelineBuilder>();
 
             return new MeceqsBuilder(services);
         }

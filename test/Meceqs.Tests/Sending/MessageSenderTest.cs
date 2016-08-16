@@ -12,12 +12,15 @@ namespace Meceqs.Tests.Sending
 {
     public class MessageSenderTest
     {
-        private IMessageSender GetSender(IEnvelopeCorrelator envelopeCorrelator = null, ISendPipeline sendPipeline = null)
+        private IMessageSender GetSender(IEnvelopeCorrelator envelopeCorrelator = null, IPipeline pipeline = null)
         {
             envelopeCorrelator = envelopeCorrelator ?? new DefaultEnvelopeCorrelator();
-            sendPipeline = sendPipeline ?? Substitute.For<ISendPipeline>();
+            pipeline = pipeline ?? Substitute.For<IPipeline>();
+            
+            var pipelineProvider = Substitute.For<IPipelineProvider>();
+            pipelineProvider.GetPipeline(Arg.Any<string>()).Returns(pipeline);
 
-            return new MessageSender(new DefaultEnvelopeFactory(), envelopeCorrelator, new DefaultFilterContextFactory(), sendPipeline);
+            return new MessageSender(new DefaultEnvelopeFactory(), envelopeCorrelator, new DefaultFilterContextFactory(), pipelineProvider);
         }
 
         [Fact]
@@ -26,11 +29,11 @@ namespace Meceqs.Tests.Sending
             var envelopeFactory = Substitute.For<IEnvelopeFactory>();
             var correlator = Substitute.For<IEnvelopeCorrelator>();
             var filterContextFactory = Substitute.For<IFilterContextFactory>();
-            var sendPipeline = Substitute.For<ISendPipeline>();
+            var pipelineProvider = Substitute.For<IPipelineProvider>();
 
-            Assert.Throws<ArgumentNullException>(() => new MessageSender(null, correlator, filterContextFactory, sendPipeline));
-            Assert.Throws<ArgumentNullException>(() => new MessageSender(envelopeFactory, null, filterContextFactory, sendPipeline));
-            Assert.Throws<ArgumentNullException>(() => new MessageSender(envelopeFactory, correlator, null, sendPipeline));
+            Assert.Throws<ArgumentNullException>(() => new MessageSender(null, correlator, filterContextFactory, pipelineProvider));
+            Assert.Throws<ArgumentNullException>(() => new MessageSender(envelopeFactory, null, filterContextFactory, pipelineProvider));
+            Assert.Throws<ArgumentNullException>(() => new MessageSender(envelopeFactory, correlator, null, pipelineProvider));
             Assert.Throws<ArgumentNullException>(() => new MessageSender(envelopeFactory, correlator, filterContextFactory, null));
         }
 
@@ -40,15 +43,15 @@ namespace Meceqs.Tests.Sending
             // Arrange
             var resultEvent = new SimpleEvent();
 
-            var sendPipeline = Substitute.For<ISendPipeline>();
-            var sender = GetSender(sendPipeline: sendPipeline);
+            var pipeline = Substitute.For<IPipeline>();
+            var sender = GetSender(pipeline: pipeline);
 
             // Act
             string result = await sender.ForMessage(resultEvent)
                 .SendAsync<string>();
 
             // Assert
-            await sendPipeline.Pipeline.Received(1).ProcessAsync<string>(Arg.Any<IList<FilterContext>>());
+            await pipeline.Received(1).ProcessAsync<string>(Arg.Any<IList<FilterContext>>());
         }
 
         [Fact]
@@ -63,13 +66,13 @@ namespace Meceqs.Tests.Sending
             var resultEvent = new SimpleEvent();
             var resultEventId = Guid.NewGuid();
 
-            var sendPipeline = Substitute.For<ISendPipeline>();
+            var pipeline = Substitute.For<IPipeline>();
 
-            var sender = GetSender(sendPipeline: sendPipeline);
+            var sender = GetSender(pipeline: pipeline);
             var cancellationSource = new CancellationTokenSource();
 
             IList<FilterContext> filterContexts = null;
-            await sendPipeline.Pipeline.ProcessAsync<string>(Arg.Do<IList<FilterContext>>(x => filterContexts = x));
+            await pipeline.ProcessAsync<string>(Arg.Do<IList<FilterContext>>(x => filterContexts = x));
 
             // Act
 
@@ -82,7 +85,7 @@ namespace Meceqs.Tests.Sending
 
             // Assert
 
-            await sendPipeline.Pipeline.Received(1).ProcessAsync<string>(Arg.Any<IList<FilterContext>>());
+            await pipeline.Received(1).ProcessAsync<string>(Arg.Any<IList<FilterContext>>());
 
             Assert.NotNull(filterContexts);
             Assert.Equal(1, filterContexts.Count);

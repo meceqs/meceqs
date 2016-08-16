@@ -11,22 +11,23 @@ namespace Meceqs.Consuming.Internal
         private readonly IList<Envelope> _envelopes;
         private readonly FilterContextItems _contextItems = new FilterContextItems();
         private readonly IFilterContextFactory _filterContextFactory;
-        private readonly IPipeline _pipeline;
+        private readonly IPipelineProvider _pipelineProvider;
 
         private CancellationToken _cancellation = CancellationToken.None;
+        private string _pipelineName = ConsumeOptions.DefaultPipelineName;
 
         public FluentConsumer(
             IList<Envelope> envelopes,
             IFilterContextFactory filterContextFactory,
-            IPipeline pipeline)
+            IPipelineProvider pipelineProvider)
         {
             Check.NotNull(envelopes, nameof(envelopes));
             Check.NotNull(filterContextFactory, nameof(filterContextFactory));
-            Check.NotNull(pipeline, nameof(pipeline));
+            Check.NotNull(pipelineProvider, nameof(pipelineProvider));
 
             _envelopes = envelopes;
             _filterContextFactory = filterContextFactory;
-            _pipeline = pipeline;
+            _pipelineProvider = pipelineProvider;
         }
 
         public IFluentConsumer SetCancellationToken(CancellationToken cancellation)
@@ -41,29 +42,28 @@ namespace Meceqs.Consuming.Internal
             return this;
         }
 
+        public IFluentConsumer UsePipeline(string pipelineName)
+        {
+            Check.NotNullOrWhiteSpace(pipelineName, nameof(pipelineName));
+
+            _pipelineName = pipelineName;
+            return this;
+        }
+
         public Task ConsumeAsync()
         {
             var filterContexts = _envelopes.Select(CreateFilterContext).ToList();
+            var pipeline = _pipelineProvider.GetPipeline(_pipelineName);
 
-            if (filterContexts.Count == 0)
-            {
-                return Task.CompletedTask;
-            }
-            else if (filterContexts.Count == 1)
-            {
-                return _pipeline.ProcessAsync(filterContexts[0]);
-            }
-            else
-            {
-                return _pipeline.ProcessAsync(filterContexts);
-            }
+            return pipeline.ProcessAsync(filterContexts);
         }
 
         public Task<TResult> ConsumeAsync<TResult>()
         {
             var filterContexts = _envelopes.Select(CreateFilterContext).ToList();
-
-            return _pipeline.ProcessAsync<TResult>(filterContexts);
+            var pipeline = _pipelineProvider.GetPipeline(_pipelineName);
+            
+            return pipeline.ProcessAsync<TResult>(filterContexts);
         }
 
         private FilterContext CreateFilterContext(Envelope envelope)

@@ -12,25 +12,26 @@ namespace Meceqs.Sending.Internal
         private readonly FilterContextItems _contextItems = new FilterContextItems();
         private readonly IEnvelopeCorrelator _envelopeCorrelator;
         private readonly IFilterContextFactory _filterContextFactory;
-        private readonly IPipeline _pipeline;
+        private readonly IPipelineProvider _pipelineProvider;
 
         private CancellationToken _cancellation = CancellationToken.None;
+        private string _pipelineName = SendOptions.DefaultPipelineName;
 
         public FluentSender(
             IList<Envelope> envelopes,
             IEnvelopeCorrelator envelopeCorrelator,
             IFilterContextFactory filterContextFactory,
-            IPipeline pipeline)
+            IPipelineProvider pipelineProvider)
         {
             Check.NotNull(envelopes, nameof(envelopes));
             Check.NotNull(envelopeCorrelator, nameof(envelopeCorrelator));
             Check.NotNull(filterContextFactory, nameof(filterContextFactory));
-            Check.NotNull(pipeline, nameof(pipeline));
+            Check.NotNull(pipelineProvider, nameof(pipelineProvider));
 
             _envelopes = envelopes;
             _envelopeCorrelator = envelopeCorrelator;
             _filterContextFactory = filterContextFactory;
-            _pipeline = pipeline;
+            _pipelineProvider = pipelineProvider;
         }
 
         public IFluentSender CorrelateWith(Envelope source)
@@ -65,29 +66,28 @@ namespace Meceqs.Sending.Internal
             return this;
         }
 
+        public IFluentSender UsePipeline(string pipelineName)
+        {
+            Check.NotNullOrWhiteSpace(pipelineName, nameof(pipelineName));
+
+            _pipelineName = pipelineName;
+            return this;
+        }
+
         public Task SendAsync()
         {
             var filterContexts = _envelopes.Select(CreateFilterContext).ToList();
+            var pipeline = _pipelineProvider.GetPipeline(_pipelineName);
 
-            if (filterContexts.Count == 0)
-            {
-                return Task.CompletedTask;
-            }
-            else if (filterContexts.Count == 1)
-            {
-                return _pipeline.ProcessAsync(filterContexts[0]);
-            }
-            else
-            {
-                return _pipeline.ProcessAsync(filterContexts);
-            }
+            return pipeline.ProcessAsync(filterContexts);
         }
 
         public Task<TResult> SendAsync<TResult>()
         {
             var filterContexts = _envelopes.Select(CreateFilterContext).ToList();
+            var pipeline = _pipelineProvider.GetPipeline(_pipelineName);
 
-            return _pipeline.ProcessAsync<TResult>(filterContexts);
+            return pipeline.ProcessAsync<TResult>(filterContexts);
         }
 
         private FilterContext CreateFilterContext(Envelope envelope)

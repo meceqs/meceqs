@@ -3,21 +3,26 @@ using Meceqs;
 using Meceqs.Configuration;
 using Meceqs.Consuming;
 using Meceqs.Consuming.Internal;
-using Microsoft.Extensions.Options;
+using Meceqs.Pipeline;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
     public static class ConsumingMeceqsBuilderExtensions
     {
-        public static IMeceqsBuilder AddConsumer(this IMeceqsBuilder builder, Action<ConsumeOptions> setupAction)
+        public static IMeceqsBuilder AddConsumer(this IMeceqsBuilder builder, Action<IPipelineBuilder> pipeline, Action<ConsumeOptions> setupAction = null)
         {
             Check.NotNull(builder, nameof(builder));
+            Check.NotNull(pipeline, nameof(pipeline));
 
-            builder.Services.AddTransient<IConfigureOptions<ConsumeOptions>, ConsumeOptionsSetup>();
-            builder.Services.Configure(setupAction);
+            builder.AddPipeline(ConsumeOptions.DefaultPipelineName, pipeline);
 
-            builder.Services.AddSingleton<IConsumePipeline, ConsumePipeline>();
+            // Core Services
             builder.Services.AddTransient<IMessageConsumer, MessageConsumer>();
+
+            if (setupAction != null)
+            {
+                builder.Services.Configure(setupAction);
+            }
 
             return builder;
         }

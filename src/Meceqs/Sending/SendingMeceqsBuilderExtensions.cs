@@ -1,27 +1,31 @@
 using System;
 using Meceqs;
 using Meceqs.Configuration;
+using Meceqs.Pipeline;
 using Meceqs.Sending;
 using Meceqs.Sending.Internal;
-using Microsoft.Extensions.Options;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
     public static class SendingMeceqsBuilderExtensions
     {
-        public static IMeceqsBuilder AddSender(this IMeceqsBuilder builder, Action<SendOptions> setupAction)
+        public static IMeceqsBuilder AddSender(this IMeceqsBuilder builder, Action<IPipelineBuilder> pipeline, Action<SendOptions> setupAction = null)
         {
             Check.NotNull(builder, nameof(builder));
+            Check.NotNull(pipeline, nameof(pipeline));
 
-            builder.Services.AddTransient<IConfigureOptions<SendOptions>, SendOptionsSetup>();
-            builder.Services.Configure(setupAction);
+            builder.AddPipeline(SendOptions.DefaultPipelineName, pipeline);
 
-            builder.Services.AddSingleton<IEnvelopeFactory, DefaultEnvelopeFactory>();
+            // Core Services
+            builder.Services.TryAddSingleton<IEnvelopeFactory, DefaultEnvelopeFactory>();
+            builder.Services.TryAddSingleton<IEnvelopeCorrelator, DefaultEnvelopeCorrelator>();
+            builder.Services.TryAddTransient<IMessageSender, MessageSender>();
 
-            builder.Services.AddSingleton<ISendPipeline, SendPipeline>();
-            builder.Services.AddTransient<IMessageSender, MessageSender>();
-
-            builder.Services.AddSingleton<IEnvelopeCorrelator, DefaultEnvelopeCorrelator>();
+            if (setupAction != null)
+            {
+                builder.Services.Configure(setupAction);
+            }
 
             return builder;
         }

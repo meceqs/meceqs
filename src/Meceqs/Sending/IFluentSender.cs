@@ -13,6 +13,8 @@ namespace Meceqs.Sending
 
         IFluentSender SetContextItem(string key, object value);
 
+        IFluentSender UsePipeline(string pipelineName);
+
         Task SendAsync();
 
         Task<TResult> SendAsync<TResult>();

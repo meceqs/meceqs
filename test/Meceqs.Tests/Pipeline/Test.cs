@@ -26,7 +26,7 @@ namespace Meceqs.Tests.Pipeline
         private IPipelineBuilder GetPipelineBuilder(IServiceCollection services)
         {
             var serviceProvider = services.BuildServiceProvider();
-            var pipelineBuilder = new DefaultPipelineBuilder(serviceProvider);
+            var pipelineBuilder = new DefaultPipelineBuilder(serviceProvider, "name");
             
             return pipelineBuilder;
         }

@@ -9,6 +9,8 @@ namespace Meceqs.Consuming
 
         IFluentConsumer SetContextItem(string key, object value);
 
+        IFluentConsumer UsePipeline(string pipelineName);
+
         Task ConsumeAsync();
 
         Task<TResult> ConsumeAsync<TResult>();

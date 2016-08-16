@@ -21,6 +21,8 @@ namespace Meceqs.Filters.EnvelopeSanitizer
 
             // TODO @cweiss is this a good solution?
 
+            // TODO where should we throw an error if Envelope.Message is null?
+
             Type messageType = context.MessageType;
 
             // if the envelope is not deserialized in a statically typed way (e.g. through ASP.NET MVC ModelBinding),

@@ -8,14 +8,17 @@ namespace Meceqs.Pipeline
     public class DefaultPipelineBuilder : IPipelineBuilder
     {
         private readonly IList<Func<FilterDelegate, FilterDelegate>> _filters = new List<Func<FilterDelegate, FilterDelegate>>();
+        private readonly string _pipelineName;
 
-        public IServiceProvider ApplicationServices { get; set; }
+        public IServiceProvider ApplicationServices { get; }
 
-        public DefaultPipelineBuilder(IServiceProvider serviceProvider)
+        public DefaultPipelineBuilder(IServiceProvider serviceProvider, string pipelineName)
         {
             Check.NotNull(serviceProvider, nameof(serviceProvider));
+            Check.NotNullOrWhiteSpace(pipelineName, nameof(pipelineName));
 
             ApplicationServices = serviceProvider;
+            _pipelineName = pipelineName;
         }
 
         public IPipelineBuilder Use(Func<FilterDelegate, FilterDelegate> filter)
@@ -24,10 +27,8 @@ namespace Meceqs.Pipeline
             return this;
         }
 
-        public IPipeline Build(string pipelineName)
+        public IPipeline Build()
         {
-            Check.NotNullOrWhiteSpace(pipelineName, nameof(pipelineName));
-
             FilterDelegate pipeline = context =>
             {
                 // TODO what should happen if there's no terminating filter?
@@ -39,7 +40,7 @@ namespace Meceqs.Pipeline
                 pipeline = filter(pipeline);
             }
 
-            return new DefaultPipeline(pipeline, pipelineName);
+            return new DefaultPipeline(pipeline, _pipelineName);
         }
     }
 }

@@ -42,17 +42,17 @@ namespace CustomerContext.WebApi
                 .AddAspNetCore()
                 .AddTypedHandling()
                 .AddTypedHandlingInterceptor<SampleHandleInterceptor>() // knows about the executing handler
-                .AddConsumer(options =>
+                .AddConsumer(pipeline =>
                 {
-                    options.Pipeline.Builder
+                    pipeline
                         .UseEnvelopeSanitizer()     // make sure, MessageType, MessageName, etc are set correctly
                         .UseAspNetCoreRequest()     // attach User, RequestServices, MessageHistory, ...
                         .UseAuditing()              // add user id to message if not present
                         .UseTypedHandling();        // forward to IHandles<TMessage, TResult>
                 })
-                .AddSender(options =>
+                .AddSender(pipeline =>
                 {
-                    options.Pipeline.Builder
+                    pipeline
                         .UseAspNetCoreRequest()
                         .UseAuditing()              // add user id to message if not present
                         .UseTypedHandling();
