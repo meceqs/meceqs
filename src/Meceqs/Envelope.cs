@@ -27,12 +27,12 @@ namespace Meceqs
         public Guid MessageId { get; set; }
         public string MessageType { get; set; }
         public string MessageName { get; set; }
-        public Guid? CorrelationId { get; set; } // TODO !! rename (ConversationId, TraceIdentifier, ...)
+        public Guid? CorrelationId { get; set; }
         public DateTime? CreatedOnUtc { get; set; }
         public MessageHeaders Headers { get; set; } = new MessageHeaders();
         public List<MessageHistoryEntry> History { get; set; } = new List<MessageHistoryEntry>();
 
-        protected Envelope() 
+        protected Envelope()
         {
         }
 
@@ -41,18 +41,10 @@ namespace Meceqs
             Check.NotNull(message, nameof(message));
             Check.NotEmpty(messageId, nameof(messageId));
 
-            Type messageType = message.GetType();
-
             Message = message;
-            MessageName = messageType.Name;
-            MessageType = messageType.FullName;
-
             MessageId = messageId;
-
-            // should be overwritten, if message is correlated with other message
-            CorrelationId = Guid.NewGuid();
-
-            CreatedOnUtc = DateTime.UtcNow;
+            
+            Sanitize();
         }
 
         public void EnsureValid()
@@ -64,6 +56,36 @@ namespace Meceqs
             Check.NotEmpty(MessageId, nameof(MessageId));
             Check.NotNullOrWhiteSpace(MessageName, nameof(MessageName));
             Check.NotNullOrWhiteSpace(MessageType, nameof(MessageType));
+        }
+
+        public void Sanitize()
+        {
+            if (Message != null)
+            {
+                Type messageType = Message.GetType();
+
+                // if the envelope is not deserialized in a statically typed way (e.g. through ASP.NET MVC ModelBinding),
+                // the values for MessageName and -Type could be wrong or missing. (e.g. because the request was made with Fiddler)
+                // For this reason, we just re-set them!
+                MessageName = messageType.Name;
+                MessageType = messageType.FullName;
+            }
+
+            if (MessageId == Guid.Empty)
+            {
+                MessageId = Guid.NewGuid();
+            }
+
+            if (!CorrelationId.HasValue || CorrelationId.Value == Guid.Empty)
+            {
+                // should be overwritten, if message is correlated with other message
+                CorrelationId = Guid.NewGuid();
+            }
+
+            if (!CreatedOnUtc.HasValue)
+            {
+                CreatedOnUtc = DateTime.UtcNow;
+            }
         }
     }
 }

@@ -2,6 +2,7 @@ using Meceqs;
 using Meceqs.Configuration;
 using Meceqs.Filters.TypedHandling;
 using Meceqs.Filters.TypedHandling.Internal;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -11,12 +12,12 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             Check.NotNull(builder, nameof(builder));
 
-            builder.Services.AddTransient<IHandlerFactory, DefaultHandlerFactory>();
+            builder.Services.TryAddTransient<IHandlerFactory, DefaultHandlerFactory>();
 
-            builder.Services.AddSingleton<IHandleContextFactory, DefaultHandleContextFactory>();
-            builder.Services.AddSingleton<IHandlerFactoryInvoker, DefaultHandlerFactoryInvoker>();
-            builder.Services.AddSingleton<IHandleMethodResolver, DefaultHandleMethodResolver>();
-            builder.Services.AddSingleton<IHandlerInvoker, DefaultHandlerInvoker>();
+            builder.Services.TryAddSingleton<IHandleContextFactory, DefaultHandleContextFactory>();
+            builder.Services.TryAddSingleton<IHandlerFactoryInvoker, DefaultHandlerFactoryInvoker>();
+            builder.Services.TryAddSingleton<IHandleMethodResolver, DefaultHandleMethodResolver>();
+            builder.Services.TryAddSingleton<IHandlerInvoker, DefaultHandlerInvoker>();
 
             return builder;
         }

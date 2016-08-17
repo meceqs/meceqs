@@ -40,7 +40,6 @@ namespace CustomerContext.WebApi
 
             services.AddMeceqs()
                 .AddAspNetCore()
-                .AddTypedHandling()
                 .AddTypedHandlingInterceptor<SampleHandleInterceptor>() // knows about the executing handler
                 .AddConsumer(pipeline =>
                 {

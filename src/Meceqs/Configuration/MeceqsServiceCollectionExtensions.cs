@@ -1,4 +1,3 @@
-using System;
 using Meceqs;
 using Meceqs.Configuration;
 
@@ -6,16 +5,16 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class MeceqsServiceCollectionExtensions
     {
-        public static IMeceqsBuilder AddMeceqs(this IServiceCollection services, Action<MeceqsOptions> setupAction = null)
+        public static IMeceqsBuilder AddMeceqs(this IServiceCollection services)
         {
             Check.NotNull(services, nameof(services));
 
-            if (setupAction != null)
-            {
-                services.Configure<MeceqsOptions>(setupAction);
-            }
+            var builder = new MeceqsBuilder(services);
 
-            return new MeceqsBuilder(services);
+            // Add common services from this library
+            builder.AddTypedHandling();
+
+            return builder;
         }
     }
 }

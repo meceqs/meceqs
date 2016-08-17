@@ -1,5 +1,4 @@
 using System;
-using System.Reflection;
 using System.Threading.Tasks;
 using Meceqs.Pipeline;
 using Microsoft.AspNetCore.Http;
@@ -8,21 +7,18 @@ namespace Meceqs.AspNetCore
 {
     public class AspNetCoreRequestFilter
     {
-        public const string HistoryPropertyRequestId = "RequestId";
-        public const string HistoryPropertyRequestPath = "RequestPath";
-
-        private static readonly string HostName = Environment.MachineName;
-        private static readonly string EndpointName = Assembly.GetEntryAssembly().GetName().Name;
-
         private readonly FilterDelegate _next;
+        private readonly AspNetCoreRequestOptions _options;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public AspNetCoreRequestFilter(FilterDelegate next, IHttpContextAccessor httpContextAccessor)
+        public AspNetCoreRequestFilter(FilterDelegate next, AspNetCoreRequestOptions options, IHttpContextAccessor httpContextAccessor)
         {
             Check.NotNull(next, nameof(next));
+            Check.NotNull(options, nameof(options));
             Check.NotNull(httpContextAccessor, nameof(httpContextAccessor));
 
             _next = next;
+            _options = options;
             _httpContextAccessor = httpContextAccessor;
         }
 
@@ -41,13 +37,13 @@ namespace Meceqs.AspNetCore
             var historyEntry = new MessageHistoryEntry
             {
                 Pipeline = context.PipelineName,
-                Host = HostName,
-                Endpoint = EndpointName,
+                Host = _options.HostName,
+                Endpoint = _options.EndpointName,
                 CreatedOnUtc = DateTime.UtcNow
             };
 
-            historyEntry.Properties.Add(HistoryPropertyRequestId, httpContext.TraceIdentifier);
-            historyEntry.Properties.Add(HistoryPropertyRequestPath, httpContext.Request.Path.Value);
+            historyEntry.Properties.Add(_options.HistoryPropertyRequestId, httpContext.TraceIdentifier);
+            historyEntry.Properties.Add(_options.HistoryPropertyRequestPath, httpContext.Request.Path.Value);
 
             context.Envelope.History.Add(historyEntry);
 
