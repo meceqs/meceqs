@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Meceqs.Pipeline;
 
 namespace Meceqs.Sending.Internal
@@ -28,12 +29,12 @@ namespace Meceqs.Sending.Internal
             _pipelineProvider = pipelineProvider;
         }
 
-        public IFluentSender ForMessage<TMessage>(TMessage message) where TMessage : class
+        public IFluentSender ForMessage(object message)
         {
             return ForMessage(message, Guid.NewGuid());
         }
 
-        public IFluentSender ForMessage<TMessage>(TMessage message, Guid messageId) where TMessage : class
+        public IFluentSender ForMessage(object message, Guid messageId)
         {
             Check.NotNull(message, nameof(message));
             Check.NotEmpty(messageId, nameof(messageId));
@@ -58,6 +59,18 @@ namespace Meceqs.Sending.Internal
             }
 
             return new FluentSender(envelopes, _envelopeCorrelator, _filterContextFactory, _pipelineProvider);
+        }
+
+        public Task SendAsync(object message, Guid? messageId = null)
+        {
+            return ForMessage(message, messageId ?? Guid.NewGuid())
+                .SendAsync();
+        }
+
+        public Task<TResult> SendAsync<TResult>(object message, Guid? messageId = null)
+        {
+            return ForMessage(message, messageId ?? Guid.NewGuid())
+                .SendAsync<TResult>();
         }
     }
 }

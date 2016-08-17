@@ -14,6 +14,11 @@ namespace Meceqs.Filters.TypedHandling
             : base(filterContext.Envelope, filterContext.Message)
         {
         }
+
+        public HandleContext(Envelope<TMessage> envelope)
+            : base(envelope, envelope.Message)
+        {
+        }
     }
 
     public abstract class HandleContext
