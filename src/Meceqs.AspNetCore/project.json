@@ -13,6 +13,7 @@
   },
 
   "frameworks": {
+    "net46": {},
     "netstandard1.5": {
         "dependencies": {
             "System.Runtime.Extensions": "4.1.0"
