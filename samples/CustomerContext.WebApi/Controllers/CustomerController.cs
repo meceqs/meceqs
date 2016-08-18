@@ -24,25 +24,25 @@ namespace CustomerContext.WebApi.Controllers
         [HttpPost]
         public Task<CreateCustomerResult> CreateCustomer(Envelope<CreateCustomerCommand> envelope)
         {
-            return _messageConsumer.ForEnvelope(envelope).ConsumeAsync<CreateCustomerResult>();
+            return _messageConsumer.ConsumeAsync<CreateCustomerResult>(envelope);
         }
 
         [HttpPost]
         public Task ChangeName(Envelope<ChangeNameCommand> envelope)
         {
-            return _messageConsumer.ForEnvelope(envelope).ConsumeAsync();
+            return _messageConsumer.ConsumeAsync(envelope);
         }
 
         [HttpPost]
         public Task<FindCustomersResult> FindCustomers(Envelope<FindCustomersQuery> envelope)
         {
-            return _messageConsumer.ForEnvelope(envelope).ConsumeAsync<FindCustomersResult>();
+            return _messageConsumer.ConsumeAsync<FindCustomersResult>(envelope);
         }
 
         [HttpPost]
         public Task<CustomerDto> GetCustomer(Envelope<GetCustomerQuery> envelope)
         {
-            return _messageConsumer.ForEnvelope(envelope).ConsumeAsync<CustomerDto>();
+            return _messageConsumer.ConsumeAsync<CustomerDto>(envelope);
         }
     }
 }
