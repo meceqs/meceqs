@@ -29,8 +29,8 @@ namespace Meceqs
         public string MessageName { get; set; }
         public Guid? CorrelationId { get; set; }
         public DateTime? CreatedOnUtc { get; set; }
-        public MessageHeaders Headers { get; set; } = new MessageHeaders();
-        public List<MessageHistoryEntry> History { get; set; } = new List<MessageHistoryEntry>();
+        public EnvelopeProperties Headers { get; set; } = new EnvelopeProperties();
+        public List<EnvelopeHistoryEntry> History { get; set; } = new List<EnvelopeHistoryEntry>();
 
         protected Envelope()
         {
@@ -50,7 +50,7 @@ namespace Meceqs
         public void EnsureValid()
         {
             if (Headers == null)
-                Headers = new MessageHeaders();
+                Headers = new EnvelopeProperties();
 
             Check.NotNull(Message, nameof(Message));
             Check.NotEmpty(MessageId, nameof(MessageId));

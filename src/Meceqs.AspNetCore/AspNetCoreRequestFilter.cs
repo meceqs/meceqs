@@ -9,34 +9,54 @@ namespace Meceqs.AspNetCore
     {
         private readonly FilterDelegate _next;
         private readonly AspNetCoreRequestOptions _options;
-        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public AspNetCoreRequestFilter(FilterDelegate next, AspNetCoreRequestOptions options, IHttpContextAccessor httpContextAccessor)
+        public AspNetCoreRequestFilter(FilterDelegate next, AspNetCoreRequestOptions options)
         {
             Check.NotNull(next, nameof(next));
             Check.NotNull(options, nameof(options));
-            Check.NotNull(httpContextAccessor, nameof(httpContextAccessor));
 
             _next = next;
             _options = options;
-            _httpContextAccessor = httpContextAccessor;
         }
 
-        public Task Invoke(FilterContext context)
+        public Task Invoke(FilterContext context, IHttpContextAccessor httpContextAccessor)
         {
             Check.NotNull(context, nameof(context));
+            Check.NotNull(httpContextAccessor, nameof(httpContextAccessor));
 
-            var httpContext = _httpContextAccessor.HttpContext;
+            var httpContext = httpContextAccessor.HttpContext;
 
             context.Cancellation = httpContext.RequestAborted;
             context.RequestServices = httpContext.RequestServices;
             context.User = httpContext.User;
 
-            // attach diagnostic information to each event
+            AddRemoteUserHeaders(context, httpContext);
+            AddHistoryEntry(context, httpContext);
 
-            var historyEntry = new MessageHistoryEntry
+            return _next(context);
+        }
+
+        private void AddRemoteUserHeaders(FilterContext filterContext, HttpContext httpContext)
+        {
+            if (!_options.AddRemoteUserHeaders)
+                return;
+
+            if (!filterContext.Envelope.Headers.ContainsKey(_options.RemoteUserIpAddressHeaderName))
             {
-                Pipeline = context.PipelineName,
+                filterContext.Envelope.Headers.Set(_options.RemoteUserIpAddressHeaderName, httpContext.Connection?.RemoteIpAddress.ToString());
+            }
+
+            if (!filterContext.Envelope.Headers.ContainsKey(_options.RemoteUserAgentHeaderName))
+            {
+                filterContext.Envelope.Headers.Set(_options.RemoteUserAgentHeaderName, httpContext.Request.Headers["User-Agent"].ToString());
+            }
+        }
+
+        private void AddHistoryEntry(FilterContext filterContext, HttpContext httpContext)
+        {
+            var historyEntry = new EnvelopeHistoryEntry
+            {
+                Pipeline = filterContext.PipelineName,
                 Host = _options.HostName,
                 Endpoint = _options.EndpointName,
                 CreatedOnUtc = DateTime.UtcNow
@@ -45,9 +65,7 @@ namespace Meceqs.AspNetCore
             historyEntry.Properties.Add(_options.HistoryPropertyRequestId, httpContext.TraceIdentifier);
             historyEntry.Properties.Add(_options.HistoryPropertyRequestPath, httpContext.Request.Path.Value);
 
-            context.Envelope.History.Add(historyEntry);
-
-            return _next(context);
+            filterContext.Envelope.History.Add(historyEntry);
         }
     }
 }

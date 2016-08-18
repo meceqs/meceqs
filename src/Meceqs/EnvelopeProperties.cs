@@ -4,8 +4,13 @@ using System.Globalization;
 
 namespace Meceqs
 {
-    public class MessageHeaders : Dictionary<string, object>
+    public class EnvelopeProperties : Dictionary<string, object>
     {
+        public EnvelopeProperties()
+            : base(StringComparer.OrdinalIgnoreCase /* to support camelCase and PascalCase serializers */)
+        {
+        }
+
         public T Get<T>(string headerName)
         {
             if (string.IsNullOrWhiteSpace(headerName))

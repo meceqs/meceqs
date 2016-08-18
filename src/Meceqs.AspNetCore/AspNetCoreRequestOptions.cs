@@ -12,5 +12,8 @@ namespace Meceqs.AspNetCore
         public string HistoryPropertyRequestId { get; set; } = "RequestId";
         public string HistoryPropertyRequestPath { get; set; } = "RequestPath";
 
+        public bool AddRemoteUserHeaders { get; set; } = false;
+        public string RemoteUserIpAddressHeaderName { get; set; } = "RemoteIpAddress";
+        public string RemoteUserAgentHeaderName { get; set; } = "RemoteUserAgent";
     }
 }
