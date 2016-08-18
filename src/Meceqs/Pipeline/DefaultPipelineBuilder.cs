@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Meceqs.Pipeline
 {
@@ -31,8 +30,8 @@ namespace Meceqs.Pipeline
         {
             FilterDelegate pipeline = context =>
             {
-                // TODO what should happen if there's no terminating filter?
-                return Task.CompletedTask;
+                // This filter will be executed last!
+                throw new InvalidOperationException("The message has not been handled by any terminating filter");
             };
 
             foreach (var filter in _filters.Reverse())
