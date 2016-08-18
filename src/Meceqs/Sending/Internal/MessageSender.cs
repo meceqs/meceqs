@@ -56,6 +56,7 @@ namespace Meceqs.Sending.Internal
             {
                 var messageId = Guid.NewGuid();
                 var envelope = _envelopeFactory.Create(message, messageId);
+                envelopes.Add(envelope);
             }
 
             return new FluentSender(envelopes, _envelopeCorrelator, _filterContextFactory, _pipelineProvider);
