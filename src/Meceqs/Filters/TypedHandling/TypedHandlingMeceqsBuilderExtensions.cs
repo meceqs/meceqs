@@ -1,3 +1,6 @@
+using System;
+using System.Linq;
+using System.Reflection;
 using Meceqs;
 using Meceqs.Configuration;
 using Meceqs.Filters.TypedHandling;
@@ -22,12 +25,64 @@ namespace Microsoft.Extensions.DependencyInjection
             return builder;
         }
 
+        public static IMeceqsBuilder AddTypedHandler<THandlerImplementation>(this IMeceqsBuilder builder)
+            where THandlerImplementation : IHandles
+        {
+            return AddTypedHandler(builder, typeof(THandlerImplementation));
+        }
+
+        public static IMeceqsBuilder AddTypedHandler(this IMeceqsBuilder builder, Type handler)
+        {
+            Check.NotNull(builder, nameof(builder));
+            Check.NotNull(handler, nameof(handler));
+
+            Type baseHandle = typeof(IHandles);
+            foreach (var handleInterface in handler.GetTypeInfo().ImplementedInterfaces)
+            {
+                if (baseHandle.IsAssignableFrom(handleInterface))
+                {
+                    builder.Services.TryAddTransient(handleInterface, handler);
+                }
+            }
+
+            return builder;
+        }
+
+        public static IMeceqsBuilder AddTypedHandlersFromAssembly<TType>(this IMeceqsBuilder builder)
+        {
+            return AddTypedHandlersFromAssembly(builder, typeof(TType).GetTypeInfo().Assembly);
+        }
+
+        public static IMeceqsBuilder AddTypedHandlersFromAssembly(this IMeceqsBuilder builder, Assembly assembly)
+        {
+            Check.NotNull(builder, nameof(builder));
+            Check.NotNull(assembly, nameof(assembly));
+
+            var handlers = from type in assembly.GetTypes()
+                           where type.GetTypeInfo().IsClass && ! type.GetTypeInfo().IsAbstract
+                           where typeof(IHandles).IsAssignableFrom(type)
+                           select type;
+
+            foreach (var handler in handlers)
+            {
+                AddTypedHandler(builder, handler);
+            }
+
+            return builder;
+        }
+
         public static IMeceqsBuilder AddTypedHandlingInterceptor<THandleInterceptor>(this IMeceqsBuilder builder)
             where THandleInterceptor : class, IHandleInterceptor
         {
-            Check.NotNull(builder, nameof(builder));
+            return AddTypedHandlingInterceptor(builder, typeof(THandleInterceptor));
+        }
 
-            builder.Services.AddTransient<IHandleInterceptor, THandleInterceptor>();
+        public static IMeceqsBuilder AddTypedHandlingInterceptor(this IMeceqsBuilder builder, Type interceptor)
+        {
+            Check.NotNull(builder, nameof(builder));
+            Check.NotNull(interceptor, nameof(interceptor));
+
+            builder.Services.TryAddTransient(typeof(IHandleInterceptor), interceptor);
 
             return builder;
         }

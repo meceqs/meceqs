@@ -1,11 +1,7 @@
 using System.Reflection;
-using CustomerContext.Contracts.Commands;
-using CustomerContext.Contracts.Queries;
 using CustomerContext.Core.CommandHandlers;
-using CustomerContext.Core.QueryHandlers;
 using CustomerContext.Core.Repositories;
 using CustomerContext.WebApi.Infrastructure;
-using Meceqs.Filters.TypedHandling;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -33,13 +29,11 @@ namespace CustomerContext.WebApi
         public void ConfigureServices(IServiceCollection services)
         {
             // CustomerContext.Core
-            services.AddTransient<IHandles<CreateCustomerCommand, CreateCustomerResult>, CustomerCommandHandler>();
-            services.AddTransient<IHandles<FindCustomersQuery, FindCustomersResult>, CustomerQueryHandler>();
-            services.AddTransient<IHandles<GetCustomerQuery, CustomerDto>, CustomerQueryHandler>();
             services.AddSingleton<ICustomerRepository, InMemoryCustomerRepository>();
 
             services.AddMeceqs()
                 .AddAspNetCore()
+                .AddTypedHandlersFromAssembly<CustomerCommandHandler>()
                 .AddTypedHandlingInterceptor<SampleHandleInterceptor>() // knows about the executing handler
                 .AddConsumer(pipeline =>
                 {
