@@ -10,11 +10,9 @@ namespace Meceqs.Filters.TypedHandling
     public class TypedHandlingFilter
     {
         private readonly FilterDelegate _next;
-        private readonly IHandlerFactory _handlerFactory;
         private readonly IHandlerFactoryInvoker _handlerFactoryInvoker;
         private readonly IHandleContextFactory _handleContextFactory;
         private readonly IHandleMethodResolver _handleMethodResolver;
-        private readonly IEnumerable<IHandleInterceptor> _handleInterceptors;
         private readonly IHandlerInvoker _handlerInvoker;
 
         public TypedHandlingFilter(
@@ -23,36 +21,37 @@ namespace Meceqs.Filters.TypedHandling
             IHandlerFactoryInvoker handlerFactoryInvoker,
             IHandleContextFactory handleContextFactory,
             IHandleMethodResolver handleMethodResolver,
-            IEnumerable<IHandleInterceptor> handleInterceptors,
             IHandlerInvoker handlerInvoker)
         {
             Check.NotNull(next, nameof(next));
-            Check.NotNull(handlerFactory, nameof(handlerFactory));
             Check.NotNull(handlerFactoryInvoker, nameof(handlerFactoryInvoker));
             Check.NotNull(handleContextFactory, nameof(handleContextFactory));
             Check.NotNull(handleMethodResolver, nameof(handleMethodResolver));
             Check.NotNull(handlerInvoker, nameof(handlerInvoker));
 
             _next = next;
-            _handlerFactory = handlerFactory;
             _handlerFactoryInvoker = handlerFactoryInvoker;
             _handleContextFactory = handleContextFactory;
             _handleMethodResolver = handleMethodResolver;
-            _handleInterceptors = handleInterceptors ?? Enumerable.Empty<IHandleInterceptor>();
             _handlerInvoker = handlerInvoker;
         }
 
-        public async Task Invoke(FilterContext filterContext)
+        public async Task Invoke(
+            FilterContext filterContext, 
+            IHandlerFactory handlerFactory,
+            IEnumerable<IHandleInterceptor> handleInterceptors)
         {
             Check.NotNull(filterContext, nameof(filterContext));
+            Check.NotNull(handlerFactory, nameof(handlerFactory));
 
             // Since the public interfaces from this filter expect generic types, we can't call them directly.
             // Separate services are responsible for invoking them by using e.g. reflection.
 
+            handleInterceptors = handleInterceptors ?? Enumerable.Empty<IHandleInterceptor>();
             Type messageType = filterContext.MessageType;
             Type resultType = filterContext.ExpectedResultType;
 
-            IHandles handler = _handlerFactoryInvoker.InvokeCreateHandler(_handlerFactory, messageType, resultType);
+            IHandles handler = _handlerFactoryInvoker.InvokeCreateHandler(handlerFactory, messageType, resultType);
 
             if (handler == null)
             {
@@ -65,14 +64,14 @@ namespace Meceqs.Filters.TypedHandling
 
             SetContextProperties(handleContext, handler, messageType, resultType);
 
-            foreach (var interceptor in _handleInterceptors)
+            foreach (var interceptor in handleInterceptors)
             {
                 await interceptor.OnHandleExecuting(handleContext);
             }
 
             filterContext.Result = await _handlerInvoker.InvokeHandleAsync(handler, handleContext, resultType);
 
-            foreach (var interceptor in _handleInterceptors.Reverse())
+            foreach (var interceptor in handleInterceptors.Reverse())
             {
                 await interceptor.OnHandleExecuted(handleContext);
             }
