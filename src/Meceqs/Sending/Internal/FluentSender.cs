@@ -54,7 +54,7 @@ namespace Meceqs.Sending.Internal
         {
             foreach (var envelope in _envelopes)
             {
-                envelope.Headers.Set(headerName, value);
+                envelope.Headers[headerName] = value;
             }
 
             return this;

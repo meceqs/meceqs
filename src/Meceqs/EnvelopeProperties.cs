@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
+using Meceqs.Internal;
 
 namespace Meceqs
 {
@@ -11,29 +11,32 @@ namespace Meceqs
         {
         }
 
-        public T Get<T>(string headerName)
+        public T Get<T>(string key)
         {
-            if (string.IsNullOrWhiteSpace(headerName))
-                throw new ArgumentNullException(nameof(headerName));
+            Check.NotNullOrWhiteSpace(key, nameof(key));
 
             object value;
-            if (TryGetValue(headerName, out value))
+            if (TryGetValue(key, out value))
             {
-                return (T)Convert.ChangeType(value, typeof(T), CultureInfo.InvariantCulture);
+                return ValueConverter.Instance.ConvertValue<T>(value);
             }
 
             return default(T);
         }
 
-        public void Set(string headerName, object value)
+        public T GetRequired<T>(string key)
         {
-            // Handlers have to be able to deal with missing/empty headers anyway,
-            // so there's no point in adding them here.
+            Check.NotNullOrWhiteSpace(key, nameof(key));
 
-            if (string.IsNullOrWhiteSpace(headerName) || value == null)
-                return;
+            object value;
+            if (TryGetValue(key, out value))
+            {
+                return ValueConverter.Instance.ConvertValue<T>(value);
+            }
 
-            this[headerName] = value;
+            throw new ArgumentOutOfRangeException(nameof(key), key, $"No entry found for key '{key}'");
         }
+
+        
     }
 }

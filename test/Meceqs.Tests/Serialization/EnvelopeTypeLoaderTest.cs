@@ -11,7 +11,7 @@ namespace Meceqs.Tests
         private IEnvelopeTypeLoader GetEnvelopeTypeLoader()
         {
             var options = new MeceqsSerializationOptions();
-            options.ContractAssemblies.Add(Assembly.GetExecutingAssembly());
+            options.ContractAssemblies.Add(GetType().GetTypeInfo().Assembly);
             var typeLoader = new DefaultEnvelopeTypeLoader(Options.Create(options));
 
             return typeLoader;

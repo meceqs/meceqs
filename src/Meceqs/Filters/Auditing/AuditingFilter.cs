@@ -32,7 +32,7 @@ namespace Meceqs.Filters.Auditing
                     var userIdFromClaim = GetValueFromClaim(context.User, _options.UserIdClaimTypes);
                     if (userIdFromClaim != null)
                     {
-                        context.Envelope.Headers.Set(_options.UserIdMessageHeaderName, userIdFromClaim);
+                        context.Envelope.Headers.Add(_options.UserIdMessageHeaderName, userIdFromClaim);
                     }
                 }
             }

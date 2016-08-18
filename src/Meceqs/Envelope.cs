@@ -28,7 +28,7 @@ namespace Meceqs
         public string MessageType { get; set; }
         public string MessageName { get; set; }
         public Guid? CorrelationId { get; set; }
-        public DateTime? CreatedOnUtc { get; set; }
+        public DateTimeOffset? CreatedOnUtc { get; set; }
         public EnvelopeProperties Headers { get; set; } = new EnvelopeProperties();
         public List<EnvelopeHistoryEntry> History { get; set; } = new List<EnvelopeHistoryEntry>();
 
@@ -84,7 +84,7 @@ namespace Meceqs
 
             if (!CreatedOnUtc.HasValue)
             {
-                CreatedOnUtc = DateTime.UtcNow;
+                CreatedOnUtc = DateTimeOffset.UtcNow;
             }
         }
     }

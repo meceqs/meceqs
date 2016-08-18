@@ -43,12 +43,12 @@ namespace Meceqs.AspNetCore
 
             if (!filterContext.Envelope.Headers.ContainsKey(_options.RemoteUserIpAddressHeaderName))
             {
-                filterContext.Envelope.Headers.Set(_options.RemoteUserIpAddressHeaderName, httpContext.Connection?.RemoteIpAddress.ToString());
+                filterContext.Envelope.Headers.Add(_options.RemoteUserIpAddressHeaderName, httpContext.Connection?.RemoteIpAddress.ToString());
             }
 
             if (!filterContext.Envelope.Headers.ContainsKey(_options.RemoteUserAgentHeaderName))
             {
-                filterContext.Envelope.Headers.Set(_options.RemoteUserAgentHeaderName, httpContext.Request.Headers["User-Agent"].ToString());
+                filterContext.Envelope.Headers.Add(_options.RemoteUserAgentHeaderName, httpContext.Request.Headers["User-Agent"].ToString());
             }
         }
 
