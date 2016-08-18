@@ -59,7 +59,7 @@ namespace Microsoft.Extensions.DependencyInjection
             Check.NotNull(assembly, nameof(assembly));
 
             var handlers = from type in assembly.GetTypes()
-                           where type.GetTypeInfo().IsClass && ! type.GetTypeInfo().IsAbstract
+                           where type.GetTypeInfo().IsClass && !type.GetTypeInfo().IsAbstract
                            where typeof(IHandles).IsAssignableFrom(type)
                            select type;
 
@@ -82,7 +82,7 @@ namespace Microsoft.Extensions.DependencyInjection
             Check.NotNull(builder, nameof(builder));
             Check.NotNull(interceptor, nameof(interceptor));
 
-            builder.Services.TryAddTransient(typeof(IHandleInterceptor), interceptor);
+            builder.Services.AddTransient(typeof(IHandleInterceptor), interceptor);
 
             return builder;
         }
