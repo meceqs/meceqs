@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Meceqs.Filters.TypedHandling;
 using Meceqs.Filters.TypedHandling.Internal;
+using Shouldly;
 using Xunit;
 
 namespace Meceqs.Tests.Filters.TypedHandling
@@ -25,8 +26,8 @@ namespace Meceqs.Tests.Filters.TypedHandling
             Type resultType = null;
 
             // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => resolver.GetHandleMethod(null, messageType, resultType));
-            Assert.Throws<ArgumentNullException>(() => resolver.GetHandleMethod(handlerType, null, resultType));
+            Should.Throw<ArgumentNullException>(() => resolver.GetHandleMethod(null, messageType, resultType));
+            Should.Throw<ArgumentNullException>(() => resolver.GetHandleMethod(handlerType, null, resultType));
         }
 
         [Fact]
@@ -122,7 +123,7 @@ namespace Meceqs.Tests.Filters.TypedHandling
             var method = resolver.GetHandleMethod(handlerType, messageType, resultType);
 
             // Assert
-            Assert.Null(method);
+            method.ShouldBeNull();
         }
 
         [Fact]
@@ -138,7 +139,7 @@ namespace Meceqs.Tests.Filters.TypedHandling
             var method = resolver.GetHandleMethod(handlerType, messageType, resultType);
 
             // Assert
-            Assert.Null(method);
+            method.ShouldBeNull();
         }
 
         private void AssertMethod(MethodInfo method, Type messageType, Type resultType)
@@ -149,9 +150,9 @@ namespace Meceqs.Tests.Filters.TypedHandling
                 ? typeof(Task<>).MakeGenericType(resultType)
                 : typeof(Task);
 
-            Assert.NotNull(method);
-            Assert.Equal(handleContextType, method.GetParameters().First().ParameterType);
-            Assert.Equal(resultTaskType, method.ReturnType);
+            method.ShouldNotBeNull();
+            method.GetParameters().First().ParameterType.ShouldBe(handleContextType);
+            method.ReturnType.ShouldBe(resultTaskType);
         }
     }
 }

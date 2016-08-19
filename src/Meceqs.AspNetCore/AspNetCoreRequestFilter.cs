@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Meceqs.Pipeline;
 using Microsoft.AspNetCore.Http;
@@ -26,9 +27,23 @@ namespace Meceqs.AspNetCore
 
             var httpContext = httpContextAccessor.HttpContext;
 
-            context.Cancellation = httpContext.RequestAborted;
             context.RequestServices = httpContext.RequestServices;
             context.User = httpContext.User;
+
+            if (context.Cancellation == default(CancellationToken))
+            {
+                context.Cancellation = httpContext.RequestAborted;
+            }
+            else
+            {
+                // Someone provided a custom cancellation. To make sure the operation still is cancelled
+                // when the ASP.NET request is cancelled, the two cancellation tokens are combined.
+                var compositeCancellation = CancellationTokenSource.CreateLinkedTokenSource(
+                    context.Cancellation,
+                    httpContext.RequestAborted
+                );
+                context.Cancellation = compositeCancellation.Token;
+            }
 
             AddRemoteUserHeaders(context, httpContext);
             AddHistoryEntry(context, httpContext);
@@ -59,7 +74,7 @@ namespace Meceqs.AspNetCore
                 Pipeline = filterContext.PipelineName,
                 Host = _options.HostName,
                 Endpoint = _options.EndpointName,
-                CreatedOnUtc = DateTime.UtcNow
+                CreatedOnUtc = DateTimeOffset.UtcNow
             };
 
             historyEntry.Properties.Add(_options.HistoryPropertyRequestId, httpContext.TraceIdentifier);

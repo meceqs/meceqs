@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -50,20 +51,30 @@ namespace Meceqs.Consuming.Internal
             return this;
         }
 
-        public Task ConsumeAsync()
+        public async Task ConsumeAsync()
         {
             var filterContexts = _envelopes.Select(CreateFilterContext).ToList();
             var pipeline = _pipelineProvider.GetPipeline(_pipelineName);
 
-            return pipeline.ProcessAsync(filterContexts);
+            foreach (var context in filterContexts)
+            {
+                await pipeline.ProcessAsync(context);
+            }
         }
 
         public Task<TResult> ConsumeAsync<TResult>()
         {
             var filterContexts = _envelopes.Select(CreateFilterContext).ToList();
             var pipeline = _pipelineProvider.GetPipeline(_pipelineName);
+
+            if (filterContexts.Count == 1)
+            {
+                return pipeline.ProcessAsync<TResult>(filterContexts[0]);
+            }
             
-            return pipeline.ProcessAsync<TResult>(filterContexts);
+            throw new InvalidOperationException(
+                $"'{nameof(ConsumeAsync)}' with a result-type can only be called if there's exactly one envelope. " +
+                $"Actual Count: {filterContexts.Count}");
         }
 
         private FilterContext CreateFilterContext(Envelope envelope)

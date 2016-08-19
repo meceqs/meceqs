@@ -31,7 +31,7 @@ namespace Meceqs.Pipeline
             FilterDelegate pipeline = context =>
             {
                 // This filter will be executed last!
-                throw new InvalidOperationException("The message has not been handled by any terminating filter");
+                throw new InvalidOperationException("The message has not been handled by a terminating filter");
             };
 
             foreach (var filter in _filters.Reverse())

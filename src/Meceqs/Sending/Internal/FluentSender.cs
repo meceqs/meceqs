@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -74,12 +75,15 @@ namespace Meceqs.Sending.Internal
             return this;
         }
 
-        public Task SendAsync()
+        public async Task SendAsync()
         {
             var filterContexts = _envelopes.Select(CreateFilterContext).ToList();
             var pipeline = _pipelineProvider.GetPipeline(_pipelineName);
 
-            return pipeline.ProcessAsync(filterContexts);
+            foreach (var context in filterContexts)
+            {
+                await pipeline.ProcessAsync(context);
+            }
         }
 
         public Task<TResult> SendAsync<TResult>()
@@ -87,7 +91,14 @@ namespace Meceqs.Sending.Internal
             var filterContexts = _envelopes.Select(CreateFilterContext).ToList();
             var pipeline = _pipelineProvider.GetPipeline(_pipelineName);
 
-            return pipeline.ProcessAsync<TResult>(filterContexts);
+            if (filterContexts.Count == 1)
+            {
+                return pipeline.ProcessAsync<TResult>(filterContexts[0]);
+            }
+            
+            throw new InvalidOperationException(
+                $"'{nameof(SendAsync)}' with a result-type can only be called if there's exactly one envelope. " +
+                $"Actual Count: {filterContexts.Count}");
         }
 
         private FilterContext CreateFilterContext(Envelope envelope)

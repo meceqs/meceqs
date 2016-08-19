@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Meceqs.Pipeline;
 using Meceqs.Sending;
 using Meceqs.Sending.Internal;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Meceqs.Tests.Sending
@@ -40,10 +40,10 @@ namespace Meceqs.Tests.Sending
             var pipelineProvider = Substitute.For<IPipelineProvider>();
 
             // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => new FluentSender(null, correlator, filterContextFactory, pipelineProvider));
-            Assert.Throws<ArgumentNullException>(() => new FluentSender(envelopes, null, filterContextFactory, pipelineProvider));
-            Assert.Throws<ArgumentNullException>(() => new FluentSender(envelopes, correlator, null, pipelineProvider));
-            Assert.Throws<ArgumentNullException>(() => new FluentSender(envelopes, correlator, filterContextFactory, null));
+            Should.Throw<ArgumentNullException>(() => new FluentSender(null, correlator, filterContextFactory, pipelineProvider));
+            Should.Throw<ArgumentNullException>(() => new FluentSender(envelopes, null, filterContextFactory, pipelineProvider));
+            Should.Throw<ArgumentNullException>(() => new FluentSender(envelopes, correlator, null, pipelineProvider));
+            Should.Throw<ArgumentNullException>(() => new FluentSender(envelopes, correlator, filterContextFactory, null));
         }
 
         [Fact]
@@ -58,7 +58,7 @@ namespace Meceqs.Tests.Sending
             await sender.SendAsync();
 
             // Assert
-            await pipeline.Received(1).ProcessAsync(Arg.Any<IList<FilterContext>>());
+            await pipeline.ReceivedWithAnyArgs(1).ProcessAsync(null);
         }
 
         [Fact]
@@ -84,12 +84,12 @@ namespace Meceqs.Tests.Sending
 
             int called = 0;
             var pipeline = Substitute.For<IPipeline>();
-            pipeline.When(x => x.ProcessAsync(Arg.Any<IList<FilterContext>>()))
+            pipeline.WhenForAnyArgs(x => x.ProcessAsync(null))
                 .Do(x => {
                     called++;
 
-                    var ctx = x.Arg<IList<FilterContext>>().First();
-                    Assert.Equal("Value", ctx.Envelope.Headers["Key"]);
+                    var ctx = x.Arg<FilterContext>();
+                    ctx.Envelope.Headers["Key"].ShouldBe("Value");
                 });
 
             var builder = GetFluentSender<SimpleMessage>(pipeline: pipeline);
@@ -99,7 +99,7 @@ namespace Meceqs.Tests.Sending
             await builder.SendAsync();
 
             // Assert
-            Assert.Equal(1, called);
+            called.ShouldBe(1);
         }
 
         [Fact]
@@ -108,12 +108,12 @@ namespace Meceqs.Tests.Sending
             // Arrange
             int called = 0;
             var pipeline = Substitute.For<IPipeline>();
-            pipeline.When(x => x.ProcessAsync(Arg.Any<IList<FilterContext>>()))
+            pipeline.WhenForAnyArgs(x => x.ProcessAsync(null))
                 .Do(x => {
                     called++;
                     
-                    var ctx = x.Arg<IList<FilterContext>>().First();
-                    Assert.Equal("Value", ctx.Items.Get<string>("Key"));
+                    var ctx = x.Arg<FilterContext>();
+                    ctx.Items.Get<string>("Key").ShouldBe("Value");
                 });
 
             var sender = GetFluentSender<SimpleMessage>(pipeline: pipeline);
@@ -123,7 +123,7 @@ namespace Meceqs.Tests.Sending
             await sender.SendAsync();
 
             // Assert
-            Assert.Equal(1, called);
+            called.ShouldBe(1);
         }
 
         [Fact]
@@ -135,12 +135,12 @@ namespace Meceqs.Tests.Sending
 
             int called = 0;
             var pipeline = Substitute.For<IPipeline>();
-            pipeline.When(x => x.ProcessAsync(Arg.Any<IList<FilterContext>>()))
+            pipeline.WhenForAnyArgs(x => x.ProcessAsync(null))
                 .Do(x => {
                     called++;
 
-                    var ctx = x.Arg<IList<FilterContext>>().First();
-                    Assert.Equal(cancellationSource.Token, ctx.Cancellation);
+                    var ctx = x.Arg<FilterContext>();
+                    ctx.Cancellation.ShouldBe(cancellationSource.Token);
                 });
 
             var builder = GetFluentSender<SimpleMessage>(pipeline: pipeline);
@@ -150,7 +150,7 @@ namespace Meceqs.Tests.Sending
             await builder.SendAsync();
 
             // Assert
-            Assert.Equal(1, called);
+            called.ShouldBe(1);
         }
 
         [Fact]
@@ -162,12 +162,12 @@ namespace Meceqs.Tests.Sending
 
             int called = 0;
             var pipeline = Substitute.For<IPipeline>();
-            pipeline.When(x => x.ProcessAsync(Arg.Any<IList<FilterContext>>()))
+            pipeline.WhenForAnyArgs(x => x.ProcessAsync(null))
                 .Do(x => {
                     called++;
 
-                    var ctx = x.Arg<IList<FilterContext>>().First();
-                    Assert.Equal(envelope, ctx.Envelope);
+                    var ctx = x.Arg<FilterContext>();
+                    ctx.Envelope.ShouldBe(envelope);
                 });
 
             var sender = GetFluentSender<SimpleMessage>(envelope: envelope, pipeline: pipeline);
@@ -176,7 +176,7 @@ namespace Meceqs.Tests.Sending
             await sender.SendAsync();
 
             // Assert
-            Assert.Equal(1, called);
+            called.ShouldBe(1);
         }
     }
 }

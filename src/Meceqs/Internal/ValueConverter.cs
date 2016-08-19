@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace Meceqs.Internal
 {
@@ -28,11 +29,20 @@ namespace Meceqs.Internal
                 // that's why we only handle special scenarios here.
 
                 if (targetType == typeof(DateTimeOffset))
-                    return (T)Convert.ChangeType(DateTimeOffset.Parse(strValue), targetType);
+                {
+                    var dateValue = DateTimeOffset.Parse(strValue, CultureInfo.InvariantCulture).ToUniversalTime();
+                    return (T)Convert.ChangeType(dateValue, targetType);
+                }
+
+                if (targetType == typeof(DateTime))
+                {
+                    var dateValue = DateTime.Parse(strValue, CultureInfo.InvariantCulture).ToUniversalTime();
+                    return (T)Convert.ChangeType(dateValue, targetType);
+                };
             }
 
             // the value is not a special case, so we just try a regular convert.
-            return (T)Convert.ChangeType(value, targetType);
+            return (T)Convert.ChangeType(value, targetType, CultureInfo.InvariantCulture);
         }
     }
 }

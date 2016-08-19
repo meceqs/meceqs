@@ -1,11 +1,11 @@
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Meceqs.Pipeline;
 using Meceqs.Sending;
 using Meceqs.Sending.Internal;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Meceqs.Tests.Sending
@@ -16,7 +16,7 @@ namespace Meceqs.Tests.Sending
         {
             envelopeCorrelator = envelopeCorrelator ?? new DefaultEnvelopeCorrelator();
             pipeline = pipeline ?? Substitute.For<IPipeline>();
-            
+
             var pipelineProvider = Substitute.For<IPipelineProvider>();
             pipelineProvider.GetPipeline(Arg.Any<string>()).Returns(pipeline);
 
@@ -31,10 +31,10 @@ namespace Meceqs.Tests.Sending
             var filterContextFactory = Substitute.For<IFilterContextFactory>();
             var pipelineProvider = Substitute.For<IPipelineProvider>();
 
-            Assert.Throws<ArgumentNullException>(() => new MessageSender(null, correlator, filterContextFactory, pipelineProvider));
-            Assert.Throws<ArgumentNullException>(() => new MessageSender(envelopeFactory, null, filterContextFactory, pipelineProvider));
-            Assert.Throws<ArgumentNullException>(() => new MessageSender(envelopeFactory, correlator, null, pipelineProvider));
-            Assert.Throws<ArgumentNullException>(() => new MessageSender(envelopeFactory, correlator, filterContextFactory, null));
+            Should.Throw<ArgumentNullException>(() => new MessageSender(null, correlator, filterContextFactory, pipelineProvider));
+            Should.Throw<ArgumentNullException>(() => new MessageSender(envelopeFactory, null, filterContextFactory, pipelineProvider));
+            Should.Throw<ArgumentNullException>(() => new MessageSender(envelopeFactory, correlator, null, pipelineProvider));
+            Should.Throw<ArgumentNullException>(() => new MessageSender(envelopeFactory, correlator, filterContextFactory, null));
         }
 
         [Fact]
@@ -51,7 +51,7 @@ namespace Meceqs.Tests.Sending
                 .SendAsync<string>();
 
             // Assert
-            await pipeline.Received(1).ProcessAsync<string>(Arg.Any<IList<FilterContext>>());
+            await pipeline.ReceivedWithAnyArgs(1).ProcessAsync<string>(null);
         }
 
         [Fact]
@@ -66,13 +66,27 @@ namespace Meceqs.Tests.Sending
             var resultEvent = new SimpleEvent();
             var resultEventId = Guid.NewGuid();
 
-            var pipeline = Substitute.For<IPipeline>();
-
-            var sender = GetSender(pipeline: pipeline);
             var cancellationSource = new CancellationTokenSource();
 
-            IList<FilterContext> filterContexts = null;
-            await pipeline.ProcessAsync<string>(Arg.Do<IList<FilterContext>>(x => filterContexts = x));
+            var called = 0;
+            var pipeline = Substitute.For<IPipeline>();
+            pipeline.WhenForAnyArgs(x => x.ProcessAsync<string>(null))
+                .Do(x =>
+                {
+                    called++;
+
+                    var ctx = x.Arg<FilterContext>();
+                    Assert.Equal(resultEventId, ctx.Envelope.MessageId);
+                    Assert.Equal(resultEvent, ctx.Envelope.Message);
+                    Assert.Equal(cancellationSource.Token, ctx.Cancellation);
+                    Assert.Equal("Value", ctx.Envelope.Headers["Key"]);
+                    Assert.Equal("SendValue", ctx.Items.Get<string>("SendKey"));
+                });
+
+            var sender = GetSender(pipeline: pipeline);
+
+            FilterContext filterContext = null;
+            await pipeline.ProcessAsync(Arg.Do<FilterContext>(x => filterContext = x));
 
             // Act
 
@@ -84,18 +98,7 @@ namespace Meceqs.Tests.Sending
                 .SendAsync<string>();
 
             // Assert
-
-            await pipeline.Received(1).ProcessAsync<string>(Arg.Any<IList<FilterContext>>());
-
-            Assert.NotNull(filterContexts);
-            Assert.Equal(1, filterContexts.Count);
-            
-            var context = filterContexts[0];
-            Assert.Equal(resultEventId, context.Envelope.MessageId);
-            Assert.Equal(resultEvent, context.Envelope.Message);
-            Assert.Equal(cancellationSource.Token, context.Cancellation);
-            Assert.Equal("Value", context.Envelope.Headers["Key"]);
-            Assert.Equal("SendValue", context.Items.Get<string>("SendKey"));
+            Assert.Equal(1, called);
         }
     }
 }

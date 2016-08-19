@@ -19,9 +19,7 @@ namespace Meceqs.Tests
             var dict = new EnvelopeProperties();
             dict.Add(keyInDict, "dummy");
 
-            var result = dict.Get<string>(keyForGet);
-
-            result.ShouldBe("dummy");
+            dict.Get<string>(keyForGet).ShouldBe("dummy");
         }
 
         [Theory]
@@ -37,9 +35,7 @@ namespace Meceqs.Tests
             var dict = new EnvelopeProperties();
             dict.Add(keyInDict, "dummy");
 
-            var result = dict[keyForGet];
-
-            result.ShouldBe("dummy");
+            dict[keyForGet].ShouldBe("dummy");
         }
 
         [Fact]
@@ -48,9 +44,7 @@ namespace Meceqs.Tests
             var dict = new EnvelopeProperties();
             dict.Add("some-key", 4);
 
-            var result = dict.Get<int>("different-key");
-
-            result.ShouldBe(0);
+            dict.Get<int>("different-key").ShouldBe(0);
         }
 
         [Fact]
@@ -59,9 +53,7 @@ namespace Meceqs.Tests
             var dict = new EnvelopeProperties();
             dict.Add("some-key", "dummy");
 
-            var result = dict.Get<string>("different-key");
-
-            result.ShouldBe(null);
+            dict.Get<string>("different-key").ShouldBeNull();
         }
 
         [Fact]
@@ -70,9 +62,7 @@ namespace Meceqs.Tests
             var dict = new EnvelopeProperties();
             dict.Add("some-key", DateTime.Now);
 
-            var result = dict.Get<DateTime?>("different-key");
-
-            result.ShouldBe(null);
+            dict.Get<DateTime?>("different-key").ShouldBeNull();
         }
 
         [Fact]
@@ -81,9 +71,7 @@ namespace Meceqs.Tests
             var dict = new EnvelopeProperties();
             dict.Add("some-key", DateTime.Now);
 
-            var result = dict.Get<DateTime>("different-key");
-
-            result.ShouldBe(default(DateTime));
+            dict.Get<DateTime>("different-key").ShouldBe(default(DateTime));
         }
 
         [Fact]
@@ -92,9 +80,7 @@ namespace Meceqs.Tests
             var dict = new EnvelopeProperties();
             dict.Add("key", 4);
 
-            var result = dict.Get<double>("key");
-
-            result.ShouldBe(4);
+            dict.Get<double>("key").ShouldBe(4.0);
         }
 
         [Fact]
@@ -103,9 +89,7 @@ namespace Meceqs.Tests
             var dict = new EnvelopeProperties();
             dict.Add("key", 4.3);
 
-            var result = dict.Get<int>("key");
-
-            result.ShouldBe(4);
+            dict.Get<int>("key").ShouldBe(4);
         }
 
         [Fact]
@@ -114,9 +98,7 @@ namespace Meceqs.Tests
             var dict = new EnvelopeProperties();
             dict.Add("key", "4");
 
-            var result = dict.Get<int>("key");
-
-            result.ShouldBe(4);
+            dict.Get<int>("key").ShouldBe(4);
         }
 
         [Fact]
@@ -125,31 +107,53 @@ namespace Meceqs.Tests
             var dict = new EnvelopeProperties();
             dict.Add("key", "4.3");
 
-            var result = dict.Get<double>("key");
-
-            result.ShouldBe(4.3);
+            dict.Get<double>("key").ShouldBe(4.3);
         }
 
         [Fact]
-        public void Get_converts_InvariantDateString_string_to_DateTime()
+        public void Get_converts_InvariantDateString_string_to_UtcDateTime()
         {
             var dict = new EnvelopeProperties();
             dict.Add("key", "2016-04-23T18:25:43.511Z");
 
-            var result = dict.Get<DateTime>("key");
-
-            result.ShouldBe(new DateTime(2016, 4, 23, 18, 25, 43, 511));
+            dict.Get<DateTime>("key").ShouldBe(new DateTime(2016, 4, 23, 18, 25, 43, 511, DateTimeKind.Utc));
         }
 
         [Fact]
-        public void Get_converts_InvariantDateString_string_to_DateTimeOffset()
+        public void Get_converts_InvariantDateString_string_to_UtcDateTimeOffset()
         {
             var dict = new EnvelopeProperties();
             dict.Add("key", "2016-04-23T18:25:43.511Z");
 
-            var result = dict.Get<DateTimeOffset>("key");
+            dict.Get<DateTimeOffset>("key")
+                .ShouldBe(new DateTimeOffset(new DateTime(2016, 4, 23, 18, 25, 43, 511, DateTimeKind.Utc)));
+        }
 
-            result.ShouldBe(new DateTimeOffset(new DateTime(2016, 4, 23, 18, 25, 43, 511, DateTimeKind.Utc)));
+        [Fact]
+        public void GetRequired_throws_if_key_is_not_present()
+        {
+            var dict = new EnvelopeProperties();
+            dict.Add("key", "value");
+
+            Should.Throw<ArgumentOutOfRangeException>(() => dict.GetRequired<string>("wrong-key"));
+        }
+
+        [Fact]
+        public void GetRequired_succeeds_if_key_exists_with_struct_default_value()
+        {
+            var dict = new EnvelopeProperties();
+            dict.Add("key", 0);
+
+            dict.GetRequired<int>("key").ShouldBe(0);
+        }
+
+        [Fact]
+        public void GetRequired_succeeds_if_key_exists_with_null_value()
+        {
+            var dict = new EnvelopeProperties();
+            dict.Add("key", null);
+
+            dict.GetRequired<string>("key").ShouldBeNull();
         }
     }
 }

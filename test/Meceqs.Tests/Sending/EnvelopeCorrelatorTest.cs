@@ -1,5 +1,6 @@
 using System;
 using Meceqs.Sending;
+using Shouldly;
 using Xunit;
 
 namespace Meceqs.Tests.Sending
@@ -29,10 +30,9 @@ namespace Meceqs.Tests.Sending
             // Arrange
 
             var correlator = GetCorrelator();
-            var correlationId = Guid.NewGuid();
 
             var source = TestObjects.Envelope<SimpleMessage>();
-            source.CorrelationId = correlationId;
+            source.CorrelationId = Guid.NewGuid();
 
             var target = TestObjects.Envelope<SimpleMessage>();
 
@@ -40,7 +40,7 @@ namespace Meceqs.Tests.Sending
             correlator.CorrelateSourceWithTarget(source, target);
 
             // Assert
-            Assert.Equal(correlationId, target.CorrelationId);
+            target.CorrelationId.ShouldBe(source.CorrelationId);
         }
     }
 }

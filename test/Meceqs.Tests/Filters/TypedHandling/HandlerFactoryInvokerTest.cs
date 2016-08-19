@@ -2,6 +2,7 @@ using System;
 using Meceqs.Filters.TypedHandling;
 using Meceqs.Filters.TypedHandling.Internal;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Meceqs.Tests.Filters.TypedHandling
@@ -22,8 +23,8 @@ namespace Meceqs.Tests.Filters.TypedHandling
             var resultType = typeof(string);
 
             // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => invoker.InvokeCreateHandler(null, typeof(SimpleMessage), resultType));
-            Assert.Throws<ArgumentNullException>(() => invoker.InvokeCreateHandler(handlerFactory, null, resultType));
+            Should.Throw<ArgumentNullException>(() => invoker.InvokeCreateHandler(null, typeof(SimpleMessage), resultType));
+            Should.Throw<ArgumentNullException>(() => invoker.InvokeCreateHandler(handlerFactory, null, resultType));
         }
 
         [Fact]

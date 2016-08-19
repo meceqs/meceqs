@@ -49,9 +49,6 @@ namespace Meceqs
 
         public void EnsureValid()
         {
-            if (Headers == null)
-                Headers = new EnvelopeProperties();
-
             Check.NotNull(Message, nameof(Message));
             Check.NotEmpty(MessageId, nameof(MessageId));
             Check.NotNullOrWhiteSpace(MessageName, nameof(MessageName));
