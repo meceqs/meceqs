@@ -50,12 +50,20 @@ namespace Meceqs.Sending.Internal
         {
             Check.NotNull(messages, nameof(messages));
 
+            // In case no-one correlates these messages with another message, we at least want
+            // all of them to have the same id.
+            // TODO @cweiss Are there cases where we want to have different correlation ids?
+            var correlationId = Guid.NewGuid();
+
             var envelopes = new List<Envelope>();
 
             foreach (var message in messages)
             {
                 var messageId = Guid.NewGuid();
                 var envelope = _envelopeFactory.Create(message, messageId);
+                
+                envelope.CorrelationId = correlationId;
+
                 envelopes.Add(envelope);
             }
 
