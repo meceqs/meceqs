@@ -6,6 +6,9 @@ using System.Reflection;
 
 namespace Meceqs.Sending.Internal
 {
+    /// <summary>
+    /// Creates a strongly-typed <see cref="Envelope{TMessage}"/> for the given message by using cached reflection.
+    /// </summary>
     public class DefaultEnvelopeFactory : IEnvelopeFactory
     {
         private readonly ConcurrentDictionary<Type, Func<object, Guid, Envelope>> _cachedConstructorDelegates;
