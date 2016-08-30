@@ -34,7 +34,7 @@ namespace Meceqs.Tests
             env.MessageId.ShouldBe(messageId);
             env.MessageName.ShouldBe("SimpleMessage");
             env.MessageType.ShouldBe("Meceqs.Tests.SimpleMessage");
-            env.CorrelationId.ShouldNotBeNull();
+            env.CorrelationId.ShouldNotBe(Guid.Empty);
             env.CreatedOnUtc.ShouldNotBeNull();
         }
 
