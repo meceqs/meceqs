@@ -2,16 +2,19 @@ using System.Reflection;
 using Meceqs;
 using Meceqs.Configuration;
 using Meceqs.Serialization;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
     public static class SerializationMeceqsBuilderExtensions
     {
-        public static IMeceqsBuilder AddSerialization(this IMeceqsBuilder builder)
+        public static IMeceqsBuilder AddSerialization<TEnvelopeSerializer>(this IMeceqsBuilder builder)
+            where TEnvelopeSerializer : class, IEnvelopeSerializer
         {
             Check.NotNull(builder, nameof(builder));
 
-            builder.Services.AddSingleton<IEnvelopeTypeLoader, DefaultEnvelopeTypeLoader>();
+            builder.Services.TryAddSingleton<IEnvelopeTypeLoader, DefaultEnvelopeTypeLoader>();
+            builder.Services.TryAddSingleton<IEnvelopeSerializer, TEnvelopeSerializer>();
 
             return builder;
         }

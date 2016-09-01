@@ -7,8 +7,6 @@ namespace Meceqs.AzureServiceBus
 {
     public class DefaultEventDataConverter : IEventDataConverter
     {
-
-
         private readonly IEnvelopeSerializer _envelopeSerializer;
         private readonly IEnvelopeTypeLoader _envelopeTypeLoader;
 
