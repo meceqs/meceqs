@@ -1,12 +1,12 @@
 ﻿{
-  "version": "1.0.0-*",
+  "version": "0.1.0-*",
 
   "buildOptions": {
     "warningsAsErrors": true
   },
 
   "dependencies": {
-    "Meceqs": "1.0.0-*"
+    "Meceqs": "0.1.0-*"
   },
 
   "frameworks": {

@@ -1,13 +1,13 @@
 {
-  "version": "1.0.0-*",
+  "version": "0.1.0-*",
 
   "buildOptions": {
     "warningsAsErrors": true
   },
 
   "dependencies": {
-    "Meceqs": "1.0.0-*",
-    "Meceqs.Serialization": "1.0.0-*",
+    "Meceqs": "0.1.0-*",
+    "Meceqs.Serialization": "0.1.0-*",
 
     "WindowsAzure.ServiceBus": "3.0.1"
   },
