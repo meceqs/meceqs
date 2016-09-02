@@ -40,13 +40,19 @@ namespace CustomerContext.WebApi
 
         private void ConfigureMeceqs(IServiceCollection services)
         {
+            // Meceqs resolves interceptors for each request by default.
+            // To change this, you can add the interceptor with your own lifecycle
+            // to the DI framework and use "Interceptors.AddService()" to
+            // tell Meceqs to resolve it from there.
+            services.AddSingleton<SingletonHandleInterceptor>();
+
             services.AddMeceqs()
 
                 // Add services to Dependency Injection
                 .AddAspNetCore()
                 .AddTypedHandlersFromAssembly<CustomerCommandHandler>()
 
-                // The WebAPI receives messages through Controllers
+                // The WebAPI receives messages through Controller actions
                 .AddConsumer(pipeline =>
                 {
                     pipeline
@@ -59,7 +65,14 @@ namespace CustomerContext.WebApi
                         {
                             // Interceptors know about the executing handler
                             // (e.g. to check for attributes on the handler)
+
+                            // This interceptor is created for each message.
+                            // (It doesn't need to be registered in the DI framework
+                            // because Meceqs uses ActivatorUtilities to create the instance.)
                             options.Interceptors.Add<SampleHandleInterceptor>();
+
+                            // this interceptor will use the lifecycle from the DI framework.
+                            options.Interceptors.AddService<SingletonHandleInterceptor>();
                         });
                 })
                 .AddSender(pipeline =>

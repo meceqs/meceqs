@@ -4,7 +4,7 @@ namespace Meceqs.Filters.TypedHandling
 {
     public class TypedHandlingOptions
     {
-        public HandleInterceptorCollection Interceptors { get; } = new HandleInterceptorCollection();
+        public InterceptorCollection Interceptors { get; } = new InterceptorCollection();
 
     }
 }

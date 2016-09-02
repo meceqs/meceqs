@@ -3,11 +3,11 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Meceqs.Filters.TypedHandling.Configuration
 {
-    public class ActivatorHandleInterceptorFactory : IHandleInterceptorFactory
+    public class ServiceInterceptorMetadata : IInterceptorMetadata
     {
         private readonly Type _interceptorType;
 
-        public ActivatorHandleInterceptorFactory(Type interceptorType)
+        public ServiceInterceptorMetadata(Type interceptorType)
         {
             Check.NotNull(interceptorType, nameof(interceptorType));
 
@@ -18,7 +18,7 @@ namespace Meceqs.Filters.TypedHandling.Configuration
         {
             Check.NotNull(serviceProvider, nameof(serviceProvider));
 
-            return (IHandleInterceptor)ActivatorUtilities.CreateInstance(serviceProvider, _interceptorType);
+            return (IHandleInterceptor)serviceProvider.GetRequiredService(_interceptorType);
         }
     }
 }

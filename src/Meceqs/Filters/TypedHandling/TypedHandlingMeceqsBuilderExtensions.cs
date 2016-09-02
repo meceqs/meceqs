@@ -70,21 +70,5 @@ namespace Microsoft.Extensions.DependencyInjection
 
             return builder;
         }
-
-        public static IMeceqsBuilder AddTypedHandlingInterceptor<THandleInterceptor>(this IMeceqsBuilder builder)
-            where THandleInterceptor : class, IHandleInterceptor
-        {
-            return AddTypedHandlingInterceptor(builder, typeof(THandleInterceptor));
-        }
-
-        public static IMeceqsBuilder AddTypedHandlingInterceptor(this IMeceqsBuilder builder, Type interceptor)
-        {
-            Check.NotNull(builder, nameof(builder));
-            Check.NotNull(interceptor, nameof(interceptor));
-
-            builder.Services.AddTransient(typeof(IHandleInterceptor), interceptor);
-
-            return builder;
-        }
     }
 }

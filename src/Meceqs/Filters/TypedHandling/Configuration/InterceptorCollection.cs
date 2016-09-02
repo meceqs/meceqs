@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace Meceqs.Filters.TypedHandling.Configuration
 {
-    public class HandleInterceptorCollection : Collection<IHandleInterceptorFactory>
+    public class InterceptorCollection : Collection<IInterceptorMetadata>
     {
         public void Add<TInterceptor>() where TInterceptor : IHandleInterceptor
         {
@@ -22,7 +22,7 @@ namespace Meceqs.Filters.TypedHandling.Configuration
                     nameof(interceptorType));
             }
 
-            var factory = new ActivatorHandleInterceptorFactory(interceptorType);
+            var factory = new ActivatorInterceptorMetadata(interceptorType);
             Add(factory);
         }
 
@@ -42,7 +42,7 @@ namespace Meceqs.Filters.TypedHandling.Configuration
                     nameof(interceptorType));
             }
 
-            var factory = new ServiceProviderHandleInterceptorFactory(interceptorType);
+            var factory = new ServiceInterceptorMetadata(interceptorType);
             Add(factory);
         }
     }
