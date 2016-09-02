@@ -4,8 +4,8 @@ using Microsoft.ServiceBus.Messaging;
 
 namespace Meceqs.AzureServiceBus
 {
-    public interface IEventDataHandler
+    public interface IServiceBusConsumer
     {
-        Task HandleAsync(EventData eventData, CancellationToken cancellation);
+        Task ConsumeAsync(BrokeredMessage brokeredMessage, CancellationToken cancellation);
     }
 }

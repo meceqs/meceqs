@@ -17,25 +17,25 @@ namespace Microsoft.Extensions.Logging
             return logger.BeginScope(new BrokeredMessageLogScope(message));
         }
 
-        public static void HandleStarting(this ILogger logger, BrokeredMessage message)
+        public static void ConsumeStarting(this ILogger logger, BrokeredMessage message)
         {
             if (logger.IsEnabled(LogLevel.Information))
             {
                 logger.Log(
                     logLevel: LogLevel.Information,
-                    eventId: LoggerEventIds.BrokeredMessageHandleStarting,
-                    state: new HandleStartingState(message),
+                    eventId: LoggerEventIds.ConsumeStarting,
+                    state: new ConsumeStartingState(message),
                     exception: null,
-                    formatter: HandleStartingState.Callback);
+                    formatter: ConsumeStartingState.Callback);
             }
         }
 
-        public static void HandleFailed(this ILogger logger, BrokeredMessage message, Exception ex)
+        public static void ConsumeFailed(this ILogger logger, BrokeredMessage message, Exception ex)
         {
-            logger.LogError(LoggerEventIds.BrokeredMessageHandleFailed, ex, "Handle failed with exception");
+            logger.LogError(LoggerEventIds.ConsumeFailed, ex, "Consume failed with exception");
         }
 
-        public static void HandleBrokeredMessageFinished(this ILogger logger, bool success, long startTimestamp, long currentTimestamp)
+        public static void ConsumeFinished(this ILogger logger, bool success, long startTimestamp, long currentTimestamp)
         {
             // Don't log if Information logging wasn't enabled at start or end of request as time will be wildly wrong.
             if (startTimestamp != 0)
@@ -44,10 +44,10 @@ namespace Microsoft.Extensions.Logging
 
                 logger.Log(
                     logLevel: LogLevel.Information,
-                    eventId: LoggerEventIds.BrokeredMessageHandleFinished,
-                    state: new HandleFinishedState(success, elapsed),
+                    eventId: LoggerEventIds.ConsumeFinished,
+                    state: new ConsumeFinishedState(success, elapsed),
                     exception: null,
-                    formatter: HandleFinishedState.Callback);
+                    formatter: ConsumeFinishedState.Callback);
             }
         }
 
@@ -109,15 +109,15 @@ namespace Microsoft.Extensions.Logging
             }
         }
 
-        private class HandleStartingState : IReadOnlyList<KeyValuePair<string, object>>
+        private class ConsumeStartingState : IReadOnlyList<KeyValuePair<string, object>>
         {
-            internal static readonly Func<object, Exception, string> Callback = (state, exception) => ((HandleStartingState)state).ToString();
+            internal static readonly Func<object, Exception, string> Callback = (state, exception) => ((ConsumeStartingState)state).ToString();
 
             private readonly BrokeredMessage _message;
 
             private string _cachedToString;
 
-            public HandleStartingState(BrokeredMessage message)
+            public ConsumeStartingState(BrokeredMessage message)
             {
                 _message = message;
             }
@@ -152,7 +152,7 @@ namespace Microsoft.Extensions.Logging
                 {
                     _cachedToString = string.Format(
                         CultureInfo.InvariantCulture,
-                        "Handle starting SequenceNr:{0} DeliveryCount:{1} Enqueued:{2}",
+                        "Consume starting SequenceNr:{0} DeliveryCount:{1} Enqueued:{2}",
                         _message.SequenceNumber,
                         _message.DeliveryCount,
                         _message.EnqueuedSequenceNumber);
@@ -175,9 +175,9 @@ namespace Microsoft.Extensions.Logging
             }
         }
 
-        private class HandleFinishedState : IReadOnlyList<KeyValuePair<string, object>>
+        private class ConsumeFinishedState : IReadOnlyList<KeyValuePair<string, object>>
         {
-            internal static readonly Func<object, Exception, string> Callback = (state, exception) => ((HandleFinishedState)state).ToString();
+            internal static readonly Func<object, Exception, string> Callback = (state, exception) => ((ConsumeFinishedState)state).ToString();
 
             private readonly bool _success;
             private readonly TimeSpan _elapsed;
@@ -208,7 +208,7 @@ namespace Microsoft.Extensions.Logging
                 }
             }
 
-            public HandleFinishedState(bool success, TimeSpan elapsed)
+            public ConsumeFinishedState(bool success, TimeSpan elapsed)
             {
                 _success = success;
                 _elapsed = elapsed;
@@ -220,7 +220,7 @@ namespace Microsoft.Extensions.Logging
                 {
                     _cachedToString = string.Format(
                         CultureInfo.InvariantCulture,
-                        "Handle finished in {0}ms Success:{1}",
+                        "Consume finished in {0}ms Success:{1}",
                         _elapsed.TotalMilliseconds,
                         _success);
                 }

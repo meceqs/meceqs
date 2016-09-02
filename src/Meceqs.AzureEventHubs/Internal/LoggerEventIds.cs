@@ -1,4 +1,4 @@
-namespace Meceqs.AzureServiceBus.Internal
+namespace Meceqs.AzureEventHubs.Internal
 {
     internal class LoggerEventIds
     {

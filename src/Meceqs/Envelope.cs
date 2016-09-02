@@ -33,8 +33,8 @@ namespace Meceqs
     /// </summary>
     /// <remarks>
     /// If we would only have the strongly-typed version, every class would need
-    /// the generic arguments as well even though most of them don't know about the 
-    /// actual message type at compile time.
+    /// the generic arguments as well, even though most of them don't need to know 
+    /// about the actual message type at compile time.
     /// </remarks>
     public abstract class Envelope
     {

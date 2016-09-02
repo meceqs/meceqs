@@ -1,5 +1,6 @@
 using Meceqs;
 using Meceqs.AzureServiceBus;
+using Meceqs.AzureServiceBus.Internal;
 using Meceqs.Configuration;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -11,10 +12,9 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             Check.NotNull(builder, nameof(builder));
 
-            // Event Hubs
-            builder.Services.TryAddSingleton<IEventDataHandler, EventDataHandler>();
-            builder.Services.TryAddSingleton<IEventDataConverter, DefaultEventDataConverter>();
-            builder.Services.TryAddSingleton<IEventHubClientFactory, DefaultEventHubClientFactory>();
+            // Service Bus
+            builder.Services.TryAddSingleton<IServiceBusConsumer, DefaultServiceBusConsumer>();
+            builder.Services.TryAddSingleton<IBrokeredMessageConverter, DefaultBrokeredMessageConverter>();
 
             return builder;
         }

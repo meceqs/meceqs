@@ -3,7 +3,7 @@ using System.IO;
 using Meceqs.Serialization;
 using Microsoft.ServiceBus.Messaging;
 
-namespace Meceqs.AzureServiceBus
+namespace Meceqs.AzureServiceBus.Internal
 {
     public class DefaultBrokeredMessageConverter : IBrokeredMessageConverter
     {

@@ -1,4 +1,4 @@
-namespace Meceqs.Serialization
+namespace Meceqs.AzureEventHubs
 {
     public static class TransportHeaderNames
     {

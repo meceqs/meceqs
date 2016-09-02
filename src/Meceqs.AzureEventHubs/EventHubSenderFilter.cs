@@ -1,22 +1,23 @@
 using System;
 using System.Threading.Tasks;
+using Meceqs.AzureEventHubs.Internal;
 using Meceqs.Pipeline;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.ServiceBus.Messaging;
 
-namespace Meceqs.AzureServiceBus.Filters
+namespace Meceqs.AzureEventHubs
 {
-    public class EventHubPublisherFilter : IDisposable
+    public class EventHubSenderFilter : IDisposable
     {
         // TODO EventHubClient lifecycle - should it be transient?
 
         private readonly ILogger _logger;
         private readonly EventHubClient _eventHubClient;
 
-        public EventHubPublisherFilter(
+        public EventHubSenderFilter(
             FilterDelegate next,
-            IOptions<EventHubPublisherOptions> options,
+            IOptions<EventHubSenderOptions> options,
             ILoggerFactory loggerFactory,
             IEventHubClientFactory eventHubClientFactory)
         {
@@ -26,7 +27,7 @@ namespace Meceqs.AzureServiceBus.Filters
             Check.NotNull(loggerFactory, nameof(loggerFactory));
             Check.NotNull(eventHubClientFactory, nameof(eventHubClientFactory));
 
-            _logger = loggerFactory.CreateLogger<EventHubPublisherFilter>();
+            _logger = loggerFactory.CreateLogger<EventHubSenderFilter>();
 
             var connection = new EventHubConnection(options.Value.EventHubConnectionString);
             _eventHubClient = eventHubClientFactory.CreateEventHubClient(connection);
@@ -37,7 +38,8 @@ namespace Meceqs.AzureServiceBus.Filters
             Check.NotNull(context, nameof(context));
             Check.NotNull(eventDataConverter, nameof(eventDataConverter));
 
-            _logger.LogInformation("Publishing message {MessageName}/{MessageId}", context.Envelope.MessageName, context.Envelope.MessageId);
+            // TODO @cweiss which LogLevel?
+            _logger.LogInformation("Sending message {MessageName}/{MessageId}", context.Envelope.MessageName, context.Envelope.MessageId);
 
             var eventData = eventDataConverter.ConvertToEventData(context.Envelope);
             
