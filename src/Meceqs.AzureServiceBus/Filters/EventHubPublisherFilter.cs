@@ -37,7 +37,7 @@ namespace Meceqs.AzureServiceBus.Filters
             Check.NotNull(context, nameof(context));
             Check.NotNull(eventDataConverter, nameof(eventDataConverter));
 
-            _logger.LogDebug("Publishing message {MessageName}/{MessageId}", context.Envelope.MessageName, context.Envelope.MessageId);
+            _logger.LogInformation("Publishing message {MessageName}/{MessageId}", context.Envelope.MessageName, context.Envelope.MessageId);
 
             var eventData = eventDataConverter.ConvertToEventData(context.Envelope);
             
