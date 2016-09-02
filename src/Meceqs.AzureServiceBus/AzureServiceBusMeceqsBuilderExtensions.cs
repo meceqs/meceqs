@@ -12,6 +12,7 @@ namespace Microsoft.Extensions.DependencyInjection
             Check.NotNull(builder, nameof(builder));
 
             // Event Hubs
+            builder.Services.TryAddSingleton<IEventDataHandler, EventDataHandler>();
             builder.Services.TryAddSingleton<IEventDataConverter, DefaultEventDataConverter>();
             builder.Services.TryAddSingleton<IEventHubClientFactory, DefaultEventHubClientFactory>();
 

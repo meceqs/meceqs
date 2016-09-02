@@ -8,34 +8,34 @@ using Microsoft.ServiceBus.Messaging;
 
 namespace Microsoft.Extensions.Logging
 {
-    internal static class BrokeredMessageLoggerExtensions
+    internal static class EventDataLoggerExtensions
     {
         private static readonly double TimestampToTicks = TimeSpan.TicksPerSecond / (double)Stopwatch.Frequency;
 
-        public static IDisposable BrokeredMessageScope(this ILogger logger, BrokeredMessage message)
+        public static IDisposable EventDataScope(this ILogger logger, EventData message)
         {
-            return logger.BeginScope(new BrokeredMessageLogScope(message));
+            return logger.BeginScope(new EventDataLogScope(message));
         }
 
-        public static void HandleStarting(this ILogger logger, BrokeredMessage message)
+        public static void HandleStarting(this ILogger logger, EventData message)
         {
             if (logger.IsEnabled(LogLevel.Information))
             {
                 logger.Log(
                     logLevel: LogLevel.Information,
-                    eventId: LoggerEventIds.BrokeredMessageHandleStarting,
+                    eventId: LoggerEventIds.EventDataHandleStarting,
                     state: new HandleStartingState(message),
                     exception: null,
                     formatter: HandleStartingState.Callback);
             }
         }
 
-        public static void HandleFailed(this ILogger logger, BrokeredMessage message, Exception ex)
+        public static void HandleFailed(this ILogger logger, EventData message, Exception ex)
         {
-            logger.LogError(LoggerEventIds.BrokeredMessageHandleFailed, ex, "Handle failed with exception");
+            logger.LogError(LoggerEventIds.EventDataHandleFailed, ex, "Handle failed with exception");
         }
 
-        public static void HandleBrokeredMessageFinished(this ILogger logger, bool success, long startTimestamp, long currentTimestamp)
+        public static void HandleEventDataFinished(this ILogger logger, bool success, long startTimestamp, long currentTimestamp)
         {
             // Don't log if Information logging wasn't enabled at start or end of request as time will be wildly wrong.
             if (startTimestamp != 0)
@@ -44,25 +44,25 @@ namespace Microsoft.Extensions.Logging
 
                 logger.Log(
                     logLevel: LogLevel.Information,
-                    eventId: LoggerEventIds.BrokeredMessageHandleFinished,
+                    eventId: LoggerEventIds.EventDataHandleFinished,
                     state: new HandleFinishedState(success, elapsed),
                     exception: null,
                     formatter: HandleFinishedState.Callback);
             }
         }
 
-        internal class BrokeredMessageLogScope : IReadOnlyList<KeyValuePair<string, object>>
+        internal class EventDataLogScope : IReadOnlyList<KeyValuePair<string, object>>
         {
-            private readonly BrokeredMessage _message;
+            private readonly EventData _eventData;
 
             private string _cachedToString;
 
-            public BrokeredMessageLogScope(BrokeredMessage message)
+            public EventDataLogScope(EventData eventData)
             {
-                _message = message;
+                _eventData = eventData;
             }
 
-            public int Count => 2;
+            public int Count => 3;
 
             public KeyValuePair<string, object> this[int index]
             {
@@ -71,9 +71,11 @@ namespace Microsoft.Extensions.Logging
                     switch (index)
                     {
                         case 0:
-                            return new KeyValuePair<string, object>("MessageId", _message.MessageId);
+                            return new KeyValuePair<string, object>(nameof(_eventData.Offset), _eventData.Offset);
                         case 1:
-                            return new KeyValuePair<string, object>("ContentType", _message.ContentType);
+                            return new KeyValuePair<string, object>(nameof(_eventData.SequenceNumber), _eventData.SequenceNumber);
+                        case 2:
+                            return new KeyValuePair<string, object>(nameof(_eventData.EnqueuedTimeUtc), _eventData.EnqueuedTimeUtc);
                         default:
                             throw new IndexOutOfRangeException(nameof(index));
                     }
@@ -86,9 +88,10 @@ namespace Microsoft.Extensions.Logging
                 {
                     _cachedToString = string.Format(
                         CultureInfo.InvariantCulture,
-                        "ID:{0} ContentType:{1}",
-                        _message.MessageId,
-                        _message.ContentType
+                        "Offset:{0} Sequence:{1} Enqueued:{2}",
+                        _eventData.Offset,
+                        _eventData.SequenceNumber,
+                        _eventData.EnqueuedTimeUtc
                     );
                 }
 
@@ -113,13 +116,13 @@ namespace Microsoft.Extensions.Logging
         {
             internal static readonly Func<object, Exception, string> Callback = (state, exception) => ((HandleStartingState)state).ToString();
 
-            private readonly BrokeredMessage _message;
+            private readonly EventData _eventData;
 
             private string _cachedToString;
 
-            public HandleStartingState(BrokeredMessage message)
+            public HandleStartingState(EventData eventData)
             {
-                _message = message;
+                _eventData = eventData;
             }
 
             public int Count => 5;
@@ -131,15 +134,11 @@ namespace Microsoft.Extensions.Logging
                     switch (index)
                     {
                         case 0:
-                            return new KeyValuePair<string, object>("SequenceNumber", _message.SequenceNumber);
+                            return new KeyValuePair<string, object>(nameof(_eventData.Offset), _eventData.Offset);
                         case 1:
-                            return new KeyValuePair<string, object>("DeliveryCount", _message.DeliveryCount);
+                            return new KeyValuePair<string, object>(nameof(_eventData.SequenceNumber), _eventData.SequenceNumber);
                         case 2:
-                            return new KeyValuePair<string, object>("EnqueuedTimeUtc", _message.EnqueuedTimeUtc);
-                        case 3:
-                            return new KeyValuePair<string, object>("CorrelationId", _message.CorrelationId);
-                        case 4:
-                            return new KeyValuePair<string, object>("ExpiresAtUtc", _message.ExpiresAtUtc);
+                            return new KeyValuePair<string, object>(nameof(_eventData.EnqueuedTimeUtc), _eventData.EnqueuedTimeUtc);
                         default:
                             throw new IndexOutOfRangeException(nameof(index));
                     }
@@ -152,10 +151,10 @@ namespace Microsoft.Extensions.Logging
                 {
                     _cachedToString = string.Format(
                         CultureInfo.InvariantCulture,
-                        "Handle starting SequenceNr:{0} DeliveryCount:{1} Enqueued:{2}",
-                        _message.SequenceNumber,
-                        _message.DeliveryCount,
-                        _message.EnqueuedSequenceNumber);
+                        "Handle starting Offset:{0} Sequence:{1} Enqueued:{2}",
+                        _eventData.Offset,
+                        _eventData.SequenceNumber,
+                        _eventData.EnqueuedTimeUtc);
                 }
 
                 return _cachedToString;

@@ -8,56 +8,52 @@ using Microsoft.ServiceBus.Messaging;
 
 namespace Meceqs.AzureServiceBus
 {
-    public class BrokeredMessageHandler : IBrokeredMessageHandler
+    public class EventDataHandler : IEventDataHandler
     {
         private readonly ILogger _logger;
 
         private readonly IServiceScopeFactory _serviceScopeFactory;
 
-        public BrokeredMessageHandler(ILoggerFactory loggerFactory, IServiceScopeFactory serviceScopeFactory)
+        public EventDataHandler(ILoggerFactory loggerFactory, IServiceScopeFactory serviceScopeFactory)
         {
             Check.NotNull(loggerFactory, nameof(loggerFactory));
             Check.NotNull(serviceScopeFactory, nameof(serviceScopeFactory));
 
-            _logger = loggerFactory.CreateLogger<BrokeredMessageHandler>();
+            _logger = loggerFactory.CreateLogger<EventDataHandler>();
             _serviceScopeFactory = serviceScopeFactory;
         }
 
-        public async Task HandleAsync(BrokeredMessage brokeredMessage, CancellationToken cancellation)
+        public async Task HandleAsync(EventData eventData, CancellationToken cancellation)
         {
-            Check.NotNull(brokeredMessage, nameof(brokeredMessage));
+            Check.NotNull(eventData, nameof(eventData));
 
             // Make sure each log message contains data about the currently processed message.
-            using (_logger.BrokeredMessageScope(brokeredMessage))
+            using (_logger.EventDataScope(eventData))
             {
-                _logger.HandleStarting(brokeredMessage);
+                _logger.HandleStarting(eventData);
 
                 long startTimestamp = DateTime.UtcNow.Ticks;
                 bool success = false;
 
                 try
                 {
-                    await ResolveServicesAndInvokeConsumer(brokeredMessage, cancellation);
-
-                    await brokeredMessage.CompleteAsync();
+                    await ResolveServicesAndInvokeConsumer(eventData, cancellation);
                     success = true;
                 }
                 catch (Exception ex)
                 {
                     success = false;
-
-                    _logger.HandleFailed(brokeredMessage, ex);
-
-                    await brokeredMessage.AbandonAsync();
+                    _logger.HandleFailed(eventData, ex);
+                    throw;
                 }
                 finally
                 {
-                    _logger.HandleBrokeredMessageFinished(success, startTimestamp, DateTime.UtcNow.Ticks);
+                    _logger.HandleEventDataFinished(success, startTimestamp, DateTime.UtcNow.Ticks);
                 }
             }
         }
 
-        private async Task ResolveServicesAndInvokeConsumer(BrokeredMessage brokeredMessage, CancellationToken cancellation)
+        private async Task ResolveServicesAndInvokeConsumer(EventData eventData, CancellationToken cancellation)
         {
             // Handling a message from an underlying transport is similar to handling a HTTP-request.
             // We must make sure processing of one message doesn't have an effect on other messages.
@@ -65,10 +61,10 @@ namespace Meceqs.AzureServiceBus
             // lifetime of one handling process.
             using (IServiceScope scope = _serviceScopeFactory.CreateScope())
             {
-                var brokeredMessageConverter = scope.ServiceProvider.GetRequiredService<IBrokeredMessageConverter>();
+                var eventDataConverter = scope.ServiceProvider.GetRequiredService<IEventDataConverter>();
                 var envelopeConsumer = scope.ServiceProvider.GetRequiredService<IMessageConsumer>();
 
-                Envelope envelope = brokeredMessageConverter.ConvertToEnvelope(brokeredMessage);
+                Envelope envelope = eventDataConverter.ConvertToEnvelope(eventData);
 
                 await envelopeConsumer.ForEnvelope(envelope)
                     .SetCancellationToken(cancellation)
