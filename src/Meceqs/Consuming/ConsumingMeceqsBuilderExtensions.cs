@@ -12,7 +12,7 @@ namespace Microsoft.Extensions.DependencyInjection
     {
         public static IMeceqsBuilder AddConsumer(this IMeceqsBuilder builder, Action<IPipelineBuilder> pipeline)
         {
-            return AddConsumer(builder, ConsumeOptions.DefaultPipelineName, pipeline);
+            return AddConsumer(builder, MeceqsDefaults.ConsumePipelineName, pipeline);
         }
 
         public static IMeceqsBuilder AddConsumer(this IMeceqsBuilder builder, string pipelineName, Action<IPipelineBuilder> pipeline)

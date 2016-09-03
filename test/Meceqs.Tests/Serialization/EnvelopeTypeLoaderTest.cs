@@ -1,6 +1,6 @@
 using System;
 using System.Reflection;
-using Meceqs.Transport;
+using Meceqs.Serialization;
 using Microsoft.Extensions.Options;
 using Xunit;
 
@@ -10,7 +10,7 @@ namespace Meceqs.Tests
     {
         private IEnvelopeTypeLoader GetEnvelopeTypeLoader()
         {
-            var options = new MeceqsTransportOptions();
+            var options = new EnvelopeTypeLoaderOptions();
             options.ContractAssemblies.Add(GetType().GetTypeInfo().Assembly);
             var typeLoader = new DefaultEnvelopeTypeLoader(Options.Create(options));
 

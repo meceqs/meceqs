@@ -1,19 +1,10 @@
-using System;
-using System.Threading;
 using System.Threading.Tasks;
+using Meceqs.Pipeline;
 
 namespace Meceqs.Consuming
 {
-    public interface IFluentConsumer
+    public interface IFluentConsumer : IFilterContextBuilder<IFluentConsumer>
     {
-        IFluentConsumer SetCancellationToken(CancellationToken cancellation);
-
-        IFluentConsumer SetRequestServices(IServiceProvider requestServices);
-
-        IFluentConsumer SetContextItem(string key, object value);
-
-        IFluentConsumer UsePipeline(string pipelineName);
-
         Task ConsumeAsync();
 
         Task<TResult> ConsumeAsync<TResult>();

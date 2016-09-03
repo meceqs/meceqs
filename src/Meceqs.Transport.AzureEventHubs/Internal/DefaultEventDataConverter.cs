@@ -1,4 +1,5 @@
 using System.IO;
+using Meceqs.Serialization;
 using Microsoft.ServiceBus.Messaging;
 
 namespace Meceqs.Transport.AzureEventHubs.Internal

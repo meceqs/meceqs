@@ -4,7 +4,7 @@ using CustomerContext.Contracts.Commands;
 
 namespace TrafficGenerator
 {
-    public static class RandomNames
+    public static class CustomerFactory
     {
         private static Random random = new Random();
 

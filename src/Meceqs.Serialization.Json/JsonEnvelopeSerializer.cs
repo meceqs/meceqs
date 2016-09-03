@@ -2,7 +2,7 @@ using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
-namespace Meceqs.Transport.Json
+namespace Meceqs.Serialization.Json
 {
     public class JsonEnvelopeSerializer : IEnvelopeSerializer
     {

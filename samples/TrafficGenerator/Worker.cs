@@ -46,7 +46,7 @@ namespace TrafficGenerator
         {
             var messageSender = requestServices.GetRequiredService<IMessageSender>();
 
-            var createCustomerCommand = RandomNames.GetRandomCreateCustomerCommand();
+            var createCustomerCommand = CustomerFactory.GetRandomCreateCustomerCommand();
 
             var result = await messageSender.ForMessage(createCustomerCommand)
                 .SetRequestServices(requestServices)

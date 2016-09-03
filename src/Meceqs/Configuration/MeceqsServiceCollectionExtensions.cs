@@ -15,6 +15,7 @@ namespace Microsoft.Extensions.DependencyInjection
             var builder = new MeceqsBuilder(services);
 
             // Add common services from this library
+            builder.AddSerialization();
             builder.AddTypedHandling();
 
             return builder;

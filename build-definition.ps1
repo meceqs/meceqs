@@ -21,7 +21,6 @@ Properties {
         "src/Meceqs",
         "src/Meceqs.AspNetCore",
         "src/Meceqs.Serialization.Json",
-        "src/Meceqs.Transport",
         "src/Meceqs.Transport.AzureEventHubs",
         "src/Meceqs.Transport.AzureServiceBus"
     )

@@ -1,20 +1,28 @@
 using System.Reflection;
 using Meceqs;
 using Meceqs.Configuration;
-using Meceqs.Transport;
+using Meceqs.Serialization;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
-    public static class TransportMeceqsBuilderExtensions
+    public static class SerializationMeceqsBuilderExtensions
     {
+        public static IMeceqsBuilder AddSerialization(this IMeceqsBuilder builder)
+        {
+            Check.NotNull(builder, nameof(builder));
+
+            builder.Services.TryAddSingleton<IEnvelopeTypeLoader, DefaultEnvelopeTypeLoader>();
+
+            return builder;
+        }
+
         public static IMeceqsBuilder AddSerializer<TEnvelopeSerializer>(this IMeceqsBuilder builder)
             where TEnvelopeSerializer : class, IEnvelopeSerializer
         {
             Check.NotNull(builder, nameof(builder));
 
-            builder.Services.TryAddSingleton<IEnvelopeTypeLoader, DefaultEnvelopeTypeLoader>();
-            builder.Services.TryAddSingleton<IEnvelopeSerializer, TEnvelopeSerializer>();
+            builder.Services.AddSingleton<IEnvelopeSerializer, TEnvelopeSerializer>();
 
             return builder;
         }
@@ -24,8 +32,7 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             Check.NotNull(builder, nameof(builder));
 
-            builder.Services.TryAddSingleton<IEnvelopeTypeLoader, DefaultEnvelopeTypeLoader>();
-            builder.Services.TryAddSingleton<IEnvelopeDeserializer, TEnvelopeDeserializer>();
+            builder.Services.AddSingleton<IEnvelopeDeserializer, TEnvelopeDeserializer>();
 
             return builder;
         }
@@ -42,8 +49,8 @@ namespace Microsoft.Extensions.DependencyInjection
             Check.NotNull(builder, nameof(builder));
             Check.NotNull(assemblies, nameof(assemblies));
 
-            builder.Services.Configure<MeceqsTransportOptions>(options => options.ContractAssemblies.AddRange(assemblies));
-            
+            builder.Services.Configure<EnvelopeTypeLoaderOptions>(options => options.ContractAssemblies.AddRange(assemblies));
+
             return builder;
         }
     }

@@ -1,22 +1,13 @@
-using System;
-using System.Threading;
 using System.Threading.Tasks;
+using Meceqs.Pipeline;
 
 namespace Meceqs.Sending
 {
-    public interface IFluentSender
+    public interface IFluentSender : IFilterContextBuilder<IFluentSender>
     {
         IFluentSender CorrelateWith(Envelope source);
 
-        IFluentSender SetCancellationToken(CancellationToken cancellation);
-
-        IFluentSender SetRequestServices(IServiceProvider requestServices);
-
         IFluentSender SetHeader(string headerName, object value);
-
-        IFluentSender SetContextItem(string key, object value);
-
-        IFluentSender UsePipeline(string pipelineName);
 
         Task SendAsync();
 
