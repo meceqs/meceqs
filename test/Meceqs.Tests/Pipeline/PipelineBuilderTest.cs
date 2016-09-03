@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Meceqs.Pipeline;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Shouldly;
 using Xunit;
@@ -12,14 +13,18 @@ namespace Meceqs.Tests.Pipeline
     {
         private IPipelineBuilder GetPipelineBuilder()
         {
-            return new DefaultPipelineBuilder(Substitute.For<IServiceProvider>(), "pipeline");
+            return new DefaultPipelineBuilder("pipeline", Substitute.For<IServiceProvider>(), Substitute.For<ILoggerFactory>());
         }
 
         [Fact]
         public void Ctor_throws_if_parameters_missing()
         {
-            Should.Throw<ArgumentNullException>(() => new DefaultPipelineBuilder(null, "pipeline"));
-            Should.Throw<ArgumentNullException>(() => new DefaultPipelineBuilder(Substitute.For<IServiceProvider>(), null));
+            var serviceProvider = Substitute.For<IServiceProvider>();
+            var loggerFactory = Substitute.For<ILoggerFactory>();
+
+            Should.Throw<ArgumentNullException>(() => new DefaultPipelineBuilder(null, serviceProvider, loggerFactory));
+            Should.Throw<ArgumentNullException>(() => new DefaultPipelineBuilder("pipeline", null, loggerFactory));
+            Should.Throw<ArgumentNullException>(() => new DefaultPipelineBuilder("pipeline", serviceProvider, null));
         }
 
         [Fact]

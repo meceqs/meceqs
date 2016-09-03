@@ -14,14 +14,18 @@ namespace Microsoft.Extensions.DependencyInjection
             Check.NotNullOrWhiteSpace(pipelineName, nameof(pipelineName));
             Check.NotNull(setupAction, nameof(setupAction));
 
-            // Core Services
-            builder.Services.TryAddSingleton<IFilterContextFactory, DefaultFilterContextFactory>();
-            builder.Services.TryAddSingleton<IPipelineProvider, DefaultPipelineProvider>();
-            builder.Services.TryAddTransient<IPipelineBuilder, DefaultPipelineBuilder>();
+            AddCoreServices(builder);
 
             builder.Services.Configure<PipelineOptions>(options => options.Pipelines.Add(pipelineName, setupAction));
 
             return builder;
+        }
+
+        private static void AddCoreServices(IMeceqsBuilder builder)
+        {
+            builder.Services.TryAddSingleton<IFilterContextFactory, DefaultFilterContextFactory>();
+            builder.Services.TryAddSingleton<IPipelineProvider, DefaultPipelineProvider>();
+            builder.Services.TryAddTransient<IPipelineBuilder, DefaultPipelineBuilder>();
         }
     }
 }

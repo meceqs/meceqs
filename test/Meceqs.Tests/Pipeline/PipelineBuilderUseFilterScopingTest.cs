@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Meceqs.Pipeline;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using NSubstitute;
 using Shouldly;
 using Xunit;
 
@@ -79,7 +81,8 @@ namespace Meceqs.Tests.Pipeline
 
         private IPipeline GetPipeline(IServiceProvider serviceProvider)
         {
-            var builder = new DefaultPipelineBuilder(serviceProvider, "pipeline");
+            var loggerFactory = Substitute.For<ILoggerFactory>();
+            var builder = new DefaultPipelineBuilder("pipeline", serviceProvider, loggerFactory);
             
             // two filters to make sure we can test scoped services.
             builder.UseFilter<FilterWithServices>(false /* isTerminating */);

@@ -1,6 +1,8 @@
 using System;
 using System.Threading.Tasks;
 using Meceqs.Pipeline;
+using Microsoft.Extensions.Logging;
+using NSubstitute;
 using Shouldly;
 using Xunit;
 
@@ -13,17 +15,18 @@ namespace Meceqs.Tests.Pipeline
             if (filterDelegate == null)
                 filterDelegate = (ctx) => Task.CompletedTask;
             
-            return new DefaultPipeline(filterDelegate, "pipeline");
+            return new DefaultPipeline(filterDelegate, "pipeline", Substitute.For<ILoggerFactory>());
         }
 
         [Fact]
         public void Ctor_throws_if_parameters_missing()
         {
             FilterDelegate filterDelegate = ctx => Task.CompletedTask;
+            var loggerFactory = Substitute.For<ILoggerFactory>();
 
-            Should.Throw<ArgumentNullException>(() => new DefaultPipeline(null, "pipeline"));
-            Should.Throw<ArgumentNullException>(() => new DefaultPipeline(filterDelegate, null));
-            Should.Throw<ArgumentNullException>(() => new DefaultPipeline(filterDelegate, ""));
+            Should.Throw<ArgumentNullException>(() => new DefaultPipeline(null, "pipeline", loggerFactory));
+            Should.Throw<ArgumentNullException>(() => new DefaultPipeline(filterDelegate, null, loggerFactory));
+            Should.Throw<ArgumentNullException>(() => new DefaultPipeline(filterDelegate, "pipeline", null));
         }
 
         [Fact]

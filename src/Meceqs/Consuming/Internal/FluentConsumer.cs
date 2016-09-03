@@ -53,7 +53,7 @@ namespace Meceqs.Consuming.Internal
 
         public async Task ConsumeAsync()
         {
-            var filterContexts = _envelopes.Select(CreateFilterContext).ToList();
+            var filterContexts = _envelopes.Select(CreateFilterContext);
             var pipeline = _pipelineProvider.GetPipeline(_pipelineName);
 
             foreach (var context in filterContexts)
@@ -64,17 +64,17 @@ namespace Meceqs.Consuming.Internal
 
         public Task<TResult> ConsumeAsync<TResult>()
         {
-            var filterContexts = _envelopes.Select(CreateFilterContext).ToList();
-            var pipeline = _pipelineProvider.GetPipeline(_pipelineName);
-
-            if (filterContexts.Count == 1)
+            if (_envelopes.Count == 1)
             {
-                return pipeline.ProcessAsync<TResult>(filterContexts[0]);
+                var filterContext = CreateFilterContext(_envelopes[0]);
+                var pipeline = _pipelineProvider.GetPipeline(_pipelineName);
+
+                return pipeline.ProcessAsync<TResult>(filterContext);
             }
-            
+
             throw new InvalidOperationException(
                 $"'{nameof(ConsumeAsync)}' with a result-type can only be called if there's exactly one envelope. " +
-                $"Actual Count: {filterContexts.Count}");
+                $"Actual Count: {_envelopes.Count}");
         }
 
         private FilterContext CreateFilterContext(Envelope envelope)

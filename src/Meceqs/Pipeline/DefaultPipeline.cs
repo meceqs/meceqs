@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace Meceqs.Pipeline
 {
@@ -6,40 +7,44 @@ namespace Meceqs.Pipeline
     {
         private readonly FilterDelegate _pipeline;
         private readonly string _pipelineName;
+        private readonly ILogger _logger;
 
-        public DefaultPipeline(FilterDelegate pipeline, string pipelineName)
+        public DefaultPipeline(FilterDelegate pipeline, string pipelineName, ILoggerFactory loggerFactory)
         {
             Check.NotNull(pipeline, nameof(pipeline));
             Check.NotNullOrWhiteSpace(pipelineName, nameof(pipelineName));
+            Check.NotNull(loggerFactory, nameof(loggerFactory));
 
             _pipeline = pipeline;
             _pipelineName = pipelineName;
+            _logger = loggerFactory.CreateLogger<DefaultPipeline>();
         }
 
         public Task ProcessAsync(FilterContext context)
         {
             Check.NotNull(context, nameof(context));
 
-            EnrichContext(context);
-            return _pipeline(context);
+            return ExecutePipeline(context);
         }
 
         public async Task<TResult> ProcessAsync<TResult>(FilterContext context)
         {
             Check.NotNull(context, nameof(context));
 
-            EnrichContext(context);
-
             context.ExpectedResultType = typeof(TResult);
 
-            await _pipeline(context);
+            await ExecutePipeline(context);
 
             return (TResult)context.Result;
         }
 
-        private void EnrichContext(FilterContext context)
+        private Task ExecutePipeline(FilterContext context)
         {
             context.PipelineName = _pipelineName;
+
+            _logger.ExecutingPipeline(context);
+
+            return _pipeline(context);
         }
     }
 }

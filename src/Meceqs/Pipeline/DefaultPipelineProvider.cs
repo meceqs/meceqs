@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace Meceqs.Pipeline
@@ -7,15 +8,18 @@ namespace Meceqs.Pipeline
     public class DefaultPipelineProvider : IPipelineProvider
     {
         private readonly PipelineOptions _options;
+        private readonly ILoggerFactory _loggerFactory;
 
         private readonly IDictionary<string, IPipeline> _pipelines = new Dictionary<string, IPipeline>();
 
-        public DefaultPipelineProvider(IOptions<PipelineOptions> options, IServiceProvider serviceProvider)
+        public DefaultPipelineProvider(IOptions<PipelineOptions> options, IServiceProvider serviceProvider, ILoggerFactory loggerFactory)
         {
             Check.NotNull(options, nameof(options));
             Check.NotNull(serviceProvider, nameof(serviceProvider));
+            Check.NotNull(loggerFactory, nameof(loggerFactory));
 
             _options = options.Value;
+            _loggerFactory = loggerFactory;
 
             BuildPipelines(serviceProvider);
         }
@@ -27,7 +31,7 @@ namespace Meceqs.Pipeline
                 string pipelineName = kvp.Key;
                 Action<IPipelineBuilder> setupAction = kvp.Value;
 
-                var builder = new DefaultPipelineBuilder(serviceProvider, pipelineName);
+                var builder = new DefaultPipelineBuilder(pipelineName, serviceProvider, _loggerFactory);
                 
                 setupAction(builder);
 

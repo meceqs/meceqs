@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 
 namespace Meceqs.Pipeline
 {
@@ -8,16 +9,19 @@ namespace Meceqs.Pipeline
     {
         private readonly IList<Func<FilterDelegate, FilterDelegate>> _filters = new List<Func<FilterDelegate, FilterDelegate>>();
         private readonly string _pipelineName;
+        private readonly ILoggerFactory _loggerFactory;
 
         public IServiceProvider ApplicationServices { get; }
 
-        public DefaultPipelineBuilder(IServiceProvider serviceProvider, string pipelineName)
+        public DefaultPipelineBuilder(string pipelineName, IServiceProvider serviceProvider, ILoggerFactory loggerFactory)
         {
-            Check.NotNull(serviceProvider, nameof(serviceProvider));
             Check.NotNullOrWhiteSpace(pipelineName, nameof(pipelineName));
+            Check.NotNull(serviceProvider, nameof(serviceProvider));
+            Check.NotNull(loggerFactory, nameof(loggerFactory));
 
             ApplicationServices = serviceProvider;
             _pipelineName = pipelineName;
+            _loggerFactory = loggerFactory;
         }
 
         public IPipelineBuilder Use(Func<FilterDelegate, FilterDelegate> filter)
@@ -39,7 +43,7 @@ namespace Meceqs.Pipeline
                 pipeline = filter(pipeline);
             }
 
-            return new DefaultPipeline(pipeline, _pipelineName);
+            return new DefaultPipeline(pipeline, _pipelineName, _loggerFactory);
         }
     }
 }
