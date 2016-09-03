@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Meceqs.Pipeline;
 
 namespace Meceqs.Consuming.Internal
@@ -34,26 +33,6 @@ namespace Meceqs.Consuming.Internal
             Check.NotNull(envelopes, nameof(envelopes));
 
             return new FluentConsumer(envelopes, _filterContextFactory, _pipelineProvider);
-        }
-
-        public Task ConsumeAsync(Envelope envelope)
-        {
-            return ForEnvelope(envelope).ConsumeAsync();
-        }
-
-        public Task<TResult> ConsumeAsync<TResult>(Envelope envelope)
-        {
-            return ForEnvelope(envelope).ConsumeAsync<TResult>();
-        }
-
-        public Task ConsumeAsync(IList<Envelope> envelopes)
-        {
-            return ForEnvelopes(envelopes).ConsumeAsync();
-        }
-
-        public Task<TResult> ConsumeAsync<TResult>(IList<Envelope> envelopes)
-        {
-            return ForEnvelopes(envelopes).ConsumeAsync<TResult>();
         }
     }
 }

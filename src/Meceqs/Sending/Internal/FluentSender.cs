@@ -9,6 +9,8 @@ namespace Meceqs.Sending.Internal
     {
         private readonly IEnvelopeCorrelator _envelopeCorrelator;
 
+        protected override IFluentSender Instance => this;
+
         public FluentSender(
             IList<Envelope> envelopes,
             IEnvelopeCorrelator envelopeCorrelator,
@@ -31,16 +33,6 @@ namespace Meceqs.Sending.Internal
             return this;
         }
 
-        public IFluentSender SetHeader(string headerName, object value)
-        {
-            foreach (var envelope in Envelopes)
-            {
-                envelope.Headers[headerName] = value;
-            }
-
-            return this;
-        }
-
         public Task SendAsync()
         {
             return ProcessAsync();
@@ -49,11 +41,6 @@ namespace Meceqs.Sending.Internal
         public Task<TResult> SendAsync<TResult>()
         {
             return ProcessAsync<TResult>();
-        }
-
-        protected override IFluentSender GetInstance()
-        {
-            return this;
         }
     }
 }

@@ -10,6 +10,8 @@ namespace Meceqs.Pipeline
 
         TBuilder SetContextItem(string key, object value);
 
+        TBuilder SetHeader(string headerName, object value);
+
         TBuilder SetRequestServices(IServiceProvider requestServices);
 
         TBuilder UsePipeline(string pipelineName);

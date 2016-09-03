@@ -11,9 +11,14 @@ namespace Meceqs.Pipeline
         private readonly IFilterContextFactory _filterContextFactory;
         private readonly IPipelineProvider _pipelineProvider;
 
+        /// <summary>
+        /// Returning "this" is not possible because "TBuilder" is not a derived type from this.
+        /// </summary>
+        protected abstract TBuilder Instance { get; }
+
         protected IList<Envelope> Envelopes { get; }
         protected CancellationToken Cancellation { get; private set; }
-        protected FilterContextItems ContextItems { get; } = new FilterContextItems();
+        protected FilterContextItems ContextItems { get; private set; }
         protected string PipelineName { get; private set; }
         protected IServiceProvider RequestServices { get; private set; }
 
@@ -29,51 +34,71 @@ namespace Meceqs.Pipeline
             Check.NotNull(pipelineProvider, nameof(pipelineProvider));
 
             PipelineName = defaultPipelineName;
+            Envelopes = envelopes;
 
             _filterContextFactory = filterContextFactory;
             _pipelineProvider = pipelineProvider;
         }
 
-        public TBuilder SetCancellationToken(CancellationToken cancellation)
+        public virtual TBuilder SetCancellationToken(CancellationToken cancellation)
         {
             Cancellation = cancellation;
-            return GetInstance();
+            return Instance;
         }
 
-        public TBuilder SetContextItem(string key, object value)
+        public virtual TBuilder SetContextItem(string key, object value)
         {
+            if (ContextItems == null)
+            {
+                ContextItems = new FilterContextItems();
+            }
+
             ContextItems.Set(key, value);
-            return GetInstance();
+            return Instance;
         }
 
-        public TBuilder SetRequestServices(IServiceProvider requestServices)
+        public virtual TBuilder SetRequestServices(IServiceProvider requestServices)
         {
             RequestServices = requestServices;
-            return GetInstance();
+            return Instance;
         }
 
-        public TBuilder UsePipeline(string pipelineName)
+        public virtual TBuilder UsePipeline(string pipelineName)
         {
             Check.NotNullOrWhiteSpace(pipelineName, nameof(pipelineName));
 
             PipelineName = pipelineName;
-            return GetInstance();
+            return Instance;
         }
 
-        protected abstract TBuilder GetInstance();
+        public TBuilder SetHeader(string headerName, object value)
+        {
+            foreach (var envelope in Envelopes)
+            {
+                envelope.Headers[headerName] = value;
+            }
+
+            return Instance;
+        }
 
         protected virtual FilterContext CreateFilterContext(Envelope envelope)
         {
+            Check.NotNull(envelope, nameof(envelope));
+
             var context = _filterContextFactory.CreateFilterContext(envelope);
 
             context.Cancellation = Cancellation;
             context.RequestServices = RequestServices;
-            context.Items.Add(ContextItems);
+
+            if (ContextItems != null)
+            {
+                context.Items.Add(ContextItems);
+            }
 
             return context;
         }
 
-        protected async Task ProcessAsync()
+        protected virtual async Task ProcessAsync()
         {
             var pipeline = _pipelineProvider.GetPipeline(PipelineName);
 
@@ -84,20 +109,19 @@ namespace Meceqs.Pipeline
             }
         }
 
-        public Task<TResult> ProcessAsync<TResult>(
-            [System.Runtime.CompilerServices.CallerMemberName] string memberName = "")
+        protected virtual Task<TResult> ProcessAsync<TResult>()
         {
-            if (Envelopes.Count == 1)
+            if (Envelopes.Count != 1)
             {
-                var filterContext = CreateFilterContext(Envelopes[0]);
-                var pipeline = _pipelineProvider.GetPipeline(PipelineName);
-
-                return pipeline.ProcessAsync<TResult>(filterContext);
+                throw new InvalidOperationException(
+                    $"'{nameof(ProcessAsync)}' with a result-type can only be called if there's exactly one envelope. " +
+                    $"Actual Count: {Envelopes.Count}");
             }
 
-            throw new InvalidOperationException(
-                $"'{memberName}' with a result-type can only be called if there's exactly one envelope. " +
-                $"Actual Count: {Envelopes.Count}");
+            var pipeline = _pipelineProvider.GetPipeline(PipelineName);
+            var filterContext = CreateFilterContext(Envelopes[0]);
+
+            return pipeline.ProcessAsync<TResult>(filterContext);
         }
     }
 }

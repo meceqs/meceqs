@@ -7,6 +7,8 @@ namespace Meceqs.Consuming.Internal
 {
     public class FluentConsumer : FilterContextBuilder<IFluentConsumer>, IFluentConsumer
     {
+        protected override IFluentConsumer Instance => this;
+
         public FluentConsumer(
             IList<Envelope> envelopes,
             IFilterContextFactory filterContextFactory,
@@ -23,11 +25,6 @@ namespace Meceqs.Consuming.Internal
         public Task<TResult> ConsumeAsync<TResult>()
         {
             return ProcessAsync<TResult>();
-        }
-
-        protected override IFluentConsumer GetInstance()
-        {
-            return this;
         }
     }
 }
