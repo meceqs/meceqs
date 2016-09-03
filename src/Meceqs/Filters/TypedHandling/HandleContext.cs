@@ -6,39 +6,37 @@ namespace Meceqs.Filters.TypedHandling
 {
     public class HandleContext<TMessage> : HandleContext where TMessage : class
     {
-        public new Envelope<TMessage> Envelope => (Envelope<TMessage>)base.Envelope;
+        public new FilterContext<TMessage> FilterContext => (FilterContext<TMessage>)base.FilterContext;
 
-        public new TMessage Message => (TMessage)base.Message;
+        public new Envelope<TMessage> Envelope => FilterContext.Envelope;
+
+        public new TMessage Message => FilterContext.Message;
 
         public HandleContext(FilterContext<TMessage> filterContext)
-            : base(filterContext.Envelope, filterContext.Message)
-        {
-        }
-
-        public HandleContext(Envelope<TMessage> envelope)
-            : base(envelope, envelope.Message)
+            : base(filterContext)
         {
         }
     }
 
     public abstract class HandleContext
     {
-        public Envelope Envelope { get; }
+        public FilterContext FilterContext { get; }
 
-        public object Message { get; }
+        public Envelope Envelope => FilterContext.Envelope;
+
+        public object Message => FilterContext.Message;
 
         public IHandles Handler { get; set; }
+
         public Type HandlerType { get; set; }
 
         public MethodInfo HandleMethod { get; set; }
 
-        protected HandleContext(Envelope envelope, object message)
+        protected HandleContext(FilterContext filterContext)
         {
-            Check.NotNull(envelope, nameof(envelope));
-            Check.NotNull(message, nameof(message));
+            Check.NotNull(filterContext, nameof(filterContext));
 
-            Envelope = envelope;
-            Message = message;
+            FilterContext = filterContext;
         }
     }
 }

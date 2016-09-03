@@ -40,7 +40,7 @@ namespace CustomerContext.WebApi
 
         private void ConfigureMeceqs(IServiceCollection services)
         {
-            // Meceqs resolves interceptors for each request by default.
+            // Meceqs resolves interceptors transiently by default.
             // To change this, you can add the interceptor with your own lifecycle
             // to the DI framework and use "Interceptors.AddService()" to
             // tell Meceqs to resolve it from there.

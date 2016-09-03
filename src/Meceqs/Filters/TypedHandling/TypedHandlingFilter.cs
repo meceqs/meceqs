@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Meceqs.Filters.TypedHandling.Internal;
@@ -51,10 +50,10 @@ namespace Meceqs.Filters.TypedHandling
             // Since the public interfaces from this filter expect generic types, we can't call them directly.
             // Separate services are responsible for invoking them by using e.g. reflection.
 
-            Type messageType = filterContext.MessageType;
-            Type resultType = filterContext.ExpectedResultType;
-
-            IHandles handler = _handlerFactoryInvoker.InvokeCreateHandler(handlerFactory, messageType, resultType);
+            IHandles handler = _handlerFactoryInvoker.InvokeCreateHandler(
+                handlerFactory,
+                filterContext.MessageType,
+                filterContext.ExpectedResultType);
 
             if (handler == null)
             {
@@ -63,28 +62,20 @@ namespace Meceqs.Filters.TypedHandling
                 return;
             }
 
-            HandleContext handleContext = _handleContextFactory.CreateHandleContext(filterContext);
+            var handleContext = CreateHandleContext(filterContext, handler);
 
-            SetContextProperties(handleContext, handler, messageType, resultType);
+            var handleExecutionChain = CreateHandleExecutionChain(handleContext);
 
-            var handleInterceptors = CreateInterceptors(filterContext.RequestServices);
-
-            foreach (var interceptor in handleInterceptors)
-            {
-                await interceptor.OnHandleExecuting(handleContext);
-            }
-
-            filterContext.Result = await _handlerInvoker.InvokeHandleAsync(handler, handleContext, resultType);
-
-            foreach (var interceptor in handleInterceptors.Reverse())
-            {
-                await interceptor.OnHandleExecuted(handleContext);
-            }
+            await handleExecutionChain(handleContext);
         }
 
-        private void SetContextProperties(HandleContext handleContext, IHandles handler, Type messageType, Type resultType)
+        private HandleContext CreateHandleContext(FilterContext filterContext, IHandles handler)
         {
+            HandleContext handleContext = _handleContextFactory.CreateHandleContext(filterContext);
+
             var handlerType = handler.GetType();
+            Type messageType = filterContext.MessageType;
+            Type resultType = filterContext.ExpectedResultType;
 
             // This allows interceptors to e.g. look for custom attributes on the class or method.
             handleContext.Handler = handler;
@@ -97,14 +88,42 @@ namespace Meceqs.Filters.TypedHandling
                     $"'{nameof(_handleMethodResolver.GetHandleMethod)}' " +
                     $"did not find a Handle-method for '{handlerType}.{messageType}/{resultType}'");
             }
+
+            return handleContext;
         }
 
-        private IEnumerable<IHandleInterceptor> CreateInterceptors(IServiceProvider serviceProvider)
+        private HandleExecutionDelegate CreateHandleExecutionChain(HandleContext handleContext)
         {
-            foreach (var metadata in _options.Interceptors)
+            // The call to handler itself is the most-inner call.
+            HandleExecutionDelegate chain = async (HandleContext context) =>
             {
-                yield return metadata.CreateInterceptor(serviceProvider);
+                context.FilterContext.Result = await _handlerInvoker.InvokeHandleAsync(
+                    context.Handler,
+                    context,
+                    context.FilterContext.ExpectedResultType);
+            };
+
+            // Wrap every existing interceptor around this call.
+            foreach (var metadata in _options.Interceptors.Reverse())
+            {
+                // This creates a delegate that contains a delegate :)
+                // The outer delegate is used to create the chain.
+                // The inner delegate represents the actual call to the interceptor and
+                // is executed when the chain is executed.
+                Func<HandleContext, HandleExecutionDelegate, HandleExecutionDelegate> interceptorFunc = (context, next) =>
+                {
+                    HandleExecutionDelegate interceptorCall = (HandleContext innerContext) =>
+                    {
+                        var interceptor = metadata.CreateInterceptor(innerContext.FilterContext.RequestServices);
+                        return interceptor.OnHandleExecutionAsync(innerContext, next);
+                    };
+                    return interceptorCall;
+                };
+
+                chain = interceptorFunc(handleContext, chain);
             }
+
+            return chain;
         }
     }
 }

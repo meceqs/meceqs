@@ -36,7 +36,5 @@ namespace Meceqs
 
             throw new ArgumentOutOfRangeException(nameof(key), key, $"No entry found for key '{key}'");
         }
-
-        
     }
 }

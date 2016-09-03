@@ -3,6 +3,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Meceqs.Filters.TypedHandling.Configuration
 {
+    /// <summary>
+    /// Resolves an <see cref="IHandleInterceptor" /> using <see cref="IServiceProvider" />.
+    /// </summary>
     public class ServiceInterceptorMetadata : IInterceptorMetadata
     {
         private readonly Type _interceptorType;

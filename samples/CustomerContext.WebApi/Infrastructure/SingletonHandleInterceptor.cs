@@ -13,16 +13,13 @@ namespace CustomerContext.WebApi.Infrastructure
             _logger = loggerFactory.CreateLogger<SingletonHandleInterceptor>();
         }
 
-        public Task OnHandleExecuting(HandleContext context)
+        public async Task OnHandleExecutionAsync(HandleContext context, HandleExecutionDelegate next)
         {
             _logger.LogInformation("OnHandleExecuting for {MessageType}", context.Message.GetType());
-            return Task.CompletedTask;
-        }
 
-        public Task OnHandleExecuted(HandleContext context)
-        {
+            await next(context);
+
             _logger.LogInformation("OnHandleExecuted for {MessageType}", context.Message.GetType());
-            return Task.CompletedTask;
         }
     }
 }

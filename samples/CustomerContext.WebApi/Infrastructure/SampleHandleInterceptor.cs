@@ -16,7 +16,16 @@ namespace CustomerContext.WebApi.Infrastructure
             _logger = loggerFactory.CreateLogger<SampleHandleInterceptor>();
         }
 
-        public Task OnHandleExecuting(HandleContext context)
+        public async Task OnHandleExecutionAsync(HandleContext context, HandleExecutionDelegate next)
+        {
+            OnHandleExecuting(context);
+
+            await next(context);
+
+            OnHandleExecuted(context);
+        }
+
+        private void OnHandleExecuting(HandleContext context)
         {
             _logger.LogInformation("OnHandleExecuting for {MessageType}", context.Message.GetType());
 
@@ -35,14 +44,13 @@ namespace CustomerContext.WebApi.Infrastructure
             {
                 _logger.LogWarning("Custom attribute found on class");
             }
-
-            return Task.CompletedTask;
         }
 
-        public Task OnHandleExecuted(HandleContext context)
+        private void OnHandleExecuted(HandleContext context)
         {
             _logger.LogInformation("OnHandleExecuted for {MessageType}", context.Message.GetType());
-            return Task.CompletedTask;
         }
+
+        
     }
 }
