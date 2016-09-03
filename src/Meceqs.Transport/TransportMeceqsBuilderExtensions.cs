@@ -1,12 +1,12 @@
 using System.Reflection;
 using Meceqs;
 using Meceqs.Configuration;
-using Meceqs.Serialization;
+using Meceqs.Transport;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
-    public static class SerializationMeceqsBuilderExtensions
+    public static class TransportMeceqsBuilderExtensions
     {
         public static IMeceqsBuilder AddSerializer<TEnvelopeSerializer>(this IMeceqsBuilder builder)
             where TEnvelopeSerializer : class, IEnvelopeSerializer
@@ -42,7 +42,7 @@ namespace Microsoft.Extensions.DependencyInjection
             Check.NotNull(builder, nameof(builder));
             Check.NotNull(assemblies, nameof(assemblies));
 
-            builder.Services.Configure<MeceqsSerializationOptions>(options => options.ContractAssemblies.AddRange(assemblies));
+            builder.Services.Configure<MeceqsTransportOptions>(options => options.ContractAssemblies.AddRange(assemblies));
             
             return builder;
         }

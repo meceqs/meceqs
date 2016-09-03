@@ -1,6 +1,6 @@
 using Meceqs;
 using Meceqs.Configuration;
-using Meceqs.Serialization.Json;
+using Meceqs.Transport.Json;
 
 namespace Microsoft.Extensions.DependencyInjection
 {

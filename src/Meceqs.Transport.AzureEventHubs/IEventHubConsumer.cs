@@ -2,7 +2,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 
-namespace Meceqs.AzureEventHubs
+namespace Meceqs.Transport.AzureEventHubs
 {
     public interface IEventHubConsumer
     {

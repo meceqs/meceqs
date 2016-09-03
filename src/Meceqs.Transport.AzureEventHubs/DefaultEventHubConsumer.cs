@@ -1,13 +1,13 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Meceqs.AzureEventHubs.Internal;
+using Meceqs.Transport.AzureEventHubs.Internal;
 using Meceqs.Consuming;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.ServiceBus.Messaging;
 
-namespace Meceqs.AzureEventHubs
+namespace Meceqs.Transport.AzureEventHubs
 {
     public class DefaultEventHubConsumer : IEventHubConsumer
     {

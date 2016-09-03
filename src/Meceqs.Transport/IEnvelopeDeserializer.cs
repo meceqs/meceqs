@@ -1,9 +1,9 @@
 using System.IO;
 
-namespace Meceqs.Serialization
+namespace Meceqs.Transport
 {
     public interface IEnvelopeDeserializer
     {
-        Envelope DeserializeFromStream(Stream serializedEnvelope, string contentType, string messageType);
+        Envelope DeserializeFromStream(string contentType, Stream serializedEnvelope, string messageType);
     }
 }

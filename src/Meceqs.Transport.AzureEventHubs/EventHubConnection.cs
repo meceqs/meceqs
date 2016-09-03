@@ -1,6 +1,6 @@
 using System;
 
-namespace Meceqs.AzureEventHubs
+namespace Meceqs.Transport.AzureEventHubs
 {
     public class EventHubConnection
     {

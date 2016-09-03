@@ -7,7 +7,7 @@
 
   "dependencies": {
     "Meceqs": "0.1.0-*",
-    "Meceqs.Serialization": "0.1.0-*",
+    "Meceqs.Transport": "0.1.0-*",
 
     "WindowsAzure.ServiceBus": "3.0.1"
   },

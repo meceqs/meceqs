@@ -3,7 +3,7 @@ using System.IO;
 using System.Text;
 using Newtonsoft.Json;
 
-namespace Meceqs.Serialization.Json
+namespace Meceqs.Transport.Json
 {
     public class JsonEnvelopeDeserializer : IEnvelopeDeserializer
     {
@@ -18,7 +18,7 @@ namespace Meceqs.Serialization.Json
             _envelopeTypeLoader = envelopetypeLoader;
         }
 
-        public Envelope DeserializeFromStream(Stream serializedEnvelope, string contentType, string messageType)
+        public Envelope DeserializeFromStream(string contentType, Stream serializedEnvelope, string messageType)
         {
             if (!string.Equals(contentType, ContentType, StringComparison.OrdinalIgnoreCase))
             {

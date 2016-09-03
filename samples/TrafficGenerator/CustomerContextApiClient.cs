@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using CustomerContext.Contracts.Commands;
 using CustomerContext.Contracts.Queries;
 using Meceqs.Filters.TypedHandling;
-using Meceqs.Serialization;
+using Meceqs.Transport;
 using Newtonsoft.Json;
 
 namespace TrafficGenerator

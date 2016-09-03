@@ -1,4 +1,4 @@
-namespace Meceqs.Serialization
+namespace Meceqs.Transport
 {
     public interface IEnvelopeSerializer
     {

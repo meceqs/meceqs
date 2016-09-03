@@ -1,8 +1,7 @@
 using System.IO;
-using Meceqs.Serialization;
 using Microsoft.ServiceBus.Messaging;
 
-namespace Meceqs.AzureServiceBus.Internal
+namespace Meceqs.Transport.AzureServiceBus.Internal
 {
     public class DefaultBrokeredMessageConverter : IBrokeredMessageConverter
     {
@@ -48,7 +47,7 @@ namespace Meceqs.AzureServiceBus.Internal
 
             Stream serializedEnvelope = brokeredMessage.GetBody<Stream>();
 
-            return _deserializer.DeserializeFromStream(serializedEnvelope, contentType, messageType);
+            return _deserializer.DeserializeFromStream(contentType, serializedEnvelope, messageType);
         }
     }
 }

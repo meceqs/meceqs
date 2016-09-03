@@ -3,14 +3,14 @@ using System.Collections.Concurrent;
 using System.Linq;
 using Microsoft.Extensions.Options;
 
-namespace Meceqs.Serialization
+namespace Meceqs.Transport
 {
     public class DefaultEnvelopeTypeLoader : IEnvelopeTypeLoader
     {
-        private readonly MeceqsSerializationOptions _options;
+        private readonly MeceqsTransportOptions _options;
         private readonly ConcurrentDictionary<string, Type> _typeCache = new ConcurrentDictionary<string, Type>();
 
-        public DefaultEnvelopeTypeLoader(IOptions<MeceqsSerializationOptions> options)
+        public DefaultEnvelopeTypeLoader(IOptions<MeceqsTransportOptions> options)
         {
             _options = options.Value;
         }

@@ -1,12 +1,12 @@
 using System;
 using System.Threading.Tasks;
-using Meceqs.AzureEventHubs.Internal;
+using Meceqs.Transport.AzureEventHubs.Internal;
 using Meceqs.Pipeline;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.ServiceBus.Messaging;
 
-namespace Meceqs.AzureEventHubs
+namespace Meceqs.Transport.AzureEventHubs
 {
     public class EventHubSenderFilter : IDisposable
     {

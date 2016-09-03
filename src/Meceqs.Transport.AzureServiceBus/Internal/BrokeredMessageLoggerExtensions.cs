@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
-using Meceqs.AzureServiceBus.Internal;
+using Meceqs.Transport.AzureServiceBus.Internal;
 using Microsoft.ServiceBus.Messaging;
 
 namespace Microsoft.Extensions.Logging

@@ -2,7 +2,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 
-namespace Meceqs.AzureServiceBus
+namespace Meceqs.Transport.AzureServiceBus
 {
     public interface IServiceBusConsumer
     {

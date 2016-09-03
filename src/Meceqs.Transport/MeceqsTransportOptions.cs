@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace Meceqs.Serialization
+namespace Meceqs.Transport
 {
-    public class MeceqsSerializationOptions
+    public class MeceqsTransportOptions
     {
         public List<Assembly> ContractAssemblies { get; set; } = new List<Assembly>();
     }

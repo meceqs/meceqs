@@ -1,8 +1,7 @@
 using System.IO;
-using Meceqs.Serialization;
 using Microsoft.ServiceBus.Messaging;
 
-namespace Meceqs.AzureEventHubs.Internal
+namespace Meceqs.Transport.AzureEventHubs.Internal
 {
     public class DefaultEventDataConverter : IEventDataConverter
     {
@@ -45,7 +44,7 @@ namespace Meceqs.AzureEventHubs.Internal
 
             Stream serializedEnvelope = eventData.GetBodyStream();
 
-            return _deserializer.DeserializeFromStream(serializedEnvelope, contentType, messageType);
+            return _deserializer.DeserializeFromStream(contentType, serializedEnvelope, messageType);
         }
     }
 }

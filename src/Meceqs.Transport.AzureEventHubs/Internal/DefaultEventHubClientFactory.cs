@@ -1,6 +1,6 @@
 using Microsoft.ServiceBus.Messaging;
 
-namespace Meceqs.AzureEventHubs.Internal
+namespace Meceqs.Transport.AzureEventHubs.Internal
 {
     public class DefaultEventHubClientFactory : IEventHubClientFactory
     {

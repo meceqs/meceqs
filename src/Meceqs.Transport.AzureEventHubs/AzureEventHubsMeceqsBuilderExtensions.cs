@@ -1,7 +1,7 @@
 using Meceqs;
 using Meceqs.Configuration;
-using Meceqs.AzureEventHubs;
-using Meceqs.AzureEventHubs.Internal;
+using Meceqs.Transport.AzureEventHubs;
+using Meceqs.Transport.AzureEventHubs.Internal;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Microsoft.Extensions.DependencyInjection

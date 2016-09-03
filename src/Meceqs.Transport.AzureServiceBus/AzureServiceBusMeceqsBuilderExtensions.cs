@@ -1,6 +1,6 @@
 using Meceqs;
-using Meceqs.AzureServiceBus;
-using Meceqs.AzureServiceBus.Internal;
+using Meceqs.Transport.AzureServiceBus;
+using Meceqs.Transport.AzureServiceBus.Internal;
 using Meceqs.Configuration;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 

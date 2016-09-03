@@ -1,6 +1,6 @@
 using Microsoft.ServiceBus.Messaging;
 
-namespace Meceqs.AzureServiceBus.Internal
+namespace Meceqs.Transport.AzureServiceBus.Internal
 {
     public interface IBrokeredMessageConverter
     {

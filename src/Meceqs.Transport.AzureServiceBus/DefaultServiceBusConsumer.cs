@@ -1,13 +1,13 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Meceqs.AzureServiceBus.Internal;
+using Meceqs.Transport.AzureServiceBus.Internal;
 using Meceqs.Consuming;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.ServiceBus.Messaging;
 
-namespace Meceqs.AzureServiceBus
+namespace Meceqs.Transport.AzureServiceBus
 {
     public class DefaultServiceBusConsumer : IServiceBusConsumer
     {

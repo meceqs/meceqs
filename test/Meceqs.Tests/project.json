@@ -9,8 +9,8 @@
 
   "dependencies": {
     "Meceqs": "0.1.0-*",
-    "Meceqs.Serialization": "0.1.0-*",
     "Meceqs.Serialization.Json": "0.1.0-*",
+    "Meceqs.Transport": "0.1.0-*",
 
     "Microsoft.Extensions.DependencyInjection": "1.0.0",
     "NSubstitute": "2.0.0-rc",
