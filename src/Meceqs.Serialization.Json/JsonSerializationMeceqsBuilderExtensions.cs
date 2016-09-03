@@ -10,7 +10,8 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             Check.NotNull(builder, nameof(builder));
 
-            builder.AddSerialization<JsonEnvelopeSerializer>();
+            builder.AddSerializer<JsonEnvelopeSerializer>();
+            builder.AddDeserializer<JsonEnvelopeDeserializer>();
 
             return builder;
         }

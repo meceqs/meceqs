@@ -1,0 +1,32 @@
+{
+  "version": "1.0.0-*",
+  "buildOptions": {
+    "debugType": "portable",
+    "emitEntryPoint": true,
+    "warningsAsErrors": true
+  },
+
+  "dependencies": {
+    "CustomerContext.Contracts": "1.0.0-*",
+
+    "Meceqs": "0.1.0-*",
+    "Meceqs.Serialization": "0.1.0-*",
+    "Meceqs.Serialization.Json": "0.1.0-*",
+
+    "Microsoft.Extensions.DependencyInjection": "1.0.0",
+    "Microsoft.Extensions.Logging": "1.0.0",
+    "Microsoft.Extensions.Logging.Console": "1.0.0"
+  },
+
+  "frameworks": {
+    "netcoreapp1.0": {
+      "dependencies": {
+        "Microsoft.NETCore.App": {
+          "type": "platform",
+          "version": "1.0.0"
+        },
+        "System.Threading.Timer": "4.0.1"
+      }
+    }
+  }
+}

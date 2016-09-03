@@ -80,7 +80,9 @@ namespace CustomerContext.WebApi
                     pipeline
                         .UseAspNetCoreRequest()
                         .UseAuditing()              // add user id to message if not present
-                        .UseTypedHandling();
+
+                        // In a real app, we would use Azure Service Bus etc. here.
+                        .UseFilter<FakeServiceBusFilter>();
                 });
         }
 

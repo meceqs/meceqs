@@ -8,7 +8,7 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class SerializationMeceqsBuilderExtensions
     {
-        public static IMeceqsBuilder AddSerialization<TEnvelopeSerializer>(this IMeceqsBuilder builder)
+        public static IMeceqsBuilder AddSerializer<TEnvelopeSerializer>(this IMeceqsBuilder builder)
             where TEnvelopeSerializer : class, IEnvelopeSerializer
         {
             Check.NotNull(builder, nameof(builder));
@@ -19,14 +19,25 @@ namespace Microsoft.Extensions.DependencyInjection
             return builder;
         }
 
-        public static IMeceqsBuilder AddContractAssembly<TType>(this IMeceqsBuilder builder)
+        public static IMeceqsBuilder AddDeserializer<TEnvelopeDeserializer>(this IMeceqsBuilder builder)
+            where TEnvelopeDeserializer : class, IEnvelopeDeserializer
+        {
+            Check.NotNull(builder, nameof(builder));
+
+            builder.Services.TryAddSingleton<IEnvelopeTypeLoader, DefaultEnvelopeTypeLoader>();
+            builder.Services.TryAddSingleton<IEnvelopeDeserializer, TEnvelopeDeserializer>();
+
+            return builder;
+        }
+
+        public static IMeceqsBuilder AddDeserializationAssembly<TType>(this IMeceqsBuilder builder)
         {
             var assembly = typeof(TType).GetTypeInfo().Assembly;
 
-            return builder.AddContractAssemblies(assembly);
+            return builder.AddDeserializationAssemblies(assembly);
         }
 
-        public static IMeceqsBuilder AddContractAssemblies(this IMeceqsBuilder builder, params Assembly[] assemblies)
+        public static IMeceqsBuilder AddDeserializationAssemblies(this IMeceqsBuilder builder, params Assembly[] assemblies)
         {
             Check.NotNull(builder, nameof(builder));
             Check.NotNull(assemblies, nameof(assemblies));

@@ -15,6 +15,7 @@ namespace Meceqs.Consuming.Internal
         private readonly IPipelineProvider _pipelineProvider;
 
         private CancellationToken _cancellation = CancellationToken.None;
+        private IServiceProvider _requestServices;
         private string _pipelineName = ConsumeOptions.DefaultPipelineName;
 
         public FluentConsumer(
@@ -34,6 +35,12 @@ namespace Meceqs.Consuming.Internal
         public IFluentConsumer SetCancellationToken(CancellationToken cancellation)
         {
             _cancellation = cancellation;
+            return this;
+        }
+
+        public IFluentConsumer SetRequestServices(IServiceProvider requestServices)
+        {
+            _requestServices = requestServices;
             return this;
         }
 
@@ -82,6 +89,7 @@ namespace Meceqs.Consuming.Internal
             var context = _filterContextFactory.CreateFilterContext(envelope);
 
             context.Cancellation = _cancellation;
+            context.RequestServices = _requestServices;
             context.Items.Add(_contextItems);
 
             return context;

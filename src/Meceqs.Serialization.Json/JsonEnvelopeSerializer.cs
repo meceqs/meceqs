@@ -1,5 +1,3 @@
-using System;
-using System.IO;
 using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -18,19 +16,15 @@ namespace Meceqs.Serialization.Json
             NullValueHandling = NullValueHandling.Ignore
         };
 
-        public Envelope Deserialize(Stream serializedEnvelope, Type envelopeType)
+        public byte[] SerializeToByteArray(Envelope envelope)
         {
-            using (StreamReader reader = new StreamReader(serializedEnvelope, Encoding.UTF8))
-            {
-                string json = reader.ReadToEnd();
-                return (Envelope)JsonConvert.DeserializeObject(json, envelopeType, _defaultSettings);
-            }
+            string json = SerializeToString(envelope);
+            return Encoding.UTF8.GetBytes(json);
         }
 
-        public byte[] Serialize(Envelope envelope)
+        public string SerializeToString(Envelope envelope)
         {
-            string json = JsonConvert.SerializeObject(envelope);
-            return Encoding.UTF8.GetBytes(json);
+            return JsonConvert.SerializeObject(envelope);
         }
     }
 }

@@ -16,6 +16,7 @@ namespace Meceqs.Sending.Internal
         private readonly IPipelineProvider _pipelineProvider;
 
         private CancellationToken _cancellation = CancellationToken.None;
+        private IServiceProvider _requestServices;
         private string _pipelineName = SendOptions.DefaultPipelineName;
 
         public FluentSender(
@@ -48,6 +49,12 @@ namespace Meceqs.Sending.Internal
         public IFluentSender SetCancellationToken(CancellationToken cancellation)
         {
             _cancellation = cancellation;
+            return this;
+        }
+
+        public IFluentSender SetRequestServices(IServiceProvider requestServices)
+        {
+            _requestServices = requestServices;
             return this;
         }
 
@@ -106,6 +113,7 @@ namespace Meceqs.Sending.Internal
             var context = _filterContextFactory.CreateFilterContext(envelope);
 
             context.Cancellation = _cancellation;
+            context.RequestServices = _requestServices;
             context.Items.Add(_contextItems);
 
             return context;

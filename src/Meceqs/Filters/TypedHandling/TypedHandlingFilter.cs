@@ -94,7 +94,7 @@ namespace Meceqs.Filters.TypedHandling
 
         private HandleExecutionDelegate CreateHandleExecutionChain(HandleContext handleContext)
         {
-            // The call to handler itself is the most-inner call.
+            // The call to handler itself is the innermost call.
             HandleExecutionDelegate chain = async (HandleContext context) =>
             {
                 context.FilterContext.Result = await _handlerInvoker.InvokeHandleAsync(

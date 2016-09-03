@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 using Meceqs.Serialization;
 using Microsoft.ServiceBus.Messaging;
@@ -7,27 +6,27 @@ namespace Meceqs.AzureEventHubs.Internal
 {
     public class DefaultEventDataConverter : IEventDataConverter
     {
-        private readonly IEnvelopeSerializer _envelopeSerializer;
-        private readonly IEnvelopeTypeLoader _envelopeTypeLoader;
+        private readonly IEnvelopeSerializer _serializer;
+        private readonly IEnvelopeDeserializer _deserializer;
 
-        public DefaultEventDataConverter(IEnvelopeSerializer envelopeSerializer, IEnvelopeTypeLoader envelopeTypeLoader)
+        public DefaultEventDataConverter(IEnvelopeSerializer serializer, IEnvelopeDeserializer deserializer)
         {
-            Check.NotNull(envelopeSerializer, nameof(envelopeSerializer));
-            Check.NotNull(envelopeTypeLoader, nameof(envelopeTypeLoader));
+            Check.NotNull(serializer, nameof(serializer));
+            Check.NotNull(deserializer, nameof(deserializer));
 
-            _envelopeSerializer = envelopeSerializer;
-            _envelopeTypeLoader = envelopeTypeLoader;
+            _serializer = serializer;
+            _deserializer = deserializer;
         }
 
         public EventData ConvertToEventData(Envelope envelope)
         {
             Check.NotNull(envelope, nameof(envelope));
 
-            byte[] serializedEnvelope = _envelopeSerializer.Serialize(envelope);
+            byte[] serializedEnvelope = _serializer.SerializeToByteArray(envelope);
 
             EventData eventData = new EventData(serializedEnvelope);
 
-            eventData.Properties[TransportHeaderNames.ContentType] = _envelopeSerializer.ContentType;
+            eventData.Properties[TransportHeaderNames.ContentType] = _serializer.ContentType;
 
             eventData.Properties[TransportHeaderNames.MessageId] = envelope.MessageId;
             eventData.Properties[TransportHeaderNames.MessageName] = envelope.MessageName;
@@ -41,12 +40,12 @@ namespace Meceqs.AzureEventHubs.Internal
             Check.NotNull(eventData, nameof(eventData));
 
             // TODO @cweiss validations?
+            string contentType = (string)eventData.Properties[TransportHeaderNames.ContentType];
             string messageType = (string)eventData.Properties[TransportHeaderNames.MessageType];
-            Type envelopeType = _envelopeTypeLoader.LoadEnvelopeType(messageType);
 
             Stream serializedEnvelope = eventData.GetBodyStream();
 
-            return _envelopeSerializer.Deserialize(serializedEnvelope, envelopeType);
+            return _deserializer.DeserializeFromStream(serializedEnvelope, contentType, messageType);
         }
     }
 }

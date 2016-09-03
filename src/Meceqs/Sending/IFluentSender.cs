@@ -1,3 +1,4 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -8,6 +9,8 @@ namespace Meceqs.Sending
         IFluentSender CorrelateWith(Envelope source);
 
         IFluentSender SetCancellationToken(CancellationToken cancellation);
+
+        IFluentSender SetRequestServices(IServiceProvider requestServices);
 
         IFluentSender SetHeader(string headerName, object value);
 

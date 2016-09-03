@@ -9,6 +9,7 @@ namespace CustomerContext.WebApi
         public static void Main(string[] args)
         {
             var host = new WebHostBuilder()
+                .UseUrls("http://localhost:5891")
                 .UseKestrel()
                 .UseContentRoot(Directory.GetCurrentDirectory())
                 .UseIISIntegration()
