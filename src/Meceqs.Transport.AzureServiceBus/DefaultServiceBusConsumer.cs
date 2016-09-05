@@ -73,6 +73,7 @@ namespace Meceqs.Transport.AzureServiceBus
 
                 await envelopeConsumer.ForEnvelope(envelope)
                     .SetCancellationToken(cancellation)
+                    .SetRequestServices(scope.ServiceProvider)
                     .ConsumeAsync();
             }
         }
