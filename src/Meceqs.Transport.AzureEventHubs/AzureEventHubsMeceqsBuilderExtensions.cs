@@ -11,24 +11,27 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class AzureEventHubsMeceqsBuilderExtensions
     {
-        private static void AddCoreServices(IMeceqsBuilder builder)
+        public static IMeceqsBuilder AddAzureEventHubs(this IMeceqsBuilder builder)
         {
+            Check.NotNull(builder, nameof(builder));
+
             builder.Services.TryAddSingleton<IEventDataConverter, DefaultEventDataConverter>();
             builder.Services.TryAddSingleton<IEventHubClientFactory, DefaultEventHubClientFactory>();
+            builder.Services.TryAddSingleton<IEventHubConsumer, DefaultEventHubConsumer>();
+
+            return builder;
         }
 
         public static IMeceqsBuilder AddAzureEventHubConsumer(this IMeceqsBuilder builder, Action<EventHubConsumerOptions> options = null)
         {
             Check.NotNull(builder, nameof(builder));
 
-            AddCoreServices(builder);
+            AddAzureEventHubs(builder);
 
             if (options != null)
             {
                 builder.Services.Configure(options);
             }
-
-            builder.Services.TryAddSingleton<IEventHubConsumer, DefaultEventHubConsumer>();
 
             return builder;
         }
