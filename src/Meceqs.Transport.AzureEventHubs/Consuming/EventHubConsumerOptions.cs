@@ -7,7 +7,7 @@ namespace Meceqs.Transport.AzureEventHubs.Consuming
     {
         public List<string> MessageTypes { get; set; } = new List<string>();
 
-        public UnsupportedMessageTypeBehavior UnsupportedMessageTypeBehavior { get; set; } = UnsupportedMessageTypeBehavior.Throw;
+        public UnknownMessageBehavior UnknownMessageBehavior { get; set; } = UnknownMessageBehavior.ThrowException;
 
         public void AddMessageType<TMessage>()
         {
@@ -20,11 +20,12 @@ namespace Meceqs.Transport.AzureEventHubs.Consuming
 
             MessageTypes.Add(messageType.FullName);
         }
-    }
 
-    public enum UnsupportedMessageTypeBehavior
-    {
-        Throw,
-        Ignore
+        public void AddMessageType(string messageType)
+        {
+            Check.NotNullOrWhiteSpace(messageType, nameof(messageType));
+
+            MessageTypes.Add(messageType);
+        }
     }
 }

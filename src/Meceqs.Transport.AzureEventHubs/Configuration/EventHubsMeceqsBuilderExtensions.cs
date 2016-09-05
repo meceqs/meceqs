@@ -3,15 +3,19 @@ using System.Collections.Generic;
 using Meceqs;
 using Meceqs.Configuration;
 using Meceqs.Filters.TypedHandling;
+using Meceqs.Transport.AzureEventHubs.Configuration;
 using Meceqs.Transport.AzureEventHubs.Consuming;
 using Meceqs.Transport.AzureEventHubs.Internal;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
-    public static class AzureEventHubsMeceqsBuilderExtensions
+    public static class EventHubsMeceqsBuilderExtensions
     {
-        public static IMeceqsBuilder AddAzureEventHubs(this IMeceqsBuilder builder)
+        /// <summary>
+        /// Adds core services for Azure Event Hubs.
+        /// </summary>
+        public static IMeceqsBuilder AddEventHubsCore(this IMeceqsBuilder builder)
         {
             Check.NotNull(builder, nameof(builder));
 
@@ -22,27 +26,50 @@ namespace Microsoft.Extensions.DependencyInjection
             return builder;
         }
 
-        public static IMeceqsBuilder AddAzureEventHubConsumer(this IMeceqsBuilder builder, Action<EventHubConsumerOptions> options = null)
+        #region Consuming
+
+        /// <summary>
+        /// A meta function for adding an Azure Event Hubs consumer with one call.
+        /// It adds the most common configuration options in <paramref name="options"/>.
+        /// </summary>
+        public static IMeceqsBuilder AddEventHubConsumer(
+            this IMeceqsBuilder builder,
+            Action<IEventHubConsumerBuilder> options)
         {
             Check.NotNull(builder, nameof(builder));
 
-            AddAzureEventHubs(builder);
+            var consumerBuilder = new EventHubConsumerBuilder();
+            options?.Invoke(consumerBuilder);
 
-            if (options != null)
+            // Add core services if they don't yet exist.
+            builder.AddEventHubsCore();
+
+            // Set EventHubConsumer options.
+            var consumerOptions = consumerBuilder.GetConsumerOptions();
+            if (consumerOptions != null)
             {
-                builder.Services.Configure(options);
+                builder.Services.Configure(consumerOptions);
             }
+
+            // Add assets from typed handlers.
+            foreach (var typedHandler in consumerBuilder.GetTypedHandlers())
+            {
+                builder.AddEventHubConsumerAssetsFromTypedHandler(typedHandler);
+            }
+
+            // Add the pipeline.
+            builder.AddConsumer(consumerBuilder.GetPipelineName(), consumerBuilder.GetPipeline());
 
             return builder;
         }
 
-        public static IMeceqsBuilder AddAzureEventHubConsumerForTypedHandler<THandler>(this IMeceqsBuilder builder)
+        public static IMeceqsBuilder AddEventHubConsumerAssetsFromTypedHandler<THandler>(this IMeceqsBuilder builder)
             where THandler : IHandles
         {
-            return AddAzureEventHubConsumerForTypedHandler(builder, typeof(THandler));
+            return AddEventHubConsumerAssetsFromTypedHandler(builder, typeof(THandler));
         }
 
-        public static IMeceqsBuilder AddAzureEventHubConsumerForTypedHandler(this IMeceqsBuilder builder, Type handlerType)
+        public static IMeceqsBuilder AddEventHubConsumerAssetsFromTypedHandler(this IMeceqsBuilder builder, Type handlerType)
         {
             Check.NotNull(builder, nameof(builder));
             Check.NotNull(handlerType, nameof(handlerType));
@@ -54,9 +81,8 @@ namespace Microsoft.Extensions.DependencyInjection
                     nameof(handlerType));
             }
 
-            IList<Type> messageTypes;
-
             // Registers the typed handler itself.
+            IList<Type> messageTypes;
             builder.AddTypedHandler(handlerType, out messageTypes);
 
             foreach (var messageType in messageTypes)
@@ -64,13 +90,13 @@ namespace Microsoft.Extensions.DependencyInjection
                 // Ensure the EventHubConsumer accepts the message.
                 builder.Services.Configure<EventHubConsumerOptions>(options => options.AddMessageType(messageType));
 
-                // TODO should this happen in AddTypedHandler()?
-
                 // Ensure deserialization for this message type works.
                 builder.AddDeserializationAssembly(messageType.Assembly);
             }
 
             return builder;
         }
+
+        #endregion Consuming
     }
 }
