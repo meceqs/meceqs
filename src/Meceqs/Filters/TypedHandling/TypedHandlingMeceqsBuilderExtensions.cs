@@ -50,10 +50,20 @@ namespace Microsoft.Extensions.DependencyInjection
             {
                 if (baseHandle.IsAssignableFrom(handleInterface))
                 {
+                    // IHandles itself is just a marker interface.
+                    if (handleInterface == typeof(IHandles))
+                        continue;
+
                     builder.Services.TryAddTransient(handleInterface, handler);
 
                     // The first generic argument is the message, 
                     // no matter if it's IHandles<Message> or IHandles<Message, Result>.
+
+                    if (handleInterface.GenericTypeArguments.Length < 1)
+                    {
+                        throw new InvalidOperationException($"'{handleInterface}' does not have any generic types.");
+                    }
+
                     implementedMessageTypes.Add(handleInterface.GenericTypeArguments[0]);
                 }
             }
