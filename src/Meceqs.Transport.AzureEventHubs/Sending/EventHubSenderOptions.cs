@@ -1,4 +1,4 @@
-namespace Meceqs.Transport.AzureEventHubs
+namespace Meceqs.Transport.AzureEventHubs.Sending
 {
     public class EventHubSenderOptions
     {

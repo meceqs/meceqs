@@ -1,5 +1,5 @@
 using Meceqs;
-using Meceqs.Transport.AzureEventHubs;
+using Meceqs.Transport.AzureEventHubs.Sending;
 using Meceqs.Pipeline;
 
 namespace Microsoft.Extensions.DependencyInjection

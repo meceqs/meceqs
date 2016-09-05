@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Meceqs;
@@ -33,8 +34,16 @@ namespace Microsoft.Extensions.DependencyInjection
 
         public static IMeceqsBuilder AddTypedHandler(this IMeceqsBuilder builder, Type handler)
         {
+            IList<Type> implementedMessageTypes;
+            return AddTypedHandler(builder, handler, out implementedMessageTypes);
+        }
+
+        public static IMeceqsBuilder AddTypedHandler(this IMeceqsBuilder builder, Type handler, out IList<Type> implementedMessageTypes)
+        {
             Check.NotNull(builder, nameof(builder));
             Check.NotNull(handler, nameof(handler));
+
+            implementedMessageTypes = new List<Type>();
 
             Type baseHandle = typeof(IHandles);
             foreach (var handleInterface in handler.GetTypeInfo().ImplementedInterfaces)
@@ -42,6 +51,10 @@ namespace Microsoft.Extensions.DependencyInjection
                 if (baseHandle.IsAssignableFrom(handleInterface))
                 {
                     builder.Services.TryAddTransient(handleInterface, handler);
+
+                    // The first generic argument is the message, 
+                    // no matter if it's IHandles<Message> or IHandles<Message, Result>.
+                    implementedMessageTypes.Add(handleInterface.GenericTypeArguments[0]);
                 }
             }
 

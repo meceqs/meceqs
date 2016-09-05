@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.ServiceBus.Messaging;
 
-namespace Meceqs.Transport.AzureEventHubs
+namespace Meceqs.Transport.AzureEventHubs.Sending
 {
     public class EventHubSenderFilter : IDisposable
     {

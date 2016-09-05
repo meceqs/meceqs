@@ -41,15 +41,15 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             var assembly = typeof(TType).GetTypeInfo().Assembly;
 
-            return builder.AddDeserializationAssemblies(assembly);
+            return builder.AddDeserializationAssembly(assembly);
         }
 
-        public static IMeceqsBuilder AddDeserializationAssemblies(this IMeceqsBuilder builder, params Assembly[] assemblies)
+        public static IMeceqsBuilder AddDeserializationAssembly(this IMeceqsBuilder builder, params Assembly[] assemblies)
         {
             Check.NotNull(builder, nameof(builder));
             Check.NotNull(assemblies, nameof(assemblies));
 
-            builder.Services.Configure<EnvelopeTypeLoaderOptions>(options => options.ContractAssemblies.AddRange(assemblies));
+            builder.Services.Configure<EnvelopeTypeLoaderOptions>(options => options.TryAddContractAssembly(assemblies));
 
             return builder;
         }
