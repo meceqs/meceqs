@@ -1,6 +1,6 @@
 using System;
 
-namespace CustomerContext.Contracts.Queries
+namespace Customers.Contracts.Queries
 {
     public class GetCustomerQuery
     {

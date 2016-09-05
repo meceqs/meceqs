@@ -1,4 +1,4 @@
-namespace CustomerContext.Contracts.Commands
+namespace Customers.Contracts.Commands
 {
     public class CreateCustomerCommand
     {

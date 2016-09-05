@@ -1,4 +1,4 @@
-namespace CustomerContext.Contracts.Queries
+namespace Customers.Contracts.Queries
 {
     public class FindCustomersQuery
     {

@@ -2,7 +2,7 @@ using System.IO;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Builder;
 
-namespace CustomerContext.WebApi
+namespace Customers.Hosts.WebApi
 {
     public class Program
     {

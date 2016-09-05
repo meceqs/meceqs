@@ -8,7 +8,7 @@
   "frameworks": {
     "netstandard1.3": {
       "dependencies": {
-        "CustomerContext.Contracts": "1.0.0-*",
+        "Customers.Contracts": "1.0.0-*",
 
         "Meceqs": "0.1.0-*",
 

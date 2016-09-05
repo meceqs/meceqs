@@ -2,7 +2,7 @@ using System.Threading.Tasks;
 using Meceqs.Pipeline;
 using Microsoft.Extensions.Logging;
 
-namespace CustomerContext.WebApi.Infrastructure
+namespace Customers.Hosts.WebApi.Infrastructure
 {
     public class FakeServiceBusFilter
     {

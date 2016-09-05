@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
-namespace CustomerContext.WebApi.Infrastructure
+namespace Customers.Hosts.WebApi.Infrastructure
 {
     /// <summary>
     /// Makes sure, every complex type is bound from HTTP body. This way, using [FromBody] is no longer necessary.

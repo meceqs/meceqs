@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using CustomerContext.Contracts.Events;
+using Customers.Contracts.Events;
 
-namespace CustomerContext.Core.Domain
+namespace Customers.Core.Domain
 {
     public class Customer
     {

@@ -1,13 +1,13 @@
 using System.Linq;
 using System.Threading.Tasks;
-using CustomerContext.Contracts.Queries;
-using CustomerContext.Core.Domain;
-using CustomerContext.Core.Repositories;
+using Customers.Contracts.Queries;
+using Customers.Core.Domain;
+using Customers.Core.Repositories;
 using Meceqs.Filters.TypedHandling;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
-namespace CustomerContext.Core.QueryHandlers
+namespace Customers.Core.QueryHandlers
 {
     [CustomLogic /* this attribute can be read by an IHandleInterceptor */]
     public class CustomerQueryHandler :

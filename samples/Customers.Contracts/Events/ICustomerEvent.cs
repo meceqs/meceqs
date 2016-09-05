@@ -1,6 +1,6 @@
 using System;
 
-namespace CustomerContext.Contracts.Events
+namespace Customers.Contracts.Events
 {
     public interface ICustomerEvent
     {

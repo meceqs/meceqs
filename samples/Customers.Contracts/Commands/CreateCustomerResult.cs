@@ -1,6 +1,6 @@
 using System;
 
-namespace CustomerContext.Contracts.Commands
+namespace Customers.Contracts.Commands
 {
     public class CreateCustomerResult
     {

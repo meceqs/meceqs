@@ -1,15 +1,15 @@
 using System;
 using System.Threading.Tasks;
-using CustomerContext.Contracts.Commands;
-using CustomerContext.Core.Domain;
-using CustomerContext.Core.Repositories;
+using Customers.Contracts.Commands;
+using Customers.Core.Domain;
+using Customers.Core.Repositories;
 using Meceqs;
 using Meceqs.Filters.TypedHandling;
 using Meceqs.Sending;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
-namespace CustomerContext.Core.CommandHandlers
+namespace Customers.Core.CommandHandlers
 {
     public class CustomerCommandHandler :
         IHandles<CreateCustomerCommand, CreateCustomerResult>,

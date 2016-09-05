@@ -7,7 +7,7 @@
   },
 
   "dependencies": {
-    "CustomerContext.Contracts": "1.0.0-*",
+    "Customers.Contracts": "1.0.0-*",
 
     "Meceqs": "0.1.0-*",
     "Meceqs.Serialization.Json": "0.1.0-*",

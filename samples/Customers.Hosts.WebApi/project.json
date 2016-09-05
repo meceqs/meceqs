@@ -5,8 +5,8 @@
       "type": "platform"
     },
 
-    "CustomerContext.Contracts": "1.0.0-*",
-    "CustomerContext.Core": "1.0.0-*",
+    "Customers.Contracts": "1.0.0-*",
+    "Customers.Core": "1.0.0-*",
 
     "Meceqs": "0.1.0-*",
     "Meceqs.AspNetCore": "0.1.0-*",

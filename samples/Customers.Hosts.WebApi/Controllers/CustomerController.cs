@@ -1,11 +1,11 @@
 using System.Threading.Tasks;
-using CustomerContext.Contracts.Commands;
-using CustomerContext.Contracts.Queries;
+using Customers.Contracts.Commands;
+using Customers.Contracts.Queries;
 using Meceqs;
 using Meceqs.Consuming;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CustomerContext.WebApi.Controllers
+namespace Customers.Hosts.WebApi.Controllers
 {
     [Route("customers/[action]")]
     [Produces("application/json")]

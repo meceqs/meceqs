@@ -1,8 +1,8 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using CustomerContext.Contracts.Commands;
-using CustomerContext.Contracts.Queries;
+using Customers.Contracts.Commands;
+using Customers.Contracts.Queries;
 using Meceqs.Sending;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;

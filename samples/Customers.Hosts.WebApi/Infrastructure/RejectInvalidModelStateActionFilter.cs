@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace CustomerContext.WebApi.Infrastructure
+namespace Customers.Hosts.WebApi.Infrastructure
 {
     public class RejectInvalidModelStateActionFilter : IActionFilter
     {

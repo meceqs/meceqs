@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace CustomerContext.Contracts.Queries
+namespace Customers.Contracts.Queries
 {
     public class FindCustomersResult
     {

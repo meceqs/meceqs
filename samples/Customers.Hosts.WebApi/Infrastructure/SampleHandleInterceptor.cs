@@ -1,11 +1,11 @@
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using CustomerContext.Core;
+using Customers.Core;
 using Meceqs.Filters.TypedHandling;
 using Microsoft.Extensions.Logging;
 
-namespace CustomerContext.WebApi.Infrastructure
+namespace Customers.Hosts.WebApi.Infrastructure
 {
     public class SampleHandleInterceptor : IHandleInterceptor
     {

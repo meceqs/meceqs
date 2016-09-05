@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using CustomerContext.Core.Domain;
+using Customers.Core.Domain;
 
-namespace CustomerContext.Core.Repositories
+namespace Customers.Core.Repositories
 {
     public interface ICustomerRepository
     {

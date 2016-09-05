@@ -1,7 +1,7 @@
 using System.Reflection;
-using CustomerContext.Core.CommandHandlers;
-using CustomerContext.Core.Repositories;
-using CustomerContext.WebApi.Infrastructure;
+using Customers.Core.CommandHandlers;
+using Customers.Core.Repositories;
+using Customers.Hosts.WebApi.Infrastructure;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -9,7 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Swashbuckle.Swagger.Model;
 
-namespace CustomerContext.WebApi
+namespace Customers.Hosts.WebApi
 {
     public class Startup
     {
