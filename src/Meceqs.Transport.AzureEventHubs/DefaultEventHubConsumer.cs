@@ -69,6 +69,7 @@ namespace Meceqs.Transport.AzureEventHubs
 
                 await envelopeConsumer.ForEnvelope(envelope)
                     .SetCancellationToken(cancellation)
+                    .SetRequestServices(scope.ServiceProvider)
                     .ConsumeAsync();
             }
         }
