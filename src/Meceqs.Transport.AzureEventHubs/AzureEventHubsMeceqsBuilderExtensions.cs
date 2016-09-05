@@ -17,7 +17,7 @@ namespace Microsoft.Extensions.DependencyInjection
             builder.Services.TryAddSingleton<IEventHubClientFactory, DefaultEventHubClientFactory>();
         }
 
-        public static IMeceqsBuilder AddAzureEventHubConsumer(this IMeceqsBuilder builder, Action<EventHubConsumerOptions> options)
+        public static IMeceqsBuilder AddAzureEventHubConsumer(this IMeceqsBuilder builder, Action<EventHubConsumerOptions> options = null)
         {
             Check.NotNull(builder, nameof(builder));
 
@@ -33,7 +33,13 @@ namespace Microsoft.Extensions.DependencyInjection
             return builder;
         }
 
-        public static IMeceqsBuilder AddAssetsFromTypedHandler(this IMeceqsBuilder builder, Type handlerType)
+        public static IMeceqsBuilder AddAzureEventHubConsumerForTypedHandler<THandler>(this IMeceqsBuilder builder)
+            where THandler : IHandles
+        {
+            return AddAzureEventHubConsumerForTypedHandler(builder, typeof(THandler));
+        }
+
+        public static IMeceqsBuilder AddAzureEventHubConsumerForTypedHandler(this IMeceqsBuilder builder, Type handlerType)
         {
             Check.NotNull(builder, nameof(builder));
             Check.NotNull(handlerType, nameof(handlerType));
