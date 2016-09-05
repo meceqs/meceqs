@@ -4,7 +4,6 @@ using Meceqs.Transport.AzureEventHubs.Internal;
 using Meceqs.Pipeline;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.ServiceBus.Messaging;
 
 namespace Meceqs.Transport.AzureEventHubs.Sending
 {
@@ -13,7 +12,7 @@ namespace Meceqs.Transport.AzureEventHubs.Sending
         // TODO EventHubClient lifecycle - should it be transient?
 
         private readonly ILogger _logger;
-        private readonly EventHubClient _eventHubClient;
+        private readonly IEventHubClient _eventHubClient;
 
         public EventHubSenderFilter(
             FilterDelegate next,

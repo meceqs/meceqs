@@ -34,7 +34,7 @@ namespace TrafficGenerator
             // Logging
 
             var loggerFactory = new LoggerFactory();
-            loggerFactory.AddConsole();
+            loggerFactory.AddConsole(LogLevel.Debug);
 
             var logger = loggerFactory.CreateLogger<Program>();
 

@@ -11,14 +11,13 @@ namespace TrafficGenerator
 {
     public class Worker
     {
-        private const string WebApiUrl = "http://localhost:5891/";
-
         private static readonly Random _random = new Random();
 
         private readonly IServiceProvider _applicationServices;
         private readonly ILogger _logger;
 
         private Timer _createCustomerTimer;
+        private Timer _changeNameTimer;
         private Timer _countCustomersTimer;
 
         public Worker(IServiceProvider applicationServices, ILoggerFactory loggerFactory)
@@ -35,6 +34,11 @@ namespace TrafficGenerator
             {
                 InvokeTimerMethod("CreateCustomer", CreateCustomer, _createCustomerTimer, 5*1000);
             }, null, _random.Next(1000) /* first start */, Timeout.Infinite);
+
+            _changeNameTimer = new Timer(_ =>
+            {
+                InvokeTimerMethod("ChangeName", ChangeName, _changeNameTimer, 10*1000);
+            }, null, _random.Next(5000, 8000) /* first start */, Timeout.Infinite);
 
             _countCustomersTimer = new Timer(_ =>
             {
@@ -53,6 +57,31 @@ namespace TrafficGenerator
                 .SendAsync<CreateCustomerResult>();
 
             _logger.LogInformation("Customer created with id {CustomerId}", result.CustomerId);
+        }
+
+        private async Task ChangeName(IServiceProvider requestServices)
+        {
+            var messageSender = requestServices.GetRequiredService<IMessageSender>();
+
+            // Change name of a random customer.
+
+            var result = await messageSender.ForMessage(new FindCustomersQuery())
+                .SetRequestServices(requestServices)
+                .SendAsync<FindCustomersResult>();
+
+            var index = new Random().Next(result.Customers.Count);
+            Guid customerId = result.Customers[index].CustomerId;
+
+            var changeNameCommand = CustomerFactory.SetRandomName(customerId);
+
+            await messageSender.ForMessage(changeNameCommand)
+                .SetRequestServices(requestServices)
+                .SendAsync();
+
+            _logger.LogInformation("Customer {CustomerId} changed his/her name to {FirstName} {LastName}",
+                changeNameCommand.CustomerId,
+                changeNameCommand.FirstName,
+                changeNameCommand.LastName);
         }
 
         private async Task CountCustomers(IServiceProvider requestServices)

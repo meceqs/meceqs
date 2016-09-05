@@ -20,6 +20,19 @@ namespace TrafficGenerator
             };
         }
 
+        public static ChangeNameCommand SetRandomName(Guid customerId)
+        {
+            int randomIndex = random.Next(_names.Count);
+            string[] randomName = _names[randomIndex].Split(' ');
+
+            return new ChangeNameCommand
+            {
+                CustomerId = customerId,
+                FirstName = randomName[0],
+                LastName = randomName[1]
+            };
+        }
+
         private static readonly List<string> _names = new List<string>
         {
             // generated with http://listofrandomnames.com/

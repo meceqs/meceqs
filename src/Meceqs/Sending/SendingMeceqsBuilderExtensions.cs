@@ -12,14 +12,15 @@ namespace Microsoft.Extensions.DependencyInjection
     {
         public static IMeceqsBuilder AddSender(this IMeceqsBuilder builder, Action<IPipelineBuilder> pipeline)
         {
-            return AddSender(builder, MeceqsDefaults.SendPipelineName, pipeline);
+            return AddSender(builder, null, pipeline);
         }
 
         public static IMeceqsBuilder AddSender(this IMeceqsBuilder builder, string pipelineName, Action<IPipelineBuilder> pipeline)
         {
             Check.NotNull(builder, nameof(builder));
-            Check.NotNullOrWhiteSpace(pipelineName, nameof(pipelineName));
             Check.NotNull(pipeline, nameof(pipeline));
+
+            pipelineName = pipelineName ?? MeceqsDefaults.SendPipelineName;
 
             builder.AddPipeline(pipelineName, pipeline);
 

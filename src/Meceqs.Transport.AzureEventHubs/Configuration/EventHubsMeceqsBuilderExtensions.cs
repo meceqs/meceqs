@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Meceqs;
 using Meceqs.Configuration;
 using Meceqs.Filters.TypedHandling;
+using Meceqs.Pipeline;
 using Meceqs.Transport.AzureEventHubs.Configuration;
 using Meceqs.Transport.AzureEventHubs.Consuming;
 using Meceqs.Transport.AzureEventHubs.Internal;
@@ -98,5 +99,25 @@ namespace Microsoft.Extensions.DependencyInjection
         }
 
         #endregion Consuming
+
+        #region Sending
+
+        public static IMeceqsBuilder AddEventHubSender(this IMeceqsBuilder builder, Action<IPipelineBuilder> pipeline)
+        {
+            return AddEventHubSender(builder, null, pipeline);
+        }
+
+        public static IMeceqsBuilder AddEventHubSender(this IMeceqsBuilder builder, string pipelineName, Action<IPipelineBuilder> pipeline)
+        {
+            Check.NotNull(builder, nameof(builder));
+
+            builder.AddEventHubsCore();
+
+            builder.AddSender(pipelineName, pipeline);
+
+            return builder;
+        }
+
+        #endregion
     }
 }

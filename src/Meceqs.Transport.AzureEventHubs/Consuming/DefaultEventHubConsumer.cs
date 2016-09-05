@@ -6,6 +6,7 @@ using Meceqs.Consuming;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.ServiceBus.Messaging;
+using Microsoft.Extensions.Options;
 
 namespace Meceqs.Transport.AzureEventHubs.Consuming
 {
@@ -15,13 +16,16 @@ namespace Meceqs.Transport.AzureEventHubs.Consuming
         private readonly ILogger _logger;
         private readonly IServiceScopeFactory _serviceScopeFactory;
 
-        public DefaultEventHubConsumer(EventHubConsumerOptions options, ILoggerFactory loggerFactory, IServiceScopeFactory serviceScopeFactory)
+        public DefaultEventHubConsumer(
+            IOptions<EventHubConsumerOptions> options,
+            ILoggerFactory loggerFactory,
+            IServiceScopeFactory serviceScopeFactory)
         {
-            Check.NotNull(options, nameof(options));
+            Check.NotNull(options?.Value, nameof(options));
             Check.NotNull(loggerFactory, nameof(loggerFactory));
             Check.NotNull(serviceScopeFactory, nameof(serviceScopeFactory));
 
-            _options = options;
+            _options = options.Value;
             _logger = loggerFactory.CreateLogger<DefaultEventHubConsumer>();
             _serviceScopeFactory = serviceScopeFactory;
         }

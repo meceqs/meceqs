@@ -8,6 +8,7 @@ using Customers.Contracts.Queries;
 using Meceqs.Filters.TypedHandling;
 using Meceqs.Serialization;
 using Newtonsoft.Json;
+using SampleConfig;
 
 namespace TrafficGenerator
 {
@@ -16,10 +17,9 @@ namespace TrafficGenerator
     /// </summary>
     public class CustomerContextApiClient :
         IHandles<CreateCustomerCommand, CreateCustomerResult>,
+        IHandles<ChangeNameCommand>,
         IHandles<FindCustomersQuery, FindCustomersResult>
     {
-        private const string WebApiUrl = "http://localhost:5891/";
-
         private static readonly HttpClient _client;
 
         private readonly IEnvelopeSerializer _serializer;
@@ -27,7 +27,7 @@ namespace TrafficGenerator
         static CustomerContextApiClient()
         {
             _client = new HttpClient();
-            _client.BaseAddress = new Uri(WebApiUrl);
+            _client.BaseAddress = new Uri(SampleConfiguration.CustomersWebApiUrl);
         }
 
         public CustomerContextApiClient(IEnvelopeSerializer serializer)
@@ -38,6 +38,11 @@ namespace TrafficGenerator
         public Task<CreateCustomerResult> HandleAsync(HandleContext<CreateCustomerCommand> context)
         {
             return SendRequestAsync<CreateCustomerResult>(context, "customers/CreateCustomer");
+        }
+
+        public Task HandleAsync(HandleContext<ChangeNameCommand> context)
+        {
+            return SendRequestAsync(context, "customers/ChangeName");
         }
 
         public Task<FindCustomersResult> HandleAsync(HandleContext<FindCustomersQuery> context)

@@ -1,6 +1,7 @@
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Builder;
+using SampleConfig;
 
 namespace Customers.Hosts.WebApi
 {
@@ -9,7 +10,7 @@ namespace Customers.Hosts.WebApi
         public static void Main(string[] args)
         {
             var host = new WebHostBuilder()
-                .UseUrls("http://localhost:5891")
+                .UseUrls(SampleConfiguration.CustomersWebApiUrl)
                 .UseKestrel()
                 .UseContentRoot(Directory.GetCurrentDirectory())
                 .UseIISIntegration()
