@@ -7,7 +7,7 @@ namespace Meceqs.Consuming.Internal
 {
     public class FluentConsumer : FilterContextBuilder<IFluentConsumer>, IFluentConsumer
     {
-        protected override IFluentConsumer Instance => this;
+        public override IFluentConsumer Instance => this;
 
         public FluentConsumer(
             IList<Envelope> envelopes,

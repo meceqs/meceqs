@@ -66,7 +66,7 @@ namespace Meceqs
         /// <summary>
         /// The creation date of the message.
         /// </summary>
-        public DateTimeOffset? CreatedOnUtc { get; set; }
+        public DateTimeOffset? CreatedOnUtc { get; set; }   // TODO @cweiss !!! DateTime or DateTimeOffset ???
 
         /// <summary>
         /// Contains additional, non-typed information about the message.

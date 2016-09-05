@@ -11,16 +11,16 @@ namespace Meceqs.Pipeline
         private readonly IFilterContextFactory _filterContextFactory;
         private readonly IPipelineProvider _pipelineProvider;
 
-        /// <summary>
-        /// Returning "this" is not possible because "TBuilder" is not a derived type from this.
-        /// </summary>
-        protected abstract TBuilder Instance { get; }
-
         protected IList<Envelope> Envelopes { get; }
         protected CancellationToken Cancellation { get; private set; }
         protected FilterContextItems ContextItems { get; private set; }
         protected string PipelineName { get; private set; }
         protected IServiceProvider RequestServices { get; private set; }
+
+        /// <summary>
+        /// Returning "this" is not possible because "TBuilder" is not a derived type from this.
+        /// </summary>
+        public abstract TBuilder Instance { get; }
 
         protected FilterContextBuilder(
             string defaultPipelineName,

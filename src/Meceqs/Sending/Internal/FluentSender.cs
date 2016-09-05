@@ -9,7 +9,7 @@ namespace Meceqs.Sending.Internal
     {
         private readonly IEnvelopeCorrelator _envelopeCorrelator;
 
-        protected override IFluentSender Instance => this;
+        public override IFluentSender Instance => this;
 
         public FluentSender(
             IList<Envelope> envelopes,
