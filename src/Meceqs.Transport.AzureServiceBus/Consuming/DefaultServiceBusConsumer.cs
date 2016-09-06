@@ -7,21 +7,26 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.ServiceBus.Messaging;
 
-namespace Meceqs.Transport.AzureServiceBus
+namespace Meceqs.Transport.AzureServiceBus.Consuming
 {
     public class DefaultServiceBusConsumer : IServiceBusConsumer
     {
         private readonly ILogger _logger;
-
         private readonly IServiceScopeFactory _serviceScopeFactory;
+        private readonly IBrokeredMessageInvoker _brokeredMessageInvoker;
 
-        public DefaultServiceBusConsumer(ILoggerFactory loggerFactory, IServiceScopeFactory serviceScopeFactory)
+        public DefaultServiceBusConsumer(
+            ILoggerFactory loggerFactory, 
+            IServiceScopeFactory serviceScopeFactory,
+            IBrokeredMessageInvoker brokeredMessageInvoker)
         {
             Check.NotNull(loggerFactory, nameof(loggerFactory));
             Check.NotNull(serviceScopeFactory, nameof(serviceScopeFactory));
+            Check.NotNull(brokeredMessageInvoker, nameof(brokeredMessageInvoker));
 
             _logger = loggerFactory.CreateLogger<DefaultServiceBusConsumer>();
             _serviceScopeFactory = serviceScopeFactory;
+            _brokeredMessageInvoker = brokeredMessageInvoker;
         }
 
         public async Task ConsumeAsync(BrokeredMessage brokeredMessage, CancellationToken cancellation)
@@ -40,7 +45,7 @@ namespace Meceqs.Transport.AzureServiceBus
                 {
                     await ResolveServicesAndInvokeConsumer(brokeredMessage, cancellation);
 
-                    await brokeredMessage.CompleteAsync();
+                    await _brokeredMessageInvoker.CompleteAsync(brokeredMessage);
                     success = true;
                 }
                 catch (Exception ex)
@@ -49,7 +54,10 @@ namespace Meceqs.Transport.AzureServiceBus
 
                     _logger.ConsumeFailed(brokeredMessage, ex);
 
-                    await brokeredMessage.AbandonAsync();
+                    await _brokeredMessageInvoker.AbandonAsync(brokeredMessage);
+
+                    // TODO @cweiss !!! remove this!
+                    throw;
                 }
                 finally
                 {

@@ -27,13 +27,19 @@ namespace Meceqs.Transport.AzureServiceBus.Internal
 
             BrokeredMessage brokeredMessage = new BrokeredMessage(payloadStream, ownsStream: true);
 
-            // Content-Type is written to both locations to be consistent with other transports that only have header-dictionaries.
+            // Some properties are written to the object and to the headers-dictionary
+            // to be consistent with other transports that only have header-dictionaries.
+
             brokeredMessage.ContentType = _serializer.ContentType;
             brokeredMessage.Properties[TransportHeaderNames.ContentType] = _serializer.ContentType;
 
+            brokeredMessage.MessageId = envelope.MessageId.ToString();
             brokeredMessage.Properties[TransportHeaderNames.MessageId] = envelope.MessageId;
+
             brokeredMessage.Properties[TransportHeaderNames.MessageName] = envelope.MessageName;
             brokeredMessage.Properties[TransportHeaderNames.MessageType] = envelope.MessageType;
+
+            brokeredMessage.CorrelationId = envelope.CorrelationId.ToString();
 
             return brokeredMessage;
         }

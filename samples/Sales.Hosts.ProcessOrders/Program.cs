@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Reflection;
 using System.Threading.Tasks;
-using Meceqs.Transport.AzureServiceBus.Sending;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Sales.Contracts.Commands;
 using SampleConfig;
 
-namespace TrafficGenerator
+namespace Sales.Hosts.ProcessOrders
 {
     /// <summary>
     /// This class configures the DI framework and launches the <see cref="Worker"/>.
@@ -17,31 +18,30 @@ namespace TrafficGenerator
             services.AddLogging();
             services.AddOptions();
 
-            services.Configure<ServiceBusSenderOptions>(x => {
-                x.ConnectionString = "dummy";
-                x.EntityPath = SampleConfiguration.PlaceOrderQueue;
-            });
-
             services.AddMeceqs()
                 .AddJsonSerialization()
-                .AddTypedHandlersFromAssembly<Program>()
-                .AddSender(pipeline =>
+
+                // TODO !! change to new schema
+                .AddServiceBusCore()
+                .AddDeserializationAssembly<PlaceOrderCommand>()
+                .AddTypedHandlersFromAssembly(Assembly.GetExecutingAssembly())
+                .AddConsumer(pipeline =>
                 {
                     pipeline.UseTypedHandling();
                 })
 
-                .AddServiceBusSender("ServiceBus", pipeline =>
+                // Fake for the ServiceBusConsumer which will read messages from local file system.
+                .AddFileMockServiceBusProcessor(options =>
                 {
-                    pipeline.RunServiceBusSender();
-                })
-
-                // send messages to a local file instead of the actual Service Bus.
-                .AddFileMockServiceBusSender(SampleConfiguration.FileMockServiceBusDirectory);
+                    options.Directory = SampleConfiguration.FileMockServiceBusDirectory;
+                    options.EntityPath = SampleConfiguration.PlaceOrderQueue;
+                });
         }
 
         public static void Main(string[] args)
         {
-            Console.WriteLine("Welcome to the Website traffic simulator!");
+            Console.WriteLine("Sales.Hosts.ProcessOrders!");
+            Console.WriteLine("==================================");
             Console.WriteLine();
             Console.WriteLine("Press [ENTER] to close application");
             Console.WriteLine();

@@ -54,10 +54,10 @@ namespace Customers.Hosts.WebApi
 
                 // Add services to Dependency Injection
                 .AddAspNetCore()
-                .AddTypedHandlersFromAssembly<CustomerCommandHandler>()
                 .AddJsonSerialization()
 
                 // The WebAPI receives messages through Controller actions
+                .AddTypedHandlersFromAssembly<CustomerCommandHandler>()
                 .AddConsumer(pipeline =>
                 {
                     pipeline
@@ -89,8 +89,8 @@ namespace Customers.Hosts.WebApi
                         .RunEventHubSender();
                 })
                 
-                // Fake for the EventHubClient which will send events to a local file.
-                .AddFileMockEventHubClient(SampleConfiguration.FileMockEventHubDirectory);
+                // Fake for the EventHubSender which will send events to a local file.
+                .AddFileMockEventHubSender(SampleConfiguration.FileMockEventHubDirectory);
         }
 
         private void ConfigureMvc(IServiceCollection services)

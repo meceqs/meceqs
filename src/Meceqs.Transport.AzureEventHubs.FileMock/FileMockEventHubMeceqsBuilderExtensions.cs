@@ -9,7 +9,7 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class FileMockEventHubMeceqsBuilderExtensions
     {
-        public static IMeceqsBuilder AddFileMockEventHubClient(this IMeceqsBuilder builder, string directory)
+        public static IMeceqsBuilder AddFileMockEventHubSender(this IMeceqsBuilder builder, string directory)
         {
             Check.NotNull(builder, nameof(builder));
 
