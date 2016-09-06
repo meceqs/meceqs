@@ -1,3 +1,4 @@
+using System;
 using Meceqs;
 using Meceqs.Configuration;
 using Meceqs.Transport.AzureEventHubs.FileMock;
@@ -22,17 +23,14 @@ namespace Microsoft.Extensions.DependencyInjection
             return builder;
         }
 
-        public static IMeceqsBuilder AddFileMockEventHubProcessor(this IMeceqsBuilder builder, string directory, string eventHubName)
+        public static IMeceqsBuilder AddFileMockEventHubProcessor(this IMeceqsBuilder builder, Action<FileMockEventHubProcessorOptions> options)
         {
             Check.NotNull(builder, nameof(builder));
 
-            var options = new FileMockEventHubProcessorOptions
-            {
-                Directory = directory,
-                EventHubName = eventHubName
-            };
+            var processorOptions = new FileMockEventHubProcessorOptions();
+            options?.Invoke(processorOptions);
 
-            builder.Services.AddSingleton(options);
+            builder.Services.AddSingleton(processorOptions);
             builder.Services.AddSingleton<FileMockEventHubProcessor>();
 
             return builder;

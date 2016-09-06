@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -17,6 +18,9 @@ namespace Meceqs.Transport.AzureEventHubs.FileMock
         private static readonly Random _random = new Random();
 
         private readonly FileMockEventHubProcessorOptions _options;
+        private readonly string _fileName;
+
+
         private readonly IServiceProvider _applicationServices;
         private readonly ILogger _logger;
 
@@ -31,10 +35,14 @@ namespace Meceqs.Transport.AzureEventHubs.FileMock
             _options = options;
             _applicationServices = applicationServices;
             _logger = loggerFactory.CreateLogger<FileMockEventHubProcessor>();
+
+            _fileName = Path.Combine(_options.Directory, $"{_options.EventHubName}.txt");
         }
 
         public void Start()
         {
+            EnsureInitialState();
+
             _logger.LogInformation("Starting timers");
 
             _processingTimer = new Timer(_ =>
@@ -43,21 +51,44 @@ namespace Meceqs.Transport.AzureEventHubs.FileMock
             }, null, _random.Next(1000) /* first start */, Timeout.Infinite);
         }
 
+        private void EnsureInitialState()
+        {
+            if (!Directory.Exists(_options.Directory))
+            {
+                Directory.CreateDirectory(_options.Directory);
+            }
+
+            if (_options.ClearEventHubOnStart && File.Exists(_fileName))
+            {
+                File.Delete(_fileName);
+            }
+        }
+
         private async Task ReadEvents()
         {
-            string fileName = Path.Combine(_options.Directory, $"{_options.EventHubName}.txt");
+            int count = 0;
+            IEnumerable<string> events = null;
 
-            // no file, no events.
-            if (!File.Exists(fileName))
-                return;
+            if (File.Exists(_fileName))
+            {
+                // Read new events
+                events = File.ReadLines(_fileName).Skip(_lineNumber);
+                count = events.Count();
+            }
+            else
+            {
+                if (_lineNumber > 0)
+                {
+                    // Someone deleted the file -> restart from the beginning!
+                    // TODO @cweiss this only works if the processor happens to access the file next.
+                    _lineNumber = 0;
+                    _logger.LogInformation("File deleted. Resetting offset to 0");
+                }
+            }
 
-            // Read new events
-            var events = File.ReadLines(fileName).Skip(_lineNumber);
-            var count = events.Count();
+            _logger.LogInformation("Processing {Count} events, Offset: {Offset}", count, _lineNumber);
 
-            _logger.LogInformation("Processing {Count} events", count);
-
-            if (count > 0)
+            if (events != null && count > 0)
             {
                 // process events (if any)
                 foreach (var evt in events)

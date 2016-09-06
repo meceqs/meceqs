@@ -4,6 +4,8 @@ namespace Meceqs.Transport.AzureEventHubs.FileMock
     {
         public string Directory { get; set; }
 
-        public string EventHubName { get; set; } 
+        public bool ClearEventHubOnStart { get; set; }
+
+        public string EventHubName { get; set; }
     }
 }

@@ -26,7 +26,12 @@ namespace Sales.Hosts.ProcessCustomerEvents
                 })
 
                 // Fake for the EventHubConsumer which will read events from a local file.
-                .AddFileMockEventHubProcessor(SampleConfiguration.FileMockEventHubDirectory, "customers");
+                .AddFileMockEventHubProcessor(options => 
+                {
+                    options.Directory = SampleConfiguration.FileMockEventHubDirectory;
+                    options.ClearEventHubOnStart = true;
+                    options.EventHubName = "customers";
+                });
         }
 
         public static void Main(string[] args)
