@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.ServiceBus.Messaging;
 using Microsoft.Extensions.Options;
+using System.Linq;
 
 namespace Meceqs.Transport.AzureEventHubs.Consuming
 {
@@ -71,6 +72,21 @@ namespace Meceqs.Transport.AzureEventHubs.Consuming
                 var eventDataConverter = scope.ServiceProvider.GetRequiredService<IEventDataConverter>();
                 var envelopeConsumer = scope.ServiceProvider.GetRequiredService<IMessageConsumer>();
 
+                string messageType = (string)eventData.Properties[TransportHeaderNames.MessageType];
+                if (!IsKnownMessageType(messageType))
+                {
+                    if (_options.UnknownMessageBehavior == UnknownMessageBehavior.ThrowException)
+                    {
+                        // TODO separate exception type.
+                        throw new InvalidOperationException($"The message type '{messageType}' has not been configured for this consumer.");
+                    }
+                    else if (_options.UnknownMessageBehavior == UnknownMessageBehavior.Skip)
+                    {
+                        _logger.LogInformation("Skipping unknown message type {MessageType}", messageType);
+                        return;
+                    }
+                }
+
                 Envelope envelope = eventDataConverter.ConvertToEnvelope(eventData);
 
                 await envelopeConsumer.ForEnvelope(envelope)
@@ -78,6 +94,11 @@ namespace Meceqs.Transport.AzureEventHubs.Consuming
                     .SetRequestServices(scope.ServiceProvider)
                     .ConsumeAsync();
             }
+        }
+
+        private bool IsKnownMessageType(string messageType)
+        {
+            return _options.MessageTypes.Any(x => string.Equals(x, messageType, StringComparison.OrdinalIgnoreCase));
         }
     }
 }

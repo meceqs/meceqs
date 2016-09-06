@@ -20,6 +20,7 @@ namespace Sales.Hosts.ProcessCustomerEvents
 
                 .AddEventHubConsumer(options =>
                 {
+                    options.SkipUnknownMessages();
                     options.AddTypedHandler<CustomerEventsHandler>();
                 });
         }

@@ -4,8 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Customers.Contracts.Commands;
-using Meceqs.Sending;
 using Meceqs.Transport;
 using Meceqs.Transport.AzureEventHubs.Consuming;
 using Microsoft.Extensions.DependencyInjection;
@@ -45,6 +43,10 @@ namespace Sales.Hosts.ProcessCustomerEvents
 
         private async Task ReadEvents()
         {
+            // no file, no events.
+            if (!File.Exists(SampleConfiguration.CustomerEventsFile))
+                return;
+
             // Read new events
             var events = File.ReadLines(SampleConfiguration.CustomerEventsFile).Skip(_lineNumber);
             var count = events.Count();

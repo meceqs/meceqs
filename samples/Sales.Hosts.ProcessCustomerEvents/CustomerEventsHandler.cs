@@ -1,9 +1,7 @@
-using System;
 using System.Threading.Tasks;
 using Customers.Contracts.Events;
 using Meceqs.Filters.TypedHandling;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 
 namespace Sales.Hosts.ProcessCustomerEvents
 {
