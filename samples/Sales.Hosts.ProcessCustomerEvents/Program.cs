@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using SampleConfig;
 
 namespace Sales.Hosts.ProcessCustomerEvents
 {
@@ -22,7 +23,10 @@ namespace Sales.Hosts.ProcessCustomerEvents
                 {
                     options.SkipUnknownMessages();
                     options.AddTypedHandler<CustomerEventsHandler>();
-                });
+                })
+
+                // Fake for the EventHubConsumer which will read events from a local file.
+                .AddFileMockEventHubProcessor(SampleConfiguration.FileMockEventHubDirectory, "customers");
         }
 
         public static void Main(string[] args)

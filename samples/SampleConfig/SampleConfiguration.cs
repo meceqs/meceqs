@@ -4,6 +4,6 @@ namespace SampleConfig
     {
         public const string CustomersWebApiUrl = "http://localhost:5891/";
 
-        public const string CustomerEventsFile = @"c:\temp\meceqs-sample\customers.txt";
+        public const string FileMockEventHubDirectory = @"c:\temp\meceqs-sample\";
     }
 }

@@ -2,13 +2,13 @@ using System.Reflection;
 using Customers.Core.CommandHandlers;
 using Customers.Core.Repositories;
 using Customers.Hosts.WebApi.Infrastructure;
-using Meceqs.Transport.AzureEventHubs.Internal;
 using Meceqs.Transport.AzureEventHubs.Sending;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using SampleConfig;
 using Swashbuckle.Swagger.Model;
 
 namespace Customers.Hosts.WebApi
@@ -30,7 +30,7 @@ namespace Customers.Hosts.WebApi
 
         public void ConfigureServices(IServiceCollection services)
         {
-            // CustomerContext.Core
+            // Customers.Core
             services.AddSingleton<ICustomerRepository, InMemoryCustomerRepository>();
 
             ConfigureMeceqs(services);
@@ -48,10 +48,7 @@ namespace Customers.Hosts.WebApi
             // tell Meceqs to resolve it from there.
             services.AddSingleton<SingletonHandleInterceptor>();
 
-            // Fake for the EventHubSender.
-            // It will write the events to a local file (see "SampleConfig"-project for paths).
-            services.Configure<EventHubSenderOptions>(x => x.EventHubConnectionString = "dummy|dummy");
-            services.AddSingleton<IEventHubClientFactory, FakeEventHubClientFactory>();
+            services.Configure<EventHubSenderOptions>(x => x.EventHubConnectionString = "customers|dummy");
 
             services.AddMeceqs()
 
@@ -90,7 +87,10 @@ namespace Customers.Hosts.WebApi
                         .UseAspNetCoreRequest()
                         .UseAuditing()              // add user id to message if not present
                         .RunEventHubSender();
-                });
+                })
+                
+                // Fake for the EventHubClient which will send events to a local file.
+                .AddFileMockEventHubClient(SampleConfiguration.FileMockEventHubDirectory);
         }
 
         private void ConfigureMvc(IServiceCollection services)

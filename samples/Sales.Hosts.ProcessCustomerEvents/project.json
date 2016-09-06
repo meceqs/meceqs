@@ -13,6 +13,7 @@
     "Meceqs": "0.1.0-*",
     "Meceqs.Serialization.Json": "0.1.0-*",
     "Meceqs.Transport.AzureEventHubs": "0.1.0-*",
+    "Meceqs.Transport.AzureEventHubs.FileMock": "0.1.0-*",
 
     "Microsoft.Extensions.DependencyInjection": "1.0.0",
     "Microsoft.Extensions.Logging": "1.0.0",

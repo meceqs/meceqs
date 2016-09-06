@@ -4,22 +4,21 @@ using System.Text;
 using System.Threading.Tasks;
 using Meceqs.Transport.AzureEventHubs.Internal;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Microsoft.ServiceBus.Messaging;
 
-namespace Meceqs.Transport.AzureEventHubs.FileMockEventHub
+namespace Meceqs.Transport.AzureEventHubs.FileMock
 {
     public class FileMockEventHubClient : IEventHubClient
     {
-        private readonly FileMockOptions _options;
+        private readonly string _fileName;
         private readonly ILogger _logger;
 
-        public FileMockEventHubClient(IOptions<FileMockOptions> options, ILoggerFactory loggerFactory)
+        public FileMockEventHubClient(string fileName, ILoggerFactory loggerFactory)
         {
-            Check.NotNull(options?.Value, nameof(options));
+            Check.NotNullOrWhiteSpace(fileName, nameof(fileName));
             Check.NotNull(loggerFactory, nameof(loggerFactory));
 
-            _options = options.Value;
+            _fileName = fileName;
             _logger = loggerFactory.CreateLogger<FileMockEventHubClient>();
 
             EnsureFileExists();
@@ -27,11 +26,14 @@ namespace Meceqs.Transport.AzureEventHubs.FileMockEventHub
 
         public Task SendAsync(EventData data)
         {
-            using (StreamReader reader = new StreamReader(data.GetBodyStream(), Encoding.UTF8))
+            InvokeWithRetry(3, () =>
             {
-                string json = reader.ReadToEnd();
-                File.AppendAllLines(_options.Filename, new [] { json });
-            }
+                using (StreamReader reader = new StreamReader(data.GetBodyStream(), Encoding.UTF8))
+                {
+                    string json = reader.ReadToEnd();
+                    File.AppendAllLines(_fileName, new[] { json });
+                }
+            });
 
             return Task.CompletedTask;
         }
@@ -40,7 +42,7 @@ namespace Meceqs.Transport.AzureEventHubs.FileMockEventHub
         {
         }
 
-        private void InvokeWithRetry(Action action, int attempts)
+        private void InvokeWithRetry(int attempts, Action action)
         {
             int attempt = 0;
             do
@@ -50,7 +52,7 @@ namespace Meceqs.Transport.AzureEventHubs.FileMockEventHub
                     attempt++;
                     action();
                     break;
-                } 
+                }
                 catch (Exception ex)
                 {
                     if (attempt >= attempts)
@@ -59,6 +61,12 @@ namespace Meceqs.Transport.AzureEventHubs.FileMockEventHub
                     }
 
                     _logger.LogWarning(0, ex, "Retrying");
+
+                    // if someone deleted the root folder...
+                    if (ex is DirectoryNotFoundException)
+                    {
+                        EnsureFileExists();
+                    }
                 }
 
             } while (true);
@@ -66,16 +74,15 @@ namespace Meceqs.Transport.AzureEventHubs.FileMockEventHub
 
         private void EnsureFileExists()
         {
-            var directory = Path.GetDirectoryName(_options.Filename);
-
-            if (_options.CreateDirectory && !Directory.Exists(directory))
+            var directory = Path.GetDirectoryName(_fileName);
+            if (!Directory.Exists(directory))
             {
                 Directory.CreateDirectory(directory);
             }
 
-            if (!File.Exists(_options.Filename))
+            if (!File.Exists(_fileName))
             {
-                File.Create(_options.Filename);
+                File.Create(_fileName);
             }
         }
     }
