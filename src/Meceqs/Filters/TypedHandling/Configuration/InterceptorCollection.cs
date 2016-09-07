@@ -12,9 +12,9 @@ namespace Meceqs.Filters.TypedHandling.Configuration
         /// <remarks>
         /// Interceptor instances will be created using
         /// <see cref="Microsoft.Extensions.DependencyInjection.ActivatorUtilities"/>.
-        /// Use <see cref="AddService(Type)"/> to register a service as an interceptor.
+        /// Use <see cref="AddService(Type)"/> to register an interceptor as a service.
         /// </remarks>
-        public void Add<TInterceptor>() where TInterceptor : IHandleInterceptor
+        public void Add<TInterceptor>() where TInterceptor : class, IHandleInterceptor
         {
             Add(typeof(TInterceptor));
         }
@@ -26,18 +26,13 @@ namespace Meceqs.Filters.TypedHandling.Configuration
         /// <remarks>
         /// Interceptor instances will be created using
         /// <see cref="Microsoft.Extensions.DependencyInjection.ActivatorUtilities"/>.
-        /// Use <see cref="AddService(Type)"/> to register a service as an interceptor.
+        /// Use <see cref="AddService(Type)"/> to register an interceptor as a service.
         /// </remarks>
         public void Add(Type interceptorType)
         {
             Check.NotNull(interceptorType, nameof(interceptorType));
 
-            if (!typeof(IHandleInterceptor).IsAssignableFrom(interceptorType))
-            {
-                throw new ArgumentException(
-                    $"Type '{interceptorType}' must derive from '{typeof(IHandleInterceptor)}'",
-                    nameof(interceptorType));
-            }
+            EnsureValidInterceptor(interceptorType);
 
             var factory = new ActivatorInterceptorMetadata(interceptorType);
             Add(factory);
@@ -51,7 +46,7 @@ namespace Meceqs.Filters.TypedHandling.Configuration
         /// <see cref="Add(Type)"/> to register an interceptor that will be created via
         /// type activation.
         /// </remarks>
-        public void AddService<TInterceptor>() where TInterceptor : IHandleInterceptor
+        public void AddService<TInterceptor>() where TInterceptor : class, IHandleInterceptor
         {
             AddService(typeof(TInterceptor));
         }
@@ -69,6 +64,14 @@ namespace Meceqs.Filters.TypedHandling.Configuration
         {
             Check.NotNull(interceptorType, nameof(interceptorType));
 
+            EnsureValidInterceptor(interceptorType);
+
+            var factory = new ServiceInterceptorMetadata(interceptorType);
+            Add(factory);
+        }
+
+        private void EnsureValidInterceptor(Type interceptorType)
+        {
             if (!typeof(IHandleInterceptor).IsAssignableFrom(interceptorType))
             {
                 throw new ArgumentException(
@@ -76,8 +79,15 @@ namespace Meceqs.Filters.TypedHandling.Configuration
                     nameof(interceptorType));
             }
 
-            var factory = new ServiceInterceptorMetadata(interceptorType);
-            Add(factory);
+            if (!interceptorType.GetTypeInfo().IsClass)
+            {
+                throw new ArgumentException($"Type '{interceptorType}' must be a class.", nameof(interceptorType));
+            }
+
+            if (interceptorType.GetTypeInfo().IsAbstract)
+            {
+                throw new ArgumentException($"Type '{interceptorType}' must not be abstract.", nameof(interceptorType));
+            }
         }
     }
 }

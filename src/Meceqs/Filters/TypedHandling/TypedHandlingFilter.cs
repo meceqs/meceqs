@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Meceqs.Filters.TypedHandling.Configuration;
 using Meceqs.Filters.TypedHandling.Internal;
 using Meceqs.Pipeline;
 
@@ -14,6 +16,8 @@ namespace Meceqs.Filters.TypedHandling
         private readonly IHandleContextFactory _handleContextFactory;
         private readonly IHandleMethodResolver _handleMethodResolver;
         private readonly IHandlerInvoker _handlerInvoker;
+
+        private readonly Dictionary<Tuple<Type, Type>, IHandlerMetadata> _handlerMapping;
 
         public TypedHandlingFilter(
             FilterDelegate next,
@@ -37,24 +41,19 @@ namespace Meceqs.Filters.TypedHandling
             _handleContextFactory = handleContextFactory;
             _handleMethodResolver = handleMethodResolver;
             _handlerInvoker = handlerInvoker;
+
+            _handlerMapping = CreateHandlerMapping(options.Handlers);
         }
 
-        public async Task Invoke(
-            FilterContext filterContext,
-            IHandlerFactory handlerFactory)
+        public async Task Invoke(FilterContext filterContext)
         {
             Check.NotNull(filterContext, nameof(filterContext));
             Check.NotNull(filterContext.RequestServices, $"{nameof(filterContext)}.{nameof(filterContext.RequestServices)}");
-            Check.NotNull(handlerFactory, nameof(handlerFactory));
 
             // Since the public interfaces from this filter expect generic types, we can't call them directly.
             // Separate services are responsible for invoking them by using e.g. reflection.
 
-            IHandles handler = _handlerFactoryInvoker.InvokeCreateHandler(
-                handlerFactory,
-                filterContext.MessageType,
-                filterContext.ExpectedResultType);
-
+            IHandles handler = CreateHandler(filterContext);
             if (handler == null)
             {
                 // let some other filter decide whether unhandled messages should throw or not.
@@ -67,6 +66,19 @@ namespace Meceqs.Filters.TypedHandling
             var handleExecutionChain = CreateHandleExecutionChain(handleContext);
 
             await handleExecutionChain(handleContext);
+        }
+
+        private IHandles CreateHandler(FilterContext filterContext)
+        {
+            var key = Tuple.Create(filterContext.MessageType, filterContext.ExpectedResultType);
+            
+            IHandlerMetadata handlerMetadata;
+            if (_handlerMapping.TryGetValue(key, out handlerMetadata))
+            {
+                return handlerMetadata.CreateHandler(filterContext.RequestServices);
+            }
+
+            return null;
         }
 
         private HandleContext CreateHandleContext(FilterContext filterContext, IHandles handler)
@@ -124,6 +136,26 @@ namespace Meceqs.Filters.TypedHandling
             }
 
             return chain;
+        }
+
+        /// <summary>
+        /// Returns a dictionary which returns a <see cref="IHandlerMetadata"/> for a given a message type and result type. 
+        /// <summary>
+        private static Dictionary<Tuple<Type, Type>, IHandlerMetadata> CreateHandlerMapping(HandlerCollection handlers)
+        {
+            Check.NotNull(handlers, nameof(handlers));
+
+            var dictionary = new Dictionary<Tuple<Type, Type>, IHandlerMetadata>();
+
+            foreach (var handlerMetadata in handlers)
+            {
+                foreach (var implementedHandle in handlerMetadata.ImplementedHandles)
+                {
+                    dictionary.Add(implementedHandle, handlerMetadata);
+                }
+            }
+
+            return dictionary;
         }
     }
 }
