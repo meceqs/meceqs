@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.ServiceBus.Messaging;
 using Microsoft.Extensions.Options;
 using System.Linq;
+using Meceqs.Configuration;
 
 namespace Meceqs.Transport.AzureEventHubs.Consuming
 {
@@ -75,6 +76,8 @@ namespace Meceqs.Transport.AzureEventHubs.Consuming
                 string messageType = (string)eventData.Properties[TransportHeaderNames.MessageType];
                 if (!IsKnownMessageType(messageType))
                 {
+                    // TODO this should be in one central location - see TypedHandling etc.
+
                     if (_options.UnknownMessageBehavior == UnknownMessageBehavior.ThrowException)
                     {
                         // TODO separate exception type.
@@ -98,7 +101,7 @@ namespace Meceqs.Transport.AzureEventHubs.Consuming
 
         private bool IsKnownMessageType(string messageType)
         {
-            return _options.MessageTypes.Any(x => string.Equals(x, messageType, StringComparison.OrdinalIgnoreCase));
+            return _options.MessageTypes.Any(x => string.Equals(x.FullName, messageType, StringComparison.OrdinalIgnoreCase));
         }
     }
 }

@@ -24,10 +24,12 @@ namespace TrafficGenerator
 
             services.AddMeceqs()
                 .AddJsonSerialization()
-                .AddTypedHandlersFromAssembly<Program>()
                 .AddSender(pipeline =>
                 {
-                    pipeline.UseTypedHandling();
+                    pipeline.RunTypedHandling(options =>
+                    {
+                        options.Handlers.AddFromAssembly<Program>();
+                    });
                 })
 
                 .AddServiceBusSender("ServiceBus", pipeline =>

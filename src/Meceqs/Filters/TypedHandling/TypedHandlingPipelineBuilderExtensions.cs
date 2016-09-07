@@ -7,14 +7,21 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class TypedHandlingPipelineBuilderExtensions
     {
-        public static IPipelineBuilder UseTypedHandling(this IPipelineBuilder builder, Action<TypedHandlingOptions> options = null)
-        {
-            Check.NotNull(builder, nameof(builder));
 
+        public static IPipelineBuilder RunTypedHandling(this IPipelineBuilder builder, Action<TypedHandlingOptions> options)
+        {
             var handlingOptions = new TypedHandlingOptions();
             options?.Invoke(handlingOptions);
 
-            builder.UseFilter<TypedHandlingFilter>(handlingOptions);
+            return RunTypedHandling(builder, handlingOptions);
+        }
+
+        public static IPipelineBuilder RunTypedHandling(this IPipelineBuilder builder, TypedHandlingOptions options)
+        {
+            Check.NotNull(builder, nameof(builder));
+            Check.NotNull(options, nameof(options));
+
+            builder.UseFilter<TypedHandlingFilter>(options);
 
             return builder;
         }

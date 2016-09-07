@@ -2,6 +2,7 @@ using System.Reflection;
 using Customers.Core.CommandHandlers;
 using Customers.Core.Repositories;
 using Customers.Hosts.WebApi.Infrastructure;
+using Meceqs.Configuration;
 using Meceqs.Transport.AzureEventHubs.Sending;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -56,8 +57,7 @@ namespace Customers.Hosts.WebApi
                 .AddAspNetCore()
                 .AddJsonSerialization()
 
-                // The WebAPI receives messages through Controller actions
-                .AddTypedHandlersFromAssembly<CustomerCommandHandler>()
+                // The WebApi is a consumer of remote messages.
                 .AddConsumer(pipeline =>
                 {
                     pipeline
@@ -66,8 +66,12 @@ namespace Customers.Hosts.WebApi
                         .UseAuditing()              // add user id to message if not present
 
                         // forward to IHandles<TMessage, TResult>
-                        .UseTypedHandling(options =>
+                        .RunTypedHandling(options =>
                         {
+                            // In this example, the context only handles messages from this Web API
+                            // so we can just add every handler.
+                            options.Handlers.AddFromAssembly<CustomerCommandHandler>();
+
                             // Interceptors know about the executing handler
                             // (e.g. to check for attributes on the handler)
 
@@ -78,6 +82,11 @@ namespace Customers.Hosts.WebApi
 
                             // this interceptor will use the lifecycle from the DI framework.
                             options.Interceptors.AddService<SingletonHandleInterceptor>();
+
+                            // Throwing an exception is the default behavior.
+                            // We could also skip unknown message types but this doesn't make much sense
+                            // for a Web API.
+                            options.UnknownMessageBehavior = UnknownMessageBehavior.ThrowException;
                         });
                 })
 

@@ -2,45 +2,45 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Meceqs.Configuration;
 using Meceqs.Filters.TypedHandling.Configuration;
 using Meceqs.Filters.TypedHandling.Internal;
 using Meceqs.Pipeline;
+using Microsoft.Extensions.Logging;
 
 namespace Meceqs.Filters.TypedHandling
 {
     public class TypedHandlingFilter
     {
-        private readonly FilterDelegate _next;
         private readonly TypedHandlingOptions _options;
-        private readonly IHandlerFactoryInvoker _handlerFactoryInvoker;
         private readonly IHandleContextFactory _handleContextFactory;
         private readonly IHandleMethodResolver _handleMethodResolver;
         private readonly IHandlerInvoker _handlerInvoker;
+        private readonly ILogger _logger;
 
         private readonly Dictionary<Tuple<Type, Type>, IHandlerMetadata> _handlerMapping;
 
         public TypedHandlingFilter(
             FilterDelegate next,
             TypedHandlingOptions options,
-            IHandlerFactory handlerFactory,
-            IHandlerFactoryInvoker handlerFactoryInvoker,
             IHandleContextFactory handleContextFactory,
             IHandleMethodResolver handleMethodResolver,
-            IHandlerInvoker handlerInvoker)
+            IHandlerInvoker handlerInvoker,
+            ILoggerFactory loggerFactory)
         {
-            Check.NotNull(next, nameof(next));
+            // "next" is not stored because this is a terminating filter.
+
             Check.NotNull(options, nameof(options));
-            Check.NotNull(handlerFactoryInvoker, nameof(handlerFactoryInvoker));
             Check.NotNull(handleContextFactory, nameof(handleContextFactory));
             Check.NotNull(handleMethodResolver, nameof(handleMethodResolver));
             Check.NotNull(handlerInvoker, nameof(handlerInvoker));
+            Check.NotNull(loggerFactory, nameof(loggerFactory));
 
-            _next = next;
             _options = options;
-            _handlerFactoryInvoker = handlerFactoryInvoker;
             _handleContextFactory = handleContextFactory;
             _handleMethodResolver = handleMethodResolver;
             _handlerInvoker = handlerInvoker;
+            _logger = loggerFactory.CreateLogger<TypedHandlingFilter>();
 
             _handlerMapping = CreateHandlerMapping(options.Handlers);
         }
@@ -48,7 +48,6 @@ namespace Meceqs.Filters.TypedHandling
         public async Task Invoke(FilterContext filterContext)
         {
             Check.NotNull(filterContext, nameof(filterContext));
-            Check.NotNull(filterContext.RequestServices, $"{nameof(filterContext)}.{nameof(filterContext.RequestServices)}");
 
             // Since the public interfaces from this filter expect generic types, we can't call them directly.
             // Separate services are responsible for invoking them by using e.g. reflection.
@@ -56,8 +55,7 @@ namespace Meceqs.Filters.TypedHandling
             IHandles handler = CreateHandler(filterContext);
             if (handler == null)
             {
-                // let some other filter decide whether unhandled messages should throw or not.
-                await _next(filterContext);
+                HandleUnknownMessageType(filterContext);
                 return;
             }
 
@@ -70,6 +68,17 @@ namespace Meceqs.Filters.TypedHandling
 
         private IHandles CreateHandler(FilterContext filterContext)
         {
+            if (filterContext.RequestServices == null)
+            {
+                throw new ArgumentException(
+                    $"'{nameof(filterContext.RequestServices)}' wasn't set. It is required to resolve " + 
+                    $"handlers from the scope of the current web/message request. " + 
+                    $"It can be set either by using a filter [e.g. UseAspNetCore()] or by " + 
+                    $"setting it yourself through 'SetRequestServices()' on the message sender/consumer",
+                    $"{nameof(filterContext)}.{nameof(filterContext.RequestServices)}"
+                );
+            }
+
             var key = Tuple.Create(filterContext.MessageType, filterContext.ExpectedResultType);
             
             IHandlerMetadata handlerMetadata;
@@ -79,6 +88,27 @@ namespace Meceqs.Filters.TypedHandling
             }
 
             return null;
+        }
+
+        private void HandleUnknownMessageType(FilterContext filterContext)
+        {
+            switch (_options.UnknownMessageBehavior)
+            {
+                case UnknownMessageBehavior.ThrowException:
+                    throw new UnknownMessageException(
+                        $"There was no handler configured for message/result types " +
+                        $"'{filterContext.MessageType}/{filterContext.ExpectedResultType}");
+                
+                case UnknownMessageBehavior.Skip:
+                    _logger.SkippingMessage(filterContext);
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException(
+                        $"options.{nameof(_options.UnknownMessageBehavior)}",
+                        _options.UnknownMessageBehavior,
+                        "The given value is not supported");
+            }
         }
 
         private HandleContext CreateHandleContext(FilterContext filterContext, IHandles handler)
@@ -144,6 +174,14 @@ namespace Meceqs.Filters.TypedHandling
         private static Dictionary<Tuple<Type, Type>, IHandlerMetadata> CreateHandlerMapping(HandlerCollection handlers)
         {
             Check.NotNull(handlers, nameof(handlers));
+
+            if (handlers.Count == 0)
+            {
+                throw new MeceqsException(
+                    $"The options don't contain any handler. " + 
+                    $"Handlers can be added by calling '{nameof(HandlerCollection)}.{nameof(HandlerCollection.Add)}' " + 
+                    $"or '{nameof(HandlerCollection)}.{nameof(HandlerCollection.AddService)}'.");
+            }
 
             var dictionary = new Dictionary<Tuple<Type, Type>, IHandlerMetadata>();
 

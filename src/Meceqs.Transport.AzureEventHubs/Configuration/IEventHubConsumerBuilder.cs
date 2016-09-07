@@ -1,7 +1,7 @@
 using System;
+using Meceqs.Configuration;
 using Meceqs.Filters.TypedHandling;
 using Meceqs.Pipeline;
-using Meceqs.Transport.AzureEventHubs.Consuming;
 
 namespace Meceqs.Transport.AzureEventHubs.Configuration
 {
@@ -11,23 +11,24 @@ namespace Meceqs.Transport.AzureEventHubs.Configuration
 
         IEventHubConsumerBuilder AddMessageType(Type messageType);
 
-        IEventHubConsumerBuilder AddMessageType(string messageType);
-
         IEventHubConsumerBuilder SetUnknownMessageBehavior(UnknownMessageBehavior behavior);
 
         IEventHubConsumerBuilder ThrowOnUnknownMessage();
 
         IEventHubConsumerBuilder SkipUnknownMessages();
 
-        IEventHubConsumerBuilder UsePipeline(Action<IPipelineBuilder> pipeline);
+        IEventHubConsumerBuilder ConfigurePipeline(Action<IPipelineBuilder> pipeline);
 
-        IEventHubConsumerBuilder UsePipeline(string pipelineName, Action<IPipelineBuilder> pipeline);
+        IEventHubConsumerBuilder ConfigurePipeline(string pipelineName, Action<IPipelineBuilder> pipeline);
 
         IEventHubConsumerBuilder AddTypedHandler<THandler>()
            where THandler : class, IHandles;
 
         IEventHubConsumerBuilder AddTypedHandler(Type handlerType);
 
-        IEventHubConsumerBuilder UseDefaultTypedHandlingPipeline(Action<TypedHandlingOptions> options = null);
+        IEventHubConsumerBuilder AddTypedHandleInterceptor<TInterceptor>()
+            where TInterceptor : class, IHandleInterceptor;
+
+        IEventHubConsumerBuilder AddTypedHandleInterceptor(Type interceptorType);
     }
 }

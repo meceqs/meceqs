@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Meceqs.Filters.TypedHandling.Configuration
 {
@@ -26,7 +25,9 @@ namespace Meceqs.Filters.TypedHandling.Configuration
         {
             Check.NotNull(serviceProvider, nameof(serviceProvider));
 
-            return (IHandles)serviceProvider.GetRequiredService(_handlerType);
+            // This doesn't use "GetRequiredService" because it's up to the filter
+            // to decide whether unknown messages should throw or not.
+            return (IHandles)serviceProvider.GetService(_handlerType);
         }
     }
 }

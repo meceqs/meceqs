@@ -44,9 +44,9 @@ namespace Meceqs.Transport.AzureServiceBus.FileFake
             return sb.ToString();
         }
 
-        public static BrokeredMessage Deserialize(string serializedMessage)
+        public static BrokeredMessage Deserialize(string serializedBrokeredMessage)
         {
-            JObject jsonMessage = JObject.Parse(serializedMessage);
+            JObject jsonMessage = JObject.Parse(serializedBrokeredMessage);
 
             string serializedEnvelope = jsonMessage.GetValue("Body").ToString();
             MemoryStream payloadStream = new MemoryStream(Encoding.UTF8.GetBytes(serializedEnvelope));

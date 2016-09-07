@@ -21,12 +21,19 @@ namespace Sales.Hosts.ProcessCustomerEvents
 
                 .AddEventHubConsumer(options =>
                 {
-                    options.SkipUnknownMessages();
-                    options.AddTypedHandler<CustomerEventsHandler>();
+                    options
+                        .AddTypedHandler<CustomerEventsHandler>()
+                        .SkipUnknownMessages()
+
+                        // RunTypedHandling will be added at the end automatically!
+                        .ConfigurePipeline(x =>
+                        {
+                            x.UseAuditing();
+                        });
                 })
 
                 // Fake for the EventHubConsumer which will read events from a local file.
-                .AddFileFakeEventHubProcessor(options => 
+                .AddFileFakeEventHubProcessor(options =>
                 {
                     options.Directory = SampleConfiguration.FileFakeEventHubDirectory;
                     options.ClearEventHubOnStart = true;

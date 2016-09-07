@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 using Meceqs.Transport.AzureEventHubs.Internal;
 using Microsoft.Extensions.Logging;
@@ -26,13 +25,11 @@ namespace Meceqs.Transport.AzureEventHubs.FileFake
 
         public Task SendAsync(EventData data)
         {
+            string serializedEventData = FileFakeEventDataSerializer.Serialize(data);
+
             InvokeWithRetry(3, () =>
             {
-                using (StreamReader reader = new StreamReader(data.GetBodyStream(), Encoding.UTF8))
-                {
-                    string json = reader.ReadToEnd();
-                    File.AppendAllLines(_fileName, new[] { json });
-                }
+                File.AppendAllLines(_fileName, new[] { serializedEventData });
             });
 
             return Task.CompletedTask;

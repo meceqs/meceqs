@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -24,10 +23,12 @@ namespace Sales.Hosts.ProcessOrders
                 // TODO !! change to new schema
                 .AddServiceBusCore()
                 .AddDeserializationAssembly<PlaceOrderCommand>()
-                .AddTypedHandlersFromAssembly(Assembly.GetExecutingAssembly())
                 .AddConsumer(pipeline =>
                 {
-                    pipeline.UseTypedHandling();
+                    pipeline.RunTypedHandling(options =>
+                    {
+                        options.Handlers.AddFromAssembly<Program>();
+                    });
                 })
 
                 // Fake for the ServiceBusConsumer which will read messages from local file system.

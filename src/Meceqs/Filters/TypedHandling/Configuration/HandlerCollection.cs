@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Reflection;
 
 namespace Meceqs.Filters.TypedHandling.Configuration
@@ -41,6 +42,48 @@ namespace Meceqs.Filters.TypedHandling.Configuration
         }
 
         /// <summary>
+        /// Adds all types representing an <see cref="IHandles"/> from the assembly of the given type.
+        /// </summary>
+        /// <param name="filter">Allows to filter the types (e.g. by namespace)</param>
+        /// <remarks>
+        /// Handler instances will be created using
+        /// <see cref="Microsoft.Extensions.DependencyInjection.ActivatorUtilities"/>.
+        /// Use <see cref="AddService(Type)"/> to register a handler as a service.
+        /// </remarks>
+        public void AddFromAssembly<TType>(Predicate<Type> filter = null)
+        {
+            var assembly = typeof(TType).GetTypeInfo().Assembly;
+
+            AddFromAssembly(assembly, filter);
+        }
+
+        /// <summary>
+        /// Adds all types representing an <see cref="IHandles"/> from the given assembly.
+        /// </summary>
+        /// <param name="assembly">The assembly to be searched for <see cref="IHandles"/> implementations.</param>
+        /// <param name="filter">Allows to filter the types (e.g. by namespace)</param>
+        /// <remarks>
+        /// Handler instances will be created using
+        /// <see cref="Microsoft.Extensions.DependencyInjection.ActivatorUtilities"/>.
+        /// Use <see cref="AddService(Type)"/> to register a handler as a service.
+        /// </remarks>
+        public void AddFromAssembly(Assembly assembly, Predicate<Type> filter = null)
+        {
+            Check.NotNull(assembly, nameof(assembly));
+
+            var handlers = from type in assembly.GetTypes()
+                           where type.GetTypeInfo().IsClass && !type.GetTypeInfo().IsAbstract
+                           where typeof(IHandles).IsAssignableFrom(type)
+                           where filter == null || filter(type)
+                           select type;
+
+            foreach (var handler in handlers)
+            {
+                Add(handler);
+            }
+        }
+
+        /// <summary>
         /// Adds a type representing an <see cref="IHandles"/>.
         /// </summary>
         /// <remarks>
@@ -73,7 +116,7 @@ namespace Meceqs.Filters.TypedHandling.Configuration
             Add(factory);
         }
 
-        private void EnsureValidHandler(Type handlerType)
+        public static void EnsureValidHandler(Type handlerType)
         {
             if (!typeof(IHandles).IsAssignableFrom(handlerType))
             {
@@ -93,7 +136,7 @@ namespace Meceqs.Filters.TypedHandling.Configuration
             }
         }
 
-        private IEnumerable<Tuple<Type, Type>> GetImplementedHandles(Type handlerType)
+        public static IEnumerable<Tuple<Type, Type>> GetImplementedHandles(Type handlerType)
         {
             var type = handlerType;
             while (type != null)
@@ -108,13 +151,13 @@ namespace Meceqs.Filters.TypedHandling.Configuration
                     if (implementedInterface == typeof(IHandles))
                         continue;
 
-                    int typeArguments = implementedInterface.GenericTypeArguments.Length; 
+                    int typeArguments = implementedInterface.GenericTypeArguments.Length;
                     if (typeArguments < 1)
                     {
                         throw new NotSupportedException(
                             $"Interface '{implementedInterface}' does not have any generic types. " +
-                            $"This method tries to read the message type and the result type from the {nameof(IHandles)} " + 
-                            $"implementations. There are two different {nameof(IHandles)} interfaces. " + 
+                            $"This method tries to read the message type and the result type from the {nameof(IHandles)} " +
+                            $"implementations. There are two different {nameof(IHandles)} interfaces. " +
                             "One that accepts only a message type and one that accepts a message type and a result type." +
                             "Seems like the given interface is neither of those!");
                     }
@@ -123,8 +166,8 @@ namespace Meceqs.Filters.TypedHandling.Configuration
                     {
                         throw new NotSupportedException(
                             $"Interface '{implementedInterface}' has more than 2 generic types (it has {typeArguments})." +
-                            $"This method tries to read the message type and the result type from the {nameof(IHandles)} " + 
-                            $"implementations. There are two different {nameof(IHandles)} interfaces. " + 
+                            $"This method tries to read the message type and the result type from the {nameof(IHandles)} " +
+                            $"implementations. There are two different {nameof(IHandles)} interfaces. " +
                             "One that accepts only a message type and one that accepts a message type and a result type." +
                             "Seems like the given interface is neither of those!");
                     }

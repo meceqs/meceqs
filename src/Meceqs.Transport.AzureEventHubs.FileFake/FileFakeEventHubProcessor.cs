@@ -124,19 +124,15 @@ namespace Meceqs.Transport.AzureEventHubs.FileFake
 
         private async Task ProcessEvent(string serializedEvent)
         {
+            Check.NotNull(serializedEvent, nameof(serializedEvent));
+
+            var eventData = FileFakeEventDataSerializer.Deserialize(serializedEvent);
+
             var serviceScopeFactory = _applicationServices.GetRequiredService<IServiceScopeFactory>();
             using (var scope = serviceScopeFactory.CreateScope())
             {
                 var requestServices = scope.ServiceProvider;
                 var eventHubConsumer = requestServices.GetRequiredService<IEventHubConsumer>();
-
-                // fake "EventData"-Object
-                var eventData = new EventData(Encoding.UTF8.GetBytes(serializedEvent));
-                JObject jsonEvent = JObject.Parse(serializedEvent);
-                eventData.Properties[TransportHeaderNames.MessageType] = jsonEvent.GetValue("MessageType").ToString();
-                eventData.Properties[TransportHeaderNames.MessageName] = jsonEvent.GetValue("MessageName").ToString();
-                eventData.Properties[TransportHeaderNames.MessageId] = jsonEvent.GetValue("MessageId").ToString();
-                eventData.Properties[TransportHeaderNames.ContentType] = "application/json";
 
                 await eventHubConsumer.ConsumeAsync(eventData, CancellationToken.None);
             }
