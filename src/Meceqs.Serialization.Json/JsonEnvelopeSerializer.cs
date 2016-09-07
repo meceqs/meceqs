@@ -24,7 +24,7 @@ namespace Meceqs.Serialization.Json
 
         public string SerializeToString(Envelope envelope)
         {
-            return JsonConvert.SerializeObject(envelope);
+            return JsonConvert.SerializeObject(envelope, _defaultSettings);
         }
     }
 }
