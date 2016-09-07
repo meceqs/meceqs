@@ -15,6 +15,7 @@ namespace Microsoft.Extensions.DependencyInjection
             Check.NotNull(builder, nameof(builder));
 
             builder.Services.TryAddSingleton<IBrokeredMessageConverter, DefaultBrokeredMessageConverter>();
+            builder.Services.TryAddSingleton<IBrokeredMessageInvoker, DefaultBrokeredMessageInvoker>();
             builder.Services.TryAddSingleton<IServiceBusMessageSenderFactory, DefaultServiceBusMessageSenderFactory>();
             builder.Services.TryAddSingleton<IServiceBusConsumer, DefaultServiceBusConsumer>();
 
