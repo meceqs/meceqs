@@ -1,13 +1,10 @@
 using System;
 using System.IO;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Meceqs.Transport.AzureServiceBus.Consuming;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.ServiceBus.Messaging;
-using Newtonsoft.Json.Linq;
 
 namespace Meceqs.Transport.AzureServiceBus.FileFake
 {
@@ -15,10 +12,9 @@ namespace Meceqs.Transport.AzureServiceBus.FileFake
     {
         private static readonly Random _random = new Random();
 
-        private readonly FileFakeServiceBusProcessorOptions _options;
+        private bool _clearOnStart;
         private readonly string _directory;
         private readonly string _archiveDirectory;
-
 
         private readonly IServiceProvider _applicationServices;
         private readonly ILogger _logger;
@@ -32,18 +28,18 @@ namespace Meceqs.Transport.AzureServiceBus.FileFake
         {
             Check.NotNull(options, nameof(options));
 
-            _options = options;
             _applicationServices = applicationServices;
             _logger = loggerFactory.CreateLogger<FileFakeServiceBusProcessor>();
 
-            if (string.IsNullOrWhiteSpace(_options.Directory))
-                throw new ArgumentNullException(nameof(_options.Directory));
-            
-            if (string.IsNullOrEmpty(_options.EntityPath))
-                throw new ArgumentNullException(nameof(_options.EntityPath));
+            if (string.IsNullOrWhiteSpace(options.Directory))
+                throw new ArgumentNullException(nameof(options.Directory));
 
-            _directory = Path.Combine(_options.Directory, _options.EntityPath);
-            _archiveDirectory = Path.Combine(_directory, _options.ArchiveFolderName);
+            if (string.IsNullOrEmpty(options.EntityPath))
+                throw new ArgumentNullException(nameof(options.EntityPath));
+
+            _clearOnStart = options.ClearOnStart;
+            _directory = Path.Combine(options.Directory, options.EntityPath);
+            _archiveDirectory = Path.Combine(_directory, options.ArchiveFolderName);
         }
 
         public void Start()
@@ -60,13 +56,13 @@ namespace Meceqs.Transport.AzureServiceBus.FileFake
 
         private void EnsureInitialState()
         {
-            if (!Directory.Exists(_options.Directory))
+            if (!Directory.Exists(_directory))
             {
-                Directory.CreateDirectory(_options.Directory);
+                Directory.CreateDirectory(_directory);
             }
-            else if (_options.ClearOnStart)
+            else if (_clearOnStart)
             {
-                var di = new DirectoryInfo(_options.Directory);
+                var di = new DirectoryInfo(_directory);
 
                 foreach (var file in di.GetFiles())
                 {
@@ -133,8 +129,9 @@ namespace Meceqs.Transport.AzureServiceBus.FileFake
 
         private async Task ProcessFile(string fileContent)
         {
-            var brokeredMessage = DeserializeBrokeredMessage(fileContent);
+            var brokeredMessage = FileFakeBrokeredMessageSerializer.Deserialize(fileContent);
 
+            // Call consumer with new scope.
             var serviceScopeFactory = _applicationServices.GetRequiredService<IServiceScopeFactory>();
             using (var scope = serviceScopeFactory.CreateScope())
             {
@@ -144,55 +141,5 @@ namespace Meceqs.Transport.AzureServiceBus.FileFake
                 await serviceBusConsumer.ConsumeAsync(brokeredMessage, CancellationToken.None);
             }
         }
-
-        private BrokeredMessage DeserializeBrokeredMessage(string serializedMessage)
-        {
-            JObject jsonMessage = JObject.Parse(serializedMessage);
-
-            string serializedEnvelope = jsonMessage.GetValue("Body").ToString();
-            MemoryStream payloadStream = new MemoryStream(Encoding.UTF8.GetBytes(serializedEnvelope));
-            BrokeredMessage brokeredMessage = new BrokeredMessage(payloadStream, ownsStream: true);
-
-            foreach (var header in TransportHeaderNames.AsList())
-            {
-                string value = jsonMessage.GetValue(header)?.ToString();
-                brokeredMessage.Properties[header] = value;
-            }
-
-            brokeredMessage.ContentType = brokeredMessage.Properties[TransportHeaderNames.ContentType].ToString();
-            brokeredMessage.MessageId = brokeredMessage.Properties[TransportHeaderNames.MessageId].ToString();
-
-            brokeredMessage.CorrelationId = jsonMessage.GetValue(nameof(brokeredMessage.CorrelationId)).ToString();
-
-            // Receiver properties are internal - that's why we need reflection :(
-            // (if these properties are not set, accessing them will throw an exception.)
-
-            SetPropertyValue(brokeredMessage, nameof(brokeredMessage.DeliveryCount), 1);
-            SetPropertyValue(brokeredMessage, nameof(brokeredMessage.SequenceNumber), 1);
-            SetPropertyValue(brokeredMessage, nameof(brokeredMessage.EnqueuedSequenceNumber), 1);
-            //SetReceiveContext(brokeredMessage);
-
-            return brokeredMessage;
-        }
-
-        private void SetPropertyValue(BrokeredMessage message, string propertyName, object value)
-        {
-            typeof(BrokeredMessage).GetProperty(propertyName).SetValue(message, value);
-        }
-
-        // private void SetReceiveContext(BrokeredMessage message)
-        // {
-        //     // now it gets really ugly. Calls to Complete() etc require a ReceiveContext
-        //     // which is internal.
-
-        //     var messageReceiver = Substitute.For<MessageReceiver>();
-        //     var assembly = Assembly.Load("Microsoft.ServiceBus");
-        //     var receiveContextType = assembly.GetType("Microsoft.ServiceBus.Messaging.ReceiveContext", throwOnError: true);
-
-        //     var ctor = receiveContextType.GetConstructor(BindingFlags.Public, null, new Type[] { typeof(MessageReceiver), typeof(Guid) }, null);
-        //     object receiveContext = ctor.Invoke(new object[] { messageReceiver, Guid.NewGuid() });
-
-        //     typeof(BrokeredMessage).GetProperty("ReceiveContext").SetValue(message, receiveContext);
-        // }
     }
 }

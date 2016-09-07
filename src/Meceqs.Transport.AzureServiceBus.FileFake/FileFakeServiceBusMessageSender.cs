@@ -1,11 +1,9 @@
 using System;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 using Meceqs.Transport.AzureServiceBus.Internal;
 using Microsoft.Extensions.Logging;
 using Microsoft.ServiceBus.Messaging;
-using Newtonsoft.Json;
 
 namespace Meceqs.Transport.AzureServiceBus.FileFake
 {
@@ -29,41 +27,11 @@ namespace Meceqs.Transport.AzureServiceBus.FileFake
         {
             string fileName = Path.Combine(_entityPathDirectory, $"{message.MessageId}.json");
             
-            // The body can only be read once.
-            string serializedEnvelope;
-            using (StreamReader reader = new StreamReader(message.GetBody<Stream>(), Encoding.UTF8))
-            {
-                serializedEnvelope = reader.ReadToEnd();
-            }
+            string serializedMessage = FileFakeBrokeredMessageSerializer.Serialize(message);
 
             InvokeWithRetry(3, () =>
             {
-                var sb = new StringBuilder();
-                var sw = new StringWriter(sb);
-
-                using (JsonWriter writer = new JsonTextWriter(sw))
-                {
-                    writer.WriteStartObject();
-
-                    foreach (var kvp in message.Properties)
-                    {
-                        writer.WritePropertyName(kvp.Key);
-                        writer.WriteValue(kvp.Value);
-                    }
-
-                    writer.WritePropertyName(nameof(message.MessageId));
-                    writer.WriteValue(message.MessageId);
-
-                    writer.WritePropertyName(nameof(message.CorrelationId));
-                    writer.WriteValue(message.CorrelationId);
-                    
-                    writer.WritePropertyName("Body");
-                    writer.WriteValue(serializedEnvelope);
-
-                    writer.WriteEndObject();
-                }
-
-                File.WriteAllText(fileName, sb.ToString());
+                File.WriteAllText(fileName, serializedMessage);
             });
 
             return Task.CompletedTask;

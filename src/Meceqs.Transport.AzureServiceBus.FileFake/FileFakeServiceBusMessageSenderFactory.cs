@@ -6,8 +6,6 @@ namespace Meceqs.Transport.AzureServiceBus.FileFake
 {
     public class FileFakeServiceBusMessageSenderFactory : IServiceBusMessageSenderFactory
     {
-
-
         private readonly string _directory;
         private readonly ILoggerFactory _loggerFactory;
 
