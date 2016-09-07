@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Text;
 using Microsoft.ServiceBus.Messaging;
@@ -29,6 +30,9 @@ namespace Meceqs.Transport.AzureEventHubs.FileFake
                     writer.WriteValue(kvp.Value);
                 }
 
+                writer.WritePropertyName(nameof(eventData.EnqueuedTimeUtc));
+                writer.WriteValue(DateTime.UtcNow);
+
                 writer.WritePropertyName("Body");
                 writer.WriteValue(serializedEnvelope);
 
@@ -38,7 +42,7 @@ namespace Meceqs.Transport.AzureEventHubs.FileFake
             return sb.ToString();
         }
 
-        public static EventData Deserialize(string serializedEventData)
+        public static EventData Deserialize(string serializedEventData, long sequenceNumber)
         {
             JObject jsonEventData = JObject.Parse(serializedEventData);
 
@@ -51,7 +55,20 @@ namespace Meceqs.Transport.AzureEventHubs.FileFake
                 eventData.Properties[header] = value;
             }
 
+            // Receiver properties are internal - that's why we need reflection :(
+
+            SetPropertyValue(eventData, nameof(eventData.SequenceNumber), sequenceNumber);
+            SetPropertyValue(eventData, nameof(eventData.Offset), sequenceNumber.ToString());
+
+            var enqueuedTimeUtc = (DateTime)jsonEventData.GetValue(nameof(eventData.EnqueuedTimeUtc)).ToObject(typeof(DateTime));
+            SetPropertyValue(eventData, nameof(eventData.EnqueuedTimeUtc), enqueuedTimeUtc);
+
             return eventData;
+        }
+
+        private static void SetPropertyValue(EventData eventData, string propertyName, object value)
+        {
+            typeof(EventData).GetProperty(propertyName).SetValue(eventData, value);
         }
     }
 }

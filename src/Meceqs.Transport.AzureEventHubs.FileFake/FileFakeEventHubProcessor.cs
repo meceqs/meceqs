@@ -1,15 +1,11 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Meceqs.Transport.AzureEventHubs.Consuming;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.ServiceBus.Messaging;
-using Newtonsoft.Json.Linq;
 
 namespace Meceqs.Transport.AzureEventHubs.FileFake
 {
@@ -26,7 +22,8 @@ namespace Meceqs.Transport.AzureEventHubs.FileFake
 
         private Timer _processingTimer;
 
-        private int _lineNumber = 0;
+        private long _fileCreationTicks = 0;
+        private int _sequenceNumber = 0;
 
         public FileFakeEventHubProcessor(FileFakeEventHubProcessorOptions options, IServiceProvider applicationServices, ILoggerFactory loggerFactory)
         {
@@ -66,37 +63,45 @@ namespace Meceqs.Transport.AzureEventHubs.FileFake
 
         private async Task ReadEvents()
         {
-            int count = 0;
-            IEnumerable<string> events = null;
-
-            if (File.Exists(_fileName))
+            if (!File.Exists(_fileName))
             {
-                // Read new events
-                events = File.ReadLines(_fileName).Skip(_lineNumber);
-                count = events.Count();
+                _sequenceNumber = 0;
+                _logger.LogInformation("No events. File does not exist: {File}", _fileName);
+                return;
             }
-            else
+
+            var fileInfo = new FileInfo(_fileName);
+
+            // We cache the creation date to make sure we can re-start if someone deletes the file.
+            
+            var creationTicks = fileInfo.CreationTimeUtc.Ticks;
+            if (_fileCreationTicks != creationTicks)
             {
-                if (_lineNumber > 0)
+                if (_fileCreationTicks > 0)
                 {
                     // Someone deleted the file -> restart from the beginning!
-                    // TODO @cweiss this only works if the processor happens to access the file next.
-                    _lineNumber = 0;
-                    _logger.LogInformation("File deleted. Resetting offset to 0");
+                    _logger.LogInformation("File creation date doesn't match. Resetting sequence number to 0");
                 }
+                
+                _sequenceNumber = 0;
+                _fileCreationTicks = creationTicks;
             }
 
-            _logger.LogInformation("Processing {Count} events, Offset: {Offset}", count, _lineNumber);
+            // Start processing.
 
-            if (events != null && count > 0)
+            var newEvents = File.ReadLines(_fileName).Skip(_sequenceNumber).ToList();
+
+            _logger.LogInformation("Processing {Count} events, SequenceNumber: {SequenceNumber}", newEvents.Count,  _sequenceNumber);
+
+            if (newEvents.Count > 0)
             {
                 // process events (if any)
-                foreach (var evt in events)
+                foreach (var evt in newEvents)
                 {
-                    await ProcessEvent(evt);
+                    await ProcessEvent(evt, _sequenceNumber);
 
                     // "commit" by moving cursor forward.
-                    _lineNumber++;
+                    _sequenceNumber++;
                 }
 
                 _logger.LogInformation("Processing finished");
@@ -122,11 +127,11 @@ namespace Meceqs.Transport.AzureEventHubs.FileFake
             }
         }
 
-        private async Task ProcessEvent(string serializedEvent)
+        private async Task ProcessEvent(string serializedEvent, int sequenceNumber)
         {
             Check.NotNull(serializedEvent, nameof(serializedEvent));
 
-            var eventData = FileFakeEventDataSerializer.Deserialize(serializedEvent);
+            var eventData = FileFakeEventDataSerializer.Deserialize(serializedEvent, sequenceNumber);
 
             var serviceScopeFactory = _applicationServices.GetRequiredService<IServiceScopeFactory>();
             using (var scope = serviceScopeFactory.CreateScope())
