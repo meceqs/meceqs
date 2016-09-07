@@ -2,16 +2,16 @@ using System.IO;
 using Meceqs.Transport.AzureServiceBus.Internal;
 using Microsoft.Extensions.Logging;
 
-namespace Meceqs.Transport.AzureServiceBus.FileMock
+namespace Meceqs.Transport.AzureServiceBus.FileFake
 {
-    public class FileMockServiceBusMessageSenderFactory : IServiceBusMessageSenderFactory
+    public class FileFakeServiceBusMessageSenderFactory : IServiceBusMessageSenderFactory
     {
 
 
         private readonly string _directory;
         private readonly ILoggerFactory _loggerFactory;
 
-        public FileMockServiceBusMessageSenderFactory(string directory, ILoggerFactory loggerFactory)
+        public FileFakeServiceBusMessageSenderFactory(string directory, ILoggerFactory loggerFactory)
         {
             Check.NotNullOrWhiteSpace(directory, nameof(directory));
             Check.NotNull(loggerFactory, nameof(loggerFactory));
@@ -28,7 +28,7 @@ namespace Meceqs.Transport.AzureServiceBus.FileMock
 
             string entityPathDirectory = Path.Combine(_directory, entityPath);
 
-            return new FileMockServiceBusMessageSender(entityPathDirectory, _loggerFactory);
+            return new FileFakeServiceBusMessageSender(entityPathDirectory, _loggerFactory);
         }
 
         private void EnsureDirectoryExists()

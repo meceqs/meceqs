@@ -31,9 +31,9 @@ namespace Sales.Hosts.ProcessOrders
                 })
 
                 // Fake for the ServiceBusConsumer which will read messages from local file system.
-                .AddFileMockServiceBusProcessor(options =>
+                .AddFileFakeServiceBusProcessor(options =>
                 {
-                    options.Directory = SampleConfiguration.FileMockServiceBusDirectory;
+                    options.Directory = SampleConfiguration.FileFakeServiceBusDirectory;
                     options.EntityPath = SampleConfiguration.PlaceOrderQueue;
                 });
         }

@@ -1,21 +1,21 @@
 using System;
 using Meceqs;
 using Meceqs.Configuration;
-using Meceqs.Transport.AzureEventHubs.FileMock;
+using Meceqs.Transport.AzureEventHubs.FileFake;
 using Meceqs.Transport.AzureEventHubs.Internal;
 using Microsoft.Extensions.Logging;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
-    public static class FileMockEventHubMeceqsBuilderExtensions
+    public static class FileFakeEventHubMeceqsBuilderExtensions
     {
-        public static IMeceqsBuilder AddFileMockEventHubSender(this IMeceqsBuilder builder, string directory)
+        public static IMeceqsBuilder AddFileFakeEventHubSender(this IMeceqsBuilder builder, string directory)
         {
             Check.NotNull(builder, nameof(builder));
 
             builder.Services.AddSingleton<IEventHubClientFactory>(serviceProvider =>
             {
-                return new FileMockEventHubClientFactory(
+                return new FileFakeEventHubClientFactory(
                     directory,
                     serviceProvider.GetRequiredService<ILoggerFactory>());
             });
@@ -23,15 +23,15 @@ namespace Microsoft.Extensions.DependencyInjection
             return builder;
         }
 
-        public static IMeceqsBuilder AddFileMockEventHubProcessor(this IMeceqsBuilder builder, Action<FileMockEventHubProcessorOptions> options)
+        public static IMeceqsBuilder AddFileFakeEventHubProcessor(this IMeceqsBuilder builder, Action<FileFakeEventHubProcessorOptions> options)
         {
             Check.NotNull(builder, nameof(builder));
 
-            var processorOptions = new FileMockEventHubProcessorOptions();
+            var processorOptions = new FileFakeEventHubProcessorOptions();
             options?.Invoke(processorOptions);
 
             builder.Services.AddSingleton(processorOptions);
-            builder.Services.AddSingleton<FileMockEventHubProcessor>();
+            builder.Services.AddSingleton<FileFakeEventHubProcessor>();
 
             return builder;
         }

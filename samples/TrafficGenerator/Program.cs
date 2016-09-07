@@ -36,7 +36,7 @@ namespace TrafficGenerator
                 })
 
                 // send messages to a local file instead of the actual Service Bus.
-                .AddFileMockServiceBusSender(SampleConfiguration.FileMockServiceBusDirectory);
+                .AddFileFakeServiceBusSender(SampleConfiguration.FileFakeServiceBusDirectory);
         }
 
         public static void Main(string[] args)

@@ -1,12 +1,12 @@
-using Meceqs.Transport.AzureEventHubs.FileMock;
+using Meceqs.Transport.AzureEventHubs.FileFake;
 
 namespace Sales.Hosts.ProcessCustomerEvents
 {
     public class Worker
     {
-        private readonly FileMockEventHubProcessor _eventProcessor;
+        private readonly FileFakeEventHubProcessor _eventProcessor;
 
-        public Worker(FileMockEventHubProcessor eventProcessor)
+        public Worker(FileFakeEventHubProcessor eventProcessor)
         {
             _eventProcessor = eventProcessor;
         }

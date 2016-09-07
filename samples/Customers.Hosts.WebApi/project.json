@@ -9,7 +9,7 @@
     "Meceqs.AspNetCore": "0.1.0-*",
     "Meceqs.Serialization.Json": "0.1.0-*",
     "Meceqs.Transport.AzureEventHubs": "0.1.0-*",
-    "Meceqs.Transport.AzureEventHubs.FileMock": "0.1.0-*",
+    "Meceqs.Transport.AzureEventHubs.FileFake": "0.1.0-*",
 
     "Microsoft.AspNetCore.Diagnostics": "1.0.0",
     "Microsoft.AspNetCore.Mvc": "1.0.0",

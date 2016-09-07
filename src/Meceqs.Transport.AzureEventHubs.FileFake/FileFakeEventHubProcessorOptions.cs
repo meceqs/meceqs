@@ -1,6 +1,6 @@
-namespace Meceqs.Transport.AzureEventHubs.FileMock
+namespace Meceqs.Transport.AzureEventHubs.FileFake
 {
-    public class FileMockEventHubProcessorOptions
+    public class FileFakeEventHubProcessorOptions
     {
         public string Directory { get; set; }
 

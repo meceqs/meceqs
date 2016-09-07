@@ -11,13 +11,13 @@ using Microsoft.Extensions.Logging;
 using Microsoft.ServiceBus.Messaging;
 using Newtonsoft.Json.Linq;
 
-namespace Meceqs.Transport.AzureEventHubs.FileMock
+namespace Meceqs.Transport.AzureEventHubs.FileFake
 {
-    public class FileMockEventHubProcessor
+    public class FileFakeEventHubProcessor
     {
         private static readonly Random _random = new Random();
 
-        private readonly FileMockEventHubProcessorOptions _options;
+        private readonly FileFakeEventHubProcessorOptions _options;
         private readonly string _fileName;
 
 
@@ -28,13 +28,13 @@ namespace Meceqs.Transport.AzureEventHubs.FileMock
 
         private int _lineNumber = 0;
 
-        public FileMockEventHubProcessor(FileMockEventHubProcessorOptions options, IServiceProvider applicationServices, ILoggerFactory loggerFactory)
+        public FileFakeEventHubProcessor(FileFakeEventHubProcessorOptions options, IServiceProvider applicationServices, ILoggerFactory loggerFactory)
         {
             Check.NotNull(options, nameof(options));
 
             _options = options;
             _applicationServices = applicationServices;
-            _logger = loggerFactory.CreateLogger<FileMockEventHubProcessor>();
+            _logger = loggerFactory.CreateLogger<FileFakeEventHubProcessor>();
 
             _fileName = Path.Combine(_options.Directory, $"{_options.EventHubName}.txt");
         }

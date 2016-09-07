@@ -1,12 +1,12 @@
-using Meceqs.Transport.AzureServiceBus.FileMock;
+using Meceqs.Transport.AzureServiceBus.FileFake;
 
 namespace Sales.Hosts.ProcessOrders
 {
     public class Worker
     {
-        private readonly FileMockServiceBusProcessor _processor;
+        private readonly FileFakeServiceBusProcessor _processor;
 
-        public Worker(FileMockServiceBusProcessor processor)
+        public Worker(FileFakeServiceBusProcessor processor)
         {
             _processor = processor;
         }

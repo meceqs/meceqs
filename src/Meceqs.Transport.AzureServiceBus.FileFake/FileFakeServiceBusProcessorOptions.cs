@@ -1,6 +1,6 @@
-namespace Meceqs.Transport.AzureServiceBus.FileMock
+namespace Meceqs.Transport.AzureServiceBus.FileFake
 {
-    public class FileMockServiceBusProcessorOptions
+    public class FileFakeServiceBusProcessorOptions
     {
         public bool ClearOnStart { get; set; } = false;
 

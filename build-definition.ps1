@@ -22,8 +22,9 @@ Properties {
         "src/Meceqs.AspNetCore",
         "src/Meceqs.Serialization.Json",
         "src/Meceqs.Transport.AzureEventHubs",
-        "src/Meceqs.Transport.AzureEventHubs.FileMock",
-        "src/Meceqs.Transport.AzureServiceBus"
+        "src/Meceqs.Transport.AzureEventHubs.FileFake",
+        "src/Meceqs.Transport.AzureServiceBus",
+        "src/Meceqs.Transport.AzureServiceBus.FileFake"
     )
 }
 

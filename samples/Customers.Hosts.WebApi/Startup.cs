@@ -90,7 +90,7 @@ namespace Customers.Hosts.WebApi
                 })
                 
                 // Fake for the EventHubSender which will send events to a local file.
-                .AddFileMockEventHubSender(SampleConfiguration.FileMockEventHubDirectory);
+                .AddFileFakeEventHubSender(SampleConfiguration.FileFakeEventHubDirectory);
         }
 
         private void ConfigureMvc(IServiceCollection services)

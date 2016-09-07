@@ -1,21 +1,21 @@
 using System;
 using Meceqs;
 using Meceqs.Configuration;
-using Meceqs.Transport.AzureServiceBus.FileMock;
+using Meceqs.Transport.AzureServiceBus.FileFake;
 using Meceqs.Transport.AzureServiceBus.Internal;
 using Microsoft.Extensions.Logging;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
-    public static class FileMockServiceBusMeceqsBuilderExtensions
+    public static class FileFakeServiceBusMeceqsBuilderExtensions
     {
-        public static IMeceqsBuilder AddFileMockServiceBusSender(this IMeceqsBuilder builder, string directory)
+        public static IMeceqsBuilder AddFileFakeServiceBusSender(this IMeceqsBuilder builder, string directory)
         {
             Check.NotNull(builder, nameof(builder));
 
             builder.Services.AddSingleton<IServiceBusMessageSenderFactory>(serviceProvider =>
             {
-                return new FileMockServiceBusMessageSenderFactory(
+                return new FileFakeServiceBusMessageSenderFactory(
                     directory,
                     serviceProvider.GetRequiredService<ILoggerFactory>());
             });
@@ -23,17 +23,17 @@ namespace Microsoft.Extensions.DependencyInjection
             return builder;
         }
 
-        public static IMeceqsBuilder AddFileMockServiceBusProcessor(this IMeceqsBuilder builder, Action<FileMockServiceBusProcessorOptions> options)
+        public static IMeceqsBuilder AddFileFakeServiceBusProcessor(this IMeceqsBuilder builder, Action<FileFakeServiceBusProcessorOptions> options)
         {
             Check.NotNull(builder, nameof(builder));
 
-            var processorOptions = new FileMockServiceBusProcessorOptions();
+            var processorOptions = new FileFakeServiceBusProcessorOptions();
             options?.Invoke(processorOptions);
 
             builder.Services.AddSingleton(processorOptions);
-            builder.Services.AddSingleton<FileMockServiceBusProcessor>();
+            builder.Services.AddSingleton<FileFakeServiceBusProcessor>();
 
-            builder.Services.AddSingleton<IBrokeredMessageInvoker, FileMockBrokeredMessageInvoker>();
+            builder.Services.AddSingleton<IBrokeredMessageInvoker, FileFakeBrokeredMessageInvoker>();
 
             return builder;
         }

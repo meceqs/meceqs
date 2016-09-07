@@ -3,16 +3,16 @@ using System.IO;
 using Meceqs.Transport.AzureEventHubs.Internal;
 using Microsoft.Extensions.Logging;
 
-namespace Meceqs.Transport.AzureEventHubs.FileMock
+namespace Meceqs.Transport.AzureEventHubs.FileFake
 {
-    public class FileMockEventHubClientFactory : IEventHubClientFactory
+    public class FileFakeEventHubClientFactory : IEventHubClientFactory
     {
         private readonly string _directory;
         private readonly ILoggerFactory _loggerFactory;
 
         private readonly ConcurrentDictionary<EventHubConnection, IEventHubClient> _clients = new ConcurrentDictionary<EventHubConnection, IEventHubClient>();
 
-        public FileMockEventHubClientFactory(string directory, ILoggerFactory loggerFactory)
+        public FileFakeEventHubClientFactory(string directory, ILoggerFactory loggerFactory)
         {
             Check.NotNullOrWhiteSpace(directory, nameof(directory));
             Check.NotNull(loggerFactory, nameof(loggerFactory));
@@ -31,7 +31,7 @@ namespace Meceqs.Transport.AzureEventHubs.FileMock
             {
                 string fileName = Path.Combine(_directory, $"{connection.EventHubName}.txt");
 
-                return new FileMockEventHubClient(fileName, _loggerFactory);
+                return new FileFakeEventHubClient(fileName, _loggerFactory);
             });
         }
 

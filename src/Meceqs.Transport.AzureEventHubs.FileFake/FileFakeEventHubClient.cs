@@ -6,20 +6,20 @@ using Meceqs.Transport.AzureEventHubs.Internal;
 using Microsoft.Extensions.Logging;
 using Microsoft.ServiceBus.Messaging;
 
-namespace Meceqs.Transport.AzureEventHubs.FileMock
+namespace Meceqs.Transport.AzureEventHubs.FileFake
 {
-    public class FileMockEventHubClient : IEventHubClient
+    public class FileFakeEventHubClient : IEventHubClient
     {
         private readonly string _fileName;
         private readonly ILogger _logger;
 
-        public FileMockEventHubClient(string fileName, ILoggerFactory loggerFactory)
+        public FileFakeEventHubClient(string fileName, ILoggerFactory loggerFactory)
         {
             Check.NotNullOrWhiteSpace(fileName, nameof(fileName));
             Check.NotNull(loggerFactory, nameof(loggerFactory));
 
             _fileName = fileName;
-            _logger = loggerFactory.CreateLogger<FileMockEventHubClient>();
+            _logger = loggerFactory.CreateLogger<FileFakeEventHubClient>();
 
             EnsureFileExists();
         }

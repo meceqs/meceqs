@@ -7,20 +7,20 @@ using Microsoft.Extensions.Logging;
 using Microsoft.ServiceBus.Messaging;
 using Newtonsoft.Json;
 
-namespace Meceqs.Transport.AzureServiceBus.FileMock
+namespace Meceqs.Transport.AzureServiceBus.FileFake
 {
-    public class FileMockServiceBusMessageSender : IServiceBusMessageSender
+    public class FileFakeServiceBusMessageSender : IServiceBusMessageSender
     {
         private readonly string _entityPathDirectory;
         private readonly ILogger _logger;
 
-        public FileMockServiceBusMessageSender(string entityPathDirectory, ILoggerFactory loggerFactory)
+        public FileFakeServiceBusMessageSender(string entityPathDirectory, ILoggerFactory loggerFactory)
         {
             Check.NotNullOrWhiteSpace(entityPathDirectory, nameof(entityPathDirectory));
             Check.NotNull(loggerFactory, nameof(loggerFactory));
 
             _entityPathDirectory = entityPathDirectory;
-            _logger = loggerFactory.CreateLogger<FileMockServiceBusMessageSender>();
+            _logger = loggerFactory.CreateLogger<FileFakeServiceBusMessageSender>();
 
             EnsureDirectoryExists();
         }

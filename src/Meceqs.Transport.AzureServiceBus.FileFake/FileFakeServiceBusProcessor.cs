@@ -9,13 +9,13 @@ using Microsoft.Extensions.Logging;
 using Microsoft.ServiceBus.Messaging;
 using Newtonsoft.Json.Linq;
 
-namespace Meceqs.Transport.AzureServiceBus.FileMock
+namespace Meceqs.Transport.AzureServiceBus.FileFake
 {
-    public class FileMockServiceBusProcessor
+    public class FileFakeServiceBusProcessor
     {
         private static readonly Random _random = new Random();
 
-        private readonly FileMockServiceBusProcessorOptions _options;
+        private readonly FileFakeServiceBusProcessorOptions _options;
         private readonly string _directory;
         private readonly string _archiveDirectory;
 
@@ -25,8 +25,8 @@ namespace Meceqs.Transport.AzureServiceBus.FileMock
 
         private Timer _processingTimer;
 
-        public FileMockServiceBusProcessor(
-            FileMockServiceBusProcessorOptions options,
+        public FileFakeServiceBusProcessor(
+            FileFakeServiceBusProcessorOptions options,
             IServiceProvider applicationServices,
             ILoggerFactory loggerFactory)
         {
@@ -34,7 +34,7 @@ namespace Meceqs.Transport.AzureServiceBus.FileMock
 
             _options = options;
             _applicationServices = applicationServices;
-            _logger = loggerFactory.CreateLogger<FileMockServiceBusProcessor>();
+            _logger = loggerFactory.CreateLogger<FileFakeServiceBusProcessor>();
 
             if (string.IsNullOrWhiteSpace(_options.Directory))
                 throw new ArgumentNullException(nameof(_options.Directory));
