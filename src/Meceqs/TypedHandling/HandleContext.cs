@@ -2,7 +2,7 @@ using System;
 using System.Reflection;
 using Meceqs.Pipeline;
 
-namespace Meceqs.Filters.TypedHandling
+namespace Meceqs.TypedHandling
 {
     public class HandleContext<TMessage> : HandleContext where TMessage : class
     {

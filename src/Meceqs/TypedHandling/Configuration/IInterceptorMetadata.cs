@@ -1,6 +1,6 @@
 using System;
 
-namespace Meceqs.Filters.TypedHandling.Configuration
+namespace Meceqs.TypedHandling.Configuration
 {
     /// <summary>
     /// Describes an <see cref="IHandleInterceptor"/> and knows how to create it.

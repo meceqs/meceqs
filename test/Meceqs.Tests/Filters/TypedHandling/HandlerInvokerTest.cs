@@ -1,6 +1,6 @@
 using System;
 using System.Threading.Tasks;
-using Meceqs.Filters.TypedHandling.Internal;
+using Meceqs.TypedHandling.Internal;
 using Shouldly;
 using Xunit;
 

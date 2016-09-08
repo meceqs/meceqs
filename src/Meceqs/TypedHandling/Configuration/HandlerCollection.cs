@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
 
-namespace Meceqs.Filters.TypedHandling.Configuration
+namespace Meceqs.TypedHandling.Configuration
 {
     public class HandlerCollection : Collection<IHandlerMetadata>
     {

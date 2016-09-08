@@ -2,7 +2,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Reflection;
 
-namespace Meceqs.Filters.TypedHandling.Configuration
+namespace Meceqs.TypedHandling.Configuration
 {
     public class InterceptorCollection : Collection<IInterceptorMetadata>
     {

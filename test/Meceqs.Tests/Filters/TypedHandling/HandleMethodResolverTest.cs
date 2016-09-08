@@ -2,8 +2,8 @@ using System;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using Meceqs.Filters.TypedHandling;
-using Meceqs.Filters.TypedHandling.Internal;
+using Meceqs.TypedHandling;
+using Meceqs.TypedHandling.Internal;
 using Shouldly;
 using Xunit;
 

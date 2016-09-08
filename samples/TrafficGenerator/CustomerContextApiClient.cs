@@ -5,8 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Customers.Contracts.Commands;
 using Customers.Contracts.Queries;
-using Meceqs.Filters.TypedHandling;
 using Meceqs.Serialization;
+using Meceqs.TypedHandling;
 using Newtonsoft.Json;
 using SampleConfig;
 

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Meceqs.Filters.TypedHandling.Configuration
+namespace Meceqs.TypedHandling.Configuration
 {
     public interface IHandlerMetadata
     {

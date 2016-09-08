@@ -1,8 +1,8 @@
 using System;
-using Meceqs.Filters.TypedHandling;
 using Meceqs.Pipeline;
 using Meceqs.Sending;
 using Meceqs.Sending.Internal;
+using Meceqs.TypedHandling;
 
 namespace Meceqs.Tests
 {

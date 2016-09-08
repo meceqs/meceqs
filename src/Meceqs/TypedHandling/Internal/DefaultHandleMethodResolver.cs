@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace Meceqs.Filters.TypedHandling.Internal
+namespace Meceqs.TypedHandling.Internal
 {
     public class DefaultHandleMethodResolver : IHandleMethodResolver
     {

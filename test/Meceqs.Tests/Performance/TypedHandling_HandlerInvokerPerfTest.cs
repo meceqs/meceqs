@@ -3,9 +3,9 @@ using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
-using Meceqs.Filters.TypedHandling;
 using Meceqs.Pipeline;
 using Meceqs.Tests;
+using Meceqs.TypedHandling;
 using Xunit;
 
 namespace Meceqs.Test.Performance

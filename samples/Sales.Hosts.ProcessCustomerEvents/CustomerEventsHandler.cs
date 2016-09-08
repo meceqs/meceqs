@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 using Customers.Contracts.Events;
-using Meceqs.Filters.TypedHandling;
+using Meceqs.TypedHandling;
 using Microsoft.Extensions.Logging;
 
 namespace Sales.Hosts.ProcessCustomerEvents

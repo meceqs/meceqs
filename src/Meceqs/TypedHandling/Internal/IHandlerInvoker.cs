@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace Meceqs.Filters.TypedHandling.Internal
+namespace Meceqs.TypedHandling.Internal
 {
     public interface IHandlerInvoker
     {

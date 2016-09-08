@@ -1,7 +1,7 @@
 using System;
 using Meceqs.Configuration;
-using Meceqs.Filters.TypedHandling;
 using Meceqs.Pipeline;
+using Meceqs.TypedHandling;
 
 namespace Meceqs.AzureEventHubs.Configuration
 {

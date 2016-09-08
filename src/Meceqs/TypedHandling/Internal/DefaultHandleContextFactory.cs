@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using Meceqs.Pipeline;
 
-namespace Meceqs.Filters.TypedHandling.Internal
+namespace Meceqs.TypedHandling.Internal
 {
     /// <summary>
     /// Creates a typed <see typeref="HandleContext" /> for the given <see typeref="FilterContext" />.

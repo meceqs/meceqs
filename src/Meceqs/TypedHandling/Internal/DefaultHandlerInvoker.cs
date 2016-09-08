@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace Meceqs.Filters.TypedHandling.Internal
+namespace Meceqs.TypedHandling.Internal
 {
     /// <summary>
     /// Uses reflection and compiled lambdas to invoke either <see typeref="IHandles<,>.HandleAsync" />

@@ -1,6 +1,6 @@
 using Meceqs.Sending;
 
-namespace Meceqs.Filters.TypedHandling
+namespace Meceqs.TypedHandling
 {
     public static class FluentSenderExtensions
     {

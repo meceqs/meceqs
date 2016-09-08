@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Meceqs.Filters.TypedHandling.Configuration
+namespace Meceqs.TypedHandling.Configuration
 {
     /// <summary>
     /// Resolves a <see cref="IHandles" /> using <see cref="IServiceProvider" />.

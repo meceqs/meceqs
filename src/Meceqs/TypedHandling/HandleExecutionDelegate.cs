@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace Meceqs.Filters.TypedHandling
+namespace Meceqs.TypedHandling
 {
     public delegate Task HandleExecutionDelegate(HandleContext context);
 }

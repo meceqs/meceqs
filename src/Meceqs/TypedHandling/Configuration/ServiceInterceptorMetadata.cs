@@ -1,16 +1,16 @@
 using System;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Meceqs.Filters.TypedHandling.Configuration
+namespace Meceqs.TypedHandling.Configuration
 {
     /// <summary>
-    /// Resolves an <see cref="IHandleInterceptor" /> using <see cref="ActivatorUtilities" />.
+    /// Resolves an <see cref="IHandleInterceptor" /> using <see cref="IServiceProvider" />.
     /// </summary>
-    public class ActivatorInterceptorMetadata : IInterceptorMetadata
+    public class ServiceInterceptorMetadata : IInterceptorMetadata
     {
         private readonly Type _interceptorType;
 
-        public ActivatorInterceptorMetadata(Type interceptorType)
+        public ServiceInterceptorMetadata(Type interceptorType)
         {
             Check.NotNull(interceptorType, nameof(interceptorType));
 
@@ -21,7 +21,7 @@ namespace Meceqs.Filters.TypedHandling.Configuration
         {
             Check.NotNull(serviceProvider, nameof(serviceProvider));
 
-            return (IHandleInterceptor)ActivatorUtilities.CreateInstance(serviceProvider, _interceptorType);
+            return (IHandleInterceptor)serviceProvider.GetRequiredService(_interceptorType);
         }
     }
 }

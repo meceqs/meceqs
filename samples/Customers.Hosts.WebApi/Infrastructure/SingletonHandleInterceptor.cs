@@ -1,5 +1,5 @@
 using System.Threading.Tasks;
-using Meceqs.Filters.TypedHandling;
+using Meceqs.TypedHandling;
 using Microsoft.Extensions.Logging;
 
 namespace Customers.Hosts.WebApi.Infrastructure

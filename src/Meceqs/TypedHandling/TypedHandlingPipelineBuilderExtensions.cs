@@ -1,7 +1,7 @@
 using System;
 using Meceqs;
-using Meceqs.Filters.TypedHandling;
 using Meceqs.Pipeline;
+using Meceqs.TypedHandling;
 
 namespace Microsoft.Extensions.DependencyInjection
 {

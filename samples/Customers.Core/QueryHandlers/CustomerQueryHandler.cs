@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Customers.Contracts.Queries;
 using Customers.Core.Domain;
 using Customers.Core.Repositories;
-using Meceqs.Filters.TypedHandling;
+using Meceqs.TypedHandling;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 

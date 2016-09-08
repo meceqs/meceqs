@@ -2,7 +2,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Customers.Core;
-using Meceqs.Filters.TypedHandling;
+using Meceqs.TypedHandling;
 using Microsoft.Extensions.Logging;
 
 namespace Customers.Hosts.WebApi.Infrastructure

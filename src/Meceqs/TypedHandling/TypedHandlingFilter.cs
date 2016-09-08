@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Meceqs.Configuration;
-using Meceqs.Filters.TypedHandling.Configuration;
-using Meceqs.Filters.TypedHandling.Internal;
 using Meceqs.Pipeline;
+using Meceqs.TypedHandling.Configuration;
+using Meceqs.TypedHandling.Internal;
 using Microsoft.Extensions.Logging;
 
-namespace Meceqs.Filters.TypedHandling
+namespace Meceqs.TypedHandling
 {
     public class TypedHandlingFilter
     {

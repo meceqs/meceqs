@@ -4,8 +4,8 @@ using Customers.Contracts.Commands;
 using Customers.Core.Domain;
 using Customers.Core.Repositories;
 using Meceqs;
-using Meceqs.Filters.TypedHandling;
 using Meceqs.Sending;
+using Meceqs.TypedHandling;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 

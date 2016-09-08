@@ -1,7 +1,7 @@
 using Meceqs.Configuration;
-using Meceqs.Filters.TypedHandling.Configuration;
+using Meceqs.TypedHandling.Configuration;
 
-namespace Meceqs.Filters.TypedHandling
+namespace Meceqs.TypedHandling
 {
     public class TypedHandlingOptions
     {

@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace Meceqs.Filters.TypedHandling
+namespace Meceqs.TypedHandling
 {
     public interface IHandles
     {

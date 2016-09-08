@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Reflection;
 using Meceqs.AzureEventHubs.Consuming;
 using Meceqs.Configuration;
-using Meceqs.Filters.TypedHandling;
-using Meceqs.Filters.TypedHandling.Configuration;
 using Meceqs.Pipeline;
+using Meceqs.TypedHandling;
+using Meceqs.TypedHandling.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Meceqs.AzureEventHubs.Configuration
