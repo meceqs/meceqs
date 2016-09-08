@@ -56,7 +56,7 @@ Write-Output "Current version: $currentVersion (Major: $currentMajor Minor: $cur
 #########################
 # Bump version
 
-if ($Version -ne $null) {
+if (![String]::IsNullOrWhiteSpace($Version)) {
     $Version = $Version.Trim().TrimEnd("*-")
 
     if (!($Version -match '([0-9]+)\.([0-9]+)\.([0-9]+)(?:(\-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-\-\.]+)?')) {
