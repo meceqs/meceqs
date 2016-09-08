@@ -68,6 +68,7 @@ Write-Output "New version: $newVersion"
 
 # The PowerShell JSON indentation is incredibly ugly and it reformats the whole document.
 # That's why we use simple string replace for the actual file update.
+# There's a higher chance for this to go wrong, but meeh...
 
 Get-ChildItem -Filter project.json -Recurse -Depth 5 | ForEach-Object {
     Write-Output ("Processing " + $_.DirectoryName)
@@ -79,8 +80,11 @@ Get-ChildItem -Filter project.json -Recurse -Depth 5 | ForEach-Object {
     # Should we update the library version?
     if ($_.Directory.Name.StartsWith($packagePrefix) -eq $true -and $json.version -ne $null) {
         
+        $oldFileContent = $fileContent
         $fileContent = $fileContent.Replace("""version"": ""$currentVersion""", """version"": ""$newVersion""")
         $fileChanged = $true
+
+        if ($oldFileContent -eq $fileContent) { throw "string.Replace for version failed!" }
 
         Write-Output " - Changed version"
     }
@@ -92,8 +96,11 @@ Get-ChildItem -Filter project.json -Recurse -Depth 5 | ForEach-Object {
             | Foreach-Object {
                 $name = $_.Name
 
+                $oldFileContent = $fileContent
                 $fileContent = $fileContent.Replace("""$name"": ""$currentVersion""", """$name"": ""$newVersion""")
                 $fileChanged = $true
+
+                if ($oldFileContent -eq $fileContent) { throw "string.Replace for dependency '$name' failed!" }
 
                 Write-Output "  - Updated dependency '$name'"
             }
