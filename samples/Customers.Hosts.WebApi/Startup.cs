@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using SampleConfig;
 using Swashbuckle.Swagger.Model;
+using Customers.Contracts.Queries;
 
 namespace Customers.Hosts.WebApi
 {
@@ -56,8 +57,10 @@ namespace Customers.Hosts.WebApi
                 // Add services to Dependency Injection
                 .AddAspNetCore()
                 .AddJsonSerialization()
+                .AddDeserializationAssembly<FindCustomersQuery>()
 
                 // The WebApi is a consumer of remote messages.
+                .AddAspNetCoreConsumer()
                 .AddConsumer(pipeline =>
                 {
                     pipeline
@@ -129,6 +132,11 @@ namespace Customers.Hosts.WebApi
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
 
             app.UseDeveloperExceptionPage();
+
+            app.UseAspNetCoreConsumer(options =>
+            {
+                options.AddMessageType<FindCustomersQuery, FindCustomersResult>();
+            });
 
             app.UseMvc();
 

@@ -123,5 +123,24 @@ namespace Meceqs.Pipeline
 
             return pipeline.ProcessAsync<TResult>(filterContext);
         }
+
+        protected virtual async Task<object> ProcessAsync(Type resultType)
+        {
+            if (Envelopes.Count != 1)
+            {
+                throw new InvalidOperationException(
+                    $"'{nameof(ProcessAsync)}' with a result-type can only be called if there's exactly one envelope. " +
+                    $"Actual Count: {Envelopes.Count}");
+            }
+
+            var pipeline = _pipelineProvider.GetPipeline(PipelineName);
+            var filterContext = CreateFilterContext(Envelopes[0]);
+
+            filterContext.ExpectedResultType = resultType;
+
+            await pipeline.ProcessAsync(filterContext);
+
+            return filterContext.Result;
+        }
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Meceqs.Configuration;
@@ -41,6 +42,11 @@ namespace Meceqs.Sending.Internal
         public Task<TResult> SendAsync<TResult>()
         {
             return ProcessAsync<TResult>();
+        }
+
+        public Task<object> SendAsync(Type resultType)
+        {
+            return ProcessAsync(resultType);
         }
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Meceqs.Configuration;
@@ -25,6 +26,11 @@ namespace Meceqs.Consuming.Internal
         public Task<TResult> ConsumeAsync<TResult>()
         {
             return ProcessAsync<TResult>();
+        }
+
+        public Task<object> ConsumeAsync(Type resultType)
+        {
+            return ProcessAsync(resultType);
         }
     }
 }

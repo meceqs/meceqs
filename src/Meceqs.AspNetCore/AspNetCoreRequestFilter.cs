@@ -34,7 +34,7 @@ namespace Meceqs.AspNetCore
             {
                 context.Cancellation = httpContext.RequestAborted;
             }
-            else
+            else if (context.Cancellation != httpContext.RequestAborted)
             {
                 // Someone provided a custom cancellation. To make sure the operation still is cancelled
                 // when the ASP.NET request is cancelled, the two cancellation tokens are combined.

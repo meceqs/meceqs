@@ -1,20 +1,20 @@
 using System.Text;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 
 namespace Meceqs.Serialization.Json
 {
-    public class JsonEnvelopeSerializer : IEnvelopeSerializer
+    public class JsonEnvelopeSerializer : IEnvelopeSerializer, IResultSerializer
     {
         private const string _contentType = "application/json";
 
+        private readonly JsonSerializerSettings _settings;
+
         public string ContentType => _contentType;
 
-        private static readonly JsonSerializerSettings _defaultSettings = new JsonSerializerSettings
+        public JsonEnvelopeSerializer(JsonSerializerSettings settings = null)
         {
-            ContractResolver = new CamelCasePropertyNamesContractResolver(),
-            NullValueHandling = NullValueHandling.Ignore
-        };
+            _settings = settings ?? JsonDefaults.DefaultSerializerSettings;
+        }
 
         public byte[] SerializeToByteArray(Envelope envelope)
         {
@@ -24,7 +24,27 @@ namespace Meceqs.Serialization.Json
 
         public string SerializeToString(Envelope envelope)
         {
-            return JsonConvert.SerializeObject(envelope, _defaultSettings);
+            return SerializeToString((object)envelope);
+        }
+
+        public string SerializeToString(object result)
+        {
+            return JsonConvert.SerializeObject(result, _settings);
+
+            // https://github.com/JamesNK/Newtonsoft.Json/blob/master/Src/Newtonsoft.Json/JsonConvert.cs
+            // (We don't use JsonConvert.SerializeObject because this always creates a new JsonSerializer)
+
+            // TODO @cweiss Json Perf??
+            // StringBuilder sb = new StringBuilder(256);
+            // StringWriter sw = new StringWriter(sb, CultureInfo.InvariantCulture);
+            // using (JsonTextWriter jsonWriter = new JsonTextWriter(sw))
+            // {
+            //     jsonWriter.Formatting = _jsonSerializer.Formatting;
+
+            //     _jsonSerializer.Serialize(jsonWriter, envelope, null);
+            // }
+
+            // return sw.ToString();
         }
     }
 }

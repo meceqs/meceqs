@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Meceqs.Pipeline;
 
@@ -10,5 +11,7 @@ namespace Meceqs.Sending
         Task SendAsync();
 
         Task<TResult> SendAsync<TResult>();
+
+        Task<object> SendAsync(Type resultType);
     }
 }

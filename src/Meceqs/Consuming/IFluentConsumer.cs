@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Meceqs.Pipeline;
 
@@ -8,5 +9,7 @@ namespace Meceqs.Consuming
         Task ConsumeAsync();
 
         Task<TResult> ConsumeAsync<TResult>();
+
+        Task<object> ConsumeAsync(Type resultType);
     }
 }
