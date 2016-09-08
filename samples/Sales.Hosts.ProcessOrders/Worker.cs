@@ -1,4 +1,4 @@
-using Meceqs.Transport.AzureServiceBus.FileFake;
+using Meceqs.AzureServiceBus.FileFake;
 
 namespace Sales.Hosts.ProcessOrders
 {

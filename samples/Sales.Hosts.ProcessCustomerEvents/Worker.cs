@@ -1,4 +1,4 @@
-using Meceqs.Transport.AzureEventHubs.FileFake;
+using Meceqs.AzureEventHubs.FileFake;
 
 namespace Sales.Hosts.ProcessCustomerEvents
 {

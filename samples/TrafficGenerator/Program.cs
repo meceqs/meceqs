@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Meceqs.Transport.AzureServiceBus.Sending;
+using Meceqs.AzureServiceBus.Sending;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using SampleConfig;

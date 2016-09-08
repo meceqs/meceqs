@@ -20,11 +20,11 @@ Properties {
     $NugetLibraries = @(
         "src/Meceqs",
         "src/Meceqs.AspNetCore",
-        "src/Meceqs.Serialization.Json",
-        "src/Meceqs.Transport.AzureEventHubs",
-        "src/Meceqs.Transport.AzureEventHubs.FileFake",
-        "src/Meceqs.Transport.AzureServiceBus",
-        "src/Meceqs.Transport.AzureServiceBus.FileFake"
+        "src/Meceqs.AzureEventHubs",
+        "src/Meceqs.AzureEventHubs.FileFake",
+        "src/Meceqs.AzureServiceBus",
+        "src/Meceqs.AzureServiceBus.FileFake",
+        "src/Meceqs.Serialization.Json"
     )
 }
 

@@ -3,7 +3,7 @@ using Customers.Core.CommandHandlers;
 using Customers.Core.Repositories;
 using Customers.Hosts.WebApi.Infrastructure;
 using Meceqs.Configuration;
-using Meceqs.Transport.AzureEventHubs.Sending;
+using Meceqs.AzureEventHubs.Sending;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
