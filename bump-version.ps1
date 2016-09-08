@@ -25,11 +25,11 @@ if ($Major -eq $true) { $selectedSwitches++ }
 if ($Minor -eq $true) { $selectedSwitches++ }
 if ($Patch -eq $true) { $selectedSwitches++ } 
 
-if ($Version -eq $null -and $selectedSwitches -eq 0) {
+if ([String]::IsNullOrWhiteSpace($Version) -and $selectedSwitches -eq 0) {
     throw "There must be either a version switch (-Major, -Minor, -Patch) or a fixed version string (-Version)"
 }
 
-if ($Version -ne $null -and $selectedSwitches -gt 0) {
+if (![String]::IsNullOrWhiteSpace($Version) -and $selectedSwitches -gt 0) {
     throw "'-Version' can not be used in combination with version switches" 
 }
 
