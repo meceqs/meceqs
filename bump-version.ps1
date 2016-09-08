@@ -1,7 +1,10 @@
 param (
     [switch]$Major,
     [switch]$Minor,
-    [switch]$Patch
+    [switch]$Patch,
+
+    # A fixed string - may not be used in combination with version switches.
+    [string]$Version
 )
 
 #########################
@@ -15,19 +18,25 @@ $packagePrefix = "Meceqs"
 
 
 #########################
-# Validate switches
+# Validate arguments
 
 $selectedSwitches = 0
 if ($Major -eq $true) { $selectedSwitches++ }
 if ($Minor -eq $true) { $selectedSwitches++ }
 if ($Patch -eq $true) { $selectedSwitches++ } 
 
-if ($selectedSwitches -eq 0) {
-    throw "No version part selected for bump"
+if ($Version -eq $null -and $selectedSwitches -eq 0) {
+    throw "There must be either a version switch (-Major, -Minor, -Patch) or a fixed version string (-Version)"
 }
+
+if ($Version -ne $null -and $selectedSwitches -gt 0) {
+    throw "'-Version' can not be used in combination with version switches" 
+}
+
 if ($selectedSwitches -gt 1) {
-    throw "Only one version part can be selected for bump"
+    throw "Only one version switch can be used"
 }
+
 
 #########################
 # Get current version from main project
@@ -43,25 +52,37 @@ $currentPatch = [Convert]::ToInt32($versionParts[2])
 
 Write-Output "Current version: $currentVersion (Major: $currentMajor Minor: $currentMinor Patch: $currentPatch)"
 
+
 #########################
 # Bump version
 
-if ($Major -eq $true) {
-    $currentMajor++
-    $currentMinor = 0
-    $currentPatch = 0
-}
-if ($Minor -eq $true) {
-    $currentMinor++
-    $currentPatch = 0
-}
-if ($Patch -eq $true) {
-    $currentPatch++
-}
+if ($Version -ne $null) {
+    $Version = $Version.Trim().TrimEnd("*-")
 
-$newVersion = "$currentMajor.$currentMinor.$currentPatch-*"
+    if (!($Version -match '([0-9]+)\.([0-9]+)\.([0-9]+)(?:(\-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-\-\.]+)?')) {
+        throw "$Version is not a valid version number"
+    }
+
+    $newVersion = "$Version-*"
+} else {
+    if ($Major -eq $true) {
+        $currentMajor++
+        $currentMinor = 0
+        $currentPatch = 0
+    }
+    if ($Minor -eq $true) {
+        $currentMinor++
+        $currentPatch = 0
+    }
+    if ($Patch -eq $true) {
+        $currentPatch++
+    }
+
+    $newVersion = "$currentMajor.$currentMinor.$currentPatch-*"
+}
 
 Write-Output "New version: $newVersion"
+
 
 #########################
 # Update all library versions and dependencies in all projects
@@ -110,3 +131,5 @@ Get-ChildItem -Filter project.json -Recurse -Depth 5 | ForEach-Object {
         $fileContent | Out-File $_.FullName
     }
 }
+
+Write-Output "Finished!"
