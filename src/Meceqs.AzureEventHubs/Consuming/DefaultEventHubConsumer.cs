@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Meceqs.AzureEventHubs.Internal;
-using Meceqs.Configuration;
 using Meceqs.Consuming;
 using Meceqs.Transport;
 using Microsoft.Extensions.DependencyInjection;
@@ -102,7 +101,7 @@ namespace Meceqs.AzureEventHubs.Consuming
 
         private bool IsKnownMessageType(string messageType)
         {
-            return _options.MessageTypes.Any(x => string.Equals(x.FullName, messageType, StringComparison.OrdinalIgnoreCase));
+            return _options.MessageTypes.Any(x => string.Equals(x.MessageType.FullName, messageType, StringComparison.OrdinalIgnoreCase));
         }
     }
 }

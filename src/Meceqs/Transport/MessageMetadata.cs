@@ -1,6 +1,6 @@
 using System;
 
-namespace Meceqs.AspNetCore.Consuming
+namespace Meceqs.Transport
 {
     public class MessageMetadata
     {

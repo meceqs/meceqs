@@ -1,6 +1,6 @@
 using System;
 
-namespace Meceqs.Configuration
+namespace Meceqs.Transport
 {
     public class UnknownMessageException : MeceqsException
     {

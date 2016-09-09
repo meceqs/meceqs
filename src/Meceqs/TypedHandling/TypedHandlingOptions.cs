@@ -1,4 +1,4 @@
-using Meceqs.Configuration;
+using Meceqs.Transport;
 using Meceqs.TypedHandling.Configuration;
 
 namespace Meceqs.TypedHandling

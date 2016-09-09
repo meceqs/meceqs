@@ -19,11 +19,15 @@ namespace Sales.Hosts.ProcessCustomerEvents
             services.AddMeceqs()
                 .AddJsonSerialization()
 
-                .AddEventHubConsumer(options =>
+                .AddEventHubConsumer(consumer =>
                 {
-                    options
-                        .AddTypedHandler<CustomerEventsHandler>()
+                    consumer
                         .SkipUnknownMessages()
+
+                        .UseTypedHandling(options =>
+                        {
+                            options.Handlers.Add<CustomerEventsHandler>();
+                        })
 
                         // RunTypedHandling will be added at the end automatically!
                         .ConfigurePipeline(x =>

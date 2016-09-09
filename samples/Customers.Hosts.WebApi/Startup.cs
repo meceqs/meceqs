@@ -1,8 +1,6 @@
-using System.Reflection;
 using Customers.Core.CommandHandlers;
 using Customers.Core.Repositories;
 using Customers.Hosts.WebApi.Infrastructure;
-using Meceqs.Configuration;
 using Meceqs.AzureEventHubs.Sending;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -10,14 +8,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using SampleConfig;
-using Swashbuckle.Swagger.Model;
-using Customers.Contracts.Queries;
 
 namespace Customers.Hosts.WebApi
 {
     public class Startup
     {
-        public Startup(IHostingEnvironment env)
+        public Startup(IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
@@ -26,6 +22,8 @@ namespace Customers.Hosts.WebApi
                 .AddEnvironmentVariables();
 
             Configuration = builder.Build();
+
+            loggerFactory.AddConsole(Configuration.GetSection("Logging"));
         }
 
         public IConfigurationRoot Configuration { get; }
@@ -36,10 +34,6 @@ namespace Customers.Hosts.WebApi
             services.AddSingleton<ICustomerRepository, InMemoryCustomerRepository>();
 
             ConfigureMeceqs(services);
-
-            ConfigureMvc(services);
-
-            ConfigureSwagger(services);
         }
 
         private void ConfigureMeceqs(IServiceCollection services)
@@ -54,45 +48,45 @@ namespace Customers.Hosts.WebApi
 
             services.AddMeceqs()
 
-                // Add services to Dependency Injection
-                .AddAspNetCore()
+                // This allows all components to use JSON serialization.
                 .AddJsonSerialization()
-                .AddDeserializationAssembly<FindCustomersQuery>()
 
-                // The WebApi is a consumer of remote messages.
-                .AddAspNetCoreConsumer()
-                .AddConsumer(pipeline =>
+                // The Web API will process incoming requests.
+                .AddAspNetCoreConsumer(consumer =>
                 {
-                    pipeline
-                        .UseEnvelopeSanitizer()     // make sure, MessageType, MessageName, etc are set correctly
-                        .UseAspNetCoreRequest()     // attach User, RequestServices, MessageHistory, ...
-                        .UseAuditing()              // add user id to message if not present
+                    // Throwing an exception is the default behavior.
+                    // We could also skip unknown message types but this doesn't make much sense
+                    // for a Web API.
+                    consumer.ThrowOnUnknownMessage();
 
-                        // forward to IHandles<TMessage, TResult>
-                        .RunTypedHandling(options =>
-                        {
-                            // In this example, the context only handles messages from this Web API
-                            // so we can just add every handler.
-                            options.Handlers.AddFromAssembly<CustomerCommandHandler>();
+                    consumer.UseTypedHandling(options =>
+                    {
+                        // In this example, the context only handles messages from this Web API
+                        // so we can just add every handler.
+                        options.Handlers.AddFromAssembly<CustomerCommandHandler>();
 
-                            // Interceptors know about the executing handler
-                            // (e.g. to check for attributes on the handler)
+                        // Interceptors know about the executing handler
+                        // (e.g. to check for attributes on the handler)
 
-                            // This interceptor is created for each message.
-                            // (It doesn't need to be registered in the DI framework
-                            // because Meceqs uses ActivatorUtilities to create the instance.)
-                            options.Interceptors.Add<SampleHandleInterceptor>();
+                        // This interceptor is created for each message.
+                        // (It doesn't need to be registered in the DI framework
+                        // because Meceqs uses ActivatorUtilities to create the instance.)
+                        options.Interceptors.Add<SampleHandleInterceptor>();
 
-                            // this interceptor will use the lifecycle from the DI framework.
-                            options.Interceptors.AddService<SingletonHandleInterceptor>();
+                        // this interceptor will use the lifecycle from the DI framework.
+                        options.Interceptors.AddService<SingletonHandleInterceptor>();
+                    });
 
-                            // Throwing an exception is the default behavior.
-                            // We could also skip unknown message types but this doesn't make much sense
-                            // for a Web API.
-                            options.UnknownMessageBehavior = UnknownMessageBehavior.ThrowException;
-                        });
+                    // This adds some custom filters to the pipeline.
+                    // They are executed in this order before the Typed Handling filter is executed.
+                    consumer.ConfigurePipeline(pipeline =>
+                    {
+                        // add user id to message if not present
+                        pipeline.UseAuditing();
+                    });
                 })
 
+                // This Web API will also send messages to an Azure Event Hub.
                 .AddEventHubSender(pipeline =>
                 {
                     pipeline
@@ -100,48 +94,16 @@ namespace Customers.Hosts.WebApi
                         .UseAuditing()              // add user id to message if not present
                         .RunEventHubSender();
                 })
-                
+
                 // Fake for the EventHubSender which will send events to a local file.
                 .AddFileFakeEventHubSender(SampleConfiguration.FileFakeEventHubDirectory);
         }
 
-        private void ConfigureMvc(IServiceCollection services)
+        public void Configure(IApplicationBuilder app)
         {
-            services.AddMvc(options =>
-            {
-                options.Filters.Add(new RejectInvalidModelStateActionFilter());
-                options.Conventions.Add(new BindComplexTypeFromBodyConvention());
-            });
-        }
-
-        private void ConfigureSwagger(IServiceCollection services)
-        {
-            services.AddSwaggerGen();
-            services.ConfigureSwaggerGen(options =>
-            {
-                options.SingleApiVersion(new Info
-                {
-                    Version = "v1",
-                    Title = Assembly.GetEntryAssembly().GetName().Name
-                });
-            });
-        }
-
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
-        {
-            loggerFactory.AddConsole(Configuration.GetSection("Logging"));
-
             app.UseDeveloperExceptionPage();
 
-            app.UseAspNetCoreConsumer(options =>
-            {
-                options.AddMessageType<FindCustomersQuery, FindCustomersResult>();
-            });
-
-            app.UseMvc();
-
-            app.UseSwagger();
-            app.UseSwaggerUi();
+            app.UseAspNetCoreConsumer();
         }
     }
 }

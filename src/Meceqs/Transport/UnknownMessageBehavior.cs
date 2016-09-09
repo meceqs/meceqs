@@ -1,4 +1,4 @@
-namespace Meceqs.Configuration
+namespace Meceqs.Transport
 {
     /// <summary>
     /// Defines how a filter/transport should treat messages
