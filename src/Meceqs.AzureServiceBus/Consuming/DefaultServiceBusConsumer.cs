@@ -1,29 +1,35 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Meceqs.AzureServiceBus.Configuration;
 using Meceqs.AzureServiceBus.Internal;
 using Meceqs.Consuming;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.ServiceBus.Messaging;
 
 namespace Meceqs.AzureServiceBus.Consuming
 {
     public class DefaultServiceBusConsumer : IServiceBusConsumer
     {
+        private readonly ServiceBusConsumerOptions _options;
         private readonly ILogger _logger;
         private readonly IServiceScopeFactory _serviceScopeFactory;
         private readonly IBrokeredMessageInvoker _brokeredMessageInvoker;
 
         public DefaultServiceBusConsumer(
+            IOptions<ServiceBusConsumerOptions> options,
             ILoggerFactory loggerFactory, 
             IServiceScopeFactory serviceScopeFactory,
             IBrokeredMessageInvoker brokeredMessageInvoker)
         {
+            Check.NotNull(options?.Value, nameof(options));
             Check.NotNull(loggerFactory, nameof(loggerFactory));
             Check.NotNull(serviceScopeFactory, nameof(serviceScopeFactory));
             Check.NotNull(brokeredMessageInvoker, nameof(brokeredMessageInvoker));
 
+            _options = options.Value;
             _logger = loggerFactory.CreateLogger<DefaultServiceBusConsumer>();
             _serviceScopeFactory = serviceScopeFactory;
             _brokeredMessageInvoker = brokeredMessageInvoker;

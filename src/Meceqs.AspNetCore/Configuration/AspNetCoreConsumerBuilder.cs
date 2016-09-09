@@ -1,7 +1,7 @@
 using Meceqs.Transport;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Meceqs.AspNetCore.Consuming
+namespace Meceqs.AspNetCore.Configuration
 {
     public class AspNetCoreConsumerBuilder : TransportConsumerBuilder<IAspNetCoreConsumerBuilder, AspNetCoreConsumerOptions>,
         IAspNetCoreConsumerBuilder

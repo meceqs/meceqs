@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Sales.Contracts.Commands;
 using SampleConfig;
 
 namespace Sales.Hosts.ProcessOrders
@@ -20,12 +19,9 @@ namespace Sales.Hosts.ProcessOrders
             services.AddMeceqs()
                 .AddJsonSerialization()
 
-                // TODO !! change to new schema
-                .AddServiceBusCore()
-                .AddDeserializationAssembly<PlaceOrderCommand>()
-                .AddConsumer(pipeline =>
+                .AddServiceBusConsumer(consumer =>
                 {
-                    pipeline.RunTypedHandling(options =>
+                    consumer.UseTypedHandling(options =>
                     {
                         options.Handlers.AddFromAssembly<Program>();
                     });

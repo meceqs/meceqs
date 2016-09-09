@@ -1,5 +1,6 @@
 using System;
 using Meceqs;
+using Meceqs.AspNetCore.Configuration;
 using Meceqs.AspNetCore.Consuming;
 using Meceqs.Configuration;
 using Microsoft.AspNetCore.Http;
@@ -14,17 +15,6 @@ namespace Microsoft.Extensions.DependencyInjection
             Check.NotNull(builder, nameof(builder));
 
             builder.Services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-
-            return builder;
-        }
-
-        #region Consuming
-
-        public static IMeceqsBuilder AddAspNetCoreConsumer(this IMeceqsBuilder builder)
-        {
-            Check.NotNull(builder, nameof(builder));
-
-            builder.AddAspNetCore();
 
             // TODO should some be singleton?
             builder.Services.TryAddSingleton<IMessagePathConvention, DefaultMessagePathConvention>();
@@ -50,7 +40,7 @@ namespace Microsoft.Extensions.DependencyInjection
             options?.Invoke(consumerBuilder);
 
             // Add core services if they don't yet exist.
-            builder.AddAspNetCoreConsumer();
+            builder.AddAspNetCore();
 
             // Add deserialization assemblies
             foreach (var assembly in consumerBuilder.GetDeserializationAssemblies())
@@ -70,7 +60,5 @@ namespace Microsoft.Extensions.DependencyInjection
 
             return builder;
         }
-
-        #endregion Consuming
     }
 }

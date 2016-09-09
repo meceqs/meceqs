@@ -29,16 +29,16 @@ namespace Microsoft.Extensions.DependencyInjection
 
         /// <summary>
         /// A meta function for adding an Azure Event Hubs consumer with one call.
-        /// It adds the most common configuration options in <paramref name="options"/>.
+        /// It adds the most common configuration options in <paramref name="consumer"/>.
         /// </summary>
         public static IMeceqsBuilder AddEventHubConsumer(
             this IMeceqsBuilder builder,
-            Action<IEventHubConsumerBuilder> options)
+            Action<IEventHubConsumerBuilder> consumer)
         {
             Check.NotNull(builder, nameof(builder));
 
             var consumerBuilder = new EventHubConsumerBuilder();
-            options?.Invoke(consumerBuilder);
+            consumer?.Invoke(consumerBuilder);
 
             // Add core services if they don't yet exist.
             builder.AddEventHubsCore();
