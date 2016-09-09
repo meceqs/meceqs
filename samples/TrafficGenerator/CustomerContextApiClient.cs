@@ -37,17 +37,17 @@ namespace TrafficGenerator
 
         public Task<CreateCustomerResult> HandleAsync(HandleContext<CreateCustomerCommand> context)
         {
-            return SendRequestAsync<CreateCustomerResult>(context, "customers/CreateCustomer");
+            return SendRequestAsync<CreateCustomerResult>(context, "CreateCustomer");
         }
 
         public Task HandleAsync(HandleContext<ChangeNameCommand> context)
         {
-            return SendRequestAsync(context, "customers/ChangeName");
+            return SendRequestAsync(context, "ChangeName");
         }
 
         public Task<FindCustomersResult> HandleAsync(HandleContext<FindCustomersQuery> context)
         {
-            return SendRequestAsync<FindCustomersResult>(context, "customers/FindCustomers");
+            return SendRequestAsync<FindCustomersResult>(context, "FindCustomers");
         }
 
         private async Task<TResult> SendRequestAsync<TResult>(HandleContext context, string relativeUrl)

@@ -10,11 +10,11 @@ namespace Meceqs.TypedHandling.Configuration
     public class ActivatorHandlerMetadata : IHandlerMetadata
     {
         private readonly Type _handlerType;
-        private readonly IEnumerable<Tuple<Type, Type>> _implementedHandles;
+        private readonly IEnumerable<HandleDefinition> _implementedHandles;
 
-        public IEnumerable<Tuple<Type, Type>> ImplementedHandles => _implementedHandles;
+        public IEnumerable<HandleDefinition> ImplementedHandles => _implementedHandles;
 
-        public ActivatorHandlerMetadata(Type handlerType, IEnumerable<Tuple<Type, Type>> implementedHandles)
+        public ActivatorHandlerMetadata(Type handlerType, IEnumerable<HandleDefinition> implementedHandles)
         {
             Check.NotNull(handlerType, nameof(handlerType));
             Check.NotNull(implementedHandles, nameof(implementedHandles));

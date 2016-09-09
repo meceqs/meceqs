@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Meceqs.Pipeline;
 using Microsoft.AspNetCore.Http;
 
-namespace Meceqs.AspNetCore
+namespace Meceqs.AspNetCore.Filters
 {
     public class AspNetCoreRequestFilter
     {

@@ -133,7 +133,7 @@ namespace Meceqs.Transport
             {
                 foreach (var implementedHandle in handler.ImplementedHandles)
                 {
-                    AddMessageType(implementedHandle.Item1, implementedHandle.Item2);
+                    AddMessageType(implementedHandle.MessageType, implementedHandle.ResultType);
                 }
             }
 

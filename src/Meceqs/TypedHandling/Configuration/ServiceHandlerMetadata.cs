@@ -10,9 +10,9 @@ namespace Meceqs.TypedHandling.Configuration
     {
         private readonly Type _handlerType;
 
-        public IEnumerable<Tuple<Type, Type>> ImplementedHandles { get; }
+        public IEnumerable<HandleDefinition> ImplementedHandles { get; }
 
-        public ServiceHandlerMetadata(Type handlerType, IEnumerable<Tuple<Type, Type>> implementedHandles)
+        public ServiceHandlerMetadata(Type handlerType, IEnumerable<HandleDefinition> implementedHandles)
         {
             Check.NotNull(handlerType, nameof(handlerType));
             Check.NotNull(implementedHandles, nameof(implementedHandles));

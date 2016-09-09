@@ -1,6 +1,6 @@
 using System;
 using Meceqs;
-using Meceqs.AspNetCore;
+using Meceqs.AspNetCore.Filters;
 using Meceqs.Pipeline;
 
 namespace Microsoft.Extensions.DependencyInjection

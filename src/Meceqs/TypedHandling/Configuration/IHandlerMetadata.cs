@@ -5,7 +5,7 @@ namespace Meceqs.TypedHandling.Configuration
 {
     public interface IHandlerMetadata
     {
-        IEnumerable<Tuple<Type, Type>> ImplementedHandles { get; }
+        IEnumerable<HandleDefinition> ImplementedHandles { get; }
 
         IHandles CreateHandler(IServiceProvider serviceProvider);
     }

@@ -18,7 +18,7 @@ namespace Meceqs.TypedHandling
         private readonly IHandlerInvoker _handlerInvoker;
         private readonly ILogger _logger;
 
-        private readonly Dictionary<Tuple<Type, Type>, IHandlerMetadata> _handlerMapping;
+        private readonly Dictionary<HandleDefinition, IHandlerMetadata> _handlerMapping;
 
         public TypedHandlingFilter(
             FilterDelegate next,
@@ -79,7 +79,7 @@ namespace Meceqs.TypedHandling
                 );
             }
 
-            var key = Tuple.Create(filterContext.MessageType, filterContext.ExpectedResultType);
+            var key = new HandleDefinition(filterContext.MessageType, filterContext.ExpectedResultType);
             
             IHandlerMetadata handlerMetadata;
             if (_handlerMapping.TryGetValue(key, out handlerMetadata))
@@ -171,7 +171,7 @@ namespace Meceqs.TypedHandling
         /// <summary>
         /// Returns a dictionary which returns a <see cref="IHandlerMetadata"/> for a given a message type and result type. 
         /// <summary>
-        private static Dictionary<Tuple<Type, Type>, IHandlerMetadata> CreateHandlerMapping(HandlerCollection handlers)
+        private static Dictionary<HandleDefinition, IHandlerMetadata> CreateHandlerMapping(HandlerCollection handlers)
         {
             Check.NotNull(handlers, nameof(handlers));
 
@@ -183,7 +183,7 @@ namespace Meceqs.TypedHandling
                     $"or '{nameof(HandlerCollection)}.{nameof(HandlerCollection.AddService)}'.");
             }
 
-            var dictionary = new Dictionary<Tuple<Type, Type>, IHandlerMetadata>();
+            var dictionary = new Dictionary<HandleDefinition, IHandlerMetadata>();
 
             foreach (var handlerMetadata in handlers)
             {

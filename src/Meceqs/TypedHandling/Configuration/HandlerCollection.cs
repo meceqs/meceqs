@@ -116,7 +116,7 @@ namespace Meceqs.TypedHandling.Configuration
             Add(factory);
         }
 
-        public static void EnsureValidHandler(Type handlerType)
+        private static void EnsureValidHandler(Type handlerType)
         {
             if (!typeof(IHandles).IsAssignableFrom(handlerType))
             {
@@ -136,7 +136,7 @@ namespace Meceqs.TypedHandling.Configuration
             }
         }
 
-        public static IEnumerable<Tuple<Type, Type>> GetImplementedHandles(Type handlerType)
+        private static IEnumerable<HandleDefinition> GetImplementedHandles(Type handlerType)
         {
             var type = handlerType;
             while (type != null)
@@ -175,7 +175,7 @@ namespace Meceqs.TypedHandling.Configuration
                     Type messageType = implementedInterface.GenericTypeArguments[0];
                     Type resultType = implementedInterface.GenericTypeArguments.Length > 1 ? implementedInterface.GenericTypeArguments[1] : null;
 
-                    yield return Tuple.Create(messageType, resultType);
+                    yield return new HandleDefinition(messageType, resultType);
                 }
 
                 type = type.GetTypeInfo().BaseType;

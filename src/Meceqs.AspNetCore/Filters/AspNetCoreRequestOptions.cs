@@ -1,7 +1,7 @@
 using System;
 using System.Reflection;
 
-namespace Meceqs.AspNetCore
+namespace Meceqs.AspNetCore.Filters
 {
     public class AspNetCoreRequestOptions
     {
