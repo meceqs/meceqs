@@ -3,7 +3,6 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Meceqs.AzureServiceBus.Consuming;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace Meceqs.AzureServiceBus.FileFake
@@ -16,19 +15,19 @@ namespace Meceqs.AzureServiceBus.FileFake
         private readonly string _directory;
         private readonly string _archiveDirectory;
 
-        private readonly IServiceProvider _applicationServices;
+        private readonly IServiceBusConsumer _serviceBusConsumer;
         private readonly ILogger _logger;
 
         private Timer _processingTimer;
 
         public FileFakeServiceBusProcessor(
             FileFakeServiceBusProcessorOptions options,
-            IServiceProvider applicationServices,
+            IServiceBusConsumer serviceBusConsumer,
             ILoggerFactory loggerFactory)
         {
             Check.NotNull(options, nameof(options));
 
-            _applicationServices = applicationServices;
+            _serviceBusConsumer = serviceBusConsumer;
             _logger = loggerFactory.CreateLogger<FileFakeServiceBusProcessor>();
 
             if (string.IsNullOrWhiteSpace(options.Directory))
@@ -131,15 +130,9 @@ namespace Meceqs.AzureServiceBus.FileFake
         {
             var brokeredMessage = FileFakeBrokeredMessageSerializer.Deserialize(fileContent);
 
-            // Call consumer with new scope.
-            var serviceScopeFactory = _applicationServices.GetRequiredService<IServiceScopeFactory>();
-            using (var scope = serviceScopeFactory.CreateScope())
-            {
-                var requestServices = scope.ServiceProvider;
-                var serviceBusConsumer = requestServices.GetRequiredService<IServiceBusConsumer>();
-
-                await serviceBusConsumer.ConsumeAsync(brokeredMessage, CancellationToken.None);
-            }
+            // The consumer will create a new scope, so we don't have to do it here.
+            var cancellationToken = CancellationToken.None; // TODO @cweiss CancellationToken???
+            await _serviceBusConsumer.ConsumeAsync(brokeredMessage, cancellationToken);
         }
     }
 }

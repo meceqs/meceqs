@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Meceqs.AzureEventHubs.Consuming;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace Meceqs.AzureEventHubs.FileFake
@@ -17,7 +16,7 @@ namespace Meceqs.AzureEventHubs.FileFake
         private readonly string _fileName;
 
 
-        private readonly IServiceProvider _applicationServices;
+        private readonly IEventHubConsumer _eventHubConsumer;
         private readonly ILogger _logger;
 
         private Timer _processingTimer;
@@ -25,12 +24,12 @@ namespace Meceqs.AzureEventHubs.FileFake
         private long _fileCreationTicks = 0;
         private int _sequenceNumber = 0;
 
-        public FileFakeEventHubProcessor(FileFakeEventHubProcessorOptions options, IServiceProvider applicationServices, ILoggerFactory loggerFactory)
+        public FileFakeEventHubProcessor(FileFakeEventHubProcessorOptions options, IEventHubConsumer eventHubConsumer, ILoggerFactory loggerFactory)
         {
             Check.NotNull(options, nameof(options));
 
             _options = options;
-            _applicationServices = applicationServices;
+            _eventHubConsumer = eventHubConsumer;
             _logger = loggerFactory.CreateLogger<FileFakeEventHubProcessor>();
 
             _fileName = Path.Combine(_options.Directory, $"{_options.EventHubName}.txt");
@@ -133,14 +132,9 @@ namespace Meceqs.AzureEventHubs.FileFake
 
             var eventData = FileFakeEventDataSerializer.Deserialize(serializedEvent, sequenceNumber);
 
-            var serviceScopeFactory = _applicationServices.GetRequiredService<IServiceScopeFactory>();
-            using (var scope = serviceScopeFactory.CreateScope())
-            {
-                var requestServices = scope.ServiceProvider;
-                var eventHubConsumer = requestServices.GetRequiredService<IEventHubConsumer>();
-
-                await eventHubConsumer.ConsumeAsync(eventData, CancellationToken.None);
-            }
+            // The consumer will create a new scope, so we don't have to do it here.
+            var cancellationToken = CancellationToken.None; // TODO @cweiss CancellationToken???
+            await _eventHubConsumer.ConsumeAsync(eventData, cancellationToken);
         }
     }
 }
