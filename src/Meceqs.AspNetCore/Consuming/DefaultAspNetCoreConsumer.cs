@@ -25,7 +25,7 @@ namespace Meceqs.AspNetCore.Consuming
             _httpResponseWriter = httpResponseWriter;
         }
 
-        public async Task HandleAsync(HttpContext httpContext, MessageMetadata metadata)
+        public async Task ConsumeAsync(HttpContext httpContext, MessageMetadata metadata)
         {
             // TODO error handling etc.
 

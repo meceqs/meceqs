@@ -6,6 +6,6 @@ namespace Meceqs.AspNetCore.Consuming
 {
     public interface IAspNetCoreConsumer
     {
-        Task HandleAsync(HttpContext httpContext, MessageMetadata metadata);
+        Task ConsumeAsync(HttpContext httpContext, MessageMetadata metadata);
     }
 }

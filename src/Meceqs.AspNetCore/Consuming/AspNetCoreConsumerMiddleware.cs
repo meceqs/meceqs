@@ -46,7 +46,7 @@ namespace Meceqs.AspNetCore.Consuming
             {
                 _logger.LogDebug("Path matched for message type {MessageType}", messageMetadata.MessageType);
 
-                return aspNetCoreConsumer.HandleAsync(httpContext, messageMetadata);
+                return aspNetCoreConsumer.ConsumeAsync(httpContext, messageMetadata);
             }
             else
             {
