@@ -1,4 +1,5 @@
 using System;
+using System.Security.Claims;
 using System.Threading;
 
 namespace Meceqs.Pipeline
@@ -15,6 +16,8 @@ namespace Meceqs.Pipeline
         TBuilder SetHeader(string headerName, object value);
 
         TBuilder SetRequestServices(IServiceProvider requestServices);
+
+        TBuilder SetUser(ClaimsPrincipal user);
 
         TBuilder UsePipeline(string pipelineName);
     }

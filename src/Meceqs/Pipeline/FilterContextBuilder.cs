@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -16,6 +17,7 @@ namespace Meceqs.Pipeline
         protected FilterContextItems ContextItems { get; private set; }
         protected string PipelineName { get; private set; }
         protected IServiceProvider RequestServices { get; private set; }
+        protected ClaimsPrincipal User { get; private set; }
 
         /// <summary>
         /// Returning "this" is not possible because "TBuilder" is not a derived type from this.
@@ -63,6 +65,12 @@ namespace Meceqs.Pipeline
             return Instance;
         }
 
+        public virtual TBuilder SetUser(ClaimsPrincipal user)
+        {
+            User = user;
+            return Instance;
+        }
+
         public virtual TBuilder UsePipeline(string pipelineName)
         {
             Check.NotNullOrWhiteSpace(pipelineName, nameof(pipelineName));
@@ -89,6 +97,7 @@ namespace Meceqs.Pipeline
 
             context.Cancellation = Cancellation;
             context.RequestServices = RequestServices;
+            context.User = User;
 
             if (ContextItems != null)
             {
