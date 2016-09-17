@@ -28,6 +28,22 @@ namespace Meceqs.Sending.Internal
             _pipelineProvider = pipelineProvider;
         }
 
+        public IFluentSender ForEnvelope(Envelope envelope)
+        {
+            Check.NotNull(envelope, nameof(envelope));
+
+            var envelopes = new List<Envelope> { envelope };
+
+            return ForEnvelopes(envelopes);
+        }
+
+        public IFluentSender ForEnvelopes(IList<Envelope> envelopes)
+        {
+            Check.NotNull(envelopes, nameof(envelopes));
+
+            return new FluentSender(envelopes, _envelopeCorrelator, _filterContextFactory, _pipelineProvider);
+        }
+
         public IFluentSender ForMessage(object message, Guid? messageId = null)
         {
             Check.NotNull(message, nameof(message));
