@@ -61,7 +61,7 @@ namespace Meceqs.TypedHandling.Configuration
         /// Adds all types representing an <see cref="IHandles"/> from the given assembly.
         /// </summary>
         /// <param name="assembly">The assembly to be searched for <see cref="IHandles"/> implementations.</param>
-        /// <param name="filter">Allows to filter the types (e.g. by namespace)</param>
+        /// <param name="filter">Allows to filter the types (e.g. by namespace).</param>
         /// <remarks>
         /// Handler instances will be created using
         /// <see cref="Microsoft.Extensions.DependencyInjection.ActivatorUtilities"/>.

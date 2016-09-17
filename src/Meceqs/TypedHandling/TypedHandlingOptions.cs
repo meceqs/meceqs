@@ -10,5 +10,15 @@ namespace Meceqs.TypedHandling
         public InterceptorCollection Interceptors { get; } = new InterceptorCollection();
 
         public UnknownMessageBehavior UnknownMessageBehavior { get; set; } = UnknownMessageBehavior.ThrowException;
+
+        public void ThrowOnUnknownMessage()
+        {
+            UnknownMessageBehavior = UnknownMessageBehavior.ThrowException;
+        }
+
+        public void SkipUnknownMessages()
+        {
+            UnknownMessageBehavior = UnknownMessageBehavior.Skip;
+        }
     }
 }

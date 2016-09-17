@@ -50,7 +50,5 @@ namespace Customers.Hosts.WebApi.Infrastructure
         {
             _logger.LogInformation("OnHandleExecuted for {MessageType}", context.Message.GetType());
         }
-
-        
     }
 }
