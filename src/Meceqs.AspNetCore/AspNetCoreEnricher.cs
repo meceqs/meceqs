@@ -80,7 +80,7 @@ namespace Meceqs.AspNetCore
                 Pipeline = filterContext.PipelineName,
                 Host = _options.HostName,
                 Endpoint = _options.EndpointName,
-                CreatedOnUtc = DateTimeOffset.UtcNow
+                CreatedOnUtc = DateTime.UtcNow
             };
 
             historyEntry.Properties.Add(_options.HistoryPropertyRequestId, httpContext.TraceIdentifier);
