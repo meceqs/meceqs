@@ -51,6 +51,11 @@ namespace Customers.Hosts.WebApi
                 // This allows all components to use JSON serialization.
                 .AddJsonSerialization()
 
+                // Pass HttpContext.RequestServices, .User, etc to every processed message.
+                // (this will also be called by AddAspNetCoreConsumer so it wouldn't be necessary here,
+                // it's just here for clarity).
+                .AddAspNetCore()
+
                 // The Web API will process incoming requests.
                 .AddAspNetCoreConsumer(consumer =>
                 {
@@ -90,7 +95,6 @@ namespace Customers.Hosts.WebApi
                 .AddEventHubSender(pipeline =>
                 {
                     pipeline
-                        .UseAspNetCoreRequest()
                         .UseAuditing()              // add user id to message if not present
                         .RunEventHubSender();
                 })

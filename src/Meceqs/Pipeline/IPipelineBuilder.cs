@@ -8,6 +8,6 @@ namespace Meceqs.Pipeline
 
         IPipelineBuilder Use(Func<FilterDelegate, FilterDelegate> filter);
 
-        IPipeline Build();
+        IPipeline Build(string pipelineName);
     }
 }

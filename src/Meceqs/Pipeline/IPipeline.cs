@@ -7,6 +7,8 @@ namespace Meceqs.Pipeline
     /// </summary>
     public interface IPipeline
     {
+        string Name { get; }
+
         Task ProcessAsync(FilterContext context);
 
         Task<TResult> ProcessAsync<TResult>(FilterContext context);

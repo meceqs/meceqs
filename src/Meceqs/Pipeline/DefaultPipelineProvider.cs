@@ -1,41 +1,36 @@
 using System;
 using System.Collections.Generic;
-using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
 namespace Meceqs.Pipeline
 {
     public class DefaultPipelineProvider : IPipelineProvider
     {
-        private readonly PipelineOptions _options;
-        private readonly ILoggerFactory _loggerFactory;
-
         private readonly IDictionary<string, IPipeline> _pipelines = new Dictionary<string, IPipeline>();
 
-        public DefaultPipelineProvider(IOptions<PipelineOptions> options, IServiceProvider serviceProvider, ILoggerFactory loggerFactory)
+        public DefaultPipelineProvider(
+            IOptions<PipelineOptions> options,
+            IServiceProvider serviceProvider)
         {
             Check.NotNull(options, nameof(options));
             Check.NotNull(serviceProvider, nameof(serviceProvider));
-            Check.NotNull(loggerFactory, nameof(loggerFactory));
 
-            _options = options.Value;
-            _loggerFactory = loggerFactory;
-
-            BuildPipelines(serviceProvider);
+            BuildPipelines(serviceProvider, options.Value);
         }
 
-        private void BuildPipelines(IServiceProvider serviceProvider)
+        private void BuildPipelines(IServiceProvider serviceProvider, PipelineOptions options)
         {
-            foreach (var kvp in _options.Pipelines)
+            foreach (var kvp in options.Pipelines)
             {
                 string pipelineName = kvp.Key;
                 Action<IPipelineBuilder> setupAction = kvp.Value;
 
-                var builder = new DefaultPipelineBuilder(pipelineName, serviceProvider, _loggerFactory);
-                
+                var builder = serviceProvider.GetRequiredService<IPipelineBuilder>();
+
                 setupAction(builder);
 
-                _pipelines.Add(pipelineName, builder.Build());
+                _pipelines.Add(pipelineName, builder.Build(pipelineName));
             }
         }
 

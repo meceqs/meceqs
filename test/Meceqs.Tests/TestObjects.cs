@@ -3,6 +3,7 @@ using Meceqs.Pipeline;
 using Meceqs.Sending;
 using Meceqs.Sending.Internal;
 using Meceqs.TypedHandling;
+using NSubstitute;
 
 namespace Meceqs.Tests
 {
@@ -21,12 +22,13 @@ namespace Meceqs.Tests
             return (Envelope<TMessage>)EnvelopeFactory().Create(message, id ?? Guid.NewGuid());
         }
 
-        public static FilterContext<TMessage> FilterContext<TMessage>(Type resultType = null)
+        public static FilterContext<TMessage> FilterContext<TMessage>(Type resultType = null, IServiceProvider requestServices = null)
             where TMessage : class, new()
         {
             var envelope = TestObjects.Envelope<TMessage>();
 
             var filterContext = new FilterContext<TMessage>(envelope);
+            filterContext.RequestServices = requestServices ?? Substitute.For<IServiceProvider>();
             filterContext.ExpectedResultType = resultType;
 
             return filterContext;

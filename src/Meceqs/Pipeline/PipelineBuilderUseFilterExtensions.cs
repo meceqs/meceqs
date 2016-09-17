@@ -63,13 +63,12 @@ namespace Microsoft.Extensions.DependencyInjection
 
                 return context =>
                 {
-                    var serviceProvider = context.RequestServices ?? applicationServices;
-                    if (serviceProvider == null)
+                    if (context.RequestServices == null)
                     {
                         throw new InvalidOperationException($"'{nameof(IServiceProvider)}' is not available.");
                     }
 
-                    return factory(instance, context, serviceProvider);
+                    return factory(instance, context, context.RequestServices);
                 };
             });
         }

@@ -25,6 +25,8 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             builder.Services.TryAddSingleton<IFilterContextFactory, DefaultFilterContextFactory>();
             builder.Services.TryAddSingleton<IPipelineProvider, DefaultPipelineProvider>();
+
+            // Every pipeline that should be built must get its own builder.
             builder.Services.TryAddTransient<IPipelineBuilder, DefaultPipelineBuilder>();
         }
     }

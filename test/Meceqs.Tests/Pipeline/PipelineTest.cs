@@ -15,7 +15,7 @@ namespace Meceqs.Tests.Pipeline
             if (filterDelegate == null)
                 filterDelegate = (ctx) => Task.CompletedTask;
             
-            return new DefaultPipeline(filterDelegate, "pipeline", Substitute.For<ILoggerFactory>());
+            return new DefaultPipeline(filterDelegate, "pipeline", Substitute.For<ILoggerFactory>(), null);
         }
 
         [Fact]
@@ -23,10 +23,20 @@ namespace Meceqs.Tests.Pipeline
         {
             FilterDelegate filterDelegate = ctx => Task.CompletedTask;
             var loggerFactory = Substitute.For<ILoggerFactory>();
+            var filterContextEnricher = Substitute.For<IFilterContextEnricher>();
 
-            Should.Throw<ArgumentNullException>(() => new DefaultPipeline(null, "pipeline", loggerFactory));
-            Should.Throw<ArgumentNullException>(() => new DefaultPipeline(filterDelegate, null, loggerFactory));
-            Should.Throw<ArgumentNullException>(() => new DefaultPipeline(filterDelegate, "pipeline", null));
+            Should.Throw<ArgumentNullException>(() => new DefaultPipeline(null, "pipeline", loggerFactory, filterContextEnricher));
+            Should.Throw<ArgumentNullException>(() => new DefaultPipeline(filterDelegate, null, loggerFactory, filterContextEnricher));
+            Should.Throw<ArgumentNullException>(() => new DefaultPipeline(filterDelegate, "pipeline", null, filterContextEnricher));
+        }
+
+        [Fact]
+        public void Ctor_DoesNotThrow_if_filterContextEnricher_missing()
+        {
+            FilterDelegate filterDelegate = ctx => Task.CompletedTask;
+            var loggerFactory = Substitute.For<ILoggerFactory>();
+
+            new DefaultPipeline(filterDelegate, "pipeline", loggerFactory, null);
         }
 
         [Fact]

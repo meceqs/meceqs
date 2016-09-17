@@ -1,34 +1,42 @@
 using System;
 using System.Threading;
-using System.Threading.Tasks;
 using Meceqs.Pipeline;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
 
-namespace Meceqs.AspNetCore.Filters
+namespace Meceqs.AspNetCore
 {
-    public class AspNetCoreRequestFilter
+    public class AspNetCoreEnricher : IFilterContextEnricher
     {
-        private readonly FilterDelegate _next;
-        private readonly AspNetCoreRequestOptions _options;
+        private readonly AspNetCoreEnricherOptions _options;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public AspNetCoreRequestFilter(FilterDelegate next, AspNetCoreRequestOptions options)
+        public AspNetCoreEnricher(
+            IOptions<AspNetCoreEnricherOptions> options,
+            IHttpContextAccessor httpContextAccessor)
         {
-            Check.NotNull(next, nameof(next));
-            Check.NotNull(options, nameof(options));
-
-            _next = next;
-            _options = options;
-        }
-
-        public Task Invoke(FilterContext context, IHttpContextAccessor httpContextAccessor)
-        {
-            Check.NotNull(context, nameof(context));
+            Check.NotNull(options?.Value, nameof(options));
             Check.NotNull(httpContextAccessor, nameof(httpContextAccessor));
 
-            var httpContext = httpContextAccessor.HttpContext;
+            _options = options.Value;
+            _httpContextAccessor = httpContextAccessor;
+        }
 
-            context.RequestServices = httpContext.RequestServices;
-            context.User = httpContext.User;
+        public void EnrichFilterContext(FilterContext context)
+        {
+            Check.NotNull(context, nameof(context));
+
+            var httpContext = _httpContextAccessor.HttpContext;
+
+            if (context.RequestServices == null)
+            {
+                context.RequestServices = httpContext.RequestServices;
+            }
+
+            if (context.User == null)
+            {
+                context.User = httpContext.User;
+            }
 
             if (context.Cancellation == default(CancellationToken))
             {
@@ -47,8 +55,6 @@ namespace Meceqs.AspNetCore.Filters
 
             AddRemoteUserHeaders(context, httpContext);
             AddHistoryEntry(context, httpContext);
-
-            return _next(context);
         }
 
         private void AddRemoteUserHeaders(FilterContext filterContext, HttpContext httpContext)

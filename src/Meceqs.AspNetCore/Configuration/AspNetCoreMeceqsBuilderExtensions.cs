@@ -1,8 +1,10 @@
 using System;
 using Meceqs;
+using Meceqs.AspNetCore;
 using Meceqs.AspNetCore.Configuration;
 using Meceqs.AspNetCore.Consuming;
 using Meceqs.Configuration;
+using Meceqs.Pipeline;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -14,7 +16,9 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             Check.NotNull(builder, nameof(builder));
 
+            // Enricher
             builder.Services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            builder.Services.TryAddSingleton<IFilterContextEnricher, AspNetCoreEnricher>();
 
             // TODO should some be singleton?
             builder.Services.TryAddSingleton<IMessagePathConvention, DefaultMessagePathConvention>();
@@ -57,6 +61,20 @@ namespace Microsoft.Extensions.DependencyInjection
 
             // Add the pipeline.
             builder.AddConsumer(consumerBuilder.GetPipelineName(), consumerBuilder.GetPipeline());
+
+            return builder;
+        }
+
+        public static IMeceqsBuilder ConfigureAspNetCoreEnricher(
+            this IMeceqsBuilder builder,
+            Action<AspNetCoreEnricherOptions> options)
+        {
+            Check.NotNull(builder, nameof(builder));
+
+            if (options != null)
+            {
+                builder.Services.Configure(options);
+            }
 
             return builder;
         }

@@ -82,13 +82,13 @@ namespace Meceqs.Tests.Pipeline
         private IPipeline GetPipeline(IServiceProvider serviceProvider)
         {
             var loggerFactory = Substitute.For<ILoggerFactory>();
-            var builder = new DefaultPipelineBuilder("pipeline", serviceProvider, loggerFactory);
+            var builder = new DefaultPipelineBuilder(serviceProvider, loggerFactory, null);
             
             // two filters to make sure we can test scoped services.
             builder.UseFilter<FilterWithServices>(false /* isTerminating */);
             builder.UseFilter<FilterWithServices>(true /* isTerminating */);
             
-            return builder.Build();
+            return builder.Build("pipeline");
         }
 
         [Fact]
@@ -106,7 +106,7 @@ namespace Meceqs.Tests.Pipeline
             // multiple requests
             for (int i = 0; i < 5; i++)
             {
-                var context = TestObjects.FilterContext<SimpleMessage>();
+                var context = TestObjects.FilterContext<SimpleMessage>(requestServices: serviceProvider);
                 await pipeline.ProcessAsync(context);
             }
 
@@ -134,7 +134,7 @@ namespace Meceqs.Tests.Pipeline
             // multiple requests
             for (int i = 0; i < 5; i++)
             {
-                var context = TestObjects.FilterContext<SimpleMessage>();
+                var context = TestObjects.FilterContext<SimpleMessage>(requestServices: serviceProvider);
                 await pipeline.ProcessAsync(context);
             }
 
@@ -165,8 +165,7 @@ namespace Meceqs.Tests.Pipeline
             {
                 using (var scope = serviceScopeFactory.CreateScope())
                 {
-                    var context = TestObjects.FilterContext<SimpleMessage>();
-                    context.RequestServices = scope.ServiceProvider;
+                    var context = TestObjects.FilterContext<SimpleMessage>(requestServices: scope.ServiceProvider);
 
                     await pipeline.ProcessAsync(context);
                 }

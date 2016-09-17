@@ -50,7 +50,7 @@ namespace Meceqs.Tests.Pipeline
             var services = new ServiceCollection();
             var serviceProvider = services.BuildServiceProvider();
 
-            return new DefaultPipelineBuilder("pipeline", serviceProvider, Substitute.For<ILoggerFactory>());
+            return new DefaultPipelineBuilder(serviceProvider, Substitute.For<ILoggerFactory>(), null);
         }
 
         [Fact]
@@ -63,7 +63,7 @@ namespace Meceqs.Tests.Pipeline
             Action callback1 = () => called1++;
             builder.UseFilter<TerminatingCallbackFilter>(callback1);
 
-            var pipeline = builder.Build();
+            var pipeline = builder.Build("pipeline");
 
             await pipeline.ProcessAsync(context);
 
@@ -88,7 +88,7 @@ namespace Meceqs.Tests.Pipeline
             Action callback3 = () => called3++;
             builder.UseFilter<TerminatingCallbackFilter>(callback3);
 
-            var pipeline = builder.Build();
+            var pipeline = builder.Build("pipeline");
 
             await pipeline.ProcessAsync(context);
 
@@ -111,7 +111,7 @@ namespace Meceqs.Tests.Pipeline
             Action callback2 = () => called2++;
             builder.UseFilter<TerminatingCallbackFilter>(callback2);
 
-            var pipeline = builder.Build();
+            var pipeline = builder.Build("pipeline");
 
             await pipeline.ProcessAsync(context);
 
@@ -133,7 +133,7 @@ namespace Meceqs.Tests.Pipeline
             Action callback2 = () => called2++;
             builder.UseFilter<CallbackFilter>(callback2);
 
-            var pipeline = builder.Build();
+            var pipeline = builder.Build("pipeline");
 
             await pipeline.ProcessAsync(context);
 

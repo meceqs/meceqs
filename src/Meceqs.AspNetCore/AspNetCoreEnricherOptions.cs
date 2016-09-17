@@ -1,9 +1,9 @@
 using System;
 using System.Reflection;
 
-namespace Meceqs.AspNetCore.Filters
+namespace Meceqs.AspNetCore
 {
-    public class AspNetCoreRequestOptions
+    public class AspNetCoreEnricherOptions
     {
         public string HostName { get; set; } = Environment.MachineName;
 

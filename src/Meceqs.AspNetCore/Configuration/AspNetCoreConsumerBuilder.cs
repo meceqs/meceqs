@@ -16,9 +16,6 @@ namespace Meceqs.AspNetCore.Configuration
                 // To make sure, they don't have to add every field (message type can be implied etc.),
                 // they are automatically added.
                 pipeline.UseEnvelopeSanitizer();
-
-                // This connects the pipeline with the ASP.NET Core request (RequestServices, User, ...).
-                pipeline.UseAspNetCoreRequest();
             };
         }
     }

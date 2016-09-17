@@ -13,7 +13,12 @@ namespace Meceqs.Tests.Pipeline
     {
         private IPipelineBuilder GetPipelineBuilder()
         {
-            return new DefaultPipelineBuilder("pipeline", Substitute.For<IServiceProvider>(), Substitute.For<ILoggerFactory>());
+            var builder = new DefaultPipelineBuilder(
+                Substitute.For<IServiceProvider>(),
+                Substitute.For<ILoggerFactory>(),
+                null);
+
+            return builder;
         }
 
         [Fact]
@@ -21,10 +26,19 @@ namespace Meceqs.Tests.Pipeline
         {
             var serviceProvider = Substitute.For<IServiceProvider>();
             var loggerFactory = Substitute.For<ILoggerFactory>();
+            var filterContextEnricher = Substitute.For<IFilterContextEnricher>();
 
-            Should.Throw<ArgumentNullException>(() => new DefaultPipelineBuilder(null, serviceProvider, loggerFactory));
-            Should.Throw<ArgumentNullException>(() => new DefaultPipelineBuilder("pipeline", null, loggerFactory));
-            Should.Throw<ArgumentNullException>(() => new DefaultPipelineBuilder("pipeline", serviceProvider, null));
+            Should.Throw<ArgumentNullException>(() => new DefaultPipelineBuilder(null, loggerFactory, filterContextEnricher));
+            Should.Throw<ArgumentNullException>(() => new DefaultPipelineBuilder(serviceProvider, null, filterContextEnricher));
+        }
+
+        [Fact]
+        public void Ctor_DoesNotThrow_if_filterContexEnricher_missing()
+        {
+            var serviceProvider = Substitute.For<IServiceProvider>();
+            var loggerFactory = Substitute.For<ILoggerFactory>();
+
+            new DefaultPipelineBuilder(serviceProvider, loggerFactory, null);
         }
 
         [Fact]
@@ -32,7 +46,7 @@ namespace Meceqs.Tests.Pipeline
         {
             var context = TestObjects.FilterContext<SimpleMessage>();
             var builder = GetPipelineBuilder();
-            var pipeline = builder.Build();
+            var pipeline = builder.Build("pipeline");
 
             Should.Throw<InvalidOperationException>(async () => await pipeline.ProcessAsync(context));
         }
@@ -45,7 +59,7 @@ namespace Meceqs.Tests.Pipeline
 
             builder.Use((ctx, next) => next());
 
-            var pipeline = builder.Build();
+            var pipeline = builder.Build("pipeline");
 
             Should.Throw<InvalidOperationException>(async () => await pipeline.ProcessAsync(context));
         }
@@ -62,10 +76,10 @@ namespace Meceqs.Tests.Pipeline
             var called2 = 0;
             builder.Use((ctx, next) => { called2++; return next(); });
 
-            var pipeline = builder.Build();
+            var pipeline = builder.Build("pipeline");
 
             Should.Throw<InvalidOperationException>(async () => await pipeline.ProcessAsync(context));
-            
+
             called1.ShouldBe(1);
             called2.ShouldBe(1);
         }
@@ -85,7 +99,7 @@ namespace Meceqs.Tests.Pipeline
             var called3 = 0;
             builder.Run(ctx => { called3++; return Task.CompletedTask; });
 
-            var pipeline = builder.Build();
+            var pipeline = builder.Build("pipeline");
 
             await pipeline.ProcessAsync(context);
 
@@ -104,7 +118,7 @@ namespace Meceqs.Tests.Pipeline
             var called = 0;
             builder.Run(ctx => { called++; return Task.CompletedTask; });
 
-            var pipeline = builder.Build();
+            var pipeline = builder.Build("pipeline");
 
             await pipeline.ProcessAsync(context);
 
@@ -123,7 +137,7 @@ namespace Meceqs.Tests.Pipeline
             var called2 = 0;
             builder.Run(ctx => { called2++; return Task.CompletedTask; });
 
-            var pipeline = builder.Build();
+            var pipeline = builder.Build("pipeline");
 
             await pipeline.ProcessAsync(context);
 
@@ -143,7 +157,7 @@ namespace Meceqs.Tests.Pipeline
             var called2 = 0;
             builder.Use((ctx, next) => { called2++; return next(); });
 
-            var pipeline = builder.Build();
+            var pipeline = builder.Build("pipeline");
 
             await pipeline.ProcessAsync(context);
 

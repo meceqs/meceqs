@@ -20,7 +20,7 @@ namespace Meceqs.Pipeline
         protected ClaimsPrincipal User { get; private set; }
 
         /// <summary>
-        /// Returning "this" is not possible because "TBuilder" is not a derived type from this.
+        /// Returning "this" in methods is not possible because "TBuilder" is not a derived type from this.
         /// </summary>
         public abstract TBuilder Instance { get; }
 

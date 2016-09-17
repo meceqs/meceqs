@@ -8,20 +8,22 @@ namespace Meceqs.Pipeline
     public class DefaultPipelineBuilder : IPipelineBuilder
     {
         private readonly IList<Func<FilterDelegate, FilterDelegate>> _filters = new List<Func<FilterDelegate, FilterDelegate>>();
-        private readonly string _pipelineName;
         private readonly ILoggerFactory _loggerFactory;
+        private readonly IFilterContextEnricher _filterContextEnricher;
 
         public IServiceProvider ApplicationServices { get; }
 
-        public DefaultPipelineBuilder(string pipelineName, IServiceProvider serviceProvider, ILoggerFactory loggerFactory)
+        public DefaultPipelineBuilder(
+            IServiceProvider serviceProvider,
+            ILoggerFactory loggerFactory,
+            IFilterContextEnricher filterContextEnricher = null)
         {
-            Check.NotNullOrWhiteSpace(pipelineName, nameof(pipelineName));
             Check.NotNull(serviceProvider, nameof(serviceProvider));
             Check.NotNull(loggerFactory, nameof(loggerFactory));
 
             ApplicationServices = serviceProvider;
-            _pipelineName = pipelineName;
             _loggerFactory = loggerFactory;
+            _filterContextEnricher = filterContextEnricher;
         }
 
         public IPipelineBuilder Use(Func<FilterDelegate, FilterDelegate> filter)
@@ -30,8 +32,10 @@ namespace Meceqs.Pipeline
             return this;
         }
 
-        public IPipeline Build()
+        public IPipeline Build(string pipelineName)
         {
+            Check.NotNullOrWhiteSpace(pipelineName, nameof(pipelineName));
+
             FilterDelegate pipeline = context =>
             {
                 // This filter will be executed last!
@@ -43,7 +47,7 @@ namespace Meceqs.Pipeline
                 pipeline = filter(pipeline);
             }
 
-            return new DefaultPipeline(pipeline, _pipelineName, _loggerFactory);
+            return new DefaultPipeline(pipeline, pipelineName, _loggerFactory, _filterContextEnricher);
         }
     }
 }
