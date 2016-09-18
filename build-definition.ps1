@@ -19,11 +19,13 @@ Properties {
     # A list of projects for which NuGet packages should be created
     $NugetLibraries = @(
         "src/Meceqs",
+        "src/Meceqs.Abstractions",
         "src/Meceqs.AspNetCore",
         "src/Meceqs.AzureEventHubs",
         "src/Meceqs.AzureEventHubs.FileFake",
         "src/Meceqs.AzureServiceBus",
         "src/Meceqs.AzureServiceBus.FileFake",
+        "src/Meceqs.HttpSender",
         "src/Meceqs.Serialization.Json"
     )
 }
