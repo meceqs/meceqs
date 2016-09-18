@@ -95,7 +95,7 @@ Get-ChildItem -Filter project.json -Recurse -Depth 5 | ForEach-Object {
     Write-Output ("Processing " + $_.DirectoryName)
 
     $fileChanged = $false
-    $fileContent = Get-Content -Path $_.FullName -Raw 
+    $fileContent = [IO.File]::ReadAllText($_.FullName)
     $json = $fileContent | ConvertFrom-Json -ErrorAction Ignore
 
     # Should we update the library version?
@@ -128,7 +128,9 @@ Get-ChildItem -Filter project.json -Recurse -Depth 5 | ForEach-Object {
     }
 
     if ($fileChanged -eq $true) {
-        $fileContent | Out-File $_.FullName
+        # Out-File adds the BOM to the encoding so we have to use a different method
+        # http://stackoverflow.com/questions/5596982/using-powershell-to-write-a-file-in-utf-8-without-the-bom
+        [IO.File]::WriteAllText($_.FullName, $fileContent)
     }
 }
 
