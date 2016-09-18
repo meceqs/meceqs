@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Customers.Contracts.Commands;
 using Meceqs.AzureServiceBus.Sending;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -24,11 +25,15 @@ namespace TrafficGenerator
 
             services.AddMeceqs()
                 .AddJsonSerialization()
-                .AddSender(pipeline =>
+
+                .AddHttpSender(sender =>
                 {
-                    pipeline.RunTypedHandling(options =>
+                    sender.AddEndpoint("Customers", options =>
                     {
-                        options.Handlers.AddFromAssembly<Program>();
+                        options.BaseAddress = SampleConfiguration.CustomersWebApiUrl;
+
+                        // Write your own extension method if you have a base class for alle messages
+                        options.AddFromAssembly<CreateCustomerCommand>(t => t.Name.EndsWith("Command") || t.Name.EndsWith("Query"));
                     });
                 })
 
@@ -43,7 +48,8 @@ namespace TrafficGenerator
 
         public static void Main(string[] args)
         {
-            Console.WriteLine("Welcome to the Website traffic simulator!");
+            Console.WriteLine("TrafficGenerator!");
+            Console.WriteLine("==================================");
             Console.WriteLine();
             Console.WriteLine("Press [ENTER] to close application");
             Console.WriteLine();

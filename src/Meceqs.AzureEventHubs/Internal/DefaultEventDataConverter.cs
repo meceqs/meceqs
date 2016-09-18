@@ -23,7 +23,7 @@ namespace Meceqs.AzureEventHubs.Internal
         {
             Check.NotNull(envelope, nameof(envelope));
 
-            byte[] serializedEnvelope = _serializer.SerializeToByteArray(envelope);
+            byte[] serializedEnvelope = _serializer.SerializeEnvelopeToByteArray(envelope);
 
             EventData eventData = new EventData(serializedEnvelope);
 
@@ -46,7 +46,7 @@ namespace Meceqs.AzureEventHubs.Internal
 
             Stream serializedEnvelope = eventData.GetBodyStream();
 
-            return _deserializer.DeserializeFromStream(contentType, serializedEnvelope, messageType);
+            return _deserializer.DeserializeEnvelopeFromStream(contentType, serializedEnvelope, messageType);
         }
     }
 }

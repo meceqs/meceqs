@@ -4,8 +4,8 @@ namespace Meceqs.Serialization
     {
         string ContentType { get; }
 
-        byte[] SerializeToByteArray(Envelope envelope);
+        byte[] SerializeEnvelopeToByteArray(Envelope envelope);
 
-        string SerializeToString(Envelope envelope);
+        string SerializeEnvelopeToString(Envelope envelope);
     }
 }

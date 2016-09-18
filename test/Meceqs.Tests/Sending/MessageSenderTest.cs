@@ -3,7 +3,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Meceqs.Pipeline;
 using Meceqs.Sending;
-using Meceqs.Sending.Internal;
 using NSubstitute;
 using Shouldly;
 using Xunit;

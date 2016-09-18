@@ -4,6 +4,6 @@ namespace Meceqs.Serialization
 {
     public interface IEnvelopeDeserializer
     {
-        Envelope DeserializeFromStream(string contentType, Stream serializedEnvelope, string messageType);
+        Envelope DeserializeEnvelopeFromStream(string contentType, Stream serializedEnvelope, string messageType);
     }
 }

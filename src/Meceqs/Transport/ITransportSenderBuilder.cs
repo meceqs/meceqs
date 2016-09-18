@@ -1,6 +1,5 @@
 using System;
 using Meceqs.Pipeline;
-using Meceqs.TypedHandling;
 
 namespace Meceqs.Transport
 {
@@ -12,9 +11,5 @@ namespace Meceqs.Transport
         TTransportSender ConfigurePipeline(Action<IPipelineBuilder> pipeline);
 
         TTransportSender ConfigurePipeline(string pipelineName, Action<IPipelineBuilder> pipeline);
-
-        TTransportSender UseTypedHandling(Action<TypedHandlingOptions> options);
-
-        TTransportSender UseTypedHandling(TypedHandlingOptions options);
     }
 }

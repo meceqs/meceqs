@@ -4,14 +4,25 @@ using Meceqs.Configuration;
 using Meceqs.HttpSender;
 using Meceqs.HttpSender.Configuration;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
     public static class HttpSenderMeceqsBuilderExtensions
     {
+        public static IMeceqsBuilder AddHttpSenderCore(this IMeceqsBuilder builder)
+        {
+            Check.NotNull(builder, nameof(builder));
+
+            builder.Services.TryAddSingleton<IHttpClientProvider, DefaultHttpClientProvider>();
+            builder.Services.TryAddSingleton<IHttpRequestMessageConverter, DefaultHttpRequestMessageConverter>();
+
+            return builder;
+        }
+
         public static IMeceqsBuilder AddHttpSender(
             this IMeceqsBuilder builder,
-            Action<HttpSenderBuilder> sender)
+            Action<IHttpSenderBuilder> sender)
         {
             return AddHttpSender(builder, null, null, sender);
         }
@@ -19,7 +30,7 @@ namespace Microsoft.Extensions.DependencyInjection
         public static IMeceqsBuilder AddHttpSender(
                     this IMeceqsBuilder builder,
                     string pipelineName,
-                    Action<HttpSenderBuilder> sender)
+                    Action<IHttpSenderBuilder> sender)
         {
             return AddHttpSender(builder, pipelineName, null, sender);
         }
@@ -27,7 +38,7 @@ namespace Microsoft.Extensions.DependencyInjection
         public static IMeceqsBuilder AddHttpSender(
             this IMeceqsBuilder builder,
             IConfiguration configuration,
-            Action<HttpSenderBuilder> sender = null)
+            Action<IHttpSenderBuilder> sender = null)
         {
             return AddHttpSender(builder, null, configuration, sender);
         }
@@ -36,7 +47,7 @@ namespace Microsoft.Extensions.DependencyInjection
             this IMeceqsBuilder builder,
             string pipelineName,
             IConfiguration configuration,
-            Action<HttpSenderBuilder> sender = null)
+            Action<IHttpSenderBuilder> sender = null)
         {
             Check.NotNull(builder, nameof(builder));
 
@@ -45,10 +56,21 @@ namespace Microsoft.Extensions.DependencyInjection
                 builder.Services.Configure<HttpSenderOptions>(configuration);
             }
 
-            if (sender != null)
+            var senderBuilder = new HttpSenderBuilder();
+            sender?.Invoke(senderBuilder);
+
+            // Add core services if they don't yet exist.
+            builder.AddHttpSenderCore();
+
+            // Add options.
+            var senderOptions = senderBuilder.GetSenderOptions();
+            if (senderOptions != null)
             {
-                builder.Services.Configure(sender);
+                builder.Services.Configure(senderOptions);
             }
+
+            // Add the pipeline.
+            builder.AddSender(senderBuilder.GetPipelineName(), senderBuilder.GetPipeline());
 
             return builder;
         }

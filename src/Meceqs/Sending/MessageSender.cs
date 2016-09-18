@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Meceqs.Pipeline;
 
-namespace Meceqs.Sending.Internal
+namespace Meceqs.Sending
 {
     public class MessageSender : IMessageSender
     {
@@ -78,7 +78,7 @@ namespace Meceqs.Sending.Internal
                 {
                     correlationId = envelope.CorrelationId;
                 }
-                
+
                 envelopes.Add(envelope);
             }
 

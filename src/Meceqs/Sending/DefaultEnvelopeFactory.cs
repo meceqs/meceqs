@@ -4,7 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace Meceqs.Sending.Internal
+namespace Meceqs.Sending
 {
     /// <summary>
     /// Creates a strongly-typed <see cref="Envelope{TMessage}"/> for the given message by using cached reflection.
@@ -38,7 +38,7 @@ namespace Meceqs.Sending.Internal
             {
                 // Resolve types
                 Type typedEnvelopeType = typeof(Envelope<>).MakeGenericType(messageType);
-                
+
                 // select non-default constructor
                 ConstructorInfo constructor = typedEnvelopeType.GetTypeInfo().DeclaredConstructors
                     .FirstOrDefault(ctor => ctor.GetParameters().Length > 0);

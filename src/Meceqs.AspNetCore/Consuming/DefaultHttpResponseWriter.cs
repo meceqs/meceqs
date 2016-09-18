@@ -22,7 +22,7 @@ namespace Meceqs.AspNetCore.Consuming
 
             httpContext.Response.ContentType = _resultSerializer.ContentType;
 
-            string response = _resultSerializer.SerializeToString(result);
+            string response = _resultSerializer.SerializeResultToString(result);
 
             return httpContext.Response.WriteAsync(response);
         }

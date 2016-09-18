@@ -1,10 +1,9 @@
 # Meceqs
 
-Meceqs is a modular messaging framework that can be used for in-process and out-of-process messaging. 
+Meceqs is a modular messaging framework that can be used for in-process and out-of-process messaging.
+It targets .NET Standard so it can be used on .NET Core, .NET Framework, Mono, Xamarin and the Universal Windows Platform.
 
-# Demo
-
-The following demo code should give you a first look at Meceqs and why we think it is useful. This is the demo scenario:
+The following demo scenario should give you a first look at Meceqs and why we think it is useful:
 
 * Your frontend web app has a sign-up page that sends a HTTP request with a `CreateCustomerCommand` to the customers context Web API.
 * Your ASP.NET Core Web API from your customers context receives the command and invokes the handler in your business layer.

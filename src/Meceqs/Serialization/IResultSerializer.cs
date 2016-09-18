@@ -4,6 +4,6 @@ namespace Meceqs.Serialization
     {
         string ContentType { get; }
 
-        string SerializeToString(object result);
+        string SerializeResultToString(object result);
     }
 }

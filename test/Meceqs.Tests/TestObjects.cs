@@ -1,7 +1,6 @@
 using System;
 using Meceqs.Pipeline;
 using Meceqs.Sending;
-using Meceqs.Sending.Internal;
 using Meceqs.TypedHandling;
 using NSubstitute;
 

@@ -4,7 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Meceqs.Pipeline;
 using Meceqs.Sending;
-using Meceqs.Sending.Internal;
 using NSubstitute;
 using Shouldly;
 using Xunit;
@@ -21,7 +20,7 @@ namespace Meceqs.Tests.Sending
             envelope = envelope ?? TestObjects.Envelope<TMessage>();
             correlator = correlator ?? new DefaultEnvelopeCorrelator();
             pipeline = pipeline ?? Substitute.For<IPipeline>();
-            
+
             var pipelineProvider = Substitute.For<IPipelineProvider>();
             pipelineProvider.GetPipeline(Arg.Any<string>()).Returns(pipeline);
 
@@ -111,7 +110,7 @@ namespace Meceqs.Tests.Sending
             pipeline.WhenForAnyArgs(x => x.ProcessAsync(null))
                 .Do(x => {
                     called++;
-                    
+
                     var ctx = x.Arg<FilterContext>();
                     ctx.Items.Get<string>("Key").ShouldBe("Value");
                 });
@@ -130,7 +129,7 @@ namespace Meceqs.Tests.Sending
         public async Task Saves_CancellationToken_In_Context()
         {
             // Arrange
-            
+
             var cancellationSource = new CancellationTokenSource();
 
             int called = 0;
@@ -144,7 +143,7 @@ namespace Meceqs.Tests.Sending
                 });
 
             var builder = GetFluentSender<SimpleMessage>(pipeline: pipeline);
-            
+
             // Act
             builder.SetCancellationToken(cancellationSource.Token);
             await builder.SendAsync();

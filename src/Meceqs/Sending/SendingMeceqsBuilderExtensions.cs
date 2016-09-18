@@ -3,7 +3,6 @@ using Meceqs;
 using Meceqs.Configuration;
 using Meceqs.Pipeline;
 using Meceqs.Sending;
-using Meceqs.Sending.Internal;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Microsoft.Extensions.DependencyInjection

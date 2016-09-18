@@ -23,7 +23,7 @@ namespace Meceqs.AzureServiceBus.Internal
         {
             Check.NotNull(envelope, nameof(envelope));
 
-            byte[] serializedEnvelope = _serializer.SerializeToByteArray(envelope);
+            byte[] serializedEnvelope = _serializer.SerializeEnvelopeToByteArray(envelope);
             MemoryStream payloadStream = new MemoryStream(serializedEnvelope);
 
             BrokeredMessage brokeredMessage = new BrokeredMessage(payloadStream, ownsStream: true);
@@ -55,7 +55,7 @@ namespace Meceqs.AzureServiceBus.Internal
 
             Stream serializedEnvelope = brokeredMessage.GetBody<Stream>();
 
-            return _deserializer.DeserializeFromStream(contentType, serializedEnvelope, messageType);
+            return _deserializer.DeserializeEnvelopeFromStream(contentType, serializedEnvelope, messageType);
         }
     }
 }

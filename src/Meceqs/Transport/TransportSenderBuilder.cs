@@ -1,7 +1,5 @@
 using System;
 using Meceqs.Pipeline;
-using Meceqs.TypedHandling;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Meceqs.Transport
 {
@@ -10,8 +8,6 @@ namespace Meceqs.Transport
         where TTransportSenderBuilder : ITransportSenderBuilder<TTransportSenderBuilder>
         where TTransportSenderOptions : TransportSenderOptions
     {
-        private Action<TTransportSenderOptions> _senderOptions;
-
         private string _pipelineName;
         private Action<IPipelineBuilder> _pipeline;
 
@@ -27,13 +23,15 @@ namespace Meceqs.Transport
         /// </summary>
         protected Action<IPipelineBuilder> PipelineEndHook { get; set; }
 
+        protected Action<TTransportSenderOptions> SenderOptions { get; set; }
+
         /// <summary>
         /// This property is only necessary to support the builder pattern with
         /// the generic arguments from this type.
         /// </summary>
         public abstract TTransportSenderBuilder Instance { get; }
 
-        public Action<TTransportSenderOptions> GetSenderOptions() => _senderOptions;
+        public Action<TTransportSenderOptions> GetSenderOptions() => SenderOptions;
         public string GetPipelineName() => _pipelineName;
 
         public Action<IPipelineBuilder> GetPipeline()
@@ -43,8 +41,7 @@ namespace Meceqs.Transport
             if (pipeline == null)
             {
                 throw new MeceqsException(
-                    $"No pipeline was configured. You can either use TypedHandling by calling " +
-                    $"'{nameof(UseTypedHandling)}' or you can configure a custom pipeline " +
+                    $"No pipeline was configured. Configure a custom pipeline " +
                     $"by calling '{nameof(ConfigurePipeline)}'.");
             }
 
@@ -62,29 +59,6 @@ namespace Meceqs.Transport
 
             _pipelineName = pipelineName;
             _pipeline = pipeline;
-            return Instance;
-        }
-
-        public TTransportSenderBuilder UseTypedHandling(Action<TypedHandlingOptions> options)
-        {
-            Check.NotNull(options, nameof(options));
-
-            var handlingOptions = new TypedHandlingOptions();
-            options(handlingOptions);
-
-            return UseTypedHandling(handlingOptions);
-        }
-
-        public TTransportSenderBuilder UseTypedHandling(TypedHandlingOptions options)
-        {
-            Check.NotNull(options, nameof(options));
-
-            // Add the filter to the end of the pipeline.
-            PipelineEndHook = pipeline =>
-            {
-                pipeline.RunTypedHandling(options);
-            };
-
             return Instance;
         }
     }

@@ -16,6 +16,7 @@
     "Meceqs.Serialization.Json": "0.1.4-*",
     "Meceqs.AzureServiceBus": "0.1.4-*",
     "Meceqs.AzureServiceBus.FileFake": "0.1.4-*",
+    "Meceqs.HttpSender": "0.1.4-*",
 
     "Microsoft.Extensions.DependencyInjection": "1.0.0",
     "Microsoft.Extensions.Logging": "1.0.0",

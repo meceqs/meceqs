@@ -16,18 +16,18 @@ namespace Meceqs.Serialization.Json
             _settings = settings ?? JsonDefaults.DefaultSerializerSettings;
         }
 
-        public byte[] SerializeToByteArray(Envelope envelope)
+        public byte[] SerializeEnvelopeToByteArray(Envelope envelope)
         {
-            string json = SerializeToString(envelope);
+            string json = SerializeEnvelopeToString(envelope);
             return Encoding.UTF8.GetBytes(json);
         }
 
-        public string SerializeToString(Envelope envelope)
+        public string SerializeEnvelopeToString(Envelope envelope)
         {
-            return SerializeToString((object)envelope);
+            return SerializeResultToString((object)envelope);
         }
 
-        public string SerializeToString(object result)
+        public string SerializeResultToString(object result)
         {
             return JsonConvert.SerializeObject(result, _settings);
 

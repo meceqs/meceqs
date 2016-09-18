@@ -25,9 +25,9 @@ namespace Meceqs.AspNetCore.Consuming
             // TODO charset/encoding?
 
             var mediaType = MediaTypeHeaderValue.Parse(httpContext.Request.ContentType);
-            
+
             // TODO @cweiss should this get the actual messageType object?
-            Envelope envelope = _envelopeDeserializer.DeserializeFromStream(
+            Envelope envelope = _envelopeDeserializer.DeserializeEnvelopeFromStream(
                 mediaType.MediaType,
                 httpContext.Request.Body,
                 messageType.FullName);

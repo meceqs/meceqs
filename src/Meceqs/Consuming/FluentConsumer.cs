@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Meceqs.Configuration;
 using Meceqs.Pipeline;
 
-namespace Meceqs.Consuming.Internal
+namespace Meceqs.Consuming
 {
     public class FluentConsumer : FilterContextBuilder<IFluentConsumer>, IFluentConsumer
     {

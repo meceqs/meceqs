@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 
 namespace Meceqs.Serialization.Json
 {
-    public class JsonEnvelopeDeserializer : IEnvelopeDeserializer
+    public class JsonEnvelopeDeserializer : IEnvelopeDeserializer, IResultDeserializer
     {
         private const string ContentType = "application/json";
 
@@ -18,7 +18,21 @@ namespace Meceqs.Serialization.Json
             _envelopeTypeLoader = envelopetypeLoader;
         }
 
-        public Envelope DeserializeFromStream(string contentType, Stream serializedEnvelope, string messageType)
+        public object DeserializeResultFromStream(string contentType, Stream serializedResult, Type resultType)
+        {
+            if (!string.Equals(contentType, ContentType, StringComparison.OrdinalIgnoreCase))
+            {
+                throw new InvalidOperationException($"Invalid ContentType! Expected: {ContentType}; Actual: {contentType}");
+            }
+
+            using (StreamReader reader = new StreamReader(serializedResult, Encoding.UTF8))
+            {
+                string json = reader.ReadToEnd();
+                return JsonConvert.DeserializeObject(json, resultType);
+            }
+        }
+
+        public Envelope DeserializeEnvelopeFromStream(string contentType, Stream serializedEnvelope, string messageType)
         {
             if (!string.Equals(contentType, ContentType, StringComparison.OrdinalIgnoreCase))
             {

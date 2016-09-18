@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Meceqs.Pipeline;
 
-namespace Meceqs.Consuming.Internal
+namespace Meceqs.Consuming
 {
     public class MessageConsumer : IMessageConsumer
     {

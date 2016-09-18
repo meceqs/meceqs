@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Meceqs.Configuration;
 using Meceqs.Pipeline;
 
-namespace Meceqs.Sending.Internal
+namespace Meceqs.Sending
 {
     public class FluentSender : FilterContextBuilder<IFluentSender>, IFluentSender
     {
