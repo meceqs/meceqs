@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Meceqs.Pipeline;
 using Meceqs.Serialization;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
 namespace Meceqs.HttpSender
@@ -11,6 +13,7 @@ namespace Meceqs.HttpSender
     public class HttpSenderFilter
     {
         private readonly HttpSenderOptions _options;
+        private readonly IServiceProvider _serviceProvider;
         private readonly IHttpClientProvider _httpClientProvider;
         private readonly IHttpRequestMessageConverter _httpRequestMessageConverter;
         private readonly IResultDeserializer _resultDeserializer;
@@ -20,17 +23,20 @@ namespace Meceqs.HttpSender
         public HttpSenderFilter(
             FilterDelegate next,
             IOptions<HttpSenderOptions> options,
+            IServiceProvider serviceProvider,
             IHttpClientProvider httpClientProvider,
             IHttpRequestMessageConverter httpRequestMessageConverter,
             IResultDeserializer resultDeserializer)
         {
             Check.NotNull(options?.Value, nameof(options));
+            Check.NotNull(serviceProvider, nameof(serviceProvider));
             Check.NotNull(httpClientProvider, nameof(httpClientProvider));
             Check.NotNull(httpRequestMessageConverter, nameof(httpRequestMessageConverter));
             Check.NotNull(resultDeserializer, nameof(resultDeserializer));
 
             // "next" is not stored because this is a terminal filter.
             _options = options.Value;
+            _serviceProvider = serviceProvider;
             _httpClientProvider = httpClientProvider;
             _httpRequestMessageConverter = httpRequestMessageConverter;
             _resultDeserializer = resultDeserializer;
@@ -89,7 +95,7 @@ namespace Meceqs.HttpSender
                 var endpointName = endpoint.Key;
                 var endpointOptions = endpoint.Value;
 
-                HttpClient client = new HttpClient();
+                var client = CreateHttpClient(endpointOptions.Handlers);
 
                 // trailing slash is really important:
                 // http://stackoverflow.com/questions/23438416/why-is-httpclient-baseaddress-not-working
@@ -97,6 +103,26 @@ namespace Meceqs.HttpSender
 
                 _httpClientProvider.AddHttpClient(endpointName, client);
             }
+        }
+
+        private HttpClient CreateHttpClient(IList<Type> delegatingHandlers)
+        {
+            // HttpClientHandler is the most-inner handler.
+            HttpMessageHandler handler = new HttpClientHandler();
+
+            // Create a chain of all configured handlers (must be created in reverse order)
+
+            foreach (var handlerType in delegatingHandlers.Reverse())
+            {
+                // This allows dependency injection on handlers.
+                var delegatingHandler = (DelegatingHandler)ActivatorUtilities.CreateInstance(_serviceProvider, handlerType);
+
+                delegatingHandler.InnerHandler = handler;
+
+                handler = delegatingHandler;
+            }
+
+            return new HttpClient(handler);
         }
     }
 }

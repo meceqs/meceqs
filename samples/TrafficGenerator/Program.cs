@@ -33,7 +33,7 @@ namespace TrafficGenerator
                         options.BaseAddress = SampleConfiguration.CustomersWebApiUrl;
 
                         // Write your own extension method if you have a base class for alle messages
-                        options.AddFromAssembly<CreateCustomerCommand>(t => t.Name.EndsWith("Command") || t.Name.EndsWith("Query"));
+                        options.AddMessagesFromAssembly<CreateCustomerCommand>(t => t.Name.EndsWith("Command") || t.Name.EndsWith("Query"));
                     });
                 })
 

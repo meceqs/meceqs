@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Reflection;
 
 namespace Meceqs.HttpSender
@@ -11,14 +12,34 @@ namespace Meceqs.HttpSender
 
         public string BaseAddress { get; set; }
 
-        public List<EndpointMessage> Messages { get; set; } = new List<EndpointMessage>();
+        public List<Type> Handlers { get; private set; } = new List<Type>();
 
-        public void AddFromAssembly<TMessage>(Predicate<Type> filter)
+        public List<EndpointMessage> Messages { get; private set; } = new List<EndpointMessage>();
+
+        public void AddDelegatingHandler<TDelegatingHandler>()
+            where TDelegatingHandler : DelegatingHandler
         {
-            AddFromAssembly(typeof(TMessage).GetTypeInfo().Assembly, filter);
+            Handlers.Add(typeof(TDelegatingHandler));
         }
 
-        public void AddFromAssembly(Assembly assembly, Predicate<Type> filter)
+        public void AddDelegatingHandler(Type delegatingHandler)
+        {
+            Check.NotNull(delegatingHandler, nameof(delegatingHandler));
+
+            if (!typeof(DelegatingHandler).IsAssignableFrom(delegatingHandler))
+            {
+                throw new ArgumentException($"'{delegatingHandler}' does not inherit from '{nameof(DelegatingHandler)}'");
+            }
+
+            Handlers.Add(delegatingHandler);
+        }
+
+        public void AddMessagesFromAssembly<TMessage>(Predicate<Type> filter)
+        {
+            AddMessagesFromAssembly(typeof(TMessage).GetTypeInfo().Assembly, filter);
+        }
+
+        public void AddMessagesFromAssembly(Assembly assembly, Predicate<Type> filter)
         {
             Check.NotNull(assembly, nameof(assembly));
             Check.NotNull(filter, nameof(filter));
@@ -30,16 +51,16 @@ namespace Meceqs.HttpSender
 
             foreach (var message in messages)
             {
-                AddMessageType(message);
+                AddMessage(message);
             }
         }
 
-        public void AddMessageType<TMessage>()
+        public void AddMessage<TMessage>()
         {
-            AddMessageType(typeof(TMessage));
+            AddMessage(typeof(TMessage));
         }
 
-        public void AddMessageType(Type messageType)
+        public void AddMessage(Type messageType)
         {
             Check.NotNull(messageType, nameof(messageType));
 
