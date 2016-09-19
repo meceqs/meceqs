@@ -1,19 +1,21 @@
 # Typed Handling Filter
 
-Meceqs can be used to do simple in-process dispatching that is similar to Jimmy Bogard's [MediatR](https://github.com/jbogard/MediatR) library.
+Meceqs can be used to do simple in-process dispatching to strongly typed handlers
+that is similar to Jimmy Bogard's [MediatR](https://github.com/jbogard/MediatR) library.
 His library has been a great inspiration for us and we would like to thank him and his contributors for creating it!
-
-Basically, this filter allows you to write strongly typed handler classes for your message types. 
 
 Our typed handling filter has the following features:
 * `IHandles<TMessage>` interface for handlers that don't return results.
 * `IHandles<TMessage, TResult>` interface for handlers that return results.
 * `HandleContext` object that contains metadata (envelope, filter context, handler reflection data).
-* `IHandleInterceptor` interface for creating interceptors that can read attributes from the handler method/class. 
+* `IHandleInterceptor` interface for creating interceptors that can read attributes from the handler method/class.
 * Handlers and interceptors can be configured separately for every pipeline.
-* Handlers and interceptors are resolved transiently by default but you can also use your own lifecycles by 
+* Handlers and interceptors are resolved transiently by default but you can also use your own lifecycles by
     adding them to the DI framework.
 * The filter can either ignore messages without a handler or throw an exception.
+
+Note that it currently does *not* support the following things:
+* Dispatching one message to multiple handlers
 
 ## Handlers
 
@@ -77,8 +79,8 @@ public class CustomerCommandHandler :
 
 ## Interceptors
 
-In contrast to regular filters, interceptors have access to the `HandleContext`. Since this context contains metadata 
-about the handle method and class, interceptors can read custom attributes from the method/class to implement attribute-based 
+In contrast to regular filters, interceptors have access to the `HandleContext`. Since this context contains metadata
+about the handle method and class, interceptors can read custom attributes from the method/class to implement attribute-based
 aspect oriented programming concepts like authorization, transaction handling etc.
 
 The following interceptor will use `HandleContext.HandleMethod` and `HandleContext.HandlerType` to look for a

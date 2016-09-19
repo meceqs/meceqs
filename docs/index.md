@@ -4,7 +4,7 @@ Meceqs is a modular messaging framework that can be used for in-process and out-
 
 Your __messages__ will be wrapped in __envelopes__ that contain headers and useful diagnostics/tracing data.
 The envelopes are sent to __pipelines__ which consist of pluggable __filters__.
-It's easy to write your own __filters__ that either enrich/modify your envelopes or send them to any external system you like
+It's easy to write your own __filters__ that either enrich/modify your envelopes or send them to any target you like
 (e.g. a HTTP endpoint, a message broker, a database, ...).
 
 Meceqs targets [.NET Standard 1.3](https://docs.microsoft.com/en-us/dotnet/articles/standard/library) so it can be used
@@ -15,19 +15,20 @@ Meceqs ships with the following integrations:
 * Strongly typed in-process dispatching
   * Use strongly typed handlers to decouple your domain (Similar to [MediatR](https://github.com/jbogard/MediatR))
 * ASP.NET Core
-  * Use a convention-based endpoint for your messages to offer Web APIs without having to write your own MVC controllers.
+  * Write your own MVC controllers to leverage the features of ASP.NET Core (serializer, routes, validation, ...)
+  * Or use our convention-based endpoint for your messages to offer Web APIs without having to write your own MVC controllers.
   * Meceqs attaches itself to the ASP.NET Core request and adds useful metadata to every message that is sent or received. (e.g. RequestPath, ...)
 * HTTP Sender (System.Net.Http.HttpClient)
-  * Send messages via HTTP - works best with the convention-based ASP.NET Core API.
+  * Send messages via HTTP - works best with our convention-based ASP.NET Core API.
 * Azure Service Bus
   * Send messages to Azure Service Bus
   * Consume messages from Azure Service Bus
-  * Meceqs also contains a file-based mock which makes local development very easy.
+  * Use a file-based mock which makes local development very easy.
   * *NOTE: There's no official .NET standard compatible Azure Service Bus library yet so this integration only works on the full .NET framework*
 * Azure Event Hubs
   * Send messages to Azure Event Hubs
   * Consume messages from Azure Event Hubs
-  * Meceqs also contains a file-based mock which makes local development very easy.
+  * Use a a file-based mock which makes local development very easy.
   * *NOTE: There's no official .NET standard compatible Azure Event Hubs library yet so this integration only works on the full .NET framework*
 * JSON serialization
 
@@ -139,22 +140,19 @@ The business layer code decides to forward the message to *Azure Service Bus* be
 // `IHandles` from "Meceqs.TypedHandling" allows you to handle messages in a strongly typed way.
 public class CreateCustomerForwarder : IHandles<CreateCustomerCommand, CreateCustomerResult>
 {
-    private readonly IMessageSender _messageSender;
-
-    public CreateCustomerForwarder(IMessageSender messageSender)
-    {
-        _messageSender = messageSender;
-    }
-
     public async Task<CreateCustomerResult> HandleAsync(HandleContext<CreateCustomerCommand> context)
     {
         // The "HandleContext" gives you access to the envelope and to additional data
         // like the current user, cancellation tokens, ...
         Guid customerId = context.Envelope.MessageId;
 
+        // Since sending new messages from a handler is very common,
+        // the context also gives you immediate access to the message sender!
+        // This saves you from having to inject it into your constructor.
+
         // This time we use the builder pattern of IMessageSender to use a named pipeline.
         // This allows you to use multiple pipelines for different use cases.
-        await _messageSender.ForEnvelope(context.Envelope)
+        await context.MessageSender.ForEnvelope(context.Envelope)
             .UsePipeline(MyPipelines.SendServiceBus)
             .SendAsync();
 
@@ -256,12 +254,10 @@ public Task ProcessMessage(BrokeredMessage message)
 // Business layer handler
 public class CreateCustomerProcessor : IHandles<CreateCustomerCommand>
 {
-    private readonly IMessageSender _messageSender;
     private readonly ICustomerRepository _customerRepository;
 
-    public CreateCustomerProcessor(IMessageSender messageSender, ICustomerRepository customerRepository)
+    public CreateCustomerProcessor(ICustomerRepository customerRepository)
     {
-        _messageSender = messageSender;
         _customerRepository = customerRepository;
     }
 
@@ -283,7 +279,7 @@ public class CreateCustomerProcessor : IHandles<CreateCustomerCommand>
 
         var customerCreatedEvent = new CustomerCreatedEvent(customerId, customer.FirstName, customer.LastName);
 
-        await _messageSender.ForMessage(customerCreatedEvent)
+        await context.MessageSender.ForMessage(customerCreatedEvent)
             .FollowsFrom(context) // This will correlate the messages
             .UsePipeline(MyPipelines.SendEventHub)
             .SendAsync();
