@@ -1,7 +1,6 @@
 using System;
 using Meceqs.Serialization;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Net.Http.Headers;
 
 namespace Meceqs.AspNetCore.Consuming
 {
@@ -24,11 +23,11 @@ namespace Meceqs.AspNetCore.Consuming
             // TODO error handling etc
             // TODO charset/encoding?
 
-            var mediaType = MediaTypeHeaderValue.Parse(httpContext.Request.ContentType);
+            var requestHeaders = httpContext.Request.GetTypedHeaders();
 
             // TODO @cweiss should this get the actual messageType object?
             Envelope envelope = _envelopeDeserializer.DeserializeEnvelopeFromStream(
-                mediaType.MediaType,
+                requestHeaders.ContentType.MediaType,
                 httpContext.Request.Body,
                 messageType.FullName);
 
