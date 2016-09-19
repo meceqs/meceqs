@@ -1,6 +1,8 @@
 using System;
 using System.Reflection;
 using Meceqs.Pipeline;
+using Meceqs.Sending;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Meceqs.TypedHandling
 {
@@ -31,6 +33,8 @@ namespace Meceqs.TypedHandling
         public Type HandlerType { get; set; }
 
         public MethodInfo HandleMethod { get; set; }
+
+        public IMessageSender MessageSender => FilterContext.RequestServices.GetRequiredService<IMessageSender>();
 
         protected HandleContext(FilterContext filterContext)
         {
