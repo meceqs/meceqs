@@ -19,6 +19,13 @@ namespace Meceqs.Pipeline
             BuildPipelines(serviceProvider, options.Value);
         }
 
+        public void BuildPipelines()
+        {
+            // No-op because pipelines are already built in the constructor.
+            // If we would do it later, it would have to be thread-safe
+            // and use e.g. Lazy<> or custom locking.
+        }
+
         private void BuildPipelines(IServiceProvider serviceProvider, PipelineOptions options)
         {
             foreach (var kvp in options.Pipelines)
