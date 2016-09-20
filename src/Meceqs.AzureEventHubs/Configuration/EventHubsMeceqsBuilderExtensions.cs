@@ -11,10 +11,7 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class EventHubsMeceqsBuilderExtensions
     {
-        /// <summary>
-        /// Adds core services for Azure Event Hubs.
-        /// </summary>
-        public static IMeceqsBuilder AddEventHubsCore(this IMeceqsBuilder builder)
+        private static IMeceqsBuilder AddEventHubServices(this IMeceqsBuilder builder)
         {
             Check.NotNull(builder, nameof(builder));
 
@@ -41,7 +38,7 @@ namespace Microsoft.Extensions.DependencyInjection
             consumer?.Invoke(consumerBuilder);
 
             // Add core services if they don't yet exist.
-            builder.AddEventHubsCore();
+            builder.AddEventHubServices();
 
             // Add deserialization assemblies
             foreach (var assembly in consumerBuilder.GetDeserializationAssemblies())
@@ -75,7 +72,7 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             Check.NotNull(builder, nameof(builder));
 
-            builder.AddEventHubsCore();
+            builder.AddEventHubServices();
 
             builder.AddSender(pipelineName, pipeline);
 

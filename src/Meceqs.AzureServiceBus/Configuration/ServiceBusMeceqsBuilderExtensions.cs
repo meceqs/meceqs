@@ -11,7 +11,7 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class ServiceBusMeceqsBuilderExtensions
     {
-        public static IMeceqsBuilder AddServiceBusCore(this IMeceqsBuilder builder)
+        private static IMeceqsBuilder AddServiceBusServices(this IMeceqsBuilder builder)
         {
             Check.NotNull(builder, nameof(builder));
 
@@ -39,7 +39,7 @@ namespace Microsoft.Extensions.DependencyInjection
             consumer?.Invoke(consumerBuilder);
 
             // Add core services if they don't yet exist.
-            builder.AddServiceBusCore();
+            builder.AddServiceBusServices();
 
             // Add deserialization assemblies
             foreach (var assembly in consumerBuilder.GetDeserializationAssemblies())
@@ -73,7 +73,7 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             Check.NotNull(builder, nameof(builder));
 
-            builder.AddServiceBusCore();
+            builder.AddServiceBusServices();
 
             builder.AddSender(pipelineName, pipeline);
 
