@@ -5,11 +5,11 @@
     "Customers.Contracts": "1.0.0-*",
     "Customers.Core": "1.0.0-*",
 
-    "Meceqs": "0.2.1-*",
-    "Meceqs.AspNetCore": "0.2.1-*",
-    "Meceqs.Serialization.Json": "0.2.1-*",
-    "Meceqs.AzureEventHubs": "0.2.1-*",
-    "Meceqs.AzureEventHubs.FileFake": "0.2.1-*",
+    "Meceqs": "0.2.2-*",
+    "Meceqs.AspNetCore": "0.2.2-*",
+    "Meceqs.Serialization.Json": "0.2.2-*",
+    "Meceqs.AzureEventHubs": "0.2.2-*",
+    "Meceqs.AzureEventHubs.FileFake": "0.2.2-*",
 
     "Microsoft.AspNetCore.Diagnostics": "1.0.0",
     "Microsoft.AspNetCore.Server.IISIntegration": "1.0.0",
