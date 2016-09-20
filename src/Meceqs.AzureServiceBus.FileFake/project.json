@@ -1,12 +1,12 @@
 {
-  "version": "0.1.4-*",
+  "version": "0.2.0-*",
 
   "buildOptions": {
     "warningsAsErrors": true
   },
 
   "dependencies": {
-    "Meceqs.AzureServiceBus": "0.1.4-*",
+    "Meceqs.AzureServiceBus": "0.2.0-*",
     "Newtonsoft.Json": "9.0.1"
   },
 

@@ -6,8 +6,8 @@
   "testRunner": "xunit",
 
   "dependencies": {
-    "Meceqs": "0.1.4-*",
-    "Meceqs.Serialization.Json": "0.1.4-*",
+    "Meceqs": "0.2.0-*",
+    "Meceqs.Serialization.Json": "0.2.0-*",
 
     "Microsoft.Extensions.DependencyInjection": "1.0.0",
     "NSubstitute": "2.0.0-rc",
