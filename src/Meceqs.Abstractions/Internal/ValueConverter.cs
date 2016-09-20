@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 
 namespace Meceqs.Internal
@@ -7,8 +6,6 @@ namespace Meceqs.Internal
     public class ValueConverter
     {
         public static ValueConverter Instance { get; set; } = new ValueConverter();
-
-        private static readonly IList<Type> _numericTypes = new List<Type>();
 
         public virtual T ConvertValue<T>(object value)
         {

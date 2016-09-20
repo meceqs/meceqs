@@ -10,10 +10,10 @@
 
     "Sales.Contracts": "1.0.0-*",
 
-    "Meceqs": "0.2.0-*",
-    "Meceqs.Serialization.Json": "0.2.0-*",
-    "Meceqs.AzureServiceBus": "0.2.0-*",
-    "Meceqs.AzureServiceBus.FileFake": "0.2.0-*",
+    "Meceqs": "0.2.1-*",
+    "Meceqs.Serialization.Json": "0.2.1-*",
+    "Meceqs.AzureServiceBus": "0.2.1-*",
+    "Meceqs.AzureServiceBus.FileFake": "0.2.1-*",
 
     "Microsoft.Extensions.DependencyInjection": "1.0.0",
     "Microsoft.Extensions.Logging": "1.0.0",

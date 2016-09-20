@@ -1,12 +1,12 @@
 {
-  "version": "0.2.0-*",
+  "version": "0.2.1-*",
 
   "buildOptions": {
     "warningsAsErrors": true
   },
 
   "dependencies": {
-    "Meceqs": "0.2.0-*",
+    "Meceqs": "0.2.1-*",
 
     "Microsoft.AspNetCore.Http": "1.0.0",
     "Microsoft.AspNetCore.Http.Extensions": "1.0.0",

@@ -5,7 +5,7 @@ Properties {
     $BuildNumber = "loc" + ((Get-Date).ToUniversalTime().ToString("yyyyMMddHHmm"))
 
     # The build configuration used for compilation
-    $BuildConfiguration = "Release"
+    $BuildConfiguration = "Debug"
     
     # The folder in which all output packages should be placed
     $ArtifactsPath = "artifacts"

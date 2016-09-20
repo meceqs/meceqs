@@ -23,7 +23,6 @@ namespace Microsoft.Extensions.DependencyInjection
 
         public static IPipelineBuilder UseFilter(this IPipelineBuilder builder, Type filter, params object[] args)
         {
-            var applicationServices = builder.ApplicationServices;
             return builder.Use(next =>
             {
                 var methods = filter.GetMethods(BindingFlags.Instance | BindingFlags.Public);
