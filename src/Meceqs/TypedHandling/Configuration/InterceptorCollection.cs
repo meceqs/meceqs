@@ -70,7 +70,7 @@ namespace Meceqs.TypedHandling.Configuration
             Add(factory);
         }
 
-        public static void EnsureValidInterceptor(Type interceptorType)
+        private static void EnsureValidInterceptor(Type interceptorType)
         {
             if (!typeof(IHandleInterceptor).IsAssignableFrom(interceptorType))
             {

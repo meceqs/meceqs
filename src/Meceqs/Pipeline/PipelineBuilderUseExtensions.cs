@@ -7,7 +7,7 @@ namespace Microsoft.Extensions.DependencyInjection
     public static class PipelineBuilderUseExtensions
     {
         /// <summary>
-        /// In-line filter.
+        /// Adds an in-line filter to the pipeline.
         /// </summary>
         public static IPipelineBuilder Use(this IPipelineBuilder builder, Func<FilterContext, Func<Task>, Task> filter)
         {

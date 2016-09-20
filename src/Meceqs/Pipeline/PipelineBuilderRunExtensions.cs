@@ -6,7 +6,7 @@ namespace Microsoft.Extensions.DependencyInjection
     public static class PipelineBuilderRunExtensions
     {
         /// <summary>
-        /// Terminal filter.
+        /// Adds a terminal filter to the pipeline.
         /// </summary>
         public static void Run(this IPipelineBuilder builder, FilterDelegate filter)
         {

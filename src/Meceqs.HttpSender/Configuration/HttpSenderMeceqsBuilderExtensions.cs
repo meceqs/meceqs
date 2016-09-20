@@ -10,7 +10,7 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class HttpSenderMeceqsBuilderExtensions
     {
-        public static IMeceqsBuilder AddHttpSenderCore(this IMeceqsBuilder builder)
+        private static IMeceqsBuilder AddHttpSenderServices(this IMeceqsBuilder builder)
         {
             Check.NotNull(builder, nameof(builder));
 
@@ -20,9 +20,7 @@ namespace Microsoft.Extensions.DependencyInjection
             return builder;
         }
 
-        public static IMeceqsBuilder AddHttpSender(
-            this IMeceqsBuilder builder,
-            Action<IHttpSenderBuilder> sender)
+        public static IMeceqsBuilder AddHttpSender(this IMeceqsBuilder builder, Action<IHttpSenderBuilder> sender)
         {
             return AddHttpSender(builder, null, null, sender);
         }
@@ -60,7 +58,7 @@ namespace Microsoft.Extensions.DependencyInjection
             sender?.Invoke(senderBuilder);
 
             // Add core services if they don't yet exist.
-            builder.AddHttpSenderCore();
+            builder.AddHttpSenderServices();
 
             // Add options.
             var senderOptions = senderBuilder.GetSenderOptions();

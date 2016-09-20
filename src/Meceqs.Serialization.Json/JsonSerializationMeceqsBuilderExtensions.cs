@@ -17,7 +17,7 @@ namespace Microsoft.Extensions.DependencyInjection
             builder.Services.AddSingleton<IEnvelopeSerializer>(serializer);
             builder.Services.AddSingleton<IResultSerializer>(serializer);
 
-            builder.AddDeserializer<JsonEnvelopeDeserializer>();
+            builder.Services.AddSingleton<IEnvelopeDeserializer, JsonEnvelopeDeserializer>();
             builder.Services.AddSingleton<IResultDeserializer, JsonEnvelopeDeserializer>();
 
             return builder;

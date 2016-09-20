@@ -16,11 +16,17 @@ namespace Microsoft.Extensions.DependencyInjection
 
         private static readonly MethodInfo GetServiceInfo = typeof(PipelineBuilderUseFilterExtensions).GetMethod(nameof(GetService), BindingFlags.NonPublic | BindingFlags.Static);
 
+        /// <summary>
+        /// Adds a filter class to the pipeline.
+        /// </summary>
         public static IPipelineBuilder UseFilter<TFilter>(this IPipelineBuilder builder, params object[] args)
         {
             return builder.UseFilter(typeof(TFilter), args);
         }
 
+        /// <summary>
+        /// Adds a filter class to the pipeline.
+        /// </summary>
         public static IPipelineBuilder UseFilter(this IPipelineBuilder builder, Type filter, params object[] args)
         {
             return builder.Use(next =>

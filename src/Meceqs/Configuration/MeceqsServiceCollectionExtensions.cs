@@ -1,5 +1,11 @@
 using Meceqs;
 using Meceqs.Configuration;
+using Meceqs.Consuming;
+using Meceqs.Pipeline;
+using Meceqs.Sending;
+using Meceqs.Serialization;
+using Meceqs.TypedHandling.Internal;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -12,13 +18,46 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             Check.NotNull(services, nameof(services));
 
-            var builder = new MeceqsBuilder(services);
+            AddConsuming(services);
+            AddPipeline(services);
+            AddSending(services);
+            AddSerialization(services);
+            AddTypedHandling(services);
 
-            // Add common services from this library
-            builder.AddSerialization();
-            builder.AddTypedHandling();
+            return new MeceqsBuilder(services);
+        }
 
-            return builder;
+        private static void AddPipeline(IServiceCollection services)
+        {
+            services.TryAddSingleton<IFilterContextFactory, DefaultFilterContextFactory>();
+            services.TryAddSingleton<IPipelineProvider, DefaultPipelineProvider>();
+
+            // Every pipeline that should be built must get its own builder.
+            services.TryAddTransient<IPipelineBuilder, DefaultPipelineBuilder>();
+        }
+
+        private static void AddConsuming(IServiceCollection services)
+        {
+            services.TryAddTransient<IMessageConsumer, MessageConsumer>();
+        }
+
+        private static void AddSending(IServiceCollection services)
+        {
+            services.TryAddSingleton<IEnvelopeFactory, DefaultEnvelopeFactory>();
+            services.TryAddSingleton<IEnvelopeCorrelator, DefaultEnvelopeCorrelator>();
+            services.TryAddTransient<IMessageSender, MessageSender>();
+        }
+
+        private static void AddSerialization(IServiceCollection services)
+        {
+            services.TryAddSingleton<IEnvelopeTypeLoader, DefaultEnvelopeTypeLoader>();
+        }
+
+        public static void AddTypedHandling(IServiceCollection services)
+        {
+            services.TryAddSingleton<IHandleContextFactory, DefaultHandleContextFactory>();
+            services.TryAddSingleton<IHandleMethodResolver, DefaultHandleMethodResolver>();
+            services.TryAddSingleton<IHandlerInvoker, DefaultHandlerInvoker>();
         }
     }
 }
