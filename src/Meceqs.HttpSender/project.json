@@ -6,11 +6,18 @@
   },
 
   "dependencies": {
-    "Meceqs": "0.1.4-*"
+    "Meceqs": "0.1.4-*",
+
+    "Microsoft.Extensions.Options.ConfigurationExtensions": "1.0.0"
   },
 
   "frameworks": {
-    "net46": {},
+    "net46": {
+      "frameworkAssemblies": {
+        "System.Net.Http": "",
+        "System.Threading.Tasks": ""
+      }
+    },
     "netstandard1.3": {
       "dependencies": {
         "System.Net.Http": "4.1.0"
