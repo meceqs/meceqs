@@ -12,37 +12,52 @@ namespace Meceqs.Tests.Sending
 {
     public class FluentSenderTest
     {
+        private IServiceProvider GetFilterContextBuilderServiceProvider(
+            IEnvelopeCorrelator correlator = null,
+            IPipeline pipeline = null
+        )
+        {
+            var serviceProvider = Substitute.For<IServiceProvider>();
+
+            serviceProvider.GetService(typeof(IEnvelopeFactory)).Returns(new DefaultEnvelopeFactory());
+            serviceProvider.GetService(typeof(IFilterContextFactory)).Returns(new DefaultFilterContextFactory());
+
+            serviceProvider.GetService(typeof(IEnvelopeCorrelator)).Returns(correlator ?? Substitute.For<IEnvelopeCorrelator>());
+
+            var pipelineProvider = Substitute.For<IPipelineProvider>();
+            pipelineProvider.GetPipeline(Arg.Any<string>()).Returns(pipeline ?? Substitute.For<IPipeline>());
+            serviceProvider.GetService(typeof(IPipelineProvider)).Returns(pipelineProvider);
+
+            return serviceProvider;
+        }
+
         private IFluentSender GetFluentSender<TMessage>(
             Envelope<TMessage> envelope = null,
             IEnvelopeCorrelator correlator = null,
             IPipeline pipeline = null) where TMessage : class, new()
         {
             envelope = envelope ?? TestObjects.Envelope<TMessage>();
-            correlator = correlator ?? new DefaultEnvelopeCorrelator();
-            pipeline = pipeline ?? Substitute.For<IPipeline>();
 
-            var pipelineProvider = Substitute.For<IPipelineProvider>();
-            pipelineProvider.GetPipeline(Arg.Any<string>()).Returns(pipeline);
+            var serviceProvider = GetFilterContextBuilderServiceProvider(correlator, pipeline);
 
-            var envelopes = new List<Envelope> { envelope };
-
-            return new FluentSender(envelopes, correlator, new DefaultFilterContextFactory(), pipelineProvider);
+            return new FluentSender(envelope, serviceProvider);
         }
 
         [Fact]
         public void Throws_if_parameters_are_missing()
         {
             // Arrange
-            var envelopes = new List<Envelope>();
-            var correlator = new DefaultEnvelopeCorrelator();
-            var filterContextFactory = new DefaultFilterContextFactory();
-            var pipelineProvider = Substitute.For<IPipelineProvider>();
+            var serviceProvider = GetFilterContextBuilderServiceProvider();
+            serviceProvider.GetService(typeof(IEnvelopeCorrelator)).Returns(Substitute.For<IEnvelopeCorrelator>());
 
             // Act & Assert
-            Should.Throw<ArgumentNullException>(() => new FluentSender(null, correlator, filterContextFactory, pipelineProvider));
-            Should.Throw<ArgumentNullException>(() => new FluentSender(envelopes, null, filterContextFactory, pipelineProvider));
-            Should.Throw<ArgumentNullException>(() => new FluentSender(envelopes, correlator, null, pipelineProvider));
-            Should.Throw<ArgumentNullException>(() => new FluentSender(envelopes, correlator, filterContextFactory, null));
+            var envelope = TestObjects.Envelope<SimpleMessage>();
+            Should.Throw<ArgumentNullException>(() => new FluentSender((Envelope)null, serviceProvider));
+            Should.Throw<ArgumentNullException>(() => new FluentSender(envelope, null));
+
+            var envelopes = new List<Envelope>();
+            Should.Throw<ArgumentNullException>(() => new FluentSender(envelopes, null));
+            Should.Throw<ArgumentNullException>(() => new FluentSender((IList<Envelope>)null, serviceProvider));
         }
 
         [Fact]

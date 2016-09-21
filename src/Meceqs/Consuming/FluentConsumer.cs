@@ -10,11 +10,13 @@ namespace Meceqs.Consuming
     {
         public override IFluentConsumer Instance => this;
 
-        public FluentConsumer(
-            IList<Envelope> envelopes,
-            IFilterContextFactory filterContextFactory,
-            IPipelineProvider pipelineProvider)
-            : base(MeceqsDefaults.ConsumePipelineName, envelopes, filterContextFactory, pipelineProvider)
+        public FluentConsumer(Envelope envelope, IServiceProvider serviceProvider)
+            : base(MeceqsDefaults.ConsumePipelineName, envelope, serviceProvider)
+        {
+        }
+
+        public FluentConsumer(IList<Envelope> envelopes, IServiceProvider serviceProvider)
+            : base(MeceqsDefaults.ConsumePipelineName, envelopes, serviceProvider)
         {
         }
 

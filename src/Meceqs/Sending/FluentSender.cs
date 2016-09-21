@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Meceqs.Configuration;
 using Meceqs.Pipeline;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Meceqs.Sending
 {
@@ -12,23 +13,28 @@ namespace Meceqs.Sending
 
         public override IFluentSender Instance => this;
 
-        public FluentSender(
-            IList<Envelope> envelopes,
-            IEnvelopeCorrelator envelopeCorrelator,
-            IFilterContextFactory filterContextFactory,
-            IPipelineProvider pipelineProvider)
-            : base(MeceqsDefaults.SendPipelineName, envelopes, filterContextFactory, pipelineProvider)
+        public FluentSender(Envelope envelope, IServiceProvider serviceProvider)
+            : base(MeceqsDefaults.SendPipelineName, envelope, serviceProvider)
         {
-            Check.NotNull(envelopeCorrelator, nameof(envelopeCorrelator));
+            _envelopeCorrelator = serviceProvider.GetRequiredService<IEnvelopeCorrelator>();
+        }
 
-            _envelopeCorrelator = envelopeCorrelator;
+        public FluentSender(IList<Envelope> envelopes, IServiceProvider serviceProvider)
+            : base(MeceqsDefaults.SendPipelineName, envelopes, serviceProvider)
+        {
+            _envelopeCorrelator = serviceProvider.GetRequiredService<IEnvelopeCorrelator>();
         }
 
         public IFluentSender CorrelateWith(Envelope source)
         {
-            foreach (var envelope in Envelopes)
+            _envelopeCorrelator.CorrelateSourceWithTarget(source, FirstEnvelope);
+
+            if (AdditionalEnvelopes != null)
             {
-                _envelopeCorrelator.CorrelateSourceWithTarget(source, envelope);
+                foreach (var envelope in AdditionalEnvelopes)
+                {
+                    _envelopeCorrelator.CorrelateSourceWithTarget(source, envelope);
+                }
             }
 
             return this;

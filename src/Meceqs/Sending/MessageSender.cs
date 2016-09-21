@@ -1,47 +1,34 @@
 using System;
 using System.Collections.Generic;
-using Meceqs.Pipeline;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Meceqs.Sending
 {
     public class MessageSender : IMessageSender
     {
+        private readonly IServiceProvider _serviceProvider;
         private readonly IEnvelopeFactory _envelopeFactory;
-        private readonly IEnvelopeCorrelator _envelopeCorrelator;
-        private readonly IFilterContextFactory _filterContextFactory;
-        private readonly IPipelineProvider _pipelineProvider;
 
-        public MessageSender(
-            IEnvelopeFactory envelopeFactory,
-            IEnvelopeCorrelator envelopeCorrelator,
-            IFilterContextFactory filterContextFactory,
-            IPipelineProvider pipelineProvider)
+        public MessageSender(IServiceProvider serviceProvider)
         {
-            Check.NotNull(envelopeFactory, nameof(envelopeFactory));
-            Check.NotNull(envelopeCorrelator, nameof(envelopeCorrelator));
-            Check.NotNull(filterContextFactory, nameof(filterContextFactory));
-            Check.NotNull(pipelineProvider, nameof(pipelineProvider));
+            Check.NotNull(serviceProvider, nameof(serviceProvider));
 
-            _envelopeFactory = envelopeFactory;
-            _envelopeCorrelator = envelopeCorrelator;
-            _filterContextFactory = filterContextFactory;
-            _pipelineProvider = pipelineProvider;
+            _serviceProvider = serviceProvider;
+            _envelopeFactory = serviceProvider.GetRequiredService<IEnvelopeFactory>();
         }
 
         public IFluentSender ForEnvelope(Envelope envelope)
         {
             Check.NotNull(envelope, nameof(envelope));
 
-            var envelopes = new List<Envelope> { envelope };
-
-            return ForEnvelopes(envelopes);
+            return new FluentSender(envelope, _serviceProvider);
         }
 
         public IFluentSender ForEnvelopes(IList<Envelope> envelopes)
         {
             Check.NotNull(envelopes, nameof(envelopes));
 
-            return new FluentSender(envelopes, _envelopeCorrelator, _filterContextFactory, _pipelineProvider);
+            return new FluentSender(envelopes, _serviceProvider);
         }
 
         public IFluentSender ForMessage(object message, Guid? messageId = null)
@@ -50,9 +37,7 @@ namespace Meceqs.Sending
 
             var envelope = _envelopeFactory.Create(message, messageId ?? Guid.NewGuid());
 
-            var envelopes = new List<Envelope> { envelope };
-
-            return new FluentSender(envelopes, _envelopeCorrelator, _filterContextFactory, _pipelineProvider);
+            return ForEnvelope(envelope);
         }
 
         public IFluentSender ForMessages<TMessage>(IList<TMessage> messages) where TMessage : class
@@ -82,7 +67,7 @@ namespace Meceqs.Sending
                 envelopes.Add(envelope);
             }
 
-            return new FluentSender(envelopes, _envelopeCorrelator, _filterContextFactory, _pipelineProvider);
+            return ForEnvelopes(envelopes);
         }
     }
 }

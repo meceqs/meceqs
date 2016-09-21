@@ -1,38 +1,31 @@
+using System;
 using System.Collections.Generic;
-using Meceqs.Pipeline;
 
 namespace Meceqs.Consuming
 {
     public class MessageConsumer : IMessageConsumer
     {
-        private readonly IFilterContextFactory _filterContextFactory;
-        private readonly IPipelineProvider _pipelineProvider;
+        private readonly IServiceProvider _serviceProvider;
 
-        public MessageConsumer(
-            IFilterContextFactory filterContextFactory,
-            IPipelineProvider pipelineProvider)
+        public MessageConsumer(IServiceProvider serviceProvider)
         {
-            Check.NotNull(filterContextFactory, nameof(filterContextFactory));
-            Check.NotNull(pipelineProvider, nameof(pipelineProvider));
+            Check.NotNull(serviceProvider, nameof(serviceProvider));
 
-            _filterContextFactory = filterContextFactory;
-            _pipelineProvider = pipelineProvider;
+            _serviceProvider = serviceProvider;
         }
 
         public IFluentConsumer ForEnvelope(Envelope envelope)
         {
             Check.NotNull(envelope, nameof(envelope));
 
-            var envelopes = new List<Envelope> { envelope };
-
-            return ForEnvelopes(envelopes);
+            return new FluentConsumer(envelope, _serviceProvider);
         }
 
         public IFluentConsumer ForEnvelopes(IList<Envelope> envelopes)
         {
             Check.NotNull(envelopes, nameof(envelopes));
 
-            return new FluentConsumer(envelopes, _filterContextFactory, _pipelineProvider);
+            return new FluentConsumer(envelopes, _serviceProvider);
         }
     }
 }

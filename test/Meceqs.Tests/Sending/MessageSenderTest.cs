@@ -13,27 +13,24 @@ namespace Meceqs.Tests.Sending
     {
         private IMessageSender GetSender(IEnvelopeCorrelator envelopeCorrelator = null, IPipeline pipeline = null)
         {
-            envelopeCorrelator = envelopeCorrelator ?? new DefaultEnvelopeCorrelator();
-            pipeline = pipeline ?? Substitute.For<IPipeline>();
+            var serviceProvider = Substitute.For<IServiceProvider>();
+
+            serviceProvider.GetService(typeof(IEnvelopeFactory)).Returns(new DefaultEnvelopeFactory());
+            serviceProvider.GetService(typeof(IFilterContextFactory)).Returns(new DefaultFilterContextFactory());
+
+            serviceProvider.GetService(typeof(IEnvelopeCorrelator)).Returns(envelopeCorrelator ?? Substitute.For<IEnvelopeCorrelator>());
 
             var pipelineProvider = Substitute.For<IPipelineProvider>();
-            pipelineProvider.GetPipeline(Arg.Any<string>()).Returns(pipeline);
+            pipelineProvider.GetPipeline(Arg.Any<string>()).Returns(pipeline ?? Substitute.For<IPipeline>());
+            serviceProvider.GetService(typeof(IPipelineProvider)).Returns(pipelineProvider);
 
-            return new MessageSender(new DefaultEnvelopeFactory(), envelopeCorrelator, new DefaultFilterContextFactory(), pipelineProvider);
+            return new MessageSender(serviceProvider);
         }
 
         [Fact]
         public void Throws_if_parameters_are_missing()
         {
-            var envelopeFactory = Substitute.For<IEnvelopeFactory>();
-            var correlator = Substitute.For<IEnvelopeCorrelator>();
-            var filterContextFactory = Substitute.For<IFilterContextFactory>();
-            var pipelineProvider = Substitute.For<IPipelineProvider>();
-
-            Should.Throw<ArgumentNullException>(() => new MessageSender(null, correlator, filterContextFactory, pipelineProvider));
-            Should.Throw<ArgumentNullException>(() => new MessageSender(envelopeFactory, null, filterContextFactory, pipelineProvider));
-            Should.Throw<ArgumentNullException>(() => new MessageSender(envelopeFactory, correlator, null, pipelineProvider));
-            Should.Throw<ArgumentNullException>(() => new MessageSender(envelopeFactory, correlator, filterContextFactory, null));
+            Should.Throw<ArgumentNullException>(() => new MessageSender(null));
         }
 
         [Fact]
