@@ -9,36 +9,22 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class MeceqsBuilderExtensions
     {
-        #region Pipelines
-
-        // TODO @cweiss Rename to AddConsumePipeline/AddSendPipeline ? (it no longer adds the actual IMessageSender etc)
-
         public static IMeceqsBuilder AddConsumePipeline(this IMeceqsBuilder builder, Action<IPipelineBuilder> pipeline)
-        {
-            return AddConsumePipeline(builder, null, pipeline);
-        }
-
-        public static IMeceqsBuilder AddConsumePipeline(this IMeceqsBuilder builder, string pipelineName, Action<IPipelineBuilder> pipeline)
         {
             Check.NotNull(builder, nameof(builder));
             Check.NotNull(pipeline, nameof(pipeline));
 
-            builder.AddPipeline(pipelineName ?? MeceqsDefaults.ConsumePipelineName, pipeline);
+            builder.AddPipeline(MeceqsDefaults.ConsumePipelineName, pipeline);
 
             return builder;
         }
 
         public static IMeceqsBuilder AddSendPipeline(this IMeceqsBuilder builder, Action<IPipelineBuilder> pipeline)
         {
-            return AddSendPipeline(builder, null, pipeline);
-        }
-
-        public static IMeceqsBuilder AddSendPipeline(this IMeceqsBuilder builder, string pipelineName, Action<IPipelineBuilder> pipeline)
-        {
             Check.NotNull(builder, nameof(builder));
             Check.NotNull(pipeline, nameof(pipeline));
 
-            builder.AddPipeline(pipelineName ?? MeceqsDefaults.SendPipelineName, pipeline);
+            builder.AddPipeline(MeceqsDefaults.SendPipelineName, pipeline);
 
             return builder;
         }
@@ -53,10 +39,6 @@ namespace Microsoft.Extensions.DependencyInjection
 
             return builder;
         }
-
-        #endregion
-
-        #region Serialization
 
         public static IMeceqsBuilder AddDeserializationAssembly<TType>(this IMeceqsBuilder builder)
         {
@@ -74,7 +56,5 @@ namespace Microsoft.Extensions.DependencyInjection
 
             return builder;
         }
-
-        #endregion
     }
 }

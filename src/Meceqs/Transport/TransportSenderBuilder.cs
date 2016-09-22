@@ -1,4 +1,5 @@
 using System;
+using Meceqs.Configuration;
 using Meceqs.Pipeline;
 
 namespace Meceqs.Transport
@@ -8,7 +9,7 @@ namespace Meceqs.Transport
         where TTransportSenderBuilder : ITransportSenderBuilder<TTransportSenderBuilder>
         where TTransportSenderOptions : TransportSenderOptions
     {
-        private string _pipelineName;
+        private string _pipelineName = MeceqsDefaults.SendPipelineName;
         private Action<IPipelineBuilder> _pipeline;
 
         /// <summary>

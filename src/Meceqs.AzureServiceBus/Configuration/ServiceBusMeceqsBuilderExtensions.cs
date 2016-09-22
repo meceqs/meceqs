@@ -46,7 +46,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 builder.Services.Configure(consumerOptions);
             }
 
-            builder.AddConsumePipeline(consumerBuilder.GetPipelineName(), consumerBuilder.GetPipeline());
+            builder.AddPipeline(consumerBuilder.GetPipelineName(), consumerBuilder.GetPipeline());
 
             return builder;
         }
@@ -70,7 +70,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 builder.Services.Configure(senderOptions);
             }
 
-            builder.AddSendPipeline(senderBuilder.GetPipelineName(), senderBuilder.GetPipeline());
+            builder.AddPipeline(senderBuilder.GetPipelineName(), senderBuilder.GetPipeline());
 
             return builder;
         }

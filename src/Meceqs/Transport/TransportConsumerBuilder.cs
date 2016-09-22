@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using Meceqs.Configuration;
 using Meceqs.Pipeline;
 using Meceqs.TypedHandling;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,7 +17,7 @@ namespace Meceqs.Transport
 
         private Action<TTransportConsumerOptions> _consumerOptions;
 
-        private string _pipelineName;
+        private string _pipelineName = MeceqsDefaults.ConsumePipelineName;
         private Action<IPipelineBuilder> _pipeline;
 
         /// <summary>

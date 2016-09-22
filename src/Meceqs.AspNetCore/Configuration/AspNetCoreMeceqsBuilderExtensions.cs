@@ -55,7 +55,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 builder.Services.Configure(consumerOptions);
             }
 
-            builder.AddConsumePipeline(consumerBuilder.GetPipelineName(), consumerBuilder.GetPipeline());
+            builder.AddPipeline(consumerBuilder.GetPipelineName(), consumerBuilder.GetPipeline());
 
             return builder;
         }
