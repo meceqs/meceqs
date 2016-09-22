@@ -107,7 +107,7 @@ namespace Meceqs.Tests.Pipeline
             for (int i = 0; i < 5; i++)
             {
                 var context = TestObjects.FilterContext<SimpleMessage>(requestServices: serviceProvider);
-                await pipeline.ProcessAsync(context);
+                await pipeline.InvokeAsync(context);
             }
 
             // app shutdown
@@ -135,7 +135,7 @@ namespace Meceqs.Tests.Pipeline
             for (int i = 0; i < 5; i++)
             {
                 var context = TestObjects.FilterContext<SimpleMessage>(requestServices: serviceProvider);
-                await pipeline.ProcessAsync(context);
+                await pipeline.InvokeAsync(context);
             }
 
             // app shutdown
@@ -167,7 +167,7 @@ namespace Meceqs.Tests.Pipeline
                 {
                     var context = TestObjects.FilterContext<SimpleMessage>(requestServices: scope.ServiceProvider);
 
-                    await pipeline.ProcessAsync(context);
+                    await pipeline.InvokeAsync(context);
                 }
             }
 

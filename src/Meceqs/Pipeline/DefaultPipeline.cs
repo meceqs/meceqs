@@ -29,28 +29,15 @@ namespace Meceqs.Pipeline
             Name = pipelineName;
         }
 
-        public Task ProcessAsync(FilterContext context)
+        public Task InvokeAsync(FilterContext context)
         {
             Check.NotNull(context, nameof(context));
 
             return ExecutePipeline(context);
         }
 
-        public async Task<TResult> ProcessAsync<TResult>(FilterContext context)
-        {
-            Check.NotNull(context, nameof(context));
-
-            context.ExpectedResultType = typeof(TResult);
-
-            await ExecutePipeline(context);
-
-            return (TResult)context.Result;
-        }
-
         private Task ExecutePipeline(FilterContext context)
         {
-            context.PipelineName = Name;
-
             // Give frameworks a chance to add additional properties to the context before
             // the pipeline is executed.
             _filterContextEnricher?.EnrichFilterContext(context);

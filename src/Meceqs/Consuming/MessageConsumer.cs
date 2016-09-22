@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 
 namespace Meceqs.Consuming
 {
@@ -19,13 +18,6 @@ namespace Meceqs.Consuming
             Check.NotNull(envelope, nameof(envelope));
 
             return new FluentConsumer(envelope, _serviceProvider);
-        }
-
-        public IFluentConsumer ForEnvelopes(IList<Envelope> envelopes)
-        {
-            Check.NotNull(envelopes, nameof(envelopes));
-
-            return new FluentConsumer(envelopes, _serviceProvider);
         }
     }
 }

@@ -47,7 +47,7 @@ namespace Meceqs.Tests.Sending
                 .SendAsync<string>();
 
             // Assert
-            await pipeline.ReceivedWithAnyArgs(1).ProcessAsync<string>(null);
+            await pipeline.ReceivedWithAnyArgs(1).InvokeAsync(null);
         }
 
         [Fact]
@@ -66,7 +66,7 @@ namespace Meceqs.Tests.Sending
 
             var called = 0;
             var pipeline = Substitute.For<IPipeline>();
-            pipeline.WhenForAnyArgs(x => x.ProcessAsync<string>(null))
+            pipeline.WhenForAnyArgs(x => x.InvokeAsync(null))
                 .Do(x =>
                 {
                     called++;
@@ -82,7 +82,7 @@ namespace Meceqs.Tests.Sending
             var sender = GetSender(pipeline: pipeline);
 
             FilterContext filterContext = null;
-            await pipeline.ProcessAsync(Arg.Do<FilterContext>(x => filterContext = x));
+            await pipeline.InvokeAsync(Arg.Do<FilterContext>(x => filterContext = x));
 
             // Act
 

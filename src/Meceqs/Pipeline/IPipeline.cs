@@ -13,14 +13,8 @@ namespace Meceqs.Pipeline
         string Name { get; }
 
         /// <summary>
-        /// Processes the <paramref name="context"/> on the pipeline without expecting a result.
+        /// Processes the <paramref name="context"/> on the pipeline.
         /// </summary>
-        Task ProcessAsync(FilterContext context);
-
-        /// <summary>
-        /// <para>Processes the <paramref name="context"/> on the pipeline and returns the given result.</para>
-        /// <para>If the actual result object has a different type, this will throw a <see cref="System.InvalidCastException"/></para>
-        /// </summary>
-        Task<TResult> ProcessAsync<TResult>(FilterContext context);
+        Task InvokeAsync(FilterContext context);
     }
 }

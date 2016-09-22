@@ -42,11 +42,6 @@ namespace Meceqs.AspNetCore
             if (httpContext == null)
                 return;
 
-            if (filterContext.RequestServices == null)
-            {
-                filterContext.RequestServices = httpContext.RequestServices;
-            }
-
             if (filterContext.User == null)
             {
                 filterContext.User = httpContext.User;

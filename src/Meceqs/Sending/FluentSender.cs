@@ -19,7 +19,7 @@ namespace Meceqs.Sending
             _envelopeCorrelator = serviceProvider.GetRequiredService<IEnvelopeCorrelator>();
         }
 
-        public FluentSender(IList<Envelope> envelopes, IServiceProvider serviceProvider)
+        public FluentSender(IEnumerable<Envelope> envelopes, IServiceProvider serviceProvider)
             : base(MeceqsDefaults.SendPipelineName, envelopes, serviceProvider)
         {
             _envelopeCorrelator = serviceProvider.GetRequiredService<IEnvelopeCorrelator>();

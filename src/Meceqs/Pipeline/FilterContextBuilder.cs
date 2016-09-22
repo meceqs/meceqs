@@ -22,7 +22,7 @@ namespace Meceqs.Pipeline
         /// <summary>
         /// Contains the 2nd, 3rd... envelope. <c>null</c> if there's no or only one envelope!
         /// </summary>
-        protected IList<Envelope> AdditionalEnvelopes { get; }
+        protected List<Envelope> AdditionalEnvelopes { get; }
 
         protected CancellationToken Cancellation { get; private set; }
         protected FilterContextItems ContextItems { get; private set; }
@@ -43,7 +43,7 @@ namespace Meceqs.Pipeline
             FirstEnvelope = envelope;
         }
 
-        protected FilterContextBuilder(string defaultPipelineName, IList<Envelope> envelopes, IServiceProvider serviceProvider)
+        protected FilterContextBuilder(string defaultPipelineName, IEnumerable<Envelope> envelopes, IServiceProvider serviceProvider)
             : this(defaultPipelineName, serviceProvider)
         {
             Check.NotNull(envelopes, nameof(envelopes));
@@ -52,11 +52,11 @@ namespace Meceqs.Pipeline
             // If we get a list, it's possible that there's no envelope at all.
             // This will result in a no-op send!
 
-            for (int i = 0; i < envelopes.Count; i++)
+            foreach (var envelope in envelopes)
             {
-                if (i == 0)
+                if (FirstEnvelope == null)
                 {
-                    FirstEnvelope = envelopes[i];
+                    FirstEnvelope = envelope;
                 }
                 else
                 {
@@ -65,7 +65,7 @@ namespace Meceqs.Pipeline
                         AdditionalEnvelopes = new List<Envelope>();
                     }
 
-                    AdditionalEnvelopes[i - 1] = envelopes[i];
+                    AdditionalEnvelopes.Add(envelope);
                 }
             }
         }
@@ -82,13 +82,13 @@ namespace Meceqs.Pipeline
             PipelineName = defaultPipelineName;
         }
 
-        public virtual TBuilder SetCancellationToken(CancellationToken cancellation)
+        public TBuilder SetCancellationToken(CancellationToken cancellation)
         {
             Cancellation = cancellation;
             return Instance;
         }
 
-        public virtual TBuilder SetContextItem(string key, object value)
+        public TBuilder SetContextItem(string key, object value)
         {
             if (ContextItems == null)
             {
@@ -99,7 +99,7 @@ namespace Meceqs.Pipeline
             return Instance;
         }
 
-        public virtual TBuilder SetRequestServices(IServiceProvider requestServices)
+        public TBuilder SetRequestServices(IServiceProvider requestServices)
         {
             Check.NotNull(requestServices, nameof(requestServices));
 
@@ -107,13 +107,13 @@ namespace Meceqs.Pipeline
             return Instance;
         }
 
-        public virtual TBuilder SetUser(ClaimsPrincipal user)
+        public TBuilder SetUser(ClaimsPrincipal user)
         {
             User = user;
             return Instance;
         }
 
-        public virtual TBuilder UsePipeline(string pipelineName)
+        public TBuilder UsePipeline(string pipelineName)
         {
             Check.NotNullOrWhiteSpace(pipelineName, nameof(pipelineName));
 
@@ -139,14 +139,15 @@ namespace Meceqs.Pipeline
             return Instance;
         }
 
-        protected virtual FilterContext CreateFilterContext(Envelope envelope)
+        protected virtual FilterContext CreateFilterContext(Envelope envelope, Type resultType)
         {
             Check.NotNull(envelope, nameof(envelope));
 
             var context = _filterContextFactory.CreateFilterContext(envelope);
 
+            context.Initialize(PipelineName, RequestServices, resultType);
+
             context.Cancellation = Cancellation;
-            context.RequestServices = RequestServices;
             context.User = User;
 
             if (ContextItems != null)
@@ -157,47 +158,48 @@ namespace Meceqs.Pipeline
             return context;
         }
 
-        protected virtual async Task ProcessAsync()
+        protected async Task ProcessAsync()
         {
             var pipeline = _pipelineProvider.GetPipeline(PipelineName);
 
             if (FirstEnvelope != null)
             {
-                var filterContext = CreateFilterContext(FirstEnvelope);
-                await pipeline.ProcessAsync(filterContext);
+                var filterContext = CreateFilterContext(FirstEnvelope, resultType: null);
+                await pipeline.InvokeAsync(filterContext);
             }
 
             if (AdditionalEnvelopes != null)
             {
                 foreach (var envelope in AdditionalEnvelopes)
                 {
-                    var filterContext = CreateFilterContext(envelope);
-                    await pipeline.ProcessAsync(filterContext);
+                    var filterContext = CreateFilterContext(envelope, resultType: null);
+                    await pipeline.InvokeAsync(filterContext);
                 }
             }
         }
 
-        protected virtual Task<TResult> ProcessAsync<TResult>()
+        protected async Task<TResult> ProcessAsync<TResult>()
         {
             EnsureExactlyOneEnvelope();
 
             var pipeline = _pipelineProvider.GetPipeline(PipelineName);
 
-            var filterContext = CreateFilterContext(FirstEnvelope);
-            return pipeline.ProcessAsync<TResult>(filterContext);
+            var filterContext = CreateFilterContext(FirstEnvelope, typeof(TResult));
+            
+            await pipeline.InvokeAsync(filterContext);
+
+            return (TResult)filterContext.Result;
         }
 
-        protected virtual async Task<object> ProcessAsync(Type resultType)
+        protected async Task<object> ProcessAsync(Type resultType)
         {
             EnsureExactlyOneEnvelope();
 
             var pipeline = _pipelineProvider.GetPipeline(PipelineName);
 
-            var filterContext = CreateFilterContext(FirstEnvelope);
+            var filterContext = CreateFilterContext(FirstEnvelope, resultType);
 
-            filterContext.ExpectedResultType = resultType;
-
-            await pipeline.ProcessAsync(filterContext);
+            await pipeline.InvokeAsync(filterContext);
 
             return filterContext.Result;
         }

@@ -24,7 +24,7 @@ namespace Meceqs.Sending
             return new FluentSender(envelope, _serviceProvider);
         }
 
-        public IFluentSender ForEnvelopes(IList<Envelope> envelopes)
+        public IFluentSender ForEnvelopes(IEnumerable<Envelope> envelopes)
         {
             Check.NotNull(envelopes, nameof(envelopes));
 
@@ -40,7 +40,7 @@ namespace Meceqs.Sending
             return ForEnvelope(envelope);
         }
 
-        public IFluentSender ForMessages<TMessage>(IList<TMessage> messages) where TMessage : class
+        public IFluentSender ForMessages<TMessage>(IEnumerable<TMessage> messages) where TMessage : class
         {
             Check.NotNull(messages, nameof(messages));
 

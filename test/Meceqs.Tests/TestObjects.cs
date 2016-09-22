@@ -25,10 +25,10 @@ namespace Meceqs.Tests
             where TMessage : class, new()
         {
             var envelope = TestObjects.Envelope<TMessage>();
+            requestServices = requestServices ?? Substitute.For<IServiceProvider>();
 
             var filterContext = new FilterContext<TMessage>(envelope);
-            filterContext.RequestServices = requestServices ?? Substitute.For<IServiceProvider>();
-            filterContext.ExpectedResultType = resultType;
+            filterContext.Initialize("pipeline", requestServices, resultType);
 
             return filterContext;
         }

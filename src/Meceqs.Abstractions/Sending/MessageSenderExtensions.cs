@@ -29,21 +29,12 @@ namespace Meceqs.Sending
         /// <summary>
         /// Shortcut for <code>ForMessages(messages).SendAsync()</code>.
         /// </summary>
-        public static Task SendAsync(this IMessageSender sender, IList<object> messages)
+        public static Task SendAsync<TMessage>(this IMessageSender sender, IEnumerable<TMessage> messages)
+            where TMessage : class
         {
             Check.NotNull(sender, nameof(sender));
 
-            return sender.ForMessages(messages).SendAsync();
-        }
-
-        /// <summary>
-        /// Shortcut for <code>ForMessages(messages).SendAsync&lt;TResult&gt;()</code>.
-        /// </summary>
-        public static Task<TResult> SendAsync<TResult>(this IMessageSender sender, IList<object> messages)
-        {
-            Check.NotNull(sender, nameof(sender));
-
-            return sender.ForMessages(messages).SendAsync<TResult>();
+            return sender.ForMessages<TMessage>(messages).SendAsync();
         }
     }
 }

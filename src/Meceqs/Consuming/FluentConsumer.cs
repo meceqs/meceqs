@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Meceqs.Configuration;
 using Meceqs.Pipeline;
@@ -12,11 +11,6 @@ namespace Meceqs.Consuming
 
         public FluentConsumer(Envelope envelope, IServiceProvider serviceProvider)
             : base(MeceqsDefaults.ConsumePipelineName, envelope, serviceProvider)
-        {
-        }
-
-        public FluentConsumer(IList<Envelope> envelopes, IServiceProvider serviceProvider)
-            : base(MeceqsDefaults.ConsumePipelineName, envelopes, serviceProvider)
         {
         }
 

@@ -65,7 +65,7 @@ namespace Meceqs.Tests.Pipeline
 
             var pipeline = builder.Build("pipeline");
 
-            await pipeline.ProcessAsync(context);
+            await pipeline.InvokeAsync(context);
 
             called1.ShouldBe(1);
         }
@@ -90,7 +90,7 @@ namespace Meceqs.Tests.Pipeline
 
             var pipeline = builder.Build("pipeline");
 
-            await pipeline.ProcessAsync(context);
+            await pipeline.InvokeAsync(context);
 
             called1.ShouldBe(1);
             called2.ShouldBe(1);
@@ -113,7 +113,7 @@ namespace Meceqs.Tests.Pipeline
 
             var pipeline = builder.Build("pipeline");
 
-            await pipeline.ProcessAsync(context);
+            await pipeline.InvokeAsync(context);
 
             called1.ShouldBe(1);
             called2.ShouldBe(0);
@@ -135,7 +135,7 @@ namespace Meceqs.Tests.Pipeline
 
             var pipeline = builder.Build("pipeline");
 
-            await pipeline.ProcessAsync(context);
+            await pipeline.InvokeAsync(context);
 
             called1.ShouldBe(1);
             called2.ShouldBe(0);

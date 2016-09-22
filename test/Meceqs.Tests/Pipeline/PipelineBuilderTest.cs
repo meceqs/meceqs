@@ -48,7 +48,7 @@ namespace Meceqs.Tests.Pipeline
             var builder = GetPipelineBuilder();
             var pipeline = builder.Build("pipeline");
 
-            Should.Throw<InvalidOperationException>(async () => await pipeline.ProcessAsync(context));
+            Should.Throw<InvalidOperationException>(async () => await pipeline.InvokeAsync(context));
         }
 
         [Fact]
@@ -61,7 +61,7 @@ namespace Meceqs.Tests.Pipeline
 
             var pipeline = builder.Build("pipeline");
 
-            Should.Throw<InvalidOperationException>(async () => await pipeline.ProcessAsync(context));
+            Should.Throw<InvalidOperationException>(async () => await pipeline.InvokeAsync(context));
         }
 
         [Fact]
@@ -78,7 +78,7 @@ namespace Meceqs.Tests.Pipeline
 
             var pipeline = builder.Build("pipeline");
 
-            Should.Throw<InvalidOperationException>(async () => await pipeline.ProcessAsync(context));
+            Should.Throw<InvalidOperationException>(async () => await pipeline.InvokeAsync(context));
 
             called1.ShouldBe(1);
             called2.ShouldBe(1);
@@ -101,7 +101,7 @@ namespace Meceqs.Tests.Pipeline
 
             var pipeline = builder.Build("pipeline");
 
-            await pipeline.ProcessAsync(context);
+            await pipeline.InvokeAsync(context);
 
             called1.ShouldBe(1);
             called2.ShouldBe(1);
@@ -120,7 +120,7 @@ namespace Meceqs.Tests.Pipeline
 
             var pipeline = builder.Build("pipeline");
 
-            await pipeline.ProcessAsync(context);
+            await pipeline.InvokeAsync(context);
 
             called.ShouldBe(1);
         }
@@ -139,7 +139,7 @@ namespace Meceqs.Tests.Pipeline
 
             var pipeline = builder.Build("pipeline");
 
-            await pipeline.ProcessAsync(context);
+            await pipeline.InvokeAsync(context);
 
             called1.ShouldBe(1);
             called2.ShouldBe(0);
@@ -159,7 +159,7 @@ namespace Meceqs.Tests.Pipeline
 
             var pipeline = builder.Build("pipeline");
 
-            await pipeline.ProcessAsync(context);
+            await pipeline.InvokeAsync(context);
 
             called1.ShouldBe(1);
             called2.ShouldBe(0);

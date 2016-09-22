@@ -12,6 +12,5 @@ namespace Meceqs.Configuration
 
             Services = services;
         }
-
     }
 }

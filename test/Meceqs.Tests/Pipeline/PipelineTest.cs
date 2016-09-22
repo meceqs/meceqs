@@ -40,16 +40,15 @@ namespace Meceqs.Tests.Pipeline
         }
 
         [Fact]
-        public async Task Process_throws_if_context_missing()
+        public async Task Invoke_throws_if_context_missing()
         {
             var pipeline = GetPipeline();
 
-            await Assert.ThrowsAsync<ArgumentNullException>(() => pipeline.ProcessAsync((FilterContext)null));
-            await Assert.ThrowsAsync<ArgumentNullException>(() => pipeline.ProcessAsync<string>((FilterContext)null));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => pipeline.InvokeAsync((FilterContext)null));
         }
 
         [Fact]
-        public async Task Process_invokes_pipeline_with_pipelineName()
+        public async Task Invoke_calls_filter_with_pipelineName()
         {
             var called = 0;
             FilterDelegate filter = (ctx) => {
@@ -60,30 +59,13 @@ namespace Meceqs.Tests.Pipeline
             var pipeline = GetPipeline(filter);
             var context = TestObjects.FilterContext<SimpleMessage>();
 
-            await pipeline.ProcessAsync(context);
+            await pipeline.InvokeAsync(context);
 
             called.ShouldBe(1);
         }
 
         [Fact]
-        public async Task ProcessTResult_invokes_pipeline_with_PipelineName()
-        {
-            var called = 0;
-            FilterDelegate filter = (ctx) => {
-                called++;
-                ctx.PipelineName.ShouldBe("pipeline");
-                return Task.CompletedTask; 
-            };
-            var pipeline = GetPipeline(filter);
-            var context = TestObjects.FilterContext<SimpleMessage>();
-
-            await pipeline.ProcessAsync<string>(context);
-
-            called.ShouldBe(1);
-        }
-
-        [Fact]
-        public async Task ProcessTResult_invokes_pipeline_with_ExpectedResultType()
+        public async Task Invoke_calls_filter_with_ExpectedResultType()
         {
             var called = 0;
             FilterDelegate filter = (ctx) => {
@@ -92,24 +74,26 @@ namespace Meceqs.Tests.Pipeline
                 return Task.CompletedTask; 
             };
             var pipeline = GetPipeline(filter);
-            var context = TestObjects.FilterContext<SimpleMessage>();
+            var context = TestObjects.FilterContext<SimpleMessage>(resultType: typeof(string));
 
-            await pipeline.ProcessAsync<string>(context);
+            await pipeline.InvokeAsync(context);
 
             called.ShouldBe(1);
         }
 
         [Fact]
-        public async Task ProcessTResult_returns_result()
+        public async Task Invoke_with_expectedResultType_returns_result()
         {
             FilterDelegate filter = (ctx) => {
                 ctx.Result = "result";
                 return Task.CompletedTask; 
             };
             var pipeline = GetPipeline(filter);
-            var context = TestObjects.FilterContext<SimpleMessage>();
+            var context = TestObjects.FilterContext<SimpleMessage>(resultType: typeof(string));
 
-            string result = await pipeline.ProcessAsync<string>(context);
+            await pipeline.InvokeAsync(context);
+
+            string result = (string)context.Result;
 
             result.ShouldBe("result");
         }

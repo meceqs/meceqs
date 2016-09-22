@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Meceqs.Consuming
@@ -23,26 +22,6 @@ namespace Meceqs.Consuming
             Check.NotNull(consumer, nameof(consumer));
 
             return consumer.ForEnvelope(envelope).ConsumeAsync<TResult>();
-        }
-
-        /// <summary>
-        /// Shortcut for <code>ForEnvelopes(envelopes).ConsumeAsync()</code>.
-        /// </summary>
-        public static Task ConsumeAsync(this IMessageConsumer consumer, IList<Envelope> envelopes)
-        {
-            Check.NotNull(consumer, nameof(consumer));
-
-            return consumer.ForEnvelopes(envelopes).ConsumeAsync();
-        }
-
-        /// <summary>
-        /// Shortcut for <code>ForEnvelopes(envelopes).ConsumeAsync&lt;TResult&gt;()</code>.
-        /// </summary>
-        public static Task<TResult> ConsumeAsync<TResult>(this IMessageConsumer consumer, IList<Envelope> envelopes)
-        {
-            Check.NotNull(consumer, nameof(consumer));
-
-            return consumer.ForEnvelopes(envelopes).ConsumeAsync<TResult>();
         }
     }
 }

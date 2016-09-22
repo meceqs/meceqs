@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Meceqs.Pipeline;
 using Meceqs.Tests;
 using Meceqs.TypedHandling;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace Meceqs.Test.Performance
@@ -32,9 +33,10 @@ namespace Meceqs.Test.Performance
             where TMessage : class, new()
         {
             var envelope = TestObjects.Envelope<TMessage>();
+            var serviceProvider = new ServiceCollection().BuildServiceProvider();
 
             var filterContext = new FilterContext<TMessage>(envelope);
-            filterContext.ExpectedResultType = typeof(TResult);
+            filterContext.Initialize("pipeline", serviceProvider, typeof(TResult));
 
             var handleContext = new HandleContext<TMessage>(filterContext);
 
