@@ -42,24 +42,20 @@ namespace Microsoft.Extensions.DependencyInjection
             var consumerBuilder = new AspNetCoreConsumerBuilder();
             options?.Invoke(consumerBuilder);
 
-            // Add core services if they don't yet exist.
             builder.AddAspNetCore();
 
-            // Add deserialization assemblies
             foreach (var assembly in consumerBuilder.GetDeserializationAssemblies())
             {
                 builder.AddDeserializationAssembly(assembly);
             }
 
-            // Set AspNetCoreConsumer options.
             var consumerOptions = consumerBuilder.GetConsumerOptions();
             if (consumerOptions != null)
             {
                 builder.Services.Configure(consumerOptions);
             }
 
-            // Add the pipeline.
-            builder.AddConsumer(consumerBuilder.GetPipelineName(), consumerBuilder.GetPipeline());
+            builder.AddConsumePipeline(consumerBuilder.GetPipelineName(), consumerBuilder.GetPipeline());
 
             return builder;
         }

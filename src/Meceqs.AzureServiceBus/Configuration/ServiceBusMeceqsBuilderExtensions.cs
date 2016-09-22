@@ -33,24 +33,20 @@ namespace Microsoft.Extensions.DependencyInjection
             var consumerBuilder = new ServiceBusConsumerBuilder();
             consumer?.Invoke(consumerBuilder);
 
-            // Add core services if they don't yet exist.
             builder.AddServiceBusServices();
 
-            // Add deserialization assemblies
             foreach (var assembly in consumerBuilder.GetDeserializationAssemblies())
             {
                 builder.AddDeserializationAssembly(assembly);
             }
 
-            // Set ServiceBus options.
             var consumerOptions = consumerBuilder.GetConsumerOptions();
             if (consumerOptions != null)
             {
                 builder.Services.Configure(consumerOptions);
             }
 
-            // Add the pipeline.
-            builder.AddConsumer(consumerBuilder.GetPipelineName(), consumerBuilder.GetPipeline());
+            builder.AddConsumePipeline(consumerBuilder.GetPipelineName(), consumerBuilder.GetPipeline());
 
             return builder;
         }
@@ -74,7 +70,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 builder.Services.Configure(senderOptions);
             }
 
-            builder.AddSender(senderBuilder.GetPipelineName(), senderBuilder.GetPipeline());
+            builder.AddSendPipeline(senderBuilder.GetPipelineName(), senderBuilder.GetPipeline());
 
             return builder;
         }

@@ -13,12 +13,12 @@ namespace Microsoft.Extensions.DependencyInjection
 
         // TODO @cweiss Rename to AddConsumePipeline/AddSendPipeline ? (it no longer adds the actual IMessageSender etc)
 
-        public static IMeceqsBuilder AddConsumer(this IMeceqsBuilder builder, Action<IPipelineBuilder> pipeline)
+        public static IMeceqsBuilder AddConsumePipeline(this IMeceqsBuilder builder, Action<IPipelineBuilder> pipeline)
         {
-            return AddConsumer(builder, null, pipeline);
+            return AddConsumePipeline(builder, null, pipeline);
         }
 
-        public static IMeceqsBuilder AddConsumer(this IMeceqsBuilder builder, string pipelineName, Action<IPipelineBuilder> pipeline)
+        public static IMeceqsBuilder AddConsumePipeline(this IMeceqsBuilder builder, string pipelineName, Action<IPipelineBuilder> pipeline)
         {
             Check.NotNull(builder, nameof(builder));
             Check.NotNull(pipeline, nameof(pipeline));
@@ -28,12 +28,12 @@ namespace Microsoft.Extensions.DependencyInjection
             return builder;
         }
 
-        public static IMeceqsBuilder AddSender(this IMeceqsBuilder builder, Action<IPipelineBuilder> pipeline)
+        public static IMeceqsBuilder AddSendPipeline(this IMeceqsBuilder builder, Action<IPipelineBuilder> pipeline)
         {
-            return AddSender(builder, null, pipeline);
+            return AddSendPipeline(builder, null, pipeline);
         }
 
-        public static IMeceqsBuilder AddSender(this IMeceqsBuilder builder, string pipelineName, Action<IPipelineBuilder> pipeline)
+        public static IMeceqsBuilder AddSendPipeline(this IMeceqsBuilder builder, string pipelineName, Action<IPipelineBuilder> pipeline)
         {
             Check.NotNull(builder, nameof(builder));
             Check.NotNull(pipeline, nameof(pipeline));

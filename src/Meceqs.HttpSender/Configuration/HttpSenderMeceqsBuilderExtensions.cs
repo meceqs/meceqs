@@ -57,18 +57,15 @@ namespace Microsoft.Extensions.DependencyInjection
             var senderBuilder = new HttpSenderBuilder();
             sender?.Invoke(senderBuilder);
 
-            // Add core services if they don't yet exist.
             builder.AddHttpSenderServices();
 
-            // Add options.
             var senderOptions = senderBuilder.GetSenderOptions();
             if (senderOptions != null)
             {
                 builder.Services.Configure(senderOptions);
             }
 
-            // Add the pipeline.
-            builder.AddSender(senderBuilder.GetPipelineName(), senderBuilder.GetPipeline());
+            builder.AddSendPipeline(senderBuilder.GetPipelineName(), senderBuilder.GetPipeline());
 
             return builder;
         }
