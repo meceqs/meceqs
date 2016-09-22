@@ -11,6 +11,8 @@ namespace Microsoft.Extensions.DependencyInjection
     {
         #region Pipelines
 
+        // TODO @cweiss Rename to AddConsumePipeline/AddSendPipeline ? (it no longer adds the actual IMessageSender etc)
+
         public static IMeceqsBuilder AddConsumer(this IMeceqsBuilder builder, Action<IPipelineBuilder> pipeline)
         {
             return AddConsumer(builder, null, pipeline);
