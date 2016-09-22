@@ -12,7 +12,7 @@ namespace Microsoft.Extensions.DependencyInjection
     public static class MeceqsServiceCollectionExtensions
     {
         /// <summary>
-        /// Adds core services and returns a builder that allows to add further Meceqs-specific functionality.
+        /// Adds Meceqs core services and returns a builder that allows to add or configure Meceqs features.
         /// </summary>
         public static IMeceqsBuilder AddMeceqs(this IServiceCollection services)
         {

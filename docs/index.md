@@ -179,7 +179,10 @@ public void ConfigureServices(IServiceCollection services)
         })
 
         // Add the sender and read the connection string from a configuration source (e.g. Azure Key Vault)
-        .AddServiceBusSender(MyPipelines.SendServiceBus, Configuration["ServiceBus"]);
+        .AddServiceBusSender(Configuration["ServiceBus"], sender =>
+        {
+            sender.SetPipelineName(MyPipelines.SendServiceBus);
+        });
 }
 
 public void Configure(IApplicationBuilder app)
@@ -300,7 +303,10 @@ services.AddMeceqs()
         });
     })
 
-    .AddEventHubSender(MyPipelines.SendEventHub, Configuration["EventHub"]);
+    .AddEventHubSender(Configuration["EventHub"], sender =>
+    {
+        sender.SetPipelineName(MyPipelines.SendEventHub);
+    });
 ```
 
 #### Envelopes

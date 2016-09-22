@@ -6,12 +6,12 @@ namespace Meceqs.Configuration
     public static class MeceqsDefaults
     {
         /// <summary>
-        /// Name of the default consume pipeline.
+        /// Name of the default "Consume" pipeline.
         /// </summary>
         public static string ConsumePipelineName = "Consume";
 
         /// <summary>
-        /// Name of the default send pipeline.
+        /// Name of the default "Send" pipeline.
         /// </summary>
         public static string SendPipelineName = "Send";
     }

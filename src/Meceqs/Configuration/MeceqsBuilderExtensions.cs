@@ -9,6 +9,10 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class MeceqsBuilderExtensions
     {
+        /// <summary>
+        /// Adds the default "Consume" pipeline. This pipeline will be used when <see cref="Meceqs.Consuming.IMessageConsumer"/>
+        /// is used without specifying a named pipeline.
+        /// </summary>
         public static IMeceqsBuilder AddConsumePipeline(this IMeceqsBuilder builder, Action<IPipelineBuilder> pipeline)
         {
             Check.NotNull(builder, nameof(builder));
@@ -19,6 +23,10 @@ namespace Microsoft.Extensions.DependencyInjection
             return builder;
         }
 
+        /// <summary>
+        /// Adds the default "Send" pipeline. This pipeline will be used when <see cref="Meceqs.Sending.IMessageSender"/>
+        /// is used without specifying a named pipeline.
+        /// </summary>
         public static IMeceqsBuilder AddSendPipeline(this IMeceqsBuilder builder, Action<IPipelineBuilder> pipeline)
         {
             Check.NotNull(builder, nameof(builder));
@@ -29,6 +37,10 @@ namespace Microsoft.Extensions.DependencyInjection
             return builder;
         }
 
+        /// <summary>
+        /// Adds a named pipeline. This pipeline can be used by <see cref="Meceqs.Consuming.IMessageConsumer"/>
+        /// and <see cref="Meceqs.Sending.IMessageSender"/>.
+        /// </summary>
         public static IMeceqsBuilder AddPipeline(this IMeceqsBuilder builder, string pipelineName, Action<IPipelineBuilder> pipeline)
         {
             Check.NotNull(builder, nameof(builder));
@@ -40,6 +52,10 @@ namespace Microsoft.Extensions.DependencyInjection
             return builder;
         }
 
+        /// <summary>
+        /// Adds the assembly of the given type to the list of assemblies that are used for creating
+        /// message instances when they are deserialized.
+        /// </summary>
         public static IMeceqsBuilder AddDeserializationAssembly<TType>(this IMeceqsBuilder builder)
         {
             var assembly = typeof(TType).GetTypeInfo().Assembly;
@@ -47,6 +63,10 @@ namespace Microsoft.Extensions.DependencyInjection
             return builder.AddDeserializationAssembly(assembly);
         }
 
+        /// <summary>
+        /// Adds the assembly to the list of assemblies that are used for creating message instances
+        /// when they are deserialized.
+        /// </summary>
         public static IMeceqsBuilder AddDeserializationAssembly(this IMeceqsBuilder builder, params Assembly[] assemblies)
         {
             Check.NotNull(builder, nameof(builder));

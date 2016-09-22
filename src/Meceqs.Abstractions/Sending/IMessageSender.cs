@@ -3,29 +3,29 @@ using System.Collections.Generic;
 
 namespace Meceqs.Sending
 {
+    /// <summary>
+    /// This interface is used for "sending a newly created message" or
+    /// for "forwarding an existing envelope" to a pipeline.
     public interface IMessageSender
     {
-        // TODO @cweiss remove handling of multiple messages/events?
+        // TODO @cweiss remove handling of multiple messages?
 
         /// <summary>
-        /// Creates a builder that sends an existing <see cref="Envelope"/> to a pipeline.
-        /// This can be used to forward an envelope from a consumer to a sender.
+        /// <para>Creates a builder that sends an existing <see cref="Envelope"/> to a pipeline.
+        /// This can be used to forward an envelope from a consumer to a sender.</para>
+        /// <para>If you don't specify a pipeline name, the default "Send" pipeline will be used.</para>
         /// </summary>
         IFluentSender ForEnvelope(Envelope envelope);
 
         /// <summary>
-        /// Creates a builder that sends a list of existing <see cref="Envelope"/>s to a pipeline.
-        /// This can be used to forward envelopes from a consumer to a sender.
-        /// </summary>
-        IFluentSender ForEnvelopes(IEnumerable<Envelope> envelopes);
-
-        /// <summary>
-        /// Creates a builder that sends a <paramref name="message"/> to a pipeline.
+        /// <para>Creates a builder that sends a <paramref name="message"/> to a pipeline.</para>
+        /// <para>If you don't specify a pipeline name, the default "Send" pipeline will be used.</para>
         /// </summary>
         IFluentSender ForMessage(object message, Guid? messageId = null);
 
         /// <summary>
-        /// Creates a builder that sends a list of <paramref name="messages"/> to a pipeline.
+        /// <para>Creates a builder that sends a list of <paramref name="messages"/> to a pipeline.</para>
+        /// <para>If you don't specify a pipeline name, the default "Send" pipeline will be used.</para>
         /// </summary>
         IFluentSender ForMessages<TMessage>(IEnumerable<TMessage> messages) where TMessage : class;
     }

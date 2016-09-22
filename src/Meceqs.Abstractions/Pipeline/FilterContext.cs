@@ -1,13 +1,23 @@
 using System;
+using System.ComponentModel;
 using System.Security.Claims;
 using System.Threading;
 
 namespace Meceqs.Pipeline
 {
+    /// <summary>
+    /// Contains the strongly typed envelope and metadata about the current execution.
+    /// </summary>
     public class FilterContext<TMessage> : FilterContext where TMessage : class
     {
+        /// <summary>
+        /// Gets the envelope for which the pipeline is executed.
+        /// <summary>
         public new Envelope<TMessage> Envelope => (Envelope<TMessage>)base.Envelope;
 
+        /// <summary>
+        /// Gets the message for which the pipeline is executed. This is a shortcut for <see cref="Envelope.Message"/>.
+        /// <summary>
         public new TMessage Message => (TMessage)base.Message;
 
         public FilterContext(Envelope<TMessage> envelope)
@@ -27,7 +37,7 @@ namespace Meceqs.Pipeline
         public Envelope Envelope { get; }
 
         /// <summary>
-        /// A shortcut for <see cref="Envelope.Message"/>.
+        /// Gets the message for which the pipeline is executed. This is a shortcut for <see cref="Envelope.Message"/>.
         /// <summary>
         public object Message => Envelope.Message; // just for faster access to the message
 
@@ -79,6 +89,10 @@ namespace Meceqs.Pipeline
             Envelope = envelope;
         }
 
+        /// <summary>
+        /// Brings the context into a valid state before the pipeline is invoked.
+        /// </summary>
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public void Initialize(string pipelineName, IServiceProvider requestServices, Type expectedResultType)
         {
             Check.NotNullOrWhiteSpace(pipelineName, nameof(pipelineName));

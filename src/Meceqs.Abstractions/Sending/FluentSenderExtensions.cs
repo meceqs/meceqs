@@ -1,5 +1,8 @@
 namespace Meceqs.Sending
 {
+    /// <summary>
+    /// Extension methods for <see cref="IFluentSender"/>.
+    /// </summary>
     public static class FluentSenderExtensions
     {
         // TODO @cweiss !! where should we put these things? (and do we even want them?)

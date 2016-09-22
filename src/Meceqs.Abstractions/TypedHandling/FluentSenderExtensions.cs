@@ -2,6 +2,9 @@ using Meceqs.Sending;
 
 namespace Meceqs.TypedHandling
 {
+    /// <summary>
+    /// Extension methods for <see cref="IFluentSender"/>.
+    /// </summary>
     public static class FluentSenderExtensions
     {
         /// <summary>
