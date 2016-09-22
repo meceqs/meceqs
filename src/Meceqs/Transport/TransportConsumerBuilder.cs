@@ -43,8 +43,6 @@ namespace Meceqs.Transport
 
         public Action<IPipelineBuilder> GetPipeline()
         {
-            //var pipeline = PipelineModifier?.Invoke(_pipeline) ?? _pipeline;
-
             var pipeline = PipelineStartHook + _pipeline + PipelineEndHook;
 
             if (pipeline == null)
@@ -100,16 +98,18 @@ namespace Meceqs.Transport
             return SetUnknownMessageBehavior(UnknownMessageBehavior.Skip);
         }
 
-        public TTransportConsumerBuilder ConfigurePipeline(Action<IPipelineBuilder> pipeline)
+        public TTransportConsumerBuilder SetPipelineName(string pipelineName)
         {
-            return ConfigurePipeline(null, pipeline);
+            Check.NotNullOrWhiteSpace(pipelineName, nameof(pipelineName));
+
+            _pipelineName = pipelineName;
+            return Instance;
         }
 
-        public TTransportConsumerBuilder ConfigurePipeline(string pipelineName, Action<IPipelineBuilder> pipeline)
+        public TTransportConsumerBuilder ConfigurePipeline(Action<IPipelineBuilder> pipeline)
         {
             Check.NotNull(pipeline, nameof(pipeline));
 
-            _pipelineName = pipelineName;
             _pipeline = pipeline;
             return Instance;
         }

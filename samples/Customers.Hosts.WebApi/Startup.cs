@@ -92,11 +92,11 @@ namespace Customers.Hosts.WebApi
                 })
 
                 // This Web API will also send messages to an Azure Event Hub.
-                .AddEventHubSender(pipeline =>
+                .AddEventHubSender(sender =>
                 {
-                    pipeline
-                        .UseAuditing()              // add user id to message if not present
-                        .RunEventHubSender();
+                    sender.ConfigurePipeline(pipeline => {
+                        pipeline.UseAuditing(); // add user id to message if not present
+                    });
                 })
 
                 // Fake for the EventHubSender which will send events to a local file.

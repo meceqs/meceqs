@@ -8,8 +8,8 @@ namespace Meceqs.Transport
     {
         TTransportSender Instance { get; }
 
-        TTransportSender ConfigurePipeline(Action<IPipelineBuilder> pipeline);
+        TTransportSender SetPipelineName(string pipelineName);
 
-        TTransportSender ConfigurePipeline(string pipelineName, Action<IPipelineBuilder> pipeline);
+        TTransportSender ConfigurePipeline(Action<IPipelineBuilder> pipeline);
     }
 }

@@ -31,8 +31,7 @@ namespace Microsoft.Extensions.DependencyInjection
         }
 
         /// <summary>
-        /// A meta function for adding an ASP.NET Core consumer with one call.
-        /// It adds the most common configuration options in <paramref name="options"/>.
+        /// Adds an ASP.NET Core consumer pipeline.
         /// </summary>
         public static IMeceqsBuilder AddAspNetCoreConsumer(
             this IMeceqsBuilder builder,

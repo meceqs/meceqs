@@ -37,9 +37,9 @@ namespace TrafficGenerator
                     });
                 })
 
-                .AddServiceBusSender("ServiceBus", pipeline =>
+                .AddServiceBusSender(sender =>
                 {
-                    pipeline.RunServiceBusSender();
+                    sender.SetPipelineName("ServiceBus");
                 })
 
                 // send messages to a local file instead of the actual Service Bus.

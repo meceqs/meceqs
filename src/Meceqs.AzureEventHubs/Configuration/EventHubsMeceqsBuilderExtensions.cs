@@ -4,7 +4,6 @@ using Meceqs.AzureEventHubs.Configuration;
 using Meceqs.AzureEventHubs.Consuming;
 using Meceqs.AzureEventHubs.Internal;
 using Meceqs.Configuration;
-using Meceqs.Pipeline;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Microsoft.Extensions.DependencyInjection
@@ -22,17 +21,15 @@ namespace Microsoft.Extensions.DependencyInjection
             return builder;
         }
 
-        #region Consuming
-
         /// <summary>
-        /// A meta function for adding an Azure Event Hubs consumer with one call.
-        /// It adds the most common configuration options in <paramref name="consumer"/>.
+        /// Adds an Azure Event Hubs consumer pipeline.
         /// </summary>
         public static IMeceqsBuilder AddEventHubConsumer(
             this IMeceqsBuilder builder,
             Action<IEventHubConsumerBuilder> consumer)
         {
             Check.NotNull(builder, nameof(builder));
+            Check.NotNull(consumer, nameof(consumer));
 
             var consumerBuilder = new EventHubConsumerBuilder();
             consumer?.Invoke(consumerBuilder);
@@ -59,26 +56,31 @@ namespace Microsoft.Extensions.DependencyInjection
             return builder;
         }
 
-        #endregion Consuming
-
-        #region Sending
-
-        public static IMeceqsBuilder AddEventHubSender(this IMeceqsBuilder builder, Action<IPipelineBuilder> pipeline)
-        {
-            return AddEventHubSender(builder, null, pipeline);
-        }
-
-        public static IMeceqsBuilder AddEventHubSender(this IMeceqsBuilder builder, string pipelineName, Action<IPipelineBuilder> pipeline)
+        /// <summary>
+        /// Adds an Azure Event Hubs sender pipeline.
+        /// </summary>
+        public static IMeceqsBuilder AddEventHubSender(this IMeceqsBuilder builder, Action<IEventHubSenderBuilder> sender)
         {
             Check.NotNull(builder, nameof(builder));
+            Check.NotNull(sender, nameof(sender));
 
+            var senderBuilder = new EventHubSenderBuilder();
+            sender?.Invoke(senderBuilder);
+
+            // Add core services if they don't yet exist.
             builder.AddEventHubServices();
 
-            builder.AddSender(pipelineName, pipeline);
+            // Set Options.
+            var senderOptions = senderBuilder.GetSenderOptions();
+            if (senderOptions != null)
+            {
+                builder.Services.Configure(senderOptions);
+            }
+
+            // Add the pipeline.
+            builder.AddSender(senderBuilder.GetPipelineName(), senderBuilder.GetPipeline());
 
             return builder;
         }
-
-        #endregion
     }
 }

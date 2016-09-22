@@ -21,9 +21,9 @@ namespace Meceqs.Transport
 
         TTransportConsumer SkipUnknownMessages();
 
-        TTransportConsumer ConfigurePipeline(Action<IPipelineBuilder> pipeline);
+        TTransportConsumer SetPipelineName(string pipelineName);
 
-        TTransportConsumer ConfigurePipeline(string pipelineName, Action<IPipelineBuilder> pipeline);
+        TTransportConsumer ConfigurePipeline(Action<IPipelineBuilder> pipeline);
 
         TTransportConsumer UseTypedHandling(Action<TypedHandlingOptions> options);
 

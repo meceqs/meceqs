@@ -4,7 +4,6 @@ using Meceqs.AzureServiceBus.Configuration;
 using Meceqs.AzureServiceBus.Consuming;
 using Meceqs.AzureServiceBus.Internal;
 using Meceqs.Configuration;
-using Meceqs.Pipeline;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Microsoft.Extensions.DependencyInjection
@@ -23,17 +22,13 @@ namespace Microsoft.Extensions.DependencyInjection
             return builder;
         }
 
-        #region Consuming
-
         /// <summary>
-        /// A meta function for adding an Azure Service Bus consumer with one call.
-        /// It adds the most common configuration options in <paramref name="consumer"/>.
+        /// Adds an Azure Service Bus consumer pipeline.
         /// </summary>
-        public static IMeceqsBuilder AddServiceBusConsumer(
-            this IMeceqsBuilder builder,
-            Action<IServiceBusConsumerBuilder> consumer)
+        public static IMeceqsBuilder AddServiceBusConsumer(this IMeceqsBuilder builder, Action<IServiceBusConsumerBuilder> consumer)
         {
             Check.NotNull(builder, nameof(builder));
+            Check.NotNull(consumer, nameof(consumer));
 
             var consumerBuilder = new ServiceBusConsumerBuilder();
             consumer?.Invoke(consumerBuilder);
@@ -60,28 +55,28 @@ namespace Microsoft.Extensions.DependencyInjection
             return builder;
         }
 
-        #endregion Consuming
-
-        #region Sending
-
-        public static IMeceqsBuilder AddServiceBusSender(this IMeceqsBuilder builder, Action<IPipelineBuilder> pipeline)
-        {
-            return AddServiceBusSender(builder, null, pipeline);
-        }
-
-        public static IMeceqsBuilder AddServiceBusSender(this IMeceqsBuilder builder, string pipelineName, Action<IPipelineBuilder> pipeline)
+        /// <summary>
+        /// Adds an Azure Service Bus sender pipeline.
+        /// </summary>
+        public static IMeceqsBuilder AddServiceBusSender(this IMeceqsBuilder builder, Action<IServiceBusSenderBuilder> sender)
         {
             Check.NotNull(builder, nameof(builder));
+            Check.NotNull(sender, nameof(sender));
+
+            var senderBuilder = new ServiceBusSenderBuilder();
+            sender?.Invoke(senderBuilder);
 
             builder.AddServiceBusServices();
 
-            builder.AddSender(pipelineName, pipeline);
+            var senderOptions = senderBuilder.GetSenderOptions();
+            if (senderOptions != null)
+            {
+                builder.Services.Configure(senderOptions);
+            }
+
+            builder.AddSender(senderBuilder.GetPipelineName(), senderBuilder.GetPipeline());
 
             return builder;
         }
-
-        #endregion
     }
-
-
 }

@@ -48,16 +48,18 @@ namespace Meceqs.Transport
             return pipeline;
         }
 
-        public TTransportSenderBuilder ConfigurePipeline(Action<IPipelineBuilder> pipeline)
+        public TTransportSenderBuilder SetPipelineName(string pipelineName)
         {
-            return ConfigurePipeline(null, pipeline);
+            Check.NotNullOrWhiteSpace(pipelineName, nameof(pipelineName));
+
+            _pipelineName = pipelineName;
+            return Instance;
         }
 
-        public TTransportSenderBuilder ConfigurePipeline(string pipelineName, Action<IPipelineBuilder> pipeline)
+        public TTransportSenderBuilder ConfigurePipeline(Action<IPipelineBuilder> pipeline)
         {
             Check.NotNull(pipeline, nameof(pipeline));
 
-            _pipelineName = pipelineName;
             _pipeline = pipeline;
             return Instance;
         }
