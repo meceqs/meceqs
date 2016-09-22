@@ -1,12 +1,12 @@
 {
-  "version": "0.2.2-*",
+  "version": "0.2.3-*",
 
   "buildOptions": {
     "warningsAsErrors": true
   },
 
   "dependencies": {
-    "Meceqs": "0.2.2-*",
+    "Meceqs": "0.2.3-*",
 
     "WindowsAzure.ServiceBus": "3.0.1"
   },

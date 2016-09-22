@@ -1,12 +1,12 @@
 {
-  "version": "0.2.2-*",
+  "version": "0.2.3-*",
 
   "buildOptions": {
     "warningsAsErrors": true
   },
 
   "dependencies": {
-    "Meceqs.Abstractions": "0.2.2-*",
+    "Meceqs.Abstractions": "0.2.3-*",
 
     "Microsoft.Extensions.DependencyInjection.Abstractions": "1.0.0",
     "Microsoft.Extensions.Logging.Abstractions": "1.0.0",
