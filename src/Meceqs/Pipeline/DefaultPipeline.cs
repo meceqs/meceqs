@@ -53,28 +53,13 @@ namespace Meceqs.Pipeline
         {
             if (context.Envelope == null)
             {
-                // Envelope is enforced in the FilterContext constructor so we don't need a nice error message here.
                 throw new ArgumentNullException($"{nameof(context)}.{nameof(context.Envelope)}");
             }
 
-            if (context.Message == null)
-            {
-                throw new ArgumentNullException(
-                    $"The envelope does not contain a message object. You should call '{nameof(Envelope)}.{nameof(Envelope.EnsureValid)}' " +
-                    $"before invoking the pipeline to make sure this error already throws when the envelope is created.",
-                    $"{nameof(context)}.{nameof(context.Message)}"
-                );
-            }
-
-            if (context.MessageType == null)
-            {
-                // This is a shortcut property and the user can't influence it so we don't need a nice error message here.
-                throw new ArgumentNullException($"{nameof(context)}.{nameof(context.MessageType)}");
-            }
+            context.Envelope.EnsureValid();
 
             if (string.IsNullOrWhiteSpace(context.PipelineName))
             {
-                // This is enforced in the constructor of this class so this should not happen - we test it here anyway.
                 throw new ArgumentNullException($"{nameof(context)}.{nameof(context.PipelineName)}");
             }
 

@@ -49,7 +49,7 @@ namespace Meceqs
         public Guid MessageId { get; set; }
 
         /// <summary>
-        /// A long, unique identifier of the message type, used for deserialization.
+        /// A unique identifier of the message type, used for deserialization.
         /// </summary>
         public string MessageType { get; set; }
 

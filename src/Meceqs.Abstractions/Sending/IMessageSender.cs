@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Meceqs.Sending
 {
@@ -27,6 +28,26 @@ namespace Meceqs.Sending
         /// <para>Creates a builder that sends a list of <paramref name="messages"/> to a pipeline.</para>
         /// <para>If you don't specify a pipeline name, the default "Send" pipeline will be used.</para>
         /// </summary>
-        IFluentSender ForMessages<TMessage>(IEnumerable<TMessage> messages) where TMessage : class;
+        IFluentSender ForMessages(IEnumerable<object> messages);
+
+        /// <summary>
+        /// Sends the message to the default "Send" pipeline. If you want to use a different pipeline
+        /// or change some other behavior, use the builder pattern with <see cref="ForMessage"/>.
+        /// </summary>
+        Task SendAsync(object message, Guid? messageId = null);
+
+        /// <summary>
+        /// Sends the message to the default "Send" pipeline and expects a result object of the given type.
+        /// If you want to use a different pipeline or change some other behavior,
+        /// use the builder pattern with <see cref="ForMessage"/>.
+        /// </summary>
+        Task<TResult> SendAsync<TResult>(object message, Guid? messageId = null);
+
+        /// <summary>
+        /// Sends the messages to the default "Send" pipeline. If you want to use a different pipeline
+        /// or change some other behavior, use the builder pattern with <see cref="ForMessage"/>.
+        /// </summary>
+        Task SendAsync(IEnumerable<object> messages);
+
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Meceqs.Sending
@@ -44,7 +45,7 @@ namespace Meceqs.Sending
             return ForEnvelope(envelope);
         }
 
-        public IFluentSender ForMessages<TMessage>(IEnumerable<TMessage> messages) where TMessage : class
+        public IFluentSender ForMessages(IEnumerable<object> messages)
         {
             Check.NotNull(messages, nameof(messages));
 
@@ -53,9 +54,7 @@ namespace Meceqs.Sending
 
             foreach (var message in messages)
             {
-                var messageId = Guid.NewGuid();
-
-                var envelope = _envelopeFactory.Create(message, messageId);
+                var envelope = _envelopeFactory.Create(message, messageId: Guid.NewGuid());
 
                 // In case no-one correlates these messages with another message, we at least want
                 // all of them to have the same correlation-id (from the first message).
@@ -72,6 +71,34 @@ namespace Meceqs.Sending
             }
 
             return new FluentSender(envelopes, _serviceProvider);
+        }
+
+        /// <summary>
+        /// Sends the message to the default "Send" pipeline. If you want to use a different pipeline
+        /// or change some other behavior, use the builder pattern with <see cref="ForMessage"/>.
+        /// </summary>
+        public Task SendAsync(object message, Guid? messageId = null)
+        {
+            return ForMessage(message, messageId).SendAsync();
+        }
+
+        /// <summary>
+        /// Sends the message to the default "Send" pipeline and expects a result object of the given type.
+        /// If you want to use a different pipeline or change some other behavior,
+        /// use the builder pattern with <see cref="ForMessage"/>.
+        /// </summary>
+        public Task<TResult> SendAsync<TResult>(object message, Guid? messageId = null)
+        {
+            return ForMessage(message, messageId).SendAsync<TResult>();
+        }
+
+        /// <summary>
+        /// Sends the messages to the default "Send" pipeline. If you want to use a different pipeline
+        /// or change some other behavior, use the builder pattern with <see cref="ForMessage"/>.
+        /// </summary>
+        public Task SendAsync(IEnumerable<object> messages)
+        {
+            return ForMessages(messages).SendAsync();
         }
     }
 }

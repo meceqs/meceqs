@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 
 namespace Meceqs.Consuming
 {
@@ -29,6 +30,25 @@ namespace Meceqs.Consuming
             envelope.EnsureValid();
 
             return new FluentConsumer(envelope, _serviceProvider);
+        }
+
+        /// <summary>
+        /// Sends the envelope to the default "Consume" pipeline. If you want to use a different pipeline
+        /// or change some other behavior, use the builder pattern with <see cref="ForEnvelope"/>.
+        /// </summary>
+        public Task ConsumeAsync(Envelope envelope)
+        {
+            return ForEnvelope(envelope).ConsumeAsync();
+        }
+
+        /// <summary>
+        /// Sends the envelope to the default "Consume" pipeline and expects a result object of the given type.
+        /// If you want to use a different pipeline or change some other behavior,
+        /// use the builder pattern with <see cref="ForEnvelope"/>.
+        /// </summary>
+        public Task<TResult> ConsumeAsync<TResult>(Envelope envelope)
+        {
+            return ForEnvelope(envelope).ConsumeAsync<TResult>();
         }
     }
 }
