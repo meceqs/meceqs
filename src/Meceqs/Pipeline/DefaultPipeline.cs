@@ -80,14 +80,7 @@ namespace Meceqs.Pipeline
 
             if (context.RequestServices == null)
             {
-                throw new ArgumentNullException(
-                    $"The {nameof(FilterContext)} has not been configured with a service provider. " +
-                    $"You can set it by either calling '{nameof(Meceqs.Consuming.IFluentConsumer.SetRequestServices)}' on " +
-                    $"a filter context builder ('{nameof(Meceqs.Consuming.IFluentConsumer)}' or '{nameof(Meceqs.Sending.IFluentSender)}') " +
-                    $"or by implementing a '{nameof(IFilterContextEnricher)}' that automatically sets the service provider " +
-                    $"for every request.",
-                    $"{nameof(context)}.{nameof(context.RequestServices)}"
-                );
+                throw new ArgumentNullException($"{nameof(context)}.{nameof(context.RequestServices)}");
             }
         }
     }
