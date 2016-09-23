@@ -36,8 +36,6 @@ namespace Meceqs.AzureServiceBus.Internal
 
             brokeredMessage.MessageId = envelope.MessageId.ToString();
             brokeredMessage.Properties[TransportHeaderNames.MessageId] = envelope.MessageId;
-
-            brokeredMessage.Properties[TransportHeaderNames.MessageName] = envelope.MessageName;
             brokeredMessage.Properties[TransportHeaderNames.MessageType] = envelope.MessageType;
 
             brokeredMessage.CorrelationId = envelope.CorrelationId.ToString();

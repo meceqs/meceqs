@@ -91,9 +91,6 @@ Envelopes contain metadata about the message. This json serialized object shows 
   // The unique type of your message - usually used for deserialization.
   "messageType": "Customers.Contracts.Commands.CreateCustomerCommand",
 
-  // A shorter, preferably unique, name - usually used for batch/stream processing where you don't need the full type.
-  "messageName": "CreateCustomerCommand",
-
   // All messages in a process/conversation will have the same correlation id.
   "correlationId": "49f32326-a4a3-4242-9d8f-396c35db2f67",
 

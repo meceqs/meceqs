@@ -33,7 +33,7 @@ namespace Meceqs
     /// </summary>
     /// <remarks>
     /// If we would only have the strongly-typed version, every class would need
-    /// the generic arguments as well, even though most of them don't need to know 
+    /// the generic arguments as well, even though most of them don't need to know
     /// about the actual message type at compile time.
     /// </remarks>
     public abstract class Envelope
@@ -52,11 +52,6 @@ namespace Meceqs
         /// A long, unique identifier of the message type, used for deserialization.
         /// </summary>
         public string MessageType { get; set; }
-
-        /// <summary>
-        /// A short, preferably unique identifier of the message, used for easier access in e.g. reporting scenarios.
-        /// </summary>
-        public string MessageName { get; set; }
 
         /// <summary>
         /// An id that is shared amongst a series of connected messages.
@@ -89,7 +84,7 @@ namespace Meceqs
 
             Message = message;
             MessageId = messageId;
-            
+
             Sanitize();
         }
 
@@ -101,7 +96,6 @@ namespace Meceqs
         {
             Check.NotNull(Message, nameof(Message));
             Check.NotEmpty(MessageId, nameof(MessageId));
-            Check.NotNullOrWhiteSpace(MessageName, nameof(MessageName));
             Check.NotNullOrWhiteSpace(MessageType, nameof(MessageType));
         }
 
@@ -115,9 +109,8 @@ namespace Meceqs
                 Type messageType = Message.GetType();
 
                 // if the envelope is not deserialized in a statically typed way (e.g. through ASP.NET MVC ModelBinding),
-                // the values for MessageName and -Type could be wrong or missing. (e.g. because the request was made with Fiddler)
-                // For this reason, we just re-set them!
-                MessageName = messageType.Name;
+                // the value for MessageType could be wrong or missing. (e.g. because the request was made with Fiddler)
+                // For this reason, we just re-set it!
                 MessageType = messageType.FullName;
             }
 

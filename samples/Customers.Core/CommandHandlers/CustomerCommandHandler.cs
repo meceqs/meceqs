@@ -30,7 +30,7 @@ namespace Customers.Core.CommandHandlers
         [CustomLogic /* this attribute can be read by an IHandleInterceptor */]
         public async Task<CreateCustomerResult> HandleAsync(HandleContext<CreateCustomerCommand> context)
         {
-            _logger.LogInformation("MessageName:{MessageName} MessageId:{MessageId}", context.Message.GetType(), context.Envelope.MessageId);
+            _logger.LogInformation("MessageType:{MessageType} MessageId:{MessageId}", context.Message.GetType(), context.Envelope.MessageId);
 
             _logger.LogInformation("Envelope:{Envelope}", JsonConvert.SerializeObject(context.Envelope));
 

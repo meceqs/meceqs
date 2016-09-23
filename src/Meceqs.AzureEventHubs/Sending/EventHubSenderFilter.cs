@@ -38,10 +38,10 @@ namespace Meceqs.AzureEventHubs.Sending
             Check.NotNull(eventDataConverter, nameof(eventDataConverter));
 
             // TODO @cweiss which LogLevel?
-            _logger.LogInformation("Sending message {MessageName}/{MessageId}", context.Envelope.MessageName, context.Envelope.MessageId);
+            _logger.LogInformation("Sending message {MessageType}/{MessageId}", context.Envelope.MessageType, context.Envelope.MessageId);
 
             var eventData = eventDataConverter.ConvertToEventData(context.Envelope);
-            
+
             // TODO @cweiss move magic string somewhere.
             eventData.PartitionKey = context.Items.Get<string>("PartitionKey");
 

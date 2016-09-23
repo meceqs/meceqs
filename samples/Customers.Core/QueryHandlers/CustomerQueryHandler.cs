@@ -26,7 +26,7 @@ namespace Customers.Core.QueryHandlers
 
         public Task<FindCustomersResult> HandleAsync(HandleContext<FindCustomersQuery> context)
         {
-            _logger.LogInformation("FindCustomers - MessageName:{MessageName} MessageId:{MessageId}",
+            _logger.LogInformation("FindCustomers - MessageType:{MessageType} MessageId:{MessageId}",
                 context.Message.GetType(), context.Envelope.MessageId);
 
             _logger.LogInformation("Envelope:{Envelope}", JsonConvert.SerializeObject(context.Envelope));
@@ -43,7 +43,7 @@ namespace Customers.Core.QueryHandlers
 
         public Task<CustomerDto> HandleAsync(HandleContext<GetCustomerQuery> context)
         {
-            _logger.LogInformation("GetCustomer - MessageName:{MessageName} MessageId:{MessageId}",
+            _logger.LogInformation("GetCustomer - MessageType:{MessageType} MessageId:{MessageId}",
                 context.Message.GetType(), context.Envelope.MessageId);
 
             var customer = _customerRepository.GetById(context.Message.CustomerId);

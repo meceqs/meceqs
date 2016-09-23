@@ -32,7 +32,6 @@ namespace Meceqs.Tests
 
             env.Message.ShouldBe(message);
             env.MessageId.ShouldBe(messageId);
-            env.MessageName.ShouldBe("SimpleMessage");
             env.MessageType.ShouldBe("Meceqs.Tests.SimpleMessage");
             env.CorrelationId.ShouldNotBe(Guid.Empty);
             env.CreatedOnUtc.ShouldNotBeNull();
@@ -61,15 +60,6 @@ namespace Meceqs.Tests
         {
             var env = GetEnvelope<SimpleMessage>();
             env.MessageType = null;
-
-            Should.Throw<ArgumentNullException>(() => env.EnsureValid());
-        }
-
-        [Fact]
-        public void EnsureValid_throws_if_messageName_missing()
-        {
-            var env = GetEnvelope<SimpleMessage>();
-            env.MessageName = null;
 
             Should.Throw<ArgumentNullException>(() => env.EnsureValid());
         }
