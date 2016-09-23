@@ -42,17 +42,17 @@ namespace Meceqs.Sending
 
         public Task SendAsync()
         {
-            return ProcessAsync();
+            return InvokePipelineAsync();
         }
 
         public Task<TResult> SendAsync<TResult>()
         {
-            return ProcessAsync<TResult>();
+            return InvokePipelineAsync<TResult>();
         }
 
         public Task<object> SendAsync(Type resultType)
         {
-            return ProcessAsync(resultType);
+            return InvokePipelineAsync(resultType);
         }
     }
 }

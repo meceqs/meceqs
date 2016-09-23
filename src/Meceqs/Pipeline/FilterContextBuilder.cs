@@ -158,7 +158,7 @@ namespace Meceqs.Pipeline
             return context;
         }
 
-        protected async Task ProcessAsync()
+        protected async Task InvokePipelineAsync()
         {
             var pipeline = _pipelineProvider.GetPipeline(PipelineName);
 
@@ -178,20 +178,20 @@ namespace Meceqs.Pipeline
             }
         }
 
-        protected async Task<TResult> ProcessAsync<TResult>()
+        protected async Task<TResult> InvokePipelineAsync<TResult>()
         {
             EnsureExactlyOneEnvelope();
 
             var pipeline = _pipelineProvider.GetPipeline(PipelineName);
 
             var filterContext = CreateFilterContext(FirstEnvelope, typeof(TResult));
-            
+
             await pipeline.InvokeAsync(filterContext);
 
             return (TResult)filterContext.Result;
         }
 
-        protected async Task<object> ProcessAsync(Type resultType)
+        protected async Task<object> InvokePipelineAsync(Type resultType)
         {
             EnsureExactlyOneEnvelope();
 
@@ -209,14 +209,14 @@ namespace Meceqs.Pipeline
             if (FirstEnvelope == null)
             {
                 throw new InvalidOperationException(
-                    $"'{nameof(ProcessAsync)}' with a result-type can only be called if there's exactly one envelope. " +
+                    $"'{nameof(InvokePipelineAsync)}' with a result-type can only be called if there's exactly one envelope. " +
                     $"Actual Count: 0");
             }
 
             if (AdditionalEnvelopes != null)
             {
                 throw new InvalidOperationException(
-                    $"'{nameof(ProcessAsync)}' with a result-type can only be called if there's exactly one envelope. " +
+                    $"'{nameof(InvokePipelineAsync)}' with a result-type can only be called if there's exactly one envelope. " +
                     $"Actual Count: {1 + AdditionalEnvelopes.Count}");
             }
         }

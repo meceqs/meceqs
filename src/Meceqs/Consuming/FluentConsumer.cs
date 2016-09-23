@@ -16,17 +16,17 @@ namespace Meceqs.Consuming
 
         public Task ConsumeAsync()
         {
-            return ProcessAsync();
+            return InvokePipelineAsync();
         }
 
         public Task<TResult> ConsumeAsync<TResult>()
         {
-            return ProcessAsync<TResult>();
+            return InvokePipelineAsync<TResult>();
         }
 
         public Task<object> ConsumeAsync(Type resultType)
         {
-            return ProcessAsync(resultType);
+            return InvokePipelineAsync(resultType);
         }
     }
 }
