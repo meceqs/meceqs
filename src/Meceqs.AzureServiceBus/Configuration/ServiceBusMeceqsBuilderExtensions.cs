@@ -3,7 +3,9 @@ using Meceqs;
 using Meceqs.AzureServiceBus.Configuration;
 using Meceqs.AzureServiceBus.Consuming;
 using Meceqs.AzureServiceBus.Internal;
+using Meceqs.AzureServiceBus.Sending;
 using Meceqs.Configuration;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Microsoft.Extensions.DependencyInjection
@@ -56,8 +58,24 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         public static IMeceqsBuilder AddServiceBusSender(this IMeceqsBuilder builder, Action<IServiceBusSenderBuilder> sender)
         {
+            return AddServiceBusSender(builder, null, sender);
+        }
+
+        /// <summary>
+        /// Adds an Azure Service Bus sender pipeline.
+        /// </summary>
+        public static IMeceqsBuilder AddServiceBusSender(
+            this IMeceqsBuilder builder,
+            IConfiguration configuration,
+            Action<IServiceBusSenderBuilder> sender)
+        {
             Check.NotNull(builder, nameof(builder));
             Check.NotNull(sender, nameof(sender));
+
+            if (configuration != null)
+            {
+                builder.Services.Configure<ServiceBusSenderOptions>(configuration);
+            }
 
             var senderBuilder = new ServiceBusSenderBuilder();
             sender?.Invoke(senderBuilder);

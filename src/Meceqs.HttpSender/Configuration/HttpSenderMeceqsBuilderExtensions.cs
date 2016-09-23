@@ -22,28 +22,11 @@ namespace Microsoft.Extensions.DependencyInjection
 
         public static IMeceqsBuilder AddHttpSender(this IMeceqsBuilder builder, Action<IHttpSenderBuilder> sender)
         {
-            return AddHttpSender(builder, null, null, sender);
-        }
-
-        public static IMeceqsBuilder AddHttpSender(
-                    this IMeceqsBuilder builder,
-                    string pipelineName,
-                    Action<IHttpSenderBuilder> sender)
-        {
-            return AddHttpSender(builder, pipelineName, null, sender);
+            return AddHttpSender(builder, null, sender);
         }
 
         public static IMeceqsBuilder AddHttpSender(
             this IMeceqsBuilder builder,
-            IConfiguration configuration,
-            Action<IHttpSenderBuilder> sender = null)
-        {
-            return AddHttpSender(builder, null, configuration, sender);
-        }
-
-        public static IMeceqsBuilder AddHttpSender(
-            this IMeceqsBuilder builder,
-            string pipelineName,
             IConfiguration configuration,
             Action<IHttpSenderBuilder> sender = null)
         {
