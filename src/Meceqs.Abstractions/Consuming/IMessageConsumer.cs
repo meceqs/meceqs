@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 
 namespace Meceqs.Consuming
@@ -25,5 +26,12 @@ namespace Meceqs.Consuming
         /// use the builder pattern with <see cref="ForEnvelope"/>.
         /// </summary>
         Task<TResult> ConsumeAsync<TResult>(Envelope envelope);
+
+        /// <summary>
+        /// Sends the envelope to the default "Consume" pipeline and expects a result object of the given type.
+        /// If you want to use a different pipeline or change some other behavior,
+        /// use the builder pattern with <see cref="ForEnvelope"/>.
+        /// </summary>
+        Task<object> ConsumeAsync(Envelope envelope, Type resultType);
     }
 }

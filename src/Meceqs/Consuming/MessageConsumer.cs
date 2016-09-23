@@ -50,5 +50,15 @@ namespace Meceqs.Consuming
         {
             return ForEnvelope(envelope).ConsumeAsync<TResult>();
         }
+
+        /// <summary>
+        /// Sends the envelope to the default "Consume" pipeline and expects a result object of the given type.
+        /// If you want to use a different pipeline or change some other behavior,
+        /// use the builder pattern with <see cref="ForEnvelope"/>.
+        /// </summary>
+        public Task<object> ConsumeAsync(Envelope envelope, Type resultType)
+        {
+            return ForEnvelope(envelope).ConsumeAsync(resultType);
+        }
     }
 }
