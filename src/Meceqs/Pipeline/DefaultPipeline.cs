@@ -42,9 +42,9 @@ namespace Meceqs.Pipeline
             // the pipeline is executed.
             _filterContextEnricher?.EnrichFilterContext(context);
 
-            ValidateFilterContext(context);
-
             _logger.ExecutingPipeline(context);
+
+            ValidateFilterContext(context);
 
             return _pipeline(context);
         }

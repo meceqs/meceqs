@@ -56,7 +56,7 @@ public class CreateCustomerCommand
 
 var cmd = new CreateCustomerCommand { FirstName = "John", LastName = "Snow" };
 
-// IMessageSender is the main interface for sending messages.
+// IMessageSender is the main interface for sending new messages to a pipeline.
 var result = await _messageSender.SendAsync<CreateCustomerResult>(cmd);
 
 Debug.WriteLine("CustomerId: " + result.CustomerId);
@@ -79,7 +79,7 @@ public void ConfigureServices(IServiceCollection services)
         // You can mix IConfiguration based configuration with static configuration.
         .AddHttpSender(Configuration["HttpSender"], sender =>
         {
-            // You could have multiple endpoints to talk to different services.
+            // You can have multiple endpoints to talk to different services.
             sender.AddEndpoint("CustomersApi", options =>
             {
                 // You can add regular "DelegatingHandler"s - e.g. to add an Authorization header to each request.

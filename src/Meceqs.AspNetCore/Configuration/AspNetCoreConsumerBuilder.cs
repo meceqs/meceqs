@@ -1,5 +1,4 @@
 using Meceqs.Transport;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Meceqs.AspNetCore.Configuration
 {
@@ -7,16 +6,5 @@ namespace Meceqs.AspNetCore.Configuration
         IAspNetCoreConsumerBuilder
     {
         public override IAspNetCoreConsumerBuilder Instance => this;
-
-        public AspNetCoreConsumerBuilder()
-        {
-            PipelineStartHook = pipeline =>
-            {
-                // Especially in dev environments, it's common that people use Fiddler etc.
-                // To make sure, they don't have to add every field (message type can be implied etc.),
-                // they are automatically added.
-                pipeline.UseEnvelopeSanitizer();
-            };
-        }
     }
 }
