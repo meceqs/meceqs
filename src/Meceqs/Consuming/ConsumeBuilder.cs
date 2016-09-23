@@ -5,11 +5,11 @@ using Meceqs.Pipeline;
 
 namespace Meceqs.Consuming
 {
-    public class FluentConsumer : FilterContextBuilder<IFluentConsumer>, IFluentConsumer
+    public class ConsumeBuilder : FilterContextBuilder<IConsumeBuilder>, IConsumeBuilder
     {
-        public override IFluentConsumer Instance => this;
+        public override IConsumeBuilder Instance => this;
 
-        public FluentConsumer(Envelope envelope, IServiceProvider serviceProvider)
+        public ConsumeBuilder(Envelope envelope, IServiceProvider serviceProvider)
             : base(MeceqsDefaults.ConsumePipelineName, envelope, serviceProvider)
         {
         }

@@ -18,7 +18,7 @@ namespace Meceqs.Sending
             _envelopeFactory = serviceProvider.GetRequiredService<IEnvelopeFactory>();
         }
 
-        public IFluentSender ForEnvelope(Envelope envelope)
+        public ISendBuilder ForEnvelope(Envelope envelope)
         {
             Check.NotNull(envelope, nameof(envelope));
 
@@ -33,10 +33,10 @@ namespace Meceqs.Sending
             // However, if there's still a required property missing, we have to give up as soon as possible.
             envelope.EnsureValid();
 
-            return new FluentSender(envelope, _serviceProvider);
+            return new SendBuilder(envelope, _serviceProvider);
         }
 
-        public IFluentSender ForMessage(object message, Guid? messageId = null)
+        public ISendBuilder ForMessage(object message, Guid? messageId = null)
         {
             Check.NotNull(message, nameof(message));
 
@@ -45,7 +45,7 @@ namespace Meceqs.Sending
             return ForEnvelope(envelope);
         }
 
-        public IFluentSender ForMessages(IEnumerable<object> messages)
+        public ISendBuilder ForMessages(IEnumerable<object> messages)
         {
             Check.NotNull(messages, nameof(messages));
 
@@ -70,7 +70,7 @@ namespace Meceqs.Sending
                 envelopes.Add(envelope);
             }
 
-            return new FluentSender(envelopes, _serviceProvider);
+            return new SendBuilder(envelopes, _serviceProvider);
         }
 
         /// <summary>

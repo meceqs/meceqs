@@ -14,7 +14,7 @@ namespace Meceqs.Consuming
             _serviceProvider = serviceProvider;
         }
 
-        public IFluentConsumer ForEnvelope(Envelope envelope)
+        public IConsumeBuilder ForEnvelope(Envelope envelope)
         {
             Check.NotNull(envelope, nameof(envelope));
 
@@ -29,7 +29,7 @@ namespace Meceqs.Consuming
             // However, if there's still a required property missing, we have to give up as soon as possible.
             envelope.EnsureValid();
 
-            return new FluentConsumer(envelope, _serviceProvider);
+            return new ConsumeBuilder(envelope, _serviceProvider);
         }
 
         /// <summary>

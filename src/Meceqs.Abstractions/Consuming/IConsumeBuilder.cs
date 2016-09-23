@@ -7,7 +7,7 @@ namespace Meceqs.Consuming
     /// <summary>
     /// Represents a builder object for consuming an existing envelope from an external caller/system.
     /// </summary>
-    public interface IFluentConsumer : IFilterContextBuilder<IFluentConsumer>
+    public interface IConsumeBuilder : IFilterContextBuilder<IConsumeBuilder>
     {
         /// <summary>
         /// Sends the envelope to the pipeline. If no pipeline name was configured,

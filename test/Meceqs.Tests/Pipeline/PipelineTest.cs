@@ -14,7 +14,7 @@ namespace Meceqs.Tests.Pipeline
         {
             if (filterDelegate == null)
                 filterDelegate = (ctx) => Task.CompletedTask;
-            
+
             return new DefaultPipeline(filterDelegate, "pipeline", Substitute.For<ILoggerFactory>(), null);
         }
 
@@ -54,7 +54,7 @@ namespace Meceqs.Tests.Pipeline
             FilterDelegate filter = (ctx) => {
                 called++;
                 ctx.PipelineName.ShouldBe("pipeline");
-                return Task.CompletedTask; 
+                return Task.CompletedTask;
             };
             var pipeline = GetPipeline(filter);
             var context = TestObjects.FilterContext<SimpleMessage>();
@@ -71,7 +71,7 @@ namespace Meceqs.Tests.Pipeline
             FilterDelegate filter = (ctx) => {
                 called++;
                 ctx.ExpectedResultType.ShouldBe(typeof(string));
-                return Task.CompletedTask; 
+                return Task.CompletedTask;
             };
             var pipeline = GetPipeline(filter);
             var context = TestObjects.FilterContext<SimpleMessage>(resultType: typeof(string));
@@ -86,7 +86,7 @@ namespace Meceqs.Tests.Pipeline
         {
             FilterDelegate filter = (ctx) => {
                 ctx.Result = "result";
-                return Task.CompletedTask; 
+                return Task.CompletedTask;
             };
             var pipeline = GetPipeline(filter);
             var context = TestObjects.FilterContext<SimpleMessage>(resultType: typeof(string));

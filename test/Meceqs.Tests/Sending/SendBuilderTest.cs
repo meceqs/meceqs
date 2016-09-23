@@ -10,7 +10,7 @@ using Xunit;
 
 namespace Meceqs.Tests.Sending
 {
-    public class FluentSenderTest
+    public class SendBuilderTest
     {
         private IServiceProvider GetFilterContextBuilderServiceProvider(
             IEnvelopeCorrelator correlator = null,
@@ -31,7 +31,7 @@ namespace Meceqs.Tests.Sending
             return serviceProvider;
         }
 
-        private IFluentSender GetFluentSender<TMessage>(
+        private ISendBuilder GetSendBuilder<TMessage>(
             Envelope<TMessage> envelope = null,
             IEnvelopeCorrelator correlator = null,
             IPipeline pipeline = null) where TMessage : class, new()
@@ -40,7 +40,7 @@ namespace Meceqs.Tests.Sending
 
             var serviceProvider = GetFilterContextBuilderServiceProvider(correlator, pipeline);
 
-            return new FluentSender(envelope, serviceProvider);
+            return new SendBuilder(envelope, serviceProvider);
         }
 
         [Fact]
@@ -52,12 +52,12 @@ namespace Meceqs.Tests.Sending
 
             // Act & Assert
             var envelope = TestObjects.Envelope<SimpleMessage>();
-            Should.Throw<ArgumentNullException>(() => new FluentSender((Envelope)null, serviceProvider));
-            Should.Throw<ArgumentNullException>(() => new FluentSender(envelope, null));
+            Should.Throw<ArgumentNullException>(() => new SendBuilder((Envelope)null, serviceProvider));
+            Should.Throw<ArgumentNullException>(() => new SendBuilder(envelope, null));
 
             var envelopes = new List<Envelope>();
-            Should.Throw<ArgumentNullException>(() => new FluentSender(envelopes, null));
-            Should.Throw<ArgumentNullException>(() => new FluentSender((IList<Envelope>)null, serviceProvider));
+            Should.Throw<ArgumentNullException>(() => new SendBuilder(envelopes, null));
+            Should.Throw<ArgumentNullException>(() => new SendBuilder((IList<Envelope>)null, serviceProvider));
         }
 
         [Fact]
@@ -66,10 +66,10 @@ namespace Meceqs.Tests.Sending
             // Arrange
             var pipeline = Substitute.For<IPipeline>();
 
-            var sender = GetFluentSender<SimpleMessage>(pipeline: pipeline);
+            var builder = GetSendBuilder<SimpleMessage>(pipeline: pipeline);
 
             // Act
-            await sender.SendAsync();
+            await builder.SendAsync();
 
             // Assert
             await pipeline.ReceivedWithAnyArgs(1).InvokeAsync(null);
@@ -81,11 +81,11 @@ namespace Meceqs.Tests.Sending
             // Arrange
             var envelope = TestObjects.Envelope<SimpleMessage>();
             var correlator = Substitute.For<IEnvelopeCorrelator>();
-            var sender = GetFluentSender<SimpleMessage>(envelope, correlator);
+            var builder = GetSendBuilder<SimpleMessage>(envelope, correlator);
 
             // Act
             var sourceMsg = TestObjects.Envelope<SimpleCommand>();
-            sender.CorrelateWith(sourceMsg);
+            builder.CorrelateWith(sourceMsg);
 
             // Assert
             correlator.Received(1).CorrelateSourceWithTarget(sourceMsg, envelope);
@@ -106,7 +106,7 @@ namespace Meceqs.Tests.Sending
                     ctx.Envelope.Headers["Key"].ShouldBe("Value");
                 });
 
-            var builder = GetFluentSender<SimpleMessage>(pipeline: pipeline);
+            var builder = GetSendBuilder<SimpleMessage>(pipeline: pipeline);
 
             // Act
             builder.SetHeader("Key", "Value");
@@ -130,11 +130,11 @@ namespace Meceqs.Tests.Sending
                     ctx.Items.Get<string>("Key").ShouldBe("Value");
                 });
 
-            var sender = GetFluentSender<SimpleMessage>(pipeline: pipeline);
+            var builder = GetSendBuilder<SimpleMessage>(pipeline: pipeline);
 
             // Act
-            sender.SetContextItem("Key", "Value");
-            await sender.SendAsync();
+            builder.SetContextItem("Key", "Value");
+            await builder.SendAsync();
 
             // Assert
             called.ShouldBe(1);
@@ -157,7 +157,7 @@ namespace Meceqs.Tests.Sending
                     ctx.Cancellation.ShouldBe(cancellationSource.Token);
                 });
 
-            var builder = GetFluentSender<SimpleMessage>(pipeline: pipeline);
+            var builder = GetSendBuilder<SimpleMessage>(pipeline: pipeline);
 
             // Act
             builder.SetCancellationToken(cancellationSource.Token);
@@ -184,10 +184,10 @@ namespace Meceqs.Tests.Sending
                     ctx.Envelope.ShouldBe(envelope);
                 });
 
-            var sender = GetFluentSender<SimpleMessage>(envelope: envelope, pipeline: pipeline);
+            var builder = GetSendBuilder<SimpleMessage>(envelope: envelope, pipeline: pipeline);
 
             // Act
-            await sender.SendAsync();
+            await builder.SendAsync();
 
             // Assert
             called.ShouldBe(1);

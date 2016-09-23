@@ -11,7 +11,7 @@ namespace Meceqs.Consuming
         /// <para>Returns a builder object that allows to change the behavior of the consume operation.</para>
         /// <para>If you don't specify a pipeline name, the default "Consume" pipeline will be used.</para>
         /// </summary>
-        IFluentConsumer ForEnvelope(Envelope envelope);
+        IConsumeBuilder ForEnvelope(Envelope envelope);
 
         /// <summary>
         /// Sends the envelope to the default "Consume" pipeline. If you want to use a different pipeline

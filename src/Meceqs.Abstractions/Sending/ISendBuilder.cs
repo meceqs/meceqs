@@ -8,13 +8,13 @@ namespace Meceqs.Sending
     /// Represents a builder object for sending a new message or for forwarding an existing envelope
     /// to a pipeline.
     /// </summary>
-    public interface IFluentSender : IFilterContextBuilder<IFluentSender>
+    public interface ISendBuilder : IFilterContextBuilder<ISendBuilder>
     {
         /// <summary>
         /// Correlates the envelope/message to be sent with the given envelope by
         /// reusing its "correlation id".
         /// </summary>
-        IFluentSender CorrelateWith(Envelope source);
+        ISendBuilder CorrelateWith(Envelope source);
 
         /// <summary>
         /// Sends the envelope/message to the pipeline. If no pipeline name was configured,

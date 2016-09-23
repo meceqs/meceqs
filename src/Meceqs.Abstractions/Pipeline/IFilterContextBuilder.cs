@@ -7,8 +7,8 @@ namespace Meceqs.Pipeline
 {
     /// <summary>
     /// Contains common logic for building a <see cref="FilterContext"/>.
-    /// This type is typically not used directly - use <see cref="Meceqs.Consuming.IFluentConsumer"/>
-    /// or <see cref="Meceqs.Sending.IFluentSender"/> instead.
+    /// This type is typically not used directly - use <see cref="Meceqs.Consuming.IConsumeBuilder"/>
+    /// or <see cref="Meceqs.Sending.ISendBuilder"/> instead.
     /// </summary>
     public interface IFilterContextBuilder<TBuilder>
         where TBuilder : IFilterContextBuilder<TBuilder>

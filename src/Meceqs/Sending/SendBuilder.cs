@@ -7,25 +7,25 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Meceqs.Sending
 {
-    public class FluentSender : FilterContextBuilder<IFluentSender>, IFluentSender
+    public class SendBuilder : FilterContextBuilder<ISendBuilder>, ISendBuilder
     {
         private readonly IEnvelopeCorrelator _envelopeCorrelator;
 
-        public override IFluentSender Instance => this;
+        public override ISendBuilder Instance => this;
 
-        public FluentSender(Envelope envelope, IServiceProvider serviceProvider)
+        public SendBuilder(Envelope envelope, IServiceProvider serviceProvider)
             : base(MeceqsDefaults.SendPipelineName, envelope, serviceProvider)
         {
             _envelopeCorrelator = serviceProvider.GetRequiredService<IEnvelopeCorrelator>();
         }
 
-        public FluentSender(IEnumerable<Envelope> envelopes, IServiceProvider serviceProvider)
+        public SendBuilder(IEnumerable<Envelope> envelopes, IServiceProvider serviceProvider)
             : base(MeceqsDefaults.SendPipelineName, envelopes, serviceProvider)
         {
             _envelopeCorrelator = serviceProvider.GetRequiredService<IEnvelopeCorrelator>();
         }
 
-        public IFluentSender CorrelateWith(Envelope source)
+        public ISendBuilder CorrelateWith(Envelope source)
         {
             _envelopeCorrelator.CorrelateSourceWithTarget(source, FirstEnvelope);
 

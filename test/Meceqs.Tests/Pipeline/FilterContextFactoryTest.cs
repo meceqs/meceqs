@@ -21,7 +21,7 @@ namespace Meceqs.Tests
         }
 
         [Fact]
-        public void Creates_FilterContext_with_same_MessageType()
+        public void Creates_FilterContext_with_same_generic_MessageType()
         {
             var envelope = TestObjects.Envelope<SimpleMessage>();
             var factory = GetFactory();
