@@ -71,16 +71,16 @@ namespace Meceqs.TypedHandling
             if (filterContext.RequestServices == null)
             {
                 throw new ArgumentException(
-                    $"'{nameof(filterContext.RequestServices)}' wasn't set. It is required to resolve " + 
-                    $"handlers from the scope of the current web/message request. " + 
-                    $"It can be set either by using a filter [e.g. UseAspNetCore()] or by " + 
+                    $"'{nameof(filterContext.RequestServices)}' wasn't set. It is required to resolve " +
+                    $"handlers from the scope of the current web/message request. " +
+                    $"It can be set either by using a filter [e.g. UseAspNetCore()] or by " +
                     $"setting it yourself through 'SetRequestServices()' on the message sender/consumer",
                     $"{nameof(filterContext)}.{nameof(filterContext.RequestServices)}"
                 );
             }
 
             var key = new HandleDefinition(filterContext.MessageType, filterContext.ExpectedResultType);
-            
+
             IHandlerMetadata handlerMetadata;
             if (_handlerMapping.TryGetValue(key, out handlerMetadata))
             {
@@ -98,7 +98,7 @@ namespace Meceqs.TypedHandling
                     throw new UnknownMessageException(
                         $"There was no handler configured for message/result types " +
                         $"'{filterContext.MessageType}/{filterContext.ExpectedResultType}");
-                
+
                 case UnknownMessageBehavior.Skip:
                     _logger.SkippingMessage(filterContext);
                     break;
@@ -113,23 +113,23 @@ namespace Meceqs.TypedHandling
 
         private HandleContext CreateHandleContext(FilterContext filterContext, IHandles handler)
         {
-            HandleContext handleContext = _handleContextFactory.CreateHandleContext(filterContext);
-
             var handlerType = handler.GetType();
-            Type messageType = filterContext.MessageType;
-            Type resultType = filterContext.ExpectedResultType;
+            var messageType = filterContext.MessageType;
+            var resultType = filterContext.ExpectedResultType;
 
             // This allows interceptors to e.g. look for custom attributes on the class or method.
-            handleContext.Handler = handler;
-            handleContext.HandlerType = handlerType;
-            handleContext.HandleMethod = _handleMethodResolver.GetHandleMethod(handlerType, messageType, resultType);
+            var handleMethod = _handleMethodResolver.GetHandleMethod(handlerType, messageType, resultType);
 
-            if (handleContext.HandleMethod == null)
+            if (handleMethod == null)
             {
                 throw new InvalidOperationException(
                     $"'{nameof(_handleMethodResolver.GetHandleMethod)}' " +
                     $"did not find a Handle-method for '{handlerType}.{messageType}/{resultType}'");
             }
+
+            HandleContext handleContext = _handleContextFactory.CreateHandleContext(filterContext);
+
+            handleContext.Initialize(handler, handleMethod);
 
             return handleContext;
         }
@@ -169,7 +169,7 @@ namespace Meceqs.TypedHandling
         }
 
         /// <summary>
-        /// Returns a dictionary which returns a <see cref="IHandlerMetadata"/> for a given a message type and result type. 
+        /// Returns a dictionary which returns a <see cref="IHandlerMetadata"/> for a given a message type and result type.
         /// <summary>
         private static Dictionary<HandleDefinition, IHandlerMetadata> CreateHandlerMapping(HandlerCollection handlers)
         {
@@ -178,8 +178,8 @@ namespace Meceqs.TypedHandling
             if (handlers.Count == 0)
             {
                 throw new MeceqsException(
-                    $"The options don't contain any handler. " + 
-                    $"Handlers can be added by calling '{nameof(HandlerCollection)}.{nameof(HandlerCollection.Add)}' " + 
+                    $"The options don't contain any handler. " +
+                    $"Handlers can be added by calling '{nameof(HandlerCollection)}.{nameof(HandlerCollection.Add)}' " +
                     $"or '{nameof(HandlerCollection)}.{nameof(HandlerCollection.AddService)}'.");
             }
 
