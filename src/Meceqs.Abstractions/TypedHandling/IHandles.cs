@@ -10,7 +10,7 @@ namespace Meceqs.TypedHandling
     }
 
     /// <summary>
-    /// Represents a handler that process the given message but does not return a result.
+    /// Represents a handler that processes the given message but does not return a result.
     /// </summary>
     public interface IHandles<TMessage> : IHandles where TMessage : class
     {
@@ -18,7 +18,7 @@ namespace Meceqs.TypedHandling
     }
 
     /// <summary>
-    /// Represents a handler that process the given message and returns a result of the given type.
+    /// Represents a handler that processes the given message and returns a result of the given type.
     /// </summary>
     public interface IHandles<TMessage, TResult> : IHandles where TMessage : class
     {

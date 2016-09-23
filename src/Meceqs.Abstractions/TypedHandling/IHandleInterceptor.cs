@@ -3,10 +3,10 @@ using System.Threading.Tasks;
 namespace Meceqs.TypedHandling
 {
     /// <summary>
-    /// Interceptors are wrapped around the handler. This allows interceptors to execute logic
-    /// before or after the handler is executed.
-    /// The main difference between "filters" is, that interceptors have access to the
-    /// actual handler class and "Handle"-method - this allows them to e.g. access custom attributes.
+    /// <para>Interceptors are wrapped around the handler. This allows interceptors to execute logic
+    /// before or after the handler is executed.</para>
+    /// <para>The main difference between "filters" is, that interceptors have access to the
+    /// actual handler class and "Handle"-method - this allows them to e.g. access custom attributes.</para>
     /// </summary>
     public interface IHandleInterceptor
     {

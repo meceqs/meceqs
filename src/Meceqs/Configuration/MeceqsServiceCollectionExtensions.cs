@@ -38,6 +38,8 @@ namespace Microsoft.Extensions.DependencyInjection
 
         private static void AddConsuming(IServiceCollection services)
         {
+            // Resolving the consumer transiently makes sure it gets
+            // resolved from a scoped service provider in case there is one.
             services.TryAddTransient<IMessageConsumer, MessageConsumer>();
         }
 
@@ -45,6 +47,9 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             services.TryAddSingleton<IEnvelopeFactory, DefaultEnvelopeFactory>();
             services.TryAddSingleton<IEnvelopeCorrelator, DefaultEnvelopeCorrelator>();
+
+            // Resolving the sender transiently makes sure it gets
+            // resolved from a scoped service provider in case there is one.
             services.TryAddTransient<IMessageSender, MessageSender>();
         }
 
