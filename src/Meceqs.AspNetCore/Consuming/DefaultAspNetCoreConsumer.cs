@@ -33,7 +33,6 @@ namespace Meceqs.AspNetCore.Consuming
 
             object result = await _messageConsumer.ForEnvelope(envelope)
                 .SetCancellationToken(httpContext.RequestAborted)
-                .SetRequestServices(httpContext.RequestServices)
                 .ConsumeAsync(metadata.ResultType);
 
             await _httpResponseWriter.HandleResult(result, httpContext);

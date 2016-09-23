@@ -20,7 +20,6 @@ namespace Meceqs.TypedHandling
             sender.CorrelateWith(context.Envelope);
 
             sender.SetCancellationToken(context.FilterContext.Cancellation);
-            sender.SetRequestServices(context.FilterContext.RequestServices);
             sender.SetUser(context.FilterContext.User);
 
             return sender.Instance;
