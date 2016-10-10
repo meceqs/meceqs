@@ -7,6 +7,9 @@ namespace Meceqs.HttpSender
     {
         void AddHttpClient(string endpointName, HttpClient client);
 
+        /// <summary>
+        /// Returns the previously stored <see cref="HttpClient"/> for the given <paramref name="endpointName"/>.
+        /// </summary>
         HttpClient GetHttpClient(string endpointName);
     }
 }

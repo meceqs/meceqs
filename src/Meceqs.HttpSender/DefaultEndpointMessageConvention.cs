@@ -3,6 +3,10 @@ using System.Collections.Generic;
 
 namespace Meceqs.HttpSender
 {
+    /// <summary>
+    /// The default convention will assume that message endpoints do not use suffixes
+    /// (e.g. "Message", "Command", ...) in their URI.
+    /// </summary>
     public class DefaultEndpointMessageConvention : IEndpointMessageConvention
     {
         private static readonly List<string> _suffixesToRemove = new List<string>

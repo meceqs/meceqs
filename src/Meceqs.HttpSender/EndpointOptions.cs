@@ -8,18 +8,33 @@ namespace Meceqs.HttpSender
 {
     public class EndpointOptions
     {
+        /// <summary>
+        /// Configures the mapping between message types and endpoint URIs for messages that
+        /// are added via one of the <see cref="AddMessage"/> methods.
+        /// </summary>
         public IEndpointMessageConvention MessageConvention { get; set; } = new DefaultEndpointMessageConvention();
 
+        /// <summary>
+        /// The base URI of the endpoint. Message requests will add a relative path
+        /// based on the configured <see cref="MessageConvention"/>.
+        /// </summary>
         public string BaseAddress { get; set; }
 
-        public List<Type> Handlers { get; private set; } = new List<Type>();
+        /// <summary>
+        /// A list of <see cref="DelegatingHandler"/> that will be used to create the underlying <see cref="HttpClient"/>.
+        /// The handlers will be chained together. The first handler in the list will be the outermost handler.
+        /// </summary>
+        public List<Type> DelegatingHandlers { get; private set; } = new List<Type>();
 
+        /// <summary>
+        /// A list of message type to endpoint URI mappings that are supported with this sender.
+        /// </summary>
         public List<EndpointMessage> Messages { get; private set; } = new List<EndpointMessage>();
 
         public void AddDelegatingHandler<TDelegatingHandler>()
             where TDelegatingHandler : DelegatingHandler
         {
-            Handlers.Add(typeof(TDelegatingHandler));
+            DelegatingHandlers.Add(typeof(TDelegatingHandler));
         }
 
         public void AddDelegatingHandler(Type delegatingHandler)
@@ -31,7 +46,7 @@ namespace Meceqs.HttpSender
                 throw new ArgumentException($"'{delegatingHandler}' does not inherit from '{nameof(DelegatingHandler)}'");
             }
 
-            Handlers.Add(delegatingHandler);
+            DelegatingHandlers.Add(delegatingHandler);
         }
 
         public void AddMessagesFromAssembly<TMessage>(Predicate<Type> filter)
@@ -55,11 +70,19 @@ namespace Meceqs.HttpSender
             }
         }
 
+        /// <summary>
+        /// Add the given message type to this sender. The relative endpoint path will be resolved
+        /// by using the configured <see cref="MessageConvention"/>.
+        /// </summary>
         public void AddMessage<TMessage>()
         {
             AddMessage(typeof(TMessage));
         }
 
+        /// <summary>
+        /// Add the given message type to this sender. The relative endpoint path will be resolved
+        /// by using the configured <see cref="MessageConvention"/>.
+        /// </summary>
         public void AddMessage(Type messageType)
         {
             Check.NotNull(messageType, nameof(messageType));

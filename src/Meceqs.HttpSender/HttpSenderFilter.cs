@@ -95,7 +95,7 @@ namespace Meceqs.HttpSender
                 var endpointName = endpoint.Key;
                 var endpointOptions = endpoint.Value;
 
-                var client = CreateHttpClient(endpointOptions.Handlers);
+                var client = CreateHttpClient(endpointOptions.DelegatingHandlers);
 
                 // trailing slash is really important:
                 // http://stackoverflow.com/questions/23438416/why-is-httpclient-baseaddress-not-working

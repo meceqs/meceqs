@@ -14,7 +14,7 @@ namespace Meceqs.Pipeline
         private readonly IPipelineProvider _pipelineProvider;
 
         /// <summary>
-        /// In most cases we sent just a single envelope. To make sure we don't have to wrap it in a list
+        /// In most cases we send just a single envelope. To make sure we don't have to wrap it in a list
         /// every time, this property always holds the single/first envelope (if there is one).
         /// </summary>
         protected Envelope FirstEnvelope { get; }

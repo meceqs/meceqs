@@ -2,6 +2,9 @@ using System;
 
 namespace Meceqs.Pipeline
 {
+    /// <summary>
+    /// Used for configuring the filters of a pipeline.
+    /// </summary>
     public interface IPipelineBuilder
     {
         /// <summary>

@@ -5,7 +5,7 @@ namespace Meceqs.Serialization
 {
     public class EnvelopeTypeLoaderOptions
     {
-        public List<Assembly> ContractAssemblies { get; set; } = new List<Assembly>();
+        public List<Assembly> ContractAssemblies { get; private set; } = new List<Assembly>();
 
         public void TryAddContractAssembly(params Assembly[] assemblies)
         {

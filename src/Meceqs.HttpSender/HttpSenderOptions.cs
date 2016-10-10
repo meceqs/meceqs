@@ -11,17 +11,19 @@ namespace Meceqs.HttpSender
         public void AddEndpoint(string endpoint, Action<EndpointOptions> options)
         {
             Check.NotNullOrWhiteSpace(endpoint, nameof(endpoint));
+            Check.NotNull(options, nameof(options));
 
-            if (Endpoints.ContainsKey(endpoint))
+            EndpointOptions existingEndpoint;
+            if (Endpoints.TryGetValue(endpoint, out existingEndpoint))
             {
-                options?.Invoke(Endpoints[endpoint]);
+                options(existingEndpoint);
             }
             else
             {
-                var optionsInstance = new EndpointOptions();
-                options?.Invoke(optionsInstance);
+                var endpointOptions = new EndpointOptions();
+                options(endpointOptions);
 
-                Endpoints.Add(endpoint, optionsInstance);
+                Endpoints.Add(endpoint, endpointOptions);
             }
         }
     }
