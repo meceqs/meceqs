@@ -53,7 +53,7 @@ namespace Meceqs.AzureServiceBus.Internal
 
             Stream serializedEnvelope = brokeredMessage.GetBody<Stream>();
 
-            return _deserializer.DeserializeEnvelopeFromStream(contentType, serializedEnvelope, messageType);
+            return _deserializer.DeserializeEnvelope(contentType, serializedEnvelope, messageType);
         }
     }
 }

@@ -1,5 +1,6 @@
 using System.Runtime.CompilerServices;
 
+[assembly: InternalsVisibleTo("Meceqs.Amqp")]
 [assembly: InternalsVisibleTo("Meceqs.AspNetCore")]
 [assembly: InternalsVisibleTo("Meceqs.AzureEventHubs")]
 [assembly: InternalsVisibleTo("Meceqs.AzureEventHubs.FileFake")]

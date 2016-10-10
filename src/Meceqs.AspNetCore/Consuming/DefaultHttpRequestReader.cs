@@ -26,7 +26,7 @@ namespace Meceqs.AspNetCore.Consuming
             var requestHeaders = httpContext.Request.GetTypedHeaders();
 
             // TODO @cweiss should this get the actual messageType object?
-            Envelope envelope = _envelopeDeserializer.DeserializeEnvelopeFromStream(
+            Envelope envelope = _envelopeDeserializer.DeserializeEnvelope(
                 requestHeaders.ContentType.MediaType,
                 httpContext.Request.Body,
                 messageType.FullName);
