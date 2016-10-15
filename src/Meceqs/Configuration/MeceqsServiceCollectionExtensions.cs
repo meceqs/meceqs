@@ -1,6 +1,6 @@
 using Meceqs;
 using Meceqs.Configuration;
-using Meceqs.Consuming;
+using Meceqs.Receiving;
 using Meceqs.Pipeline;
 using Meceqs.Sending;
 using Meceqs.Serialization;
@@ -18,8 +18,8 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             Check.NotNull(services, nameof(services));
 
-            AddConsuming(services);
             AddPipeline(services);
+            AddReceiving(services);
             AddSending(services);
             AddSerialization(services);
             AddTypedHandling(services);
@@ -36,11 +36,11 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAddTransient<IPipelineBuilder, DefaultPipelineBuilder>();
         }
 
-        private static void AddConsuming(IServiceCollection services)
+        private static void AddReceiving(IServiceCollection services)
         {
-            // Resolving the consumer transiently makes sure it gets
+            // Resolving the receiver transiently makes sure it gets
             // resolved from a scoped service provider in case there is one.
-            services.TryAddTransient<IMessageConsumer, MessageConsumer>();
+            services.TryAddTransient<IMessageReceiver, MessageReceiver>();
         }
 
         private static void AddSending(IServiceCollection services)

@@ -1,22 +1,22 @@
 using Meceqs;
-using Meceqs.AspNetCore.Consuming;
+using Meceqs.AspNetCore.Receiving;
 using Microsoft.AspNetCore.Http;
 
 namespace Microsoft.AspNetCore.Builder
 {
-    public static class AspNetCoreConsumerApplicationBuilderExtensions
+    public static class AspNetCoreReceiverApplicationBuilderExtensions
     {
-        public static IApplicationBuilder UseAspNetCoreConsumer(this IApplicationBuilder builder, PathString? pathMatch = null)
+        public static IApplicationBuilder UseAspNetCoreReceiver(this IApplicationBuilder builder, PathString? pathMatch = null)
         {
             Check.NotNull(builder, nameof(builder));
 
             if (!string.IsNullOrWhiteSpace(pathMatch))
             {
-                builder.Map(pathMatch.Value, x => x.UseMiddleware<AspNetCoreConsumerMiddleware>());
+                builder.Map(pathMatch.Value, x => x.UseMiddleware<AspNetCoreReceiverMiddleware>());
             }
             else
             {
-                builder.UseMiddleware<AspNetCoreConsumerMiddleware>();
+                builder.UseMiddleware<AspNetCoreReceiverMiddleware>();
             }
 
             return builder;

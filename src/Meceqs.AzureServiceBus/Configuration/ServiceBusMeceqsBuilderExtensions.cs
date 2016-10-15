@@ -1,7 +1,7 @@
 using System;
 using Meceqs;
 using Meceqs.AzureServiceBus.Configuration;
-using Meceqs.AzureServiceBus.Consuming;
+using Meceqs.AzureServiceBus.Receiving;
 using Meceqs.AzureServiceBus.Internal;
 using Meceqs.AzureServiceBus.Sending;
 using Meceqs.Configuration;
@@ -19,36 +19,36 @@ namespace Microsoft.Extensions.DependencyInjection
             builder.Services.TryAddSingleton<IBrokeredMessageConverter, DefaultBrokeredMessageConverter>();
             builder.Services.TryAddSingleton<IBrokeredMessageInvoker, DefaultBrokeredMessageInvoker>();
             builder.Services.TryAddSingleton<IServiceBusMessageSenderFactory, DefaultServiceBusMessageSenderFactory>();
-            builder.Services.TryAddSingleton<IServiceBusConsumer, DefaultServiceBusConsumer>();
+            builder.Services.TryAddSingleton<IServiceBusReceiver, DefaultServiceBusReceiver>();
 
             return builder;
         }
 
         /// <summary>
-        /// Adds an Azure Service Bus consumer pipeline.
+        /// Adds an Azure Service Bus receiver pipeline.
         /// </summary>
-        public static IMeceqsBuilder AddServiceBusConsumer(this IMeceqsBuilder builder, Action<IServiceBusConsumerBuilder> consumer)
+        public static IMeceqsBuilder AddServiceBusReceiver(this IMeceqsBuilder builder, Action<IServiceBusReceiverBuilder> receiver)
         {
             Check.NotNull(builder, nameof(builder));
-            Check.NotNull(consumer, nameof(consumer));
+            Check.NotNull(receiver, nameof(receiver));
 
-            var consumerBuilder = new ServiceBusConsumerBuilder();
-            consumer?.Invoke(consumerBuilder);
+            var receiverBuilder = new ServiceBusReceiverBuilder();
+            receiver?.Invoke(receiverBuilder);
 
             builder.AddServiceBusServices();
 
-            foreach (var assembly in consumerBuilder.GetDeserializationAssemblies())
+            foreach (var assembly in receiverBuilder.GetDeserializationAssemblies())
             {
                 builder.AddDeserializationAssembly(assembly);
             }
 
-            var consumerOptions = consumerBuilder.GetConsumerOptions();
-            if (consumerOptions != null)
+            var receiverOptions = receiverBuilder.GetReceiverOptions();
+            if (receiverOptions != null)
             {
-                builder.Services.Configure(consumerOptions);
+                builder.Services.Configure(receiverOptions);
             }
 
-            builder.AddPipeline(consumerBuilder.GetPipelineName(), consumerBuilder.GetPipeline());
+            builder.AddPipeline(receiverBuilder.GetPipelineName(), receiverBuilder.GetPipeline());
 
             return builder;
         }

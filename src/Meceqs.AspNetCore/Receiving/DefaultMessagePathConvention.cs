@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Meceqs.AspNetCore.Consuming
+namespace Meceqs.AspNetCore.Receiving
 {
     public class DefaultMessagePathConvention : IMessagePathConvention
     {

@@ -1,6 +1,6 @@
 using System;
 
-namespace Meceqs.AspNetCore.Consuming
+namespace Meceqs.AspNetCore.Receiving
 {
     public interface IMessagePathConvention
     {

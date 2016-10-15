@@ -17,25 +17,25 @@ namespace Microsoft.Extensions.Logging
             return logger.BeginScope(new BrokeredMessageLogScope(message));
         }
 
-        public static void ConsumeStarting(this ILogger logger, BrokeredMessage message)
+        public static void ReceiveStarting(this ILogger logger, BrokeredMessage message)
         {
             if (logger.IsEnabled(LogLevel.Information))
             {
                 logger.Log(
                     logLevel: LogLevel.Information,
-                    eventId: LoggerEventIds.ConsumeStarting,
-                    state: new ConsumeStartingState(message),
+                    eventId: LoggerEventIds.ReceiveStarting,
+                    state: new ReceiveStartingState(message),
                     exception: null,
-                    formatter: ConsumeStartingState.Callback);
+                    formatter: ReceiveStartingState.Callback);
             }
         }
 
-        public static void ConsumeFailed(this ILogger logger, BrokeredMessage message, Exception ex)
+        public static void ReceiveFailed(this ILogger logger, BrokeredMessage message, Exception ex)
         {
-            logger.LogError(LoggerEventIds.ConsumeFailed, ex, "Consume failed with exception");
+            logger.LogError(LoggerEventIds.ReceiveFailed, ex, "Receive failed with exception");
         }
 
-        public static void ConsumeFinished(this ILogger logger, bool success, long startTimestamp, long currentTimestamp)
+        public static void ReceiveFinished(this ILogger logger, bool success, long startTimestamp, long currentTimestamp)
         {
             // Don't log if Information logging wasn't enabled at start or end of request as time will be wildly wrong.
             if (startTimestamp != 0)
@@ -44,10 +44,10 @@ namespace Microsoft.Extensions.Logging
 
                 logger.Log(
                     logLevel: LogLevel.Information,
-                    eventId: LoggerEventIds.ConsumeFinished,
-                    state: new ConsumeFinishedState(success, elapsed),
+                    eventId: LoggerEventIds.ReceiveFinished,
+                    state: new ReceiveFinishedState(success, elapsed),
                     exception: null,
-                    formatter: ConsumeFinishedState.Callback);
+                    formatter: ReceiveFinishedState.Callback);
             }
         }
 
@@ -109,15 +109,15 @@ namespace Microsoft.Extensions.Logging
             }
         }
 
-        private class ConsumeStartingState : IReadOnlyList<KeyValuePair<string, object>>
+        private class ReceiveStartingState : IReadOnlyList<KeyValuePair<string, object>>
         {
-            internal static readonly Func<object, Exception, string> Callback = (state, exception) => ((ConsumeStartingState)state).ToString();
+            internal static readonly Func<object, Exception, string> Callback = (state, exception) => ((ReceiveStartingState)state).ToString();
 
             private readonly BrokeredMessage _message;
 
             private string _cachedToString;
 
-            public ConsumeStartingState(BrokeredMessage message)
+            public ReceiveStartingState(BrokeredMessage message)
             {
                 _message = message;
             }
@@ -152,7 +152,7 @@ namespace Microsoft.Extensions.Logging
                 {
                     _cachedToString = string.Format(
                         CultureInfo.InvariantCulture,
-                        "Consume starting SequenceNr:{0} DeliveryCount:{1} Enqueued:{2}",
+                        "Receive starting SequenceNr:{0} DeliveryCount:{1} Enqueued:{2}",
                         _message.SequenceNumber,
                         _message.DeliveryCount,
                         _message.EnqueuedSequenceNumber);
@@ -175,9 +175,9 @@ namespace Microsoft.Extensions.Logging
             }
         }
 
-        private class ConsumeFinishedState : IReadOnlyList<KeyValuePair<string, object>>
+        private class ReceiveFinishedState : IReadOnlyList<KeyValuePair<string, object>>
         {
-            internal static readonly Func<object, Exception, string> Callback = (state, exception) => ((ConsumeFinishedState)state).ToString();
+            internal static readonly Func<object, Exception, string> Callback = (state, exception) => ((ReceiveFinishedState)state).ToString();
 
             private readonly bool _success;
             private readonly TimeSpan _elapsed;
@@ -208,7 +208,7 @@ namespace Microsoft.Extensions.Logging
                 }
             }
 
-            public ConsumeFinishedState(bool success, TimeSpan elapsed)
+            public ReceiveFinishedState(bool success, TimeSpan elapsed)
             {
                 _success = success;
                 _elapsed = elapsed;
@@ -220,7 +220,7 @@ namespace Microsoft.Extensions.Logging
                 {
                     _cachedToString = string.Format(
                         CultureInfo.InvariantCulture,
-                        "Consume finished in {0}ms Success:{1}",
+                        "Receive finished in {0}ms Success:{1}",
                         _elapsed.TotalMilliseconds,
                         _success);
                 }

@@ -3,28 +3,28 @@ using System.Threading.Tasks;
 using Meceqs.Configuration;
 using Meceqs.Pipeline;
 
-namespace Meceqs.Consuming
+namespace Meceqs.Receiving
 {
-    public class ConsumeBuilder : FilterContextBuilder<IConsumeBuilder>, IConsumeBuilder
+    public class ReceiveBuilder : FilterContextBuilder<IReceiveBuilder>, IReceiveBuilder
     {
-        public override IConsumeBuilder Instance => this;
+        public override IReceiveBuilder Instance => this;
 
-        public ConsumeBuilder(Envelope envelope, IServiceProvider serviceProvider)
-            : base(MeceqsDefaults.ConsumePipelineName, envelope, serviceProvider)
+        public ReceiveBuilder(Envelope envelope, IServiceProvider serviceProvider)
+            : base(MeceqsDefaults.ReceivePipelineName, envelope, serviceProvider)
         {
         }
 
-        public Task ConsumeAsync()
+        public Task ReceiveAsync()
         {
             return InvokePipelineAsync();
         }
 
-        public Task<TResult> ConsumeAsync<TResult>()
+        public Task<TResult> ReceiveAsync<TResult>()
         {
             return InvokePipelineAsync<TResult>();
         }
 
-        public Task<object> ConsumeAsync(Type resultType)
+        public Task<object> ReceiveAsync(Type resultType)
         {
             return InvokePipelineAsync(resultType);
         }

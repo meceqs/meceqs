@@ -2,9 +2,9 @@ using Meceqs.Transport;
 
 namespace Meceqs.AzureServiceBus.Configuration
 {
-    public class ServiceBusConsumerBuilder : TransportConsumerBuilder<IServiceBusConsumerBuilder, ServiceBusConsumerOptions>,
-        IServiceBusConsumerBuilder
+    public class ServiceBusReceiverBuilder : TransportReceiverBuilder<IServiceBusReceiverBuilder, ServiceBusReceiverOptions>,
+        IServiceBusReceiverBuilder
     {
-        public override IServiceBusConsumerBuilder Instance => this;
+        public override IServiceBusReceiverBuilder Instance => this;
     }
 }

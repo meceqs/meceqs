@@ -2,10 +2,10 @@ using System.Threading.Tasks;
 using Meceqs.Transport;
 using Microsoft.AspNetCore.Http;
 
-namespace Meceqs.AspNetCore.Consuming
+namespace Meceqs.AspNetCore.Receiving
 {
-    public interface IAspNetCoreConsumer
+    public interface IAspNetCoreReceiver
     {
-        Task ConsumeAsync(HttpContext httpContext, MessageMetadata metadata);
+        Task ReceiveAsync(HttpContext httpContext, MessageMetadata metadata);
     }
 }

@@ -2,8 +2,8 @@ namespace Meceqs.AzureServiceBus.Internal
 {
     internal class LoggerEventIds
     {
-        public const int ConsumeStarting = 1;
-        public const int ConsumeFinished = 2;
-        public const int ConsumeFailed = 3;
+        public const int ReceiveStarting = 1;
+        public const int ReceiveFinished = 2;
+        public const int ReceiveFailed = 3;
     }
 }

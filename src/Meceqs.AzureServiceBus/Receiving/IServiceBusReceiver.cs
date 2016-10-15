@@ -2,10 +2,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 
-namespace Meceqs.AzureServiceBus.Consuming
+namespace Meceqs.AzureServiceBus.Receiving
 {
-    public interface IServiceBusConsumer
+    public interface IServiceBusReceiver
     {
-        Task ConsumeAsync(BrokeredMessage brokeredMessage, CancellationToken cancellation);
+        Task ReceiveAsync(BrokeredMessage brokeredMessage, CancellationToken cancellation);
     }
 }

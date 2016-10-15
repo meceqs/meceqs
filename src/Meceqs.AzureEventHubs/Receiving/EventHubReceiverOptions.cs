@@ -1,8 +1,8 @@
 using Meceqs.Transport;
 
-namespace Meceqs.AzureEventHubs.Consuming
+namespace Meceqs.AzureEventHubs.Receiving
 {
-    public class EventHubConsumerOptions : TransportConsumerOptions
+    public class EventHubReceiverOptions : TransportReceiverOptions
     {
     }
 }

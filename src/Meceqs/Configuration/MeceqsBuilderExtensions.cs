@@ -10,15 +10,15 @@ namespace Microsoft.Extensions.DependencyInjection
     public static class MeceqsBuilderExtensions
     {
         /// <summary>
-        /// Adds the default "Consume" pipeline. This pipeline will be used when <see cref="Meceqs.Consuming.IMessageConsumer"/>
+        /// Adds the default "Receive" pipeline. This pipeline will be used when <see cref="Meceqs.Receiving.IMessageReceiver"/>
         /// is used without specifying a named pipeline.
         /// </summary>
-        public static IMeceqsBuilder AddConsumePipeline(this IMeceqsBuilder builder, Action<IPipelineBuilder> pipeline)
+        public static IMeceqsBuilder AddReceivePipeline(this IMeceqsBuilder builder, Action<IPipelineBuilder> pipeline)
         {
             Check.NotNull(builder, nameof(builder));
             Check.NotNull(pipeline, nameof(pipeline));
 
-            builder.AddPipeline(MeceqsDefaults.ConsumePipelineName, pipeline);
+            builder.AddPipeline(MeceqsDefaults.ReceivePipelineName, pipeline);
 
             return builder;
         }
@@ -38,7 +38,7 @@ namespace Microsoft.Extensions.DependencyInjection
         }
 
         /// <summary>
-        /// Adds a named pipeline. This pipeline can be used by <see cref="Meceqs.Consuming.IMessageConsumer"/>
+        /// Adds a named pipeline. This pipeline can be used by <see cref="Meceqs.Receiving.IMessageReceiver"/>
         /// and <see cref="Meceqs.Sending.IMessageSender"/>.
         /// </summary>
         public static IMeceqsBuilder AddPipeline(this IMeceqsBuilder builder, string pipelineName, Action<IPipelineBuilder> pipeline)

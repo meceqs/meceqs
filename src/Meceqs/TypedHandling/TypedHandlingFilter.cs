@@ -74,7 +74,7 @@ namespace Meceqs.TypedHandling
                     $"'{nameof(filterContext.RequestServices)}' wasn't set. It is required to resolve " +
                     $"handlers from the scope of the current web/message request. " +
                     $"It can be set either by using a filter [e.g. UseAspNetCore()] or by " +
-                    $"setting it yourself through 'SetRequestServices()' on the message sender/consumer",
+                    $"setting it yourself through 'SetRequestServices()' on the message sender/receiver",
                     $"{nameof(filterContext)}.{nameof(filterContext.RequestServices)}"
                 );
             }

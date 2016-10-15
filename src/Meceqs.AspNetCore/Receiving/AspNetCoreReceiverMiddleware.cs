@@ -8,19 +8,19 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Meceqs.AspNetCore.Consuming
+namespace Meceqs.AspNetCore.Receiving
 {
-    public class AspNetCoreConsumerMiddleware
+    public class AspNetCoreReceiverMiddleware
     {
         private readonly RequestDelegate _next;
-        private readonly AspNetCoreConsumerOptions _options;
+        private readonly AspNetCoreReceiverOptions _options;
         private readonly ILogger _logger;
 
         private readonly Dictionary<string, MessageMetadata> _pathLookup;
 
-        public AspNetCoreConsumerMiddleware(
+        public AspNetCoreReceiverMiddleware(
             RequestDelegate next,
-            IOptions<AspNetCoreConsumerOptions> options,
+            IOptions<AspNetCoreReceiverOptions> options,
             IMessagePathConvention messagePathConvention,
             ILoggerFactory loggerFactory)
         {
@@ -31,22 +31,22 @@ namespace Meceqs.AspNetCore.Consuming
 
             _next = next;
             _options = options.Value;
-            _logger = loggerFactory.CreateLogger<AspNetCoreConsumerMiddleware>();
+            _logger = loggerFactory.CreateLogger<AspNetCoreReceiverMiddleware>();
 
             _pathLookup = BuildPathLookup(messagePathConvention);
         }
 
-        public Task Invoke(HttpContext httpContext, IAspNetCoreConsumer aspNetCoreConsumer)
+        public Task Invoke(HttpContext httpContext, IAspNetCoreReceiver aspNetCoreReceiver)
         {
             Check.NotNull(httpContext, nameof(httpContext));
-            Check.NotNull(aspNetCoreConsumer, nameof(aspNetCoreConsumer));
+            Check.NotNull(aspNetCoreReceiver, nameof(aspNetCoreReceiver));
 
             MessageMetadata messageMetadata;
             if (_pathLookup.TryGetValue(httpContext.Request.Path, out messageMetadata))
             {
                 _logger.LogDebug("Path matched for message type {MessageType}", messageMetadata.MessageType);
 
-                return aspNetCoreConsumer.ConsumeAsync(httpContext, messageMetadata);
+                return aspNetCoreReceiver.ReceiveAsync(httpContext, messageMetadata);
             }
             else
             {
@@ -61,7 +61,7 @@ namespace Meceqs.AspNetCore.Consuming
         {
             if (_options.MessageTypes.Count == 0)
             {
-                throw new MeceqsException($"There are no configured handlers in {nameof(AspNetCoreConsumerOptions)}.{nameof(_options.MessageTypes)}");
+                throw new MeceqsException($"There are no configured handlers in {nameof(AspNetCoreReceiverOptions)}.{nameof(_options.MessageTypes)}");
             }
 
             var lookup = new Dictionary<string, MessageMetadata>(StringComparer.OrdinalIgnoreCase);

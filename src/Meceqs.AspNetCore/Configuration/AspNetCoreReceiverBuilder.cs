@@ -2,9 +2,9 @@ using Meceqs.Transport;
 
 namespace Meceqs.AspNetCore.Configuration
 {
-    public class AspNetCoreConsumerBuilder : TransportConsumerBuilder<IAspNetCoreConsumerBuilder, AspNetCoreConsumerOptions>,
-        IAspNetCoreConsumerBuilder
+    public class AspNetCoreReceiverBuilder : TransportReceiverBuilder<IAspNetCoreReceiverBuilder, AspNetCoreReceiverOptions>,
+        IAspNetCoreReceiverBuilder
     {
-        public override IAspNetCoreConsumerBuilder Instance => this;
+        public override IAspNetCoreReceiverBuilder Instance => this;
     }
 }

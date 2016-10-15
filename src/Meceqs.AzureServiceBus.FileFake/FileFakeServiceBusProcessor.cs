@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Meceqs.AzureServiceBus.Consuming;
+using Meceqs.AzureServiceBus.Receiving;
 using Microsoft.Extensions.Logging;
 
 namespace Meceqs.AzureServiceBus.FileFake
@@ -15,19 +15,19 @@ namespace Meceqs.AzureServiceBus.FileFake
         private readonly string _directory;
         private readonly string _archiveDirectory;
 
-        private readonly IServiceBusConsumer _serviceBusConsumer;
+        private readonly IServiceBusReceiver _serviceBusReceiver;
         private readonly ILogger _logger;
 
         private Timer _processingTimer;
 
         public FileFakeServiceBusProcessor(
             FileFakeServiceBusProcessorOptions options,
-            IServiceBusConsumer serviceBusConsumer,
+            IServiceBusReceiver serviceBusReceiver,
             ILoggerFactory loggerFactory)
         {
             Check.NotNull(options, nameof(options));
 
-            _serviceBusConsumer = serviceBusConsumer;
+            _serviceBusReceiver = serviceBusReceiver;
             _logger = loggerFactory.CreateLogger<FileFakeServiceBusProcessor>();
 
             if (string.IsNullOrWhiteSpace(options.Directory))
@@ -130,9 +130,9 @@ namespace Meceqs.AzureServiceBus.FileFake
         {
             var brokeredMessage = FileFakeBrokeredMessageSerializer.Deserialize(fileContent);
 
-            // The consumer will create a new scope, so we don't have to do it here.
+            // The receiver will create a new scope, so we don't have to do it here.
             var cancellationToken = CancellationToken.None; // TODO @cweiss CancellationToken???
-            await _serviceBusConsumer.ConsumeAsync(brokeredMessage, cancellationToken);
+            await _serviceBusReceiver.ReceiveAsync(brokeredMessage, cancellationToken);
         }
     }
 }

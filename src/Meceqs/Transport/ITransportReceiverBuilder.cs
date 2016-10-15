@@ -4,29 +4,29 @@ using Meceqs.TypedHandling;
 
 namespace Meceqs.Transport
 {
-    public interface ITransportConsumerBuilder<TTransportConsumer>
-        where TTransportConsumer : ITransportConsumerBuilder<TTransportConsumer>
+    public interface ITransportReceiverBuilder<TTransportReceiver>
+        where TTransportReceiver : ITransportReceiverBuilder<TTransportReceiver>
     {
-        TTransportConsumer Instance { get; }
+        TTransportReceiver Instance { get; }
 
-        TTransportConsumer AddMessageType<TMessage>();
+        TTransportReceiver AddMessageType<TMessage>();
 
-        TTransportConsumer AddMessageType<TMessage, TResult>();
+        TTransportReceiver AddMessageType<TMessage, TResult>();
 
-        TTransportConsumer AddMessageType(Type messageType, Type resultType = null);
+        TTransportReceiver AddMessageType(Type messageType, Type resultType = null);
 
-        TTransportConsumer SetUnknownMessageBehavior(UnknownMessageBehavior behavior);
+        TTransportReceiver SetUnknownMessageBehavior(UnknownMessageBehavior behavior);
 
-        TTransportConsumer ThrowOnUnknownMessage();
+        TTransportReceiver ThrowOnUnknownMessage();
 
-        TTransportConsumer SkipUnknownMessages();
+        TTransportReceiver SkipUnknownMessages();
 
-        TTransportConsumer SetPipelineName(string pipelineName);
+        TTransportReceiver SetPipelineName(string pipelineName);
 
-        TTransportConsumer ConfigurePipeline(Action<IPipelineBuilder> pipeline);
+        TTransportReceiver ConfigurePipeline(Action<IPipelineBuilder> pipeline);
 
-        TTransportConsumer UseTypedHandling(Action<TypedHandlingOptions> options);
+        TTransportReceiver UseTypedHandling(Action<TypedHandlingOptions> options);
 
-        TTransportConsumer UseTypedHandling(TypedHandlingOptions options);
+        TTransportReceiver UseTypedHandling(TypedHandlingOptions options);
     }
 }

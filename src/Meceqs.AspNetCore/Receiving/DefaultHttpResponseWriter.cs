@@ -2,7 +2,7 @@ using System.Threading.Tasks;
 using Meceqs.Serialization;
 using Microsoft.AspNetCore.Http;
 
-namespace Meceqs.AspNetCore.Consuming
+namespace Meceqs.AspNetCore.Receiving
 {
     public class DefaultHttpResponseWriter : IHttpResponseWriter
     {

@@ -1,11 +1,11 @@
-using Meceqs.AzureEventHubs.Consuming;
+using Meceqs.AzureEventHubs.Receiving;
 using Meceqs.Transport;
 
 namespace Meceqs.AzureEventHubs.Configuration
 {
-    public class EventHubConsumerBuilder : TransportConsumerBuilder<IEventHubConsumerBuilder, EventHubConsumerOptions>,
-        IEventHubConsumerBuilder
+    public class EventHubReceiverBuilder : TransportReceiverBuilder<IEventHubReceiverBuilder, EventHubReceiverOptions>,
+        IEventHubReceiverBuilder
     {
-        public override IEventHubConsumerBuilder Instance => this;
+        public override IEventHubReceiverBuilder Instance => this;
     }
 }

@@ -1,27 +1,27 @@
 using System;
 using System.Threading.Tasks;
-using Meceqs.Consuming;
+using Meceqs.Receiving;
 using Meceqs.Pipeline;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 using Xunit;
 
-namespace Meceqs.Tests.Consuming
+namespace Meceqs.Tests.Receiving
 {
-    public class MessageConsumerTest
+    public class MessageReceiverTest
     {
-        private IMessageConsumer GetMessageConsumer(Action<FilterContext> callback = null)
+        private IMessageReceiver GetMessageReceiver(Action<FilterContext> callback = null)
         {
             var services = new ServiceCollection()
                 .AddLogging()
                 .AddOptions();
 
             services.AddMeceqs()
-                .AddConsumePipeline(pipeline => pipeline.RunCallback(callback));
+                .AddReceivePipeline(pipeline => pipeline.RunCallback(callback));
 
             var serviceProvider = services.BuildServiceProvider();
 
-            return new MessageConsumer(serviceProvider);
+            return new MessageReceiver(serviceProvider);
         }
 
         private Envelope GetEmptyEnvelope<TMessage>() where TMessage : class, new()
@@ -47,10 +47,10 @@ namespace Meceqs.Tests.Consuming
             });
 
             // Arrange
-            var consumer = GetMessageConsumer(callback);
+            var receiver = GetMessageReceiver(callback);
 
             // Act
-            await (resultType == null ? consumer.ConsumeAsync(envelope) : consumer.ConsumeAsync(envelope, resultType));
+            await (resultType == null ? receiver.ReceiveAsync(envelope) : receiver.ReceiveAsync(envelope, resultType));
 
             called.ShouldBeTrue();
         }
@@ -59,10 +59,10 @@ namespace Meceqs.Tests.Consuming
         public void Missing_envelope_throws()
         {
             // Arrange
-            var consumer = GetMessageConsumer();
+            var receiver = GetMessageReceiver();
 
             // Act & Assert
-            Should.Throw<ArgumentNullException>(() => consumer.ForEnvelope(null));
+            Should.Throw<ArgumentNullException>(() => receiver.ForEnvelope(null));
         }
 
         [Fact]
@@ -70,10 +70,10 @@ namespace Meceqs.Tests.Consuming
         {
             // Arrange
             var envelope = new Envelope<SimpleMessage>();
-            var consumer = GetMessageConsumer();
+            var receiver = GetMessageReceiver();
 
             // Act & Assert
-            Should.Throw<ArgumentNullException>(() => consumer.ForEnvelope(envelope));
+            Should.Throw<ArgumentNullException>(() => receiver.ForEnvelope(envelope));
         }
 
         [Fact]
@@ -167,9 +167,9 @@ namespace Meceqs.Tests.Consuming
             var envelope = TestObjects.Envelope<SimpleMessage>();
 
             var callback = new Action<FilterContext>((ctx) => ctx.Result = "result");
-            var consumer = GetMessageConsumer(callback);
+            var receiver = GetMessageReceiver(callback);
 
-            string result = await consumer.ConsumeAsync<string>(envelope);
+            string result = await receiver.ReceiveAsync<string>(envelope);
 
             result.ShouldBe("result");
         }

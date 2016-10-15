@@ -1,39 +1,39 @@
 using System.Threading.Tasks;
-using Meceqs.Consuming;
+using Meceqs.Receiving;
 using Meceqs.Transport;
 using Microsoft.AspNetCore.Http;
 
-namespace Meceqs.AspNetCore.Consuming
+namespace Meceqs.AspNetCore.Receiving
 {
-    public class DefaultAspNetCoreConsumer : IAspNetCoreConsumer
+    public class DefaultAspNetCoreReceiver : IAspNetCoreReceiver
     {
         private readonly IHttpRequestReader _httpRequestReader;
-        private readonly IMessageConsumer _messageConsumer;
+        private readonly IMessageReceiver _messageReceiver;
         private readonly IHttpResponseWriter _httpResponseWriter;
 
-        public DefaultAspNetCoreConsumer(
+        public DefaultAspNetCoreReceiver(
             IHttpRequestReader httpRequestReader,
-            IMessageConsumer messageConsumer,
+            IMessageReceiver messageReceiver,
             IHttpResponseWriter httpResponseWriter)
-        { 
+        {
             Check.NotNull(httpRequestReader, nameof(httpRequestReader));
-            Check.NotNull(messageConsumer, nameof(messageConsumer));
+            Check.NotNull(messageReceiver, nameof(messageReceiver));
             Check.NotNull(httpResponseWriter, nameof(httpResponseWriter));
 
             _httpRequestReader = httpRequestReader;
-            _messageConsumer = messageConsumer;
+            _messageReceiver = messageReceiver;
             _httpResponseWriter = httpResponseWriter;
         }
 
-        public async Task ConsumeAsync(HttpContext httpContext, MessageMetadata metadata)
+        public async Task ReceiveAsync(HttpContext httpContext, MessageMetadata metadata)
         {
             // TODO error handling etc.
 
             var envelope = _httpRequestReader.ConvertToEnvelope(httpContext, metadata.MessageType);
 
-            object result = await _messageConsumer.ForEnvelope(envelope)
+            object result = await _messageReceiver.ForEnvelope(envelope)
                 .SetCancellationToken(httpContext.RequestAborted)
-                .ConsumeAsync(metadata.ResultType);
+                .ReceiveAsync(metadata.ResultType);
 
             await _httpResponseWriter.HandleResult(result, httpContext);
         }

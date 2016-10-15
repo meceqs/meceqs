@@ -2,7 +2,7 @@ using System;
 using Meceqs;
 using Meceqs.AspNetCore;
 using Meceqs.AspNetCore.Configuration;
-using Meceqs.AspNetCore.Consuming;
+using Meceqs.AspNetCore.Receiving;
 using Meceqs.Configuration;
 using Meceqs.Pipeline;
 using Microsoft.AspNetCore.Http;
@@ -25,37 +25,37 @@ namespace Microsoft.Extensions.DependencyInjection
             builder.Services.TryAddTransient<IHttpRequestReader, DefaultHttpRequestReader>();
             builder.Services.TryAddTransient<IHttpResponseWriter, DefaultHttpResponseWriter>();
 
-            builder.Services.TryAddTransient<IAspNetCoreConsumer, DefaultAspNetCoreConsumer>();
+            builder.Services.TryAddTransient<IAspNetCoreReceiver, DefaultAspNetCoreReceiver>();
 
             return builder;
         }
 
         /// <summary>
-        /// Adds an ASP.NET Core consumer pipeline.
+        /// Adds an ASP.NET Core receiver pipeline.
         /// </summary>
-        public static IMeceqsBuilder AddAspNetCoreConsumer(
+        public static IMeceqsBuilder AddAspNetCoreReceiver(
             this IMeceqsBuilder builder,
-            Action<IAspNetCoreConsumerBuilder> options)
+            Action<IAspNetCoreReceiverBuilder> options)
         {
             Check.NotNull(builder, nameof(builder));
 
-            var consumerBuilder = new AspNetCoreConsumerBuilder();
-            options?.Invoke(consumerBuilder);
+            var receiverBuilder = new AspNetCoreReceiverBuilder();
+            options?.Invoke(receiverBuilder);
 
             builder.AddAspNetCore();
 
-            foreach (var assembly in consumerBuilder.GetDeserializationAssemblies())
+            foreach (var assembly in receiverBuilder.GetDeserializationAssemblies())
             {
                 builder.AddDeserializationAssembly(assembly);
             }
 
-            var consumerOptions = consumerBuilder.GetConsumerOptions();
-            if (consumerOptions != null)
+            var receiverOptions = receiverBuilder.GetReceiverOptions();
+            if (receiverOptions != null)
             {
-                builder.Services.Configure(consumerOptions);
+                builder.Services.Configure(receiverOptions);
             }
 
-            builder.AddPipeline(consumerBuilder.GetPipelineName(), consumerBuilder.GetPipeline());
+            builder.AddPipeline(receiverBuilder.GetPipelineName(), receiverBuilder.GetPipeline());
 
             return builder;
         }

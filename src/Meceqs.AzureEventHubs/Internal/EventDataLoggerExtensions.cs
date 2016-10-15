@@ -17,25 +17,25 @@ namespace Microsoft.Extensions.Logging
             return logger.BeginScope(new EventDataLogScope(message));
         }
 
-        public static void ConsumeStarting(this ILogger logger, EventData message)
+        public static void ReceiveStarting(this ILogger logger, EventData message)
         {
             if (logger.IsEnabled(LogLevel.Information))
             {
                 logger.Log(
                     logLevel: LogLevel.Information,
-                    eventId: LoggerEventIds.ConsumeStarting,
-                    state: new ConsumeStartingState(message),
+                    eventId: LoggerEventIds.ReceiveStarting,
+                    state: new ReceiveStartingState(message),
                     exception: null,
-                    formatter: ConsumeStartingState.Callback);
+                    formatter: ReceiveStartingState.Callback);
             }
         }
 
-        public static void ConsumeFailed(this ILogger logger, EventData message, Exception ex)
+        public static void ReceiveFailed(this ILogger logger, EventData message, Exception ex)
         {
-            logger.LogError(LoggerEventIds.ConsumeFailed, ex, "Consume failed with exception");
+            logger.LogError(LoggerEventIds.ReceiveFailed, ex, "Receive failed with exception");
         }
 
-        public static void ConsumeFinished(this ILogger logger, bool success, long startTimestamp, long currentTimestamp)
+        public static void ReceiveFinished(this ILogger logger, bool success, long startTimestamp, long currentTimestamp)
         {
             // Don't log if Information logging wasn't enabled at start or end of request as time will be wildly wrong.
             if (startTimestamp != 0)
@@ -44,10 +44,10 @@ namespace Microsoft.Extensions.Logging
 
                 logger.Log(
                     logLevel: LogLevel.Information,
-                    eventId: LoggerEventIds.ConsumeFinished,
-                    state: new ConsumeFinishedState(success, elapsed),
+                    eventId: LoggerEventIds.ReceiveFinished,
+                    state: new ReceiveFinishedState(success, elapsed),
                     exception: null,
-                    formatter: ConsumeFinishedState.Callback);
+                    formatter: ReceiveFinishedState.Callback);
             }
         }
 
@@ -112,15 +112,15 @@ namespace Microsoft.Extensions.Logging
             }
         }
 
-        private class ConsumeStartingState : IReadOnlyList<KeyValuePair<string, object>>
+        private class ReceiveStartingState : IReadOnlyList<KeyValuePair<string, object>>
         {
-            internal static readonly Func<object, Exception, string> Callback = (state, exception) => ((ConsumeStartingState)state).ToString();
+            internal static readonly Func<object, Exception, string> Callback = (state, exception) => ((ReceiveStartingState)state).ToString();
 
             private readonly EventData _eventData;
 
             private string _cachedToString;
 
-            public ConsumeStartingState(EventData eventData)
+            public ReceiveStartingState(EventData eventData)
             {
                 _eventData = eventData;
             }
@@ -151,7 +151,7 @@ namespace Microsoft.Extensions.Logging
                 {
                     _cachedToString = string.Format(
                         CultureInfo.InvariantCulture,
-                        "Consume starting Offset:{0} Sequence:{1} Enqueued:{2}",
+                        "Receive starting Offset:{0} Sequence:{1} Enqueued:{2}",
                         _eventData.Offset,
                         _eventData.SequenceNumber,
                         _eventData.EnqueuedTimeUtc);
@@ -174,9 +174,9 @@ namespace Microsoft.Extensions.Logging
             }
         }
 
-        private class ConsumeFinishedState : IReadOnlyList<KeyValuePair<string, object>>
+        private class ReceiveFinishedState : IReadOnlyList<KeyValuePair<string, object>>
         {
-            internal static readonly Func<object, Exception, string> Callback = (state, exception) => ((ConsumeFinishedState)state).ToString();
+            internal static readonly Func<object, Exception, string> Callback = (state, exception) => ((ReceiveFinishedState)state).ToString();
 
             private readonly bool _success;
             private readonly TimeSpan _elapsed;
@@ -207,7 +207,7 @@ namespace Microsoft.Extensions.Logging
                 }
             }
 
-            public ConsumeFinishedState(bool success, TimeSpan elapsed)
+            public ReceiveFinishedState(bool success, TimeSpan elapsed)
             {
                 _success = success;
                 _elapsed = elapsed;
@@ -219,7 +219,7 @@ namespace Microsoft.Extensions.Logging
                 {
                     _cachedToString = string.Format(
                         CultureInfo.InvariantCulture,
-                        "Consume finished in {0}ms Success:{1}",
+                        "Receive finished in {0}ms Success:{1}",
                         _elapsed.TotalMilliseconds,
                         _success);
                 }

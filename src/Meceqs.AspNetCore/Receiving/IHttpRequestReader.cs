@@ -1,7 +1,7 @@
 using System;
 using Microsoft.AspNetCore.Http;
 
-namespace Meceqs.AspNetCore.Consuming
+namespace Meceqs.AspNetCore.Receiving
 {
     public interface IHttpRequestReader
     {

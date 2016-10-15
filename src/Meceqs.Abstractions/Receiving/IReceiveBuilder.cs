@@ -2,29 +2,29 @@ using System;
 using System.Threading.Tasks;
 using Meceqs.Pipeline;
 
-namespace Meceqs.Consuming
+namespace Meceqs.Receiving
 {
     /// <summary>
-    /// Represents a builder object for consuming an existing envelope from an external caller/system.
+    /// Represents a builder object for receiving an existing envelope from an external caller/system.
     /// </summary>
-    public interface IConsumeBuilder : IFilterContextBuilder<IConsumeBuilder>
+    public interface IReceiveBuilder : IFilterContextBuilder<IReceiveBuilder>
     {
         /// <summary>
         /// Sends the envelope to the pipeline. If no pipeline name was configured,
-        /// the default "Consume" pipeline will be used.
+        /// the default "Receive" pipeline will be used.
         /// </summary>
-        Task ConsumeAsync();
+        Task ReceiveAsync();
 
         /// <summary>
         /// Sends the envelope to the pipeline and expects a result object of the given type.
-        /// If no pipeline name was configured, the default "Consume" pipeline will be used.
+        /// If no pipeline name was configured, the default "Receive" pipeline will be used.
         /// </summary>
-        Task<TResult> ConsumeAsync<TResult>();
+        Task<TResult> ReceiveAsync<TResult>();
 
         /// <summary>
         /// Sends the envelope to the pipeline and expects a result object of the given type.
-        /// If no pipeline name was configured, the default "Consume" pipeline will be used.
+        /// If no pipeline name was configured, the default "Receive" pipeline will be used.
         /// </summary>
-        Task<object> ConsumeAsync(Type resultType);
+        Task<object> ReceiveAsync(Type resultType);
     }
 }

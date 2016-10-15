@@ -52,19 +52,19 @@ namespace Customers.Hosts.WebApi
                 .AddJsonSerialization()
 
                 // Pass HttpContext.RequestServices, .User, etc to every processed message.
-                // (this will also be called by AddAspNetCoreConsumer so it wouldn't be necessary here,
+                // (this will also be called by AddAspNetCoreReceiver so it wouldn't be necessary here,
                 // it's just here for clarity).
                 .AddAspNetCore()
 
                 // The Web API will process incoming requests.
-                .AddAspNetCoreConsumer(consumer =>
+                .AddAspNetCoreReceiver(receiver =>
                 {
                     // Throwing an exception is the default behavior.
                     // We could also skip unknown message types but this doesn't make much sense
                     // for a Web API.
-                    consumer.ThrowOnUnknownMessage();
+                    receiver.ThrowOnUnknownMessage();
 
-                    consumer.UseTypedHandling(options =>
+                    receiver.UseTypedHandling(options =>
                     {
                         // In this example, the context only handles messages from this Web API
                         // so we can just add every handler.
@@ -84,7 +84,7 @@ namespace Customers.Hosts.WebApi
 
                     // This adds some custom filters to the pipeline.
                     // They are executed in this order before the Typed Handling filter is executed.
-                    consumer.ConfigurePipeline(pipeline =>
+                    receiver.ConfigurePipeline(pipeline =>
                     {
                         // add user id to message if not present
                         pipeline.UseAuditing();
@@ -107,7 +107,7 @@ namespace Customers.Hosts.WebApi
         {
             app.UseDeveloperExceptionPage();
 
-            app.UseAspNetCoreConsumer();
+            app.UseAspNetCoreReceiver();
         }
     }
 }

@@ -19,15 +19,15 @@ namespace Sales.Hosts.ProcessOrders
             services.AddMeceqs()
                 .AddJsonSerialization()
 
-                .AddServiceBusConsumer(consumer =>
+                .AddServiceBusReceiver(receiver =>
                 {
-                    consumer.UseTypedHandling(options =>
+                    receiver.UseTypedHandling(options =>
                     {
                         options.Handlers.AddFromAssembly<Program>();
                     });
                 })
 
-                // Fake for the ServiceBusConsumer which will read messages from local file system.
+                // Fake for the ServiceBusReceiver which will read messages from local file system.
                 .AddFileFakeServiceBusProcessor(options =>
                 {
                     options.Directory = SampleConfiguration.FileFakeServiceBusDirectory;

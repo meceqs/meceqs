@@ -19,9 +19,9 @@ namespace Sales.Hosts.ProcessCustomerEvents
             services.AddMeceqs()
                 .AddJsonSerialization()
 
-                .AddEventHubConsumer(consumer =>
+                .AddEventHubReceiver(receiver =>
                 {
-                    consumer
+                    receiver
                         .SkipUnknownMessages()
 
                         .UseTypedHandling(options =>
@@ -36,7 +36,7 @@ namespace Sales.Hosts.ProcessCustomerEvents
                         });
                 })
 
-                // Fake for the EventHubConsumer which will read events from a local file.
+                // Fake for the EventHubReceiver which will read events from a local file.
                 .AddFileFakeEventHubProcessor(options =>
                 {
                     options.Directory = SampleConfiguration.FileFakeEventHubDirectory;

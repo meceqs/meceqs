@@ -7,7 +7,7 @@ namespace Meceqs.Pipeline
 {
     /// <summary>
     /// Contains common logic for building a <see cref="FilterContext"/>.
-    /// This type is typically not used directly - use <see cref="Meceqs.Consuming.IConsumeBuilder"/>
+    /// This type is typically not used directly - use <see cref="Meceqs.Receiving.IReceiveBuilder"/>
     /// or <see cref="Meceqs.Sending.ISendBuilder"/> instead.
     /// </summary>
     public interface IFilterContextBuilder<TBuilder>
@@ -37,7 +37,7 @@ namespace Meceqs.Pipeline
 
         /// <summary>
         /// Uses the given service provider for <see cref="FilterContext.RequestServices"/>
-        /// instead of the default (which is the same provider either <see cref="Meceqs.Consuming.IMessageConsumer"/>
+        /// instead of the default (which is the same provider either <see cref="Meceqs.Receiving.IMessageReceiver"/>
         /// or <see cref="Meceqs.Sending.IMessageSender"/> was resolved from).
         /// </summary>
         TBuilder SetRequestServices(IServiceProvider requestServices);
@@ -49,7 +49,7 @@ namespace Meceqs.Pipeline
 
         /// <summary>
         /// Uses a pipeline with the given name instead of the default pipeline
-        /// (which would be "Consume" for <see cref="Meceqs.Consuming.IMessageConsumer"/>
+        /// (which would be "Receive" for <see cref="Meceqs.Receiving.IMessageReceiver"/>
         /// or "Send" for <see cref="Meceqs.Sending.IMessageSender"/>).
         TBuilder UsePipeline(string pipelineName);
     }

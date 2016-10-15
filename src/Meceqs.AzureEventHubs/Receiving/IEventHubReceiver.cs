@@ -2,10 +2,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
 
-namespace Meceqs.AzureEventHubs.Consuming
+namespace Meceqs.AzureEventHubs.Receiving
 {
-    public interface IEventHubConsumer
+    public interface IEventHubReceiver
     {
-        Task ConsumeAsync(EventData eventData, CancellationToken cancellation);
+        Task ReceiveAsync(EventData eventData, CancellationToken cancellation);
     }
 }

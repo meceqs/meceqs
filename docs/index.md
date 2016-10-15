@@ -22,12 +22,12 @@ Meceqs ships with the following integrations:
   * Send messages via HTTP - works best with our convention-based ASP.NET Core API.
 * Azure Service Bus
   * Send messages to Azure Service Bus
-  * Consume messages from Azure Service Bus
+  * Receive messages from Azure Service Bus
   * Use a file-based mock which makes local development very easy.
   * *NOTE: There's no official .NET standard compatible Azure Service Bus library yet so this integration only works on the full .NET framework*
 * Azure Event Hubs
   * Send messages to Azure Event Hubs
-  * Consume messages from Azure Event Hubs
+  * Receive messages from Azure Event Hubs
   * Use a a file-based mock which makes local development very easy.
   * *NOTE: There's no official .NET standard compatible Azure Event Hubs library yet so this integration only works on the full .NET framework*
 * JSON serialization
@@ -39,7 +39,7 @@ The following demo scenario should give you a good first look at Meceqs:
 * Your ASP.NET Core frontend has a sign-up page that sends a HTTP request with a `CreateCustomerCommand` to the backend Web API of your customer context.
 * Your ASP.NET Core Web API from your customer context receives the command and invokes the handler in your business layer.
 * The business layer code decides to forward the message to *Azure Service Bus* because it is too complex to process immediately.
-* Your Azure Service Bus host process will consume the message and invoke another handler in your business layer.
+* Your Azure Service Bus host process will receive the message and invoke another handler in your business layer.
 * The business layer code will create a new customer, store it in a database and publish an event to *Azure Event Hubs*.
 
 ### Frontend web application
@@ -167,11 +167,11 @@ public void ConfigureServices(IServiceCollection services)
     services.AddMeceqs()
         .AddJsonSerialization()
 
-        // Configures the behavior of the ASP.NET Core consumer.
-        .AddAspNetCoreConsumer(consumer =>
+        // Configures the behavior of the ASP.NET Core receiver.
+        .AddAspNetCoreReceiver(receiver =>
         {
-            // The consumer should forward messages to the handler from above.
-            consumer.UseTypedHandling(options =>
+            // The receiver should forward messages to the handler from above.
+            receiver.UseTypedHandling(options =>
             {
                 options.Handlers.Add<CreateCustomerForwarder>();
             });
@@ -186,8 +186,8 @@ public void ConfigureServices(IServiceCollection services)
 
 public void Configure(IApplicationBuilder app)
 {
-    // This adds the consumer to the ASP.NET Core pipeline.
-    app.UseAspNetCoreConsumer();
+    // This adds the receiver to the ASP.NET Core pipeline.
+    app.UseAspNetCoreReceiver();
 }
 ```
 
@@ -217,7 +217,7 @@ There's one history entry for every pipeline that processed the message.
       }
     },
     {
-      "pipeline": "Consume",
+      "pipeline": "Receive",
       "host": "BACKEND01",
       "endpoint": "Customers.Hosts.WebApi",
       "createdOnUtc": "2016-09-17T19:48:28.6304382Z",
@@ -241,15 +241,15 @@ There's one history entry for every pipeline that processed the message.
 ```
 
 ### Azure Service Bus Host
-Your Azure Service Bus host process will consume the message and invoke another handler in your business layer.
+Your Azure Service Bus host process will receive the message and invoke another handler in your business layer.
 The business layer code will create a new customer, store it in a database and publish an event to *Azure Event Hubs*.
 
 #### Usage
 ```csharp
-// Your Azure Service Bus host will read the BrokeredMessage and call this code to "consume" the envelope
+// Your Azure Service Bus host will read the BrokeredMessage and call this code to "receive" the envelope
 public Task ProcessMessage(BrokeredMessage message)
 {
-    return _serviceBusConsumer.ConsumeAsync(message, _cancellationToken);
+    return _serviceBusReceiver.ReceiveAsync(message, _cancellationToken);
 }
 
 // Business layer handler
@@ -276,7 +276,7 @@ public class CreateCustomerProcessor : IHandles<CreateCustomerCommand>
         // Raise an event
 
         // For demo purposes, we ignore the fact that this creates a new messageId and therefore
-        // isn't completely idempotent. Consumers would have to de-duplicate based on the customerId.
+        // isn't completely idempotent. Receivers would have to de-duplicate based on the customerId.
 
         var customerCreatedEvent = new CustomerCreatedEvent(customerId, customer.FirstName, customer.LastName);
 
@@ -293,9 +293,9 @@ public class CreateCustomerProcessor : IHandles<CreateCustomerCommand>
 services.AddMeceqs()
     .AddJsonSerialization()
 
-    .AddServiceBusConsumer(consumer =>
+    .AddServiceBusReceiver(receiver =>
     {
-        consumer.UseTypedHandling(options =>
+        receiver.UseTypedHandling(options =>
         {
             options.Handlers.Add<CreateCustomerProcessor>();
         });

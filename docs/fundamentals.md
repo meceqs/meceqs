@@ -8,7 +8,7 @@ The following concepts build the foundation of Meceqs:
     Every *message* is wrapped in an *envelope* that holds potential message headers and important metadata for correlation, de-duplication, diagnostics, serialization.
 * __Pipeline:__
     *Envelopes* are sent to a *pipeline*. A pipeline consists of one or many *filters* that can modify or process the *envelope*.
-    An application can have multiple pipelines (e.g. for doing HTTP calls, for sending messages to a message broker or for consuming messages from a broker).
+    An application can have multiple pipelines (e.g. for doing HTTP calls, for sending messages to a message broker or for receiving messages from a broker).
 * __Filter:__
     A *filter* is one processing unit in a *pipeline*. Filters are similar to "middleware" in ASP.NET Core.
     A filter can have an intermediary role (e.g. log/modify/enrich the *envelope*) and call into the next *filter* or
@@ -165,8 +165,8 @@ Typically, a pipeline is used for one of two scenarios:
     * Save events in a database/event store (e.g. SQL, GetEventStore, Azure Event Hubs, Apache Kafka)
     * Execute more business logic in case of a decoupled in-process architecture
     * ...
-* __Consuming messages:__
-    Whenever your application *receives an existing envelope* from somewhere, you want to *consume* it.
+* __Receiving messages:__
+    Whenever your application *receives an existing envelope* from somewhere, you want to *receive* it.
     This typically happens when your application is a Web API, a worker process for incoming messages from a broker, etc.
     In this case, the last filter in the pipeline usually does one of the following things:
     * Execute business logic for an incoming command/query/event (and maybe return a result)
@@ -179,7 +179,7 @@ so there must be an easy way to know which pipeline should be invoked.
 Doing so manually (as in the previous chapter) would require you to create the `FilterContext` yourself
 and to specify the name of the pipeline for each call.
 
-To make this easier and obvious, Meceqs includes two interfaces for *sending* and *consuming* messages
+To make this easier and obvious, Meceqs includes two interfaces for *sending* and *receiving* messages
 that automatically create the filter context and invoke the proper pipeline:
 
 ### Meceqs.Sending.IMessageSender
@@ -217,27 +217,27 @@ await _messageSender.ForMessage(cmd)
     .SendAsync();
 ```
 
-### Meceqs.Consuming.IMessageConsumer
-The interface `Meceqs.Consuming.IMessageConsumer` is used for __consuming an existing envelope__
-on a pipeline with the default name `Consume`.
+### Meceqs.Receiving.IMessageReceiver
+The interface `Meceqs.Receiving.IMessageReceiver` is used for __receiving an existing envelope__
+on a pipeline with the default name `Receive`.
 
 ```csharp
 // The envelope would come from Azure Service Bus, a HTTP call, ...
 Envelope existingEnvelope;
 
-// Consume using the shortcut...
-await _messageConsumer.ConsumeAsync(existingEnvelope);
+// Receive using the shortcut...
+await _messageReceiver.ReceiveAsync(existingEnvelope);
 
 // ... or using the builder pattern
-await _messageConsumer.ForEnvelope(existingEnvelope)
+await _messageReceiver.ForEnvelope(existingEnvelope)
     .UsePipeline("SomeOtherPipeline")
-    .ConsumeAsync();
+    .ReceiveAsync();
 ```
 
-In typical asynchronous cases (like processing messages from a queue, ...) a message consumer does not return a result.
-However, if the message consumer is part of a synchronous conversation (like a HTTP call) it's very common
-that the consumer has to return a result to the caller - especially in case of query requests.
-For this reason, `IMessageConsumer` also offers a `ConsumeAsync<TResult>()` method.
+In typical asynchronous cases (like processing messages from a queue, ...) a message receiver does not return a result.
+However, if the message receiver is part of a synchronous conversation (like a HTTP call) it's very common
+that the receiver has to return a result to the caller - especially in case of query requests.
+For this reason, `IMessageReceiver` also offers a `ReceiveAsync<TResult>()` method.
 
 Following up in our example, the ASP.NET Core backend API would implement a MVC controller with the following code
 to process the `CreateCustomerCommand` and to immediately return a `CreateCustomerResult`:
@@ -246,7 +246,7 @@ to process the `CreateCustomerCommand` and to immediately return a `CreateCustom
 [HttpPost]
 public Task<CreateCustomerResult> CreateCustomer([FromBody] Envelope<CreateCustomerCommand> envelope)
 {
-    return _messageConsumer.ConsumeAsync<CreateCustomerResult>(envelope);
+    return _messageReceiver.ReceiveAsync<CreateCustomerResult>(envelope);
 }
 ```
 
@@ -302,8 +302,8 @@ public class ExceptionLoggerFilter
 ## Terminal filters
 
 At the end of every pipeline there must be a terminal filter that doesn't call into a next filter.
-This filter will process the message in a way that is useful for your scenario. In case of a sending pipeline,
-the filter might send the message to Azure Service Bus. In case of a consuming pipeline, the filter might use
+This filter will process the message in a way that is useful for your scenario. In case of a sender pipeline,
+the filter might send the message to Azure Service Bus. In case of a receiver pipeline, the filter might use
 our [Typed Handling Filter](typed-handling.md) to invoke a service in your business layer.
 
 Meceqs includes filters for typed in-process handling and also for different transports.

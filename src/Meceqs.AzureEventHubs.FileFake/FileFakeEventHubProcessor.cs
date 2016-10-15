@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Meceqs.AzureEventHubs.Consuming;
+using Meceqs.AzureEventHubs.Receiving;
 using Microsoft.Extensions.Logging;
 
 namespace Meceqs.AzureEventHubs.FileFake
@@ -16,7 +16,7 @@ namespace Meceqs.AzureEventHubs.FileFake
         private readonly string _fileName;
 
 
-        private readonly IEventHubConsumer _eventHubConsumer;
+        private readonly IEventHubReceiver _eventHubReceiver;
         private readonly ILogger _logger;
 
         private Timer _processingTimer;
@@ -24,12 +24,12 @@ namespace Meceqs.AzureEventHubs.FileFake
         private long _fileCreationTicks = 0;
         private int _sequenceNumber = 0;
 
-        public FileFakeEventHubProcessor(FileFakeEventHubProcessorOptions options, IEventHubConsumer eventHubConsumer, ILoggerFactory loggerFactory)
+        public FileFakeEventHubProcessor(FileFakeEventHubProcessorOptions options, IEventHubReceiver eventHubReceiver, ILoggerFactory loggerFactory)
         {
             Check.NotNull(options, nameof(options));
 
             _options = options;
-            _eventHubConsumer = eventHubConsumer;
+            _eventHubReceiver = eventHubReceiver;
             _logger = loggerFactory.CreateLogger<FileFakeEventHubProcessor>();
 
             _fileName = Path.Combine(_options.Directory, $"{_options.EventHubName}.txt");
@@ -72,7 +72,7 @@ namespace Meceqs.AzureEventHubs.FileFake
             var fileInfo = new FileInfo(_fileName);
 
             // We cache the creation date to make sure we can re-start if someone deletes the file.
-            
+
             var creationTicks = fileInfo.CreationTimeUtc.Ticks;
             if (_fileCreationTicks != creationTicks)
             {
@@ -81,7 +81,7 @@ namespace Meceqs.AzureEventHubs.FileFake
                     // Someone deleted the file -> restart from the beginning!
                     _logger.LogInformation("File creation date doesn't match. Resetting sequence number to 0");
                 }
-                
+
                 _sequenceNumber = 0;
                 _fileCreationTicks = creationTicks;
             }
@@ -132,9 +132,9 @@ namespace Meceqs.AzureEventHubs.FileFake
 
             var eventData = FileFakeEventDataSerializer.Deserialize(serializedEvent, sequenceNumber);
 
-            // The consumer will create a new scope, so we don't have to do it here.
+            // The receiver will create a new scope, so we don't have to do it here.
             var cancellationToken = CancellationToken.None; // TODO @cweiss CancellationToken???
-            await _eventHubConsumer.ConsumeAsync(eventData, cancellationToken);
+            await _eventHubReceiver.ReceiveAsync(eventData, cancellationToken);
         }
     }
 }

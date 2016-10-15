@@ -13,7 +13,7 @@ namespace Meceqs.Sending
 
         /// <summary>
         /// <para>Creates a builder that sends an existing <see cref="Envelope"/> to a pipeline.
-        /// This can be used to forward an envelope from a consumer to a sender.</para>
+        /// This can be used to forward an envelope from a receiver to a sender.</para>
         /// <para>If you don't specify a pipeline name, the default "Send" pipeline will be used.</para>
         /// </summary>
         ISendBuilder ForEnvelope(Envelope envelope);

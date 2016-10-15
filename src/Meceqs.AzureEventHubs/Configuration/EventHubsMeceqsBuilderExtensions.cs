@@ -1,7 +1,7 @@
 using System;
 using Meceqs;
 using Meceqs.AzureEventHubs.Configuration;
-using Meceqs.AzureEventHubs.Consuming;
+using Meceqs.AzureEventHubs.Receiving;
 using Meceqs.AzureEventHubs.Internal;
 using Meceqs.AzureEventHubs.Sending;
 using Meceqs.Configuration;
@@ -18,38 +18,38 @@ namespace Microsoft.Extensions.DependencyInjection
 
             builder.Services.TryAddSingleton<IEventDataConverter, DefaultEventDataConverter>();
             builder.Services.TryAddSingleton<IEventHubClientFactory, DefaultEventHubClientFactory>();
-            builder.Services.TryAddSingleton<IEventHubConsumer, DefaultEventHubConsumer>();
+            builder.Services.TryAddSingleton<IEventHubReceiver, DefaultEventHubReceiver>();
 
             return builder;
         }
 
         /// <summary>
-        /// Adds an Azure Event Hubs consumer pipeline.
+        /// Adds an Azure Event Hubs receiver pipeline.
         /// </summary>
-        public static IMeceqsBuilder AddEventHubConsumer(
+        public static IMeceqsBuilder AddEventHubReceiver(
             this IMeceqsBuilder builder,
-            Action<IEventHubConsumerBuilder> consumer)
+            Action<IEventHubReceiverBuilder> receiver)
         {
             Check.NotNull(builder, nameof(builder));
-            Check.NotNull(consumer, nameof(consumer));
+            Check.NotNull(receiver, nameof(receiver));
 
-            var consumerBuilder = new EventHubConsumerBuilder();
-            consumer?.Invoke(consumerBuilder);
+            var receiverBuilder = new EventHubReceiverBuilder();
+            receiver?.Invoke(receiverBuilder);
 
             builder.AddEventHubServices();
 
-            foreach (var assembly in consumerBuilder.GetDeserializationAssemblies())
+            foreach (var assembly in receiverBuilder.GetDeserializationAssemblies())
             {
                 builder.AddDeserializationAssembly(assembly);
             }
 
-            var consumerOptions = consumerBuilder.GetConsumerOptions();
-            if (consumerOptions != null)
+            var receiverOptions = receiverBuilder.GetReceiverOptions();
+            if (receiverOptions != null)
             {
-                builder.Services.Configure(consumerOptions);
+                builder.Services.Configure(receiverOptions);
             }
 
-            builder.AddPipeline(consumerBuilder.GetPipelineName(), consumerBuilder.GetPipeline());
+            builder.AddPipeline(receiverBuilder.GetPipelineName(), receiverBuilder.GetPipeline());
 
             return builder;
         }
