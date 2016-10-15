@@ -8,7 +8,25 @@ namespace Meceqs.TypedHandling
     public static class SendBuilderExtensions
     {
         /// <summary>
-        /// States the the message to be sent "follows from" a previous message.
+        /// States that the message to be sent is a "child of" a parent message.
+        /// This will correlate the messages and reuse properties from the orginal filter context
+        /// (e.g. service provider, user, cancellation token).
+        /// </summary>
+        public static ISendBuilder ChildOf(this ISendBuilder builder, HandleContext context)
+        {
+            Check.NotNull(builder, nameof(builder));
+            Check.NotNull(context, nameof(context));
+
+            builder.CorrelateWith(context.Envelope);
+
+            builder.SetCancellationToken(context.FilterContext.Cancellation);
+            builder.SetUser(context.FilterContext.User);
+
+            return builder.Instance;
+        }
+
+        /// <summary>
+        /// States that the message to be sent "follows from" a previous message.
         /// This will correlate the messages and reuse properties from the orginal filter context
         /// (e.g. service provider, user, cancellation token).
         /// </summary>
