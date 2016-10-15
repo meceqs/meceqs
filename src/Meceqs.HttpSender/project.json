@@ -1,12 +1,12 @@
 {
-  "version": "0.2.3-*",
+  "version": "0.3.0-*",
 
   "buildOptions": {
     "warningsAsErrors": true
   },
 
   "dependencies": {
-    "Meceqs": "0.2.3-*",
+    "Meceqs": "0.3.0-*",
 
     "Microsoft.Extensions.Options.ConfigurationExtensions": "1.0.0"
   },

@@ -1,12 +1,12 @@
 {
-  "version": "0.2.3-*",
+  "version": "0.3.0-*",
 
   "buildOptions": {
     "warningsAsErrors": true
   },
 
   "dependencies": {
-    "Meceqs": "0.2.3-*",
+    "Meceqs": "0.3.0-*",
 
     "Newtonsoft.Json": "9.0.1"
   },

@@ -1,12 +1,12 @@
 {
-  "version": "0.2.3-*",
+  "version": "0.3.0-*",
 
   "buildOptions": {
     "warningsAsErrors": true
   },
 
   "dependencies": {
-    "Meceqs.AzureEventHubs": "0.2.3-*",
+    "Meceqs.AzureEventHubs": "0.3.0-*",
     "Newtonsoft.Json": "9.0.1"
   },
 

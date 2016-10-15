@@ -6,7 +6,7 @@
   "testRunner": "xunit",
 
   "dependencies": {
-    "Meceqs": "0.2.3-*",
+    "Meceqs": "0.3.0-*",
 
     "Microsoft.Extensions.DependencyInjection": "1.0.0",
     "Microsoft.Extensions.Logging": "1.0.0",

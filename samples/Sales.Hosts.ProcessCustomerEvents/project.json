@@ -10,10 +10,10 @@
 
     "Customers.Contracts": "1.0.0-*",
 
-    "Meceqs": "0.2.3-*",
-    "Meceqs.Serialization.Json": "0.2.3-*",
-    "Meceqs.AzureEventHubs": "0.2.3-*",
-    "Meceqs.AzureEventHubs.FileFake": "0.2.3-*",
+    "Meceqs": "0.3.0-*",
+    "Meceqs.Serialization.Json": "0.3.0-*",
+    "Meceqs.AzureEventHubs": "0.3.0-*",
+    "Meceqs.AzureEventHubs.FileFake": "0.3.0-*",
 
     "Microsoft.Extensions.DependencyInjection": "1.0.0",
     "Microsoft.Extensions.Logging": "1.0.0",
