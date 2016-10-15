@@ -45,7 +45,7 @@ namespace Meceqs.AzureEventHubs.Internal
 
             Stream serializedEnvelope = eventData.GetBodyStream();
 
-            return _deserializer.DeserializeEnvelopeFromStream(contentType, serializedEnvelope, messageType);
+            return _deserializer.DeserializeEnvelope(contentType, serializedEnvelope, messageType);
         }
     }
 }
