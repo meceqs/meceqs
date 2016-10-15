@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
-using Meceqs.Receiving;
 using Meceqs.Pipeline;
+using Meceqs.Receiving;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 using Xunit;

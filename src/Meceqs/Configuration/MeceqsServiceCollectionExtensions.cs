@@ -1,7 +1,7 @@
 using Meceqs;
 using Meceqs.Configuration;
-using Meceqs.Receiving;
 using Meceqs.Pipeline;
+using Meceqs.Receiving;
 using Meceqs.Sending;
 using Meceqs.Serialization;
 using Meceqs.TypedHandling.Internal;

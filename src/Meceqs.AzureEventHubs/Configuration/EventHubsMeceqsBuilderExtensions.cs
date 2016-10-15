@@ -1,8 +1,8 @@
 using System;
 using Meceqs;
 using Meceqs.AzureEventHubs.Configuration;
-using Meceqs.AzureEventHubs.Receiving;
 using Meceqs.AzureEventHubs.Internal;
+using Meceqs.AzureEventHubs.Receiving;
 using Meceqs.AzureEventHubs.Sending;
 using Meceqs.Configuration;
 using Microsoft.Extensions.Configuration;
