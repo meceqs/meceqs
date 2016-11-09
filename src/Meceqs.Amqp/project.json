@@ -6,7 +6,7 @@
   },
 
   "dependencies": {
-    "Meceqs": "0.2.3-*",
+    "Meceqs": "0.3.0-*",
 
     "AMQPNetLite": "1.2.1",
     "Microsoft.Extensions.Options.ConfigurationExtensions": "1.0.0"
