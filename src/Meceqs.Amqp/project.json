@@ -1,5 +1,5 @@
 {
-  "version": "0.2.3-*",
+  "version": "0.3.0-*",
 
   "buildOptions": {
     "warningsAsErrors": true
@@ -8,18 +8,18 @@
   "dependencies": {
     "Meceqs": "0.3.0-*",
 
-    "AMQPNetLite": "1.2.1",
-    "Microsoft.Extensions.Options.ConfigurationExtensions": "1.0.0"
+    "AMQPNetLite": "1.2.2",
+    "Microsoft.Extensions.Options.ConfigurationExtensions": "1.1.0"
   },
 
   "frameworks": {
     "netstandard1.3": {
       "dependencies": {
-        "System.Collections.NonGeneric": "4.0.1",
-        "System.Diagnostics.Tools": "4.0.1",
-        "System.Threading.Timer": "4.0.1",
-        "System.Reflection.Emit.Lightweight": "4.0.1",
-        "System.Runtime.Serialization.Primitives": "4.1.1"
+        "System.Collections.NonGeneric": "4.3.0",
+        "System.Diagnostics.Tools": "4.3.0",
+        "System.Threading.Timer": "4.3.0",
+        "System.Reflection.Emit.Lightweight": "4.3.0",
+        "System.Runtime.Serialization.Primitives": "4.3.0"
       }
     }
   }

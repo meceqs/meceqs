@@ -8,9 +8,9 @@
   "dependencies": {
     "Meceqs": "0.3.0-*",
 
-    "Microsoft.AspNetCore.Http": "1.0.0",
-    "Microsoft.AspNetCore.Http.Extensions": "1.0.0",
-    "Microsoft.Extensions.Options.ConfigurationExtensions": "1.0.0"
+    "Microsoft.AspNetCore.Http": "1.1.0",
+    "Microsoft.AspNetCore.Http.Extensions": "1.1.0",
+    "Microsoft.Extensions.Options.ConfigurationExtensions": "1.1.0"
   },
 
   "frameworks": {
@@ -21,7 +21,7 @@
     },
     "netstandard1.5": {
         "dependencies": {
-            "System.Runtime.Extensions": "4.1.0"
+            "System.Runtime.Extensions": "4.3.0"
         }
     }
   }

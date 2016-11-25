@@ -8,8 +8,8 @@
   "frameworks": {
     "netstandard1.0": {
       "dependencies": {
-        "System.Collections": "4.0.11",
-        "System.Runtime": "4.1.0"
+        "System.Collections": "4.3.0",
+        "System.Runtime": "4.3.0"
       }
     }
   }

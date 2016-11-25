@@ -18,9 +18,9 @@
     "Meceqs.HttpSender": "0.3.0-*",
     "Meceqs.Serialization.Json": "0.3.0-*",
 
-    "Microsoft.Extensions.DependencyInjection": "1.0.0",
-    "Microsoft.Extensions.Logging": "1.0.0",
-    "Microsoft.Extensions.Logging.Console": "1.0.0"
+    "Microsoft.Extensions.DependencyInjection": "1.1.0",
+    "Microsoft.Extensions.Logging": "1.1.0",
+    "Microsoft.Extensions.Logging.Console": "1.1.0"
   },
 
   "frameworks": {

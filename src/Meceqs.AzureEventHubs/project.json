@@ -8,8 +8,8 @@
   "dependencies": {
     "Meceqs": "0.3.0-*",
 
-    "Microsoft.Extensions.Options.ConfigurationExtensions": "1.0.0",
-    "WindowsAzure.ServiceBus": "3.0.1"
+    "Microsoft.Extensions.Options.ConfigurationExtensions": "1.1.0",
+    "WindowsAzure.ServiceBus": "3.4.2"
   },
 
   "frameworks": {
