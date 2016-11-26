@@ -13,10 +13,10 @@ namespace Meceqs.Tests.Pipeline
     {
         private class CallbackMiddleware
         {
-            private readonly MessageDelegate _next;
+            private readonly MiddlewareDelegate _next;
             private readonly Action _callback;
 
-            public CallbackMiddleware(MessageDelegate next, Action callback)
+            public CallbackMiddleware(MiddlewareDelegate next, Action callback)
             {
                 _next = next;
                 _callback = callback;
@@ -33,7 +33,7 @@ namespace Meceqs.Tests.Pipeline
         {
             private readonly Action _callback;
 
-            public TerminatingCallbackMiddleware(MessageDelegate next, Action callback)
+            public TerminatingCallbackMiddleware(MiddlewareDelegate next, Action callback)
             {
                 _callback = callback;
             }

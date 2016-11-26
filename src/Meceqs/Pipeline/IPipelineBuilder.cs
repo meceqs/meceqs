@@ -16,7 +16,7 @@ namespace Meceqs.Pipeline
         /// <summary>
         /// Adds the given middleware delegate to the pipeline.
         /// </summary>
-        IPipelineBuilder Use(Func<MessageDelegate, MessageDelegate> middleware);
+        IPipelineBuilder Use(Func<MiddlewareDelegate, MiddlewareDelegate> middleware);
 
         /// <summary>
         /// Creates an executable pipeline with all configured middleware components.

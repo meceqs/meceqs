@@ -61,7 +61,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 var instance = ActivatorUtilities.CreateInstance(builder.ApplicationServices, middleware, ctorArgs);
                 if (parameters.Length == 1)
                 {
-                    return (MessageDelegate)methodinfo.CreateDelegate(typeof(MessageDelegate), instance);
+                    return (MiddlewareDelegate)methodinfo.CreateDelegate(typeof(MiddlewareDelegate), instance);
                 }
 
                 var factory = Compile<object>(methodinfo, parameters);

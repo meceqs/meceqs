@@ -8,7 +8,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <summary>
         /// Adds a terminal middleware to the pipeline.
         /// </summary>
-        public static void Run(this IPipelineBuilder builder, MessageDelegate middleware)
+        public static void Run(this IPipelineBuilder builder, MiddlewareDelegate middleware)
         {
             Check.NotNull(builder, nameof(builder));
             Check.NotNull(middleware, nameof(middleware));

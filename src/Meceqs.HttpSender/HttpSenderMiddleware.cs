@@ -21,7 +21,7 @@ namespace Meceqs.HttpSender
         private readonly Dictionary<Type, Tuple<string, EndpointMessage>> _messageMapping;
 
         public HttpSenderMiddleware(
-            MessageDelegate next,
+            MiddlewareDelegate next,
             IOptions<HttpSenderOptions> options,
             IServiceProvider serviceProvider,
             IHttpClientProvider httpClientProvider,

@@ -7,10 +7,10 @@ namespace Meceqs.Tests
 {
     public class CallbackMiddleware
     {
-        private readonly MessageDelegate _next;
+        private readonly MiddlewareDelegate _next;
         private readonly Action<MessageContext> _callback;
 
-        public CallbackMiddleware(MessageDelegate next, Action<MessageContext> callback)
+        public CallbackMiddleware(MiddlewareDelegate next, Action<MessageContext> callback)
         {
             _next = next;
             _callback = callback;

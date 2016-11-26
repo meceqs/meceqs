@@ -13,7 +13,7 @@ namespace Meceqs.AzureServiceBus.Sending
         private readonly IServiceBusMessageSender _sender;
 
         public ServiceBusSenderMiddleware(
-            MessageDelegate next,
+            MiddlewareDelegate next,
             IOptions<ServiceBusSenderOptions> options,
             IServiceBusMessageSenderFactory senderFactory)
         {

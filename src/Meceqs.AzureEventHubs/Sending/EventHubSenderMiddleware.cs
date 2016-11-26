@@ -15,7 +15,7 @@ namespace Meceqs.AzureEventHubs.Sending
         private readonly IEventHubClient _eventHubClient;
 
         public EventHubSenderMiddleware(
-            MessageDelegate next,
+            MiddlewareDelegate next,
             IOptions<EventHubSenderOptions> options,
             ILoggerFactory loggerFactory,
             IEventHubClientFactory eventHubClientFactory)

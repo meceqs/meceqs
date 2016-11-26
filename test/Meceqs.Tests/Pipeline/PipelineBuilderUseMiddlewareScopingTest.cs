@@ -14,10 +14,10 @@ namespace Meceqs.Tests.Pipeline
     {
         private class MiddlewareWithServices
         {
-            private readonly MessageDelegate _next;
+            private readonly MiddlewareDelegate _next;
             private readonly IMiddlewareCtorService _ctorService;
 
-            public MiddlewareWithServices(MessageDelegate next, bool isTerminating, IMiddlewareCtorService ctorService)
+            public MiddlewareWithServices(MiddlewareDelegate next, bool isTerminating, IMiddlewareCtorService ctorService)
             {
                 _ctorService = ctorService;
                 if (!isTerminating)

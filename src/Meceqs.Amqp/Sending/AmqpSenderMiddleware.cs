@@ -14,7 +14,7 @@ namespace Meceqs.Amqp.Sending
         private readonly IAmqpMessageConverter _messageConverter;
 
         public AmqpSenderMiddleware(
-            MessageDelegate next,
+            MiddlewareDelegate next,
             IOptions<AmqpSenderOptions> options,
             ISenderLinkFactory senderLinkFactory,
             IAmqpMessageConverter messageConverter)

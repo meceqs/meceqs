@@ -259,7 +259,7 @@ By specifying the envelope as an action parameter, MVC will automatically handle
 Once a pipeline is invoked, the message context will be passed from middleware to middleware.
 
 *Middleware components* are very similar to [ASP.NET Core middleware](https://docs.asp.net/en/latest/fundamentals/middleware.html).
-It's a simple class that takes a `MessageDelegate next` constructor parameter representing the next middleware and that
+It's a simple class that takes a `MiddlewareDelegate next` constructor parameter representing the next middleware and that
 has a `public Task Invoke(MessageContext context)` method. You have to call `_next(context)` in this method to invoke
 the next middleware. This means, you can also use `using` and `try..catch` blocks around this call.
 
@@ -272,12 +272,12 @@ A simple exception logging middleware would be implemented as below:
 ```csharp
 public class ExceptionLoggerMiddleware
 {
-    private readonly MessageDelegate _next;
+    private readonly MiddlewareDelegate _next;
     private readonly ILogger _logger;
 
     // Middleware are singleton objects. Services injected into the constructor
     // are resolved just once from the root service provider.
-    public ExceptionLoggerMiddleware(MessageDelegate next, ILoggerFactory loggerFactory)
+    public ExceptionLoggerMiddleware(MiddlewareDelegate next, ILoggerFactory loggerFactory)
     {
         _next = next;
         _logger = loggerFactory.CreateLogger<ExceptionLoggerMiddleware>();

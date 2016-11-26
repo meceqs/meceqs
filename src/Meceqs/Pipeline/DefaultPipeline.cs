@@ -6,14 +6,14 @@ namespace Meceqs.Pipeline
 {
     public class DefaultPipeline : IPipeline
     {
-        private readonly MessageDelegate _pipeline;
+        private readonly MiddlewareDelegate _pipeline;
         private readonly ILogger _logger;
         private readonly IMessageContextEnricher _messageContextEnricher;
 
         public string Name { get; }
 
         public DefaultPipeline(
-            MessageDelegate pipeline,
+            MiddlewareDelegate pipeline,
             string pipelineName,
             ILoggerFactory loggerFactory,
             IMessageContextEnricher messageContextEnricher)

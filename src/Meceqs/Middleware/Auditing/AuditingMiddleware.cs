@@ -8,10 +8,10 @@ namespace Meceqs.Middleware.Auditing
 {
     public class AuditingMiddleware
     {
-        private readonly MessageDelegate _next;
+        private readonly MiddlewareDelegate _next;
         private readonly AuditingOptions _options;
 
-        public AuditingMiddleware(MessageDelegate next, AuditingOptions options)
+        public AuditingMiddleware(MiddlewareDelegate next, AuditingOptions options)
         {
             Check.NotNull(next, nameof(next));
             Check.NotNull(options, nameof(options));

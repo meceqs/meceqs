@@ -7,7 +7,7 @@ namespace Meceqs.Pipeline
 {
     public class DefaultPipelineBuilder : IPipelineBuilder
     {
-        private readonly IList<Func<MessageDelegate, MessageDelegate>> _middlewareEntries;
+        private readonly IList<Func<MiddlewareDelegate, MiddlewareDelegate>> _middlewareEntries;
         private readonly ILoggerFactory _loggerFactory;
         private readonly IMessageContextEnricher _messageContextEnricher;
 
@@ -21,14 +21,14 @@ namespace Meceqs.Pipeline
             Check.NotNull(serviceProvider, nameof(serviceProvider));
             Check.NotNull(loggerFactory, nameof(loggerFactory));
 
-            _middlewareEntries = new List<Func<MessageDelegate, MessageDelegate>>();
+            _middlewareEntries = new List<Func<MiddlewareDelegate, MiddlewareDelegate>>();
 
             ApplicationServices = serviceProvider;
             _loggerFactory = loggerFactory;
             _messageContextEnricher = messageContextEnricher;
         }
 
-        public IPipelineBuilder Use(Func<MessageDelegate, MessageDelegate> middleware)
+        public IPipelineBuilder Use(Func<MiddlewareDelegate, MiddlewareDelegate> middleware)
         {
             _middlewareEntries.Add(middleware);
             return this;
@@ -38,7 +38,7 @@ namespace Meceqs.Pipeline
         {
             Check.NotNullOrWhiteSpace(pipelineName, nameof(pipelineName));
 
-            MessageDelegate pipeline = context =>
+            MiddlewareDelegate pipeline = context =>
             {
                 // This middleware will be executed last!
                 throw new InvalidOperationException("The message has not been handled by a terminating middleware");

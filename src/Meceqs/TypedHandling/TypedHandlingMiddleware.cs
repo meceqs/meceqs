@@ -21,7 +21,7 @@ namespace Meceqs.TypedHandling
         private readonly Dictionary<HandleDefinition, IHandlerMetadata> _handlerMapping;
 
         public TypedHandlingMiddleware(
-            MessageDelegate next,
+            MiddlewareDelegate next,
             TypedHandlingOptions options,
             IHandleContextFactory handleContextFactory,
             IHandleMethodResolver handleMethodResolver,
