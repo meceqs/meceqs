@@ -7,6 +7,7 @@
 
     "Meceqs": "0.4.0-*",
     "Meceqs.AspNetCore": "0.4.0-*",
+    "Meceqs.AspNetCore.Swagger": "0.4.0-*",
     "Meceqs.Serialization.Json": "0.4.0-*",
     "Meceqs.AzureEventHubs": "0.4.0-*",
     "Meceqs.AzureEventHubs.FileFake": "0.4.0-*",

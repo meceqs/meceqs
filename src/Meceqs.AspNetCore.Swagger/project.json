@@ -1,0 +1,22 @@
+{
+  "version": "0.4.0-*",
+
+  "buildOptions": {
+    "warningsAsErrors": true
+  },
+
+  "dependencies": {
+    "Meceqs.AspNetCore": "0.4.0-*",
+
+    "Microsoft.AspNetCore.Hosting.Abstractions": "1.1.0",
+    "NSwag.CodeGeneration": "7.7.6173.30628",
+    "NSwag.Core": "7.7.6173.30627"
+  },
+
+  "frameworks": {
+    "net46": {
+    },
+    "netstandard1.5": {
+    }
+  }
+}
