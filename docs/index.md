@@ -3,8 +3,8 @@
 Meceqs is a modular messaging framework that can be used for in-process and out-of-process messaging.
 
 Your __messages__ will be wrapped in __envelopes__ that contain headers and useful diagnostics/tracing data.
-The envelopes are sent to __pipelines__ which consist of pluggable __filters__.
-It's easy to write your own __filters__ that either enrich/modify your envelopes or send them to any target you like
+The envelopes are sent to __pipelines__ which consist of pluggable __middleware components__.
+It's easy to write your own __middleware__ that either enriches/modifies your envelopes or sends them to any target you like
 (e.g. a HTTP endpoint, a message broker, a database, ...).
 
 Meceqs targets [.NET Standard 1.3](https://docs.microsoft.com/en-us/dotnet/articles/standard/library) so it can be used

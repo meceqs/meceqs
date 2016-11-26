@@ -7,18 +7,18 @@ The following concepts build the foundation of Meceqs:
 * __Envelope:__
     Every *message* is wrapped in an *envelope* that holds potential message headers and important metadata for correlation, de-duplication, diagnostics, serialization.
 * __Pipeline:__
-    *Envelopes* are sent to a *pipeline*. A pipeline consists of one or many *filters* that can modify or process the *envelope*.
+    *Envelopes* are sent to a *pipeline*. A pipeline consists of one or many *middleware components* that can modify or process the *envelope*.
     An application can have multiple pipelines (e.g. for doing HTTP calls, for sending messages to a message broker or for receiving messages from a broker).
-* __Filter:__
-    A *filter* is one processing unit in a *pipeline*. Filters are similar to "middleware" in ASP.NET Core.
-    A filter can have an intermediary role (e.g. log/modify/enrich the *envelope*) and call into the next *filter* or
+* __Middleware:__
+    A *middleware* is one processing unit in a *pipeline*. They are the same concept as "middleware" in ASP.NET Core.
+    A middleware can have an intermediary role (e.g. log/modify/enrich the *envelope*) and call into the next *middleware* or
     it can process the envelope (e.g. send it to an external messaging system) and terminate the pipeline.
-* __FilterContext:__
-    A context object that is passed from filter to filter. It holds the envelope and additional data like cancellation tokens,
+* __MessageContext:__
+    A context object that is passed from middleware to middleware. It holds the envelope and additional data like cancellation tokens,
     the current user etc. This is similar to the `HttpContext` type from ASP.NET Core.
 * __Result objects:__
     For synchronous request/response messaging, the pipeline can be invoked with an expected result type
-    and any *filter* can set the `FilterContext.Result` property to return the result object to the caller.
+    and any *middleware* can set the `MessageContext.Result` property to return the result object to the caller.
     This is similar to the `HttpContext.Response` feature in ASP.NET Core.
 
 ## Messages
@@ -107,22 +107,23 @@ Envelopes contain metadata about the message. This json serialized object shows 
 }
 ```
 
-### FilterContext
+### MessageContext
 
-Filters in a pipeline may need to forward data to other filters, access the current user, resolve services from the DI container, etc.
-To make sure this is possible and extensible, a `FilterContext` will be passed from filter to filter. This object contains your envelope
-and many additional properties.
+Middleware components in a pipeline may need to forward data to other middleware, access the current user,
+resolve services from the DI container, etc.
+To make sure this is possible and extensible, a `MessageContext` will be passed from middleware to middleware.
+This object contains your envelope and many additional properties.
 
 ```csharp
-FilterContext filterContext = new FilterContext<CreateCustomerCommand>(envelope);
+MessageContext messageContext = new MessageContext<CreateCustomerCommand>(envelope);
 
 // These values will usually come from your framework (e.g. from HttpContext in ASP.NET Core).
-filterContext.Cancellation = _cancellationToken;
-filterContext.RequestServices = _serviceProvider;
-filterContext.User = _user;
+messageContext.Cancellation = _cancellationToken;
+messageContext.RequestServices = _serviceProvider;
+messageContext.User = _user;
 
-// A filter might execute some logic based on this. This will not be stored in the envelope.
-filterContext.Items.Set("someFlag", true);
+// A middleware might execute some logic based on this. This will not be stored in the envelope.
+messageContext.Items.Set("someFlag", true);
 ```
 
 ### Invoking a pipeline
@@ -138,15 +139,15 @@ IPipelineProvider pipelineProvider;
 IPipeline pipeline = pipelineProvider.GetPipeline("Send");
 
 // This will invoke the pipeline for your message.
-await pipeline.ProcessAsync(filterContext);
+await pipeline.ProcessAsync(messageContext);
 ```
 
 It's important to understand that invoking a pipeline is a simple in-process method call that
 uses `Task` and `async/await` to minimize blocking.
 Invoking a pipeline does not start a thread and also doesn't use a queuing system. A pipeline is just
-a list of filter objects that are invoked sequentially.
+a list of middleware components that are invoked sequentially.
 
-Filters are described shortly, but first you need to see the easy way for invoking a pipeline!
+Middleware components are described shortly, but first you need to see the easy way for invoking a pipeline!
 
 ## Invoking a pipeline - the short and easy way
 
@@ -159,7 +160,7 @@ Typically, a pipeline is used for one of two scenarios:
 * __Sending messages:__
     Whenever you *create a new message* in your application, you want to *send* it away.
     This typically happens when your application is a mobile client, a web frontend, etc.
-    In this case, the last filter in the pipeline might do one of the following things:
+    In this case, the last middleware in the pipeline might do one of the following things:
     * Create a synchronous HTTP call for commands/queries
     * Send commands/events to a message broker (e.g. Azure Service Bus, RabbitMQ)
     * Save events in a database/event store (e.g. SQL, GetEventStore, Azure Event Hubs, Apache Kafka)
@@ -168,19 +169,19 @@ Typically, a pipeline is used for one of two scenarios:
 * __Receiving messages:__
     Whenever your application *receives an existing envelope* from somewhere, you want to *receive* it.
     This typically happens when your application is a Web API, a worker process for incoming messages from a broker, etc.
-    In this case, the last filter in the pipeline usually does one of the following things:
+    In this case, the last middleware in the pipeline usually does one of the following things:
     * Execute business logic for an incoming command/query/event (and maybe return a result)
     * Create additional messages (by using the same mechanism as in the previously mentioned **Sending messages**)
     * Store/forward the envelope
     * ...
 
-Both scenarios require pipelines with different filters and many applications need both scenarios
+Both scenarios require pipelines with different middleware components and many applications need both scenarios
 so there must be an easy way to know which pipeline should be invoked.
-Doing so manually (as in the previous chapter) would require you to create the `FilterContext` yourself
+Doing so manually (as in the previous chapter) would require you to create the `MessageContext` yourself
 and to specify the name of the pipeline for each call.
 
 To make this easier and obvious, Meceqs includes two interfaces for *sending* and *receiving* messages
-that automatically create the filter context and invoke the proper pipeline:
+that automatically create the message context and invoke the proper pipeline:
 
 ### Meceqs.Sending.IMessageSender
 The interface `Meceqs.Sending.IMessageSender` is used for __sending a new message__ or
@@ -205,7 +206,7 @@ CreateCustomerResult result = await _messageSender.SendAsync<CreateCustomerResul
 Debug.WriteLine("CustomerId: " + result.CustomerId);
 ```
 
-If you need to set headers on the envelope or some medata on the filter context,
+If you need to set headers on the envelope or some medata on the message context,
 you can use `ForMessage()` which returns a convenient builder object:
 
 ```csharp
@@ -234,7 +235,7 @@ await _messageReceiver.ForEnvelope(existingEnvelope)
     .ReceiveAsync();
 ```
 
-In typical asynchronous cases (like processing messages from a queue, ...) a message receiver does not return a result.
+In typical asynchronous scenarios (like processing messages from a queue, ...) a message receiver does not return a result.
 However, if the message receiver is part of a synchronous conversation (like a HTTP call) it's very common
 that the receiver has to return a result to the caller - especially in case of query requests.
 For this reason, `IMessageReceiver` also offers a `ReceiveAsync<TResult>()` method.
@@ -253,38 +254,38 @@ public Task<CreateCustomerResult> CreateCustomer([FromBody] Envelope<CreateCusto
 This example also shows how easy it is to integrate Meceqs into an ASP.NET Core MVC application.
 By specifying the envelope as an action parameter, MVC will automatically handle the deserialization.
 
-## Writing a filter
+## Writing a middleware
 
-Once a pipeline is invoked, the filter context will be passed from filter to filter.
+Once a pipeline is invoked, the message context will be passed from middleware to middleware.
 
-*Filters* are very similar to [ASP.NET Core middleware](https://docs.asp.net/en/latest/fundamentals/middleware.html).
-It's a simple class that takes a `FilterDelegate next` constructor parameter representing the next filter and that
-has a `public Task Invoke(FilterContext context)` method. You have to call `_next(context)` in this method to invoke
-the next filter. This means, you can also use `using` and `try..catch` blocks around this call.
+*Middleware components* are very similar to [ASP.NET Core middleware](https://docs.asp.net/en/latest/fundamentals/middleware.html).
+It's a simple class that takes a `MessageDelegate next` constructor parameter representing the next middleware and that
+has a `public Task Invoke(MessageContext context)` method. You have to call `_next(context)` in this method to invoke
+the next middleware. This means, you can also use `using` and `try..catch` blocks around this call.
 
-Filters support dependency injection on their constructor and on the `Invoke` method. It's important to understand
-that __filters are singleton objects__, this means constructor parameters are resolved just once from the root service provider
+Middleware components support dependency injection on their constructor and on the `Invoke` method. It's important to understand
+that __middleware components are singleton objects__, this means constructor parameters are resolved just once from the root service provider
 whereas additional parameters on the `Invoke`-method are resolved for every message.
 
-A simple exception logging filter would be implemented as below:
+A simple exception logging middleware would be implemented as below:
 
 ```csharp
-public class ExceptionLoggerFilter
+public class ExceptionLoggerMiddleware
 {
-    private readonly FilterDelegate _next;
+    private readonly MessageDelegate _next;
     private readonly ILogger _logger;
 
-    // Filters are singleton objects. Services injected into the constructor
+    // Middleware are singleton objects. Services injected into the constructor
     // are resolved just once from the root service provider.
-    public ExceptionLoggerFilter(FilterDelegate next, ILoggerFactory loggerFactory)
+    public ExceptionLoggerMiddleware(MessageDelegate next, ILoggerFactory loggerFactory)
     {
         _next = next;
-        _logger = loggerFactory.CreateLogger<ExceptionLoggerFilter>();
+        _logger = loggerFactory.CreateLogger<ExceptionLoggerMiddleware>();
     }
 
     // You can add additional parameters to this method to resolve services from
     // the scoped service provider.
-    public async Task Invoke(FilterContext context)
+    public async Task Invoke(MessageContext context)
     {
         try
         {
@@ -299,11 +300,11 @@ public class ExceptionLoggerFilter
 }
 ```
 
-## Terminal filters
+## Terminal middleware
 
-At the end of every pipeline there must be a terminal filter that doesn't call into a next filter.
-This filter will process the message in a way that is useful for your scenario. In case of a sender pipeline,
-the filter might send the message to Azure Service Bus. In case of a receiver pipeline, the filter might use
-our [Typed Handling Filter](typed-handling.md) to invoke a service in your business layer.
+At the end of every pipeline there must be a terminal middleware that doesn't call into a next middleware.
+This middleware will process the message in a way that is useful for your scenario. In case of a sender pipeline,
+the middleware might send the message to Azure Service Bus. In case of a receiver pipeline, the middleware might use
+our [Typed Handling Middleware](typed-handling.md) to invoke a service in your business layer.
 
-Meceqs includes filters for typed in-process handling and also for different transports.
+Meceqs includes middleware for typed in-process handling and also for different transports.

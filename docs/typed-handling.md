@@ -1,18 +1,18 @@
-# Typed Handling Filter
+# Typed Handling Middleware
 
 Meceqs can be used to do simple in-process dispatching to strongly typed handlers
 that is similar to Jimmy Bogard's [MediatR](https://github.com/jbogard/MediatR) library.
 His library has been a great inspiration for us and we would like to thank him and his contributors for creating it!
 
-Our typed handling filter has the following features:
+Our typed handling middleware has the following features:
 * `IHandles<TMessage>` interface for handlers that don't return results.
 * `IHandles<TMessage, TResult>` interface for handlers that return results.
-* `HandleContext` object that contains metadata (envelope, filter context, handler reflection data).
+* `HandleContext` object that contains metadata (envelope, message context, handler reflection data).
 * `IHandleInterceptor` interface for creating interceptors that can read attributes from the handler method/class.
 * Handlers and interceptors can be configured separately for every pipeline.
 * Handlers and interceptors are resolved transiently by default but you can also use your own lifecycles by
     adding them to the DI framework.
-* The filter can either ignore messages without a handler or throw an exception.
+* The middleware can either ignore messages without a handler or throw an exception.
 
 Note that it currently does *not* support the following things:
 * Dispatching one message to multiple handlers
@@ -79,7 +79,7 @@ public class CustomerCommandHandler :
 
 ## Interceptors
 
-In contrast to regular filters, interceptors have access to the `HandleContext`. Since this context contains metadata
+In contrast to regular middleware, interceptors have access to the `HandleContext`. Since this context contains metadata
 about the handle method and class, interceptors can read custom attributes from the method/class to implement attribute-based
 aspect oriented programming concepts like authorization, transaction handling etc.
 
@@ -126,18 +126,18 @@ public class SampleHandleInterceptor : IHandleInterceptor
 
 ## Configuration
 
-You can add the typed handling filter to any pipeline by calling the following code in your configuration code:
+You can add the typed handling middleware to any pipeline by calling the following code in your configuration code:
 
 ```csharp
 services.AddMeceqs()
     .AddPipeline("my-pipeline", pipeline =>
     {
-        //pipeline.UseYourCustomFilter();
+        //pipeline.UseYourCustomMiddleware();
 
-        // This must be the last filter in the pipeline because it is terminal.
+        // This must be the last middleware in the pipeline because it is terminal.
         pipeline.RunTypedHandling(options =>
         {
-            // This will tell the filter to add all handlers from the assembly of the given type.
+            // This will tell the middleware to add all handlers from the assembly of the given type.
             options.Handlers.AddFromAssembly<CustomerCommandHandler>();
 
             // This would add only the given handler.
@@ -151,11 +151,11 @@ services.AddMeceqs()
             // This interceptor will use the lifecycle from the DI framework.
             options.Interceptors.AddService<SingletonHandleInterceptor>();
 
-            // This will tell the filter to throw if there's no handler for a message.
+            // This will tell the middleware to throw if there's no handler for a message.
             // (this is the default behavior)
             options.ThrowOnUnknownMessage();
 
-            // This would tell the filter to ignore messages without a handler.
+            // This would tell the middleware to ignore messages without a handler.
             //options.SkipUnknownMessages();
         });
     });
