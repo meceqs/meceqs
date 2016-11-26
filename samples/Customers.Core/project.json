@@ -8,7 +8,7 @@
   "dependencies": {
     "Customers.Contracts": "1.0.0-*",
 
-    "Meceqs.Abstractions": "0.3.0-*",
+    "Meceqs.Abstractions": "0.4.0-*",
 
     "Microsoft.Extensions.Logging.Abstractions": "1.1.0",
     "Newtonsoft.Json": "9.0.1"
