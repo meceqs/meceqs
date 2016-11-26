@@ -6,7 +6,7 @@ namespace Microsoft.Extensions.Logging
     {
         // TODO @cweiss static func's etc.
 
-        public static void ExecutingPipeline(this ILogger logger, FilterContext context)
+        public static void ExecutingPipeline(this ILogger logger, MessageContext context)
         {
             logger.LogDebug(
                 "Executing {MessageType} on pipeline {Pipeline}",
@@ -14,7 +14,7 @@ namespace Microsoft.Extensions.Logging
                 context.PipelineName);
         }
 
-        public static void SkippingMessage(this ILogger logger, FilterContext context)
+        public static void SkippingMessage(this ILogger logger, MessageContext context)
         {
             logger.LogDebug(
                 "Skipping message of type {MessageType}",

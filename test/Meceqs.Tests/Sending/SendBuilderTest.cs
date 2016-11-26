@@ -12,7 +12,7 @@ namespace Meceqs.Tests.Sending
 {
     public class SendBuilderTest
     {
-        private IServiceProvider GetFilterContextBuilderServiceProvider(
+        private IServiceProvider GetMessageContextBuilderServiceProvider(
             IEnvelopeCorrelator correlator = null,
             IPipeline pipeline = null
         )
@@ -20,7 +20,7 @@ namespace Meceqs.Tests.Sending
             var serviceProvider = Substitute.For<IServiceProvider>();
 
             serviceProvider.GetService(typeof(IEnvelopeFactory)).Returns(new DefaultEnvelopeFactory());
-            serviceProvider.GetService(typeof(IFilterContextFactory)).Returns(new DefaultFilterContextFactory());
+            serviceProvider.GetService(typeof(IMessageContextFactory)).Returns(new DefaultMessageContextFactory());
 
             serviceProvider.GetService(typeof(IEnvelopeCorrelator)).Returns(correlator ?? Substitute.For<IEnvelopeCorrelator>());
 
@@ -38,7 +38,7 @@ namespace Meceqs.Tests.Sending
         {
             envelope = envelope ?? TestObjects.Envelope<TMessage>();
 
-            var serviceProvider = GetFilterContextBuilderServiceProvider(correlator, pipeline);
+            var serviceProvider = GetMessageContextBuilderServiceProvider(correlator, pipeline);
 
             return new SendBuilder(envelope, serviceProvider);
         }
@@ -47,7 +47,7 @@ namespace Meceqs.Tests.Sending
         public void Throws_if_parameters_are_missing()
         {
             // Arrange
-            var serviceProvider = GetFilterContextBuilderServiceProvider();
+            var serviceProvider = GetMessageContextBuilderServiceProvider();
             serviceProvider.GetService(typeof(IEnvelopeCorrelator)).Returns(Substitute.For<IEnvelopeCorrelator>());
 
             // Act & Assert
@@ -102,7 +102,7 @@ namespace Meceqs.Tests.Sending
                 .Do(x => {
                     called++;
 
-                    var ctx = x.Arg<FilterContext>();
+                    var ctx = x.Arg<MessageContext>();
                     ctx.Envelope.Headers["Key"].ShouldBe("Value");
                 });
 
@@ -126,7 +126,7 @@ namespace Meceqs.Tests.Sending
                 .Do(x => {
                     called++;
 
-                    var ctx = x.Arg<FilterContext>();
+                    var ctx = x.Arg<MessageContext>();
                     ctx.Items.Get<string>("Key").ShouldBe("Value");
                 });
 
@@ -153,7 +153,7 @@ namespace Meceqs.Tests.Sending
                 .Do(x => {
                     called++;
 
-                    var ctx = x.Arg<FilterContext>();
+                    var ctx = x.Arg<MessageContext>();
                     ctx.Cancellation.ShouldBe(cancellationSource.Token);
                 });
 
@@ -180,7 +180,7 @@ namespace Meceqs.Tests.Sending
                 .Do(x => {
                     called++;
 
-                    var ctx = x.Arg<FilterContext>();
+                    var ctx = x.Arg<MessageContext>();
                     ctx.Envelope.ShouldBe(envelope);
                 });
 

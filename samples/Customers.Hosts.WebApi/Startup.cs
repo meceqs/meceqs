@@ -82,8 +82,8 @@ namespace Customers.Hosts.WebApi
                         options.Interceptors.AddService<SingletonHandleInterceptor>();
                     });
 
-                    // This adds some custom filters to the pipeline.
-                    // They are executed in this order before the Typed Handling filter is executed.
+                    // This adds a custom middleware to the pipeline.
+                    // They are executed in this order before the Typed Handling middleware is executed.
                     receiver.ConfigurePipeline(pipeline =>
                     {
                         // add user id to message if not present

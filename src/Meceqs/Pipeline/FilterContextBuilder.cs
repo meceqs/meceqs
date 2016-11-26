@@ -7,10 +7,10 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Meceqs.Pipeline
 {
-    public abstract class FilterContextBuilder<TBuilder> : IFilterContextBuilder<TBuilder>
-        where TBuilder : IFilterContextBuilder<TBuilder>
+    public abstract class MessageContextBuilder<TBuilder> : IMessageContextBuilder<TBuilder>
+        where TBuilder : IMessageContextBuilder<TBuilder>
     {
-        private readonly IFilterContextFactory _filterContextFactory;
+        private readonly IMessageContextFactory _messageContextFactory;
         private readonly IPipelineProvider _pipelineProvider;
 
         /// <summary>
@@ -25,7 +25,7 @@ namespace Meceqs.Pipeline
         protected List<Envelope> AdditionalEnvelopes { get; }
 
         protected CancellationToken Cancellation { get; private set; }
-        protected FilterContextItems ContextItems { get; private set; }
+        protected MessageContextItems ContextItems { get; private set; }
         protected string PipelineName { get; private set; }
         protected IServiceProvider RequestServices { get; private set; }
         protected ClaimsPrincipal User { get; private set; }
@@ -35,7 +35,7 @@ namespace Meceqs.Pipeline
         /// </summary>
         public abstract TBuilder Instance { get; }
 
-        protected FilterContextBuilder(string defaultPipelineName, Envelope envelope, IServiceProvider serviceProvider)
+        protected MessageContextBuilder(string defaultPipelineName, Envelope envelope, IServiceProvider serviceProvider)
             : this(defaultPipelineName, serviceProvider)
         {
             Check.NotNull(envelope, nameof(envelope));
@@ -43,7 +43,7 @@ namespace Meceqs.Pipeline
             FirstEnvelope = envelope;
         }
 
-        protected FilterContextBuilder(string defaultPipelineName, IEnumerable<Envelope> envelopes, IServiceProvider serviceProvider)
+        protected MessageContextBuilder(string defaultPipelineName, IEnumerable<Envelope> envelopes, IServiceProvider serviceProvider)
             : this(defaultPipelineName, serviceProvider)
         {
             Check.NotNull(envelopes, nameof(envelopes));
@@ -70,12 +70,12 @@ namespace Meceqs.Pipeline
             }
         }
 
-        private FilterContextBuilder(string defaultPipelineName, IServiceProvider serviceProvider)
+        private MessageContextBuilder(string defaultPipelineName, IServiceProvider serviceProvider)
         {
             Check.NotNullOrWhiteSpace(defaultPipelineName, nameof(defaultPipelineName));
             Check.NotNull(serviceProvider, nameof(serviceProvider));
 
-            _filterContextFactory = serviceProvider.GetRequiredService<IFilterContextFactory>();
+            _messageContextFactory = serviceProvider.GetRequiredService<IMessageContextFactory>();
             _pipelineProvider = serviceProvider.GetRequiredService<IPipelineProvider>();
 
             RequestServices = serviceProvider;
@@ -92,7 +92,7 @@ namespace Meceqs.Pipeline
         {
             if (ContextItems == null)
             {
-                ContextItems = new FilterContextItems();
+                ContextItems = new MessageContextItems();
             }
 
             ContextItems.Set(key, value);
@@ -139,11 +139,11 @@ namespace Meceqs.Pipeline
             return Instance;
         }
 
-        protected virtual FilterContext CreateFilterContext(Envelope envelope, Type resultType)
+        protected virtual MessageContext CreateMessageContext(Envelope envelope, Type resultType)
         {
             Check.NotNull(envelope, nameof(envelope));
 
-            var context = _filterContextFactory.CreateFilterContext(envelope);
+            var context = _messageContextFactory.CreateMessageContext(envelope);
 
             context.Initialize(PipelineName, RequestServices, resultType);
 
@@ -164,16 +164,16 @@ namespace Meceqs.Pipeline
 
             if (FirstEnvelope != null)
             {
-                var filterContext = CreateFilterContext(FirstEnvelope, resultType: null);
-                await pipeline.InvokeAsync(filterContext);
+                var messageContext = CreateMessageContext(FirstEnvelope, resultType: null);
+                await pipeline.InvokeAsync(messageContext);
             }
 
             if (AdditionalEnvelopes != null)
             {
                 foreach (var envelope in AdditionalEnvelopes)
                 {
-                    var filterContext = CreateFilterContext(envelope, resultType: null);
-                    await pipeline.InvokeAsync(filterContext);
+                    var messageContext = CreateMessageContext(envelope, resultType: null);
+                    await pipeline.InvokeAsync(messageContext);
                 }
             }
         }
@@ -184,11 +184,11 @@ namespace Meceqs.Pipeline
 
             var pipeline = _pipelineProvider.GetPipeline(PipelineName);
 
-            var filterContext = CreateFilterContext(FirstEnvelope, typeof(TResult));
+            var messageContext = CreateMessageContext(FirstEnvelope, typeof(TResult));
 
-            await pipeline.InvokeAsync(filterContext);
+            await pipeline.InvokeAsync(messageContext);
 
-            return (TResult)filterContext.Result;
+            return (TResult)messageContext.Result;
         }
 
         protected async Task<object> InvokePipelineAsync(Type resultType)
@@ -197,11 +197,11 @@ namespace Meceqs.Pipeline
 
             var pipeline = _pipelineProvider.GetPipeline(PipelineName);
 
-            var filterContext = CreateFilterContext(FirstEnvelope, resultType);
+            var messageContext = CreateMessageContext(FirstEnvelope, resultType);
 
-            await pipeline.InvokeAsync(filterContext);
+            await pipeline.InvokeAsync(messageContext);
 
-            return filterContext.Result;
+            return messageContext.Result;
         }
 
         private void EnsureExactlyOneEnvelope()

@@ -9,36 +9,36 @@ using Xunit;
 
 namespace Meceqs.Tests.Pipeline
 {
-    public class PipelineBuilderUseFilterTest
+    public class PipelineBuilderUseMiddlewareTest
     {
-        private class CallbackFilter
+        private class CallbackMiddleware
         {
-            private readonly FilterDelegate _next;
+            private readonly MessageDelegate _next;
             private readonly Action _callback;
 
-            public CallbackFilter(FilterDelegate next, Action callback)
+            public CallbackMiddleware(MessageDelegate next, Action callback)
             {
                 _next = next;
                 _callback = callback;
             }
 
-            public Task Invoke(FilterContext context)
+            public Task Invoke(MessageContext context)
             {
                 _callback();
                 return _next(context);
             }
         }
 
-        private class TerminatingCallbackFilter
+        private class TerminatingCallbackMiddleware
         {
             private readonly Action _callback;
 
-            public TerminatingCallbackFilter(FilterDelegate next, Action callback)
+            public TerminatingCallbackMiddleware(MessageDelegate next, Action callback)
             {
                 _callback = callback;
             }
 
-            public Task Invoke(FilterContext context)
+            public Task Invoke(MessageContext context)
             {
                 _callback();
                 return Task.CompletedTask;
@@ -54,14 +54,14 @@ namespace Meceqs.Tests.Pipeline
         }
 
         [Fact]
-        public async Task Calls_terminating_filter()
+        public async Task Calls_terminating_middleware()
         {
-            var context = TestObjects.FilterContext<SimpleMessage>();
+            var context = TestObjects.MessageContext<SimpleMessage>();
             var builder = GetPipelineBuilder();
 
             var called1 = 0;
             Action callback1 = () => called1++;
-            builder.UseFilter<TerminatingCallbackFilter>(callback1);
+            builder.UseMiddleware<TerminatingCallbackMiddleware>(callback1);
 
             var pipeline = builder.Build("pipeline");
 
@@ -71,22 +71,22 @@ namespace Meceqs.Tests.Pipeline
         }
 
         [Fact]
-        public async Task Calls_multiple_filters()
+        public async Task Calls_multiple_middleware_components()
         {
-            var context = TestObjects.FilterContext<SimpleMessage>();
+            var context = TestObjects.MessageContext<SimpleMessage>();
             var builder = GetPipelineBuilder();
 
             var called1 = 0;
             Action callback1 = () => called1++;
-            builder.UseFilter<CallbackFilter>(callback1);
+            builder.UseMiddleware<CallbackMiddleware>(callback1);
 
             var called2 = 0;
             Action callback2 = () => called2++;
-            builder.UseFilter<CallbackFilter>(callback2);
+            builder.UseMiddleware<CallbackMiddleware>(callback2);
 
             var called3 = 0;
             Action callback3 = () => called3++;
-            builder.UseFilter<TerminatingCallbackFilter>(callback3);
+            builder.UseMiddleware<TerminatingCallbackMiddleware>(callback3);
 
             var pipeline = builder.Build("pipeline");
 
@@ -98,18 +98,18 @@ namespace Meceqs.Tests.Pipeline
         }
 
         [Fact]
-        public async Task Doesnt_call_second_terminating_filter()
+        public async Task Doesnt_call_second_terminating_middleware()
         {
-            var context = TestObjects.FilterContext<SimpleMessage>();
+            var context = TestObjects.MessageContext<SimpleMessage>();
             var builder = GetPipelineBuilder();
 
             var called1 = 0;
             Action callback1 = () => called1++;
-            builder.UseFilter<TerminatingCallbackFilter>(callback1);
+            builder.UseMiddleware<TerminatingCallbackMiddleware>(callback1);
 
             var called2 = 0;
             Action callback2 = () => called2++;
-            builder.UseFilter<TerminatingCallbackFilter>(callback2);
+            builder.UseMiddleware<TerminatingCallbackMiddleware>(callback2);
 
             var pipeline = builder.Build("pipeline");
 
@@ -120,18 +120,18 @@ namespace Meceqs.Tests.Pipeline
         }
 
         [Fact]
-        public async Task Doesnt_call_regular_filter_after_terminating_filter()
+        public async Task Doesnt_call_regular_middleware_after_terminating_middleware()
         {
-            var context = TestObjects.FilterContext<SimpleMessage>();
+            var context = TestObjects.MessageContext<SimpleMessage>();
             var builder = GetPipelineBuilder();
 
             var called1 = 0;
             Action callback1 = () => called1++;
-            builder.UseFilter<TerminatingCallbackFilter>(callback1);
+            builder.UseMiddleware<TerminatingCallbackMiddleware>(callback1);
 
             var called2 = 0;
             Action callback2 = () => called2++;
-            builder.UseFilter<CallbackFilter>(callback2);
+            builder.UseMiddleware<CallbackMiddleware>(callback2);
 
             var pipeline = builder.Build("pipeline");
 

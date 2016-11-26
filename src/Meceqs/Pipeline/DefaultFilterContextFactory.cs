@@ -7,19 +7,19 @@ using System.Reflection;
 namespace Meceqs.Pipeline
 {
     /// <summary>
-    /// Creates a typed <see typeref="FilterContext" /> for the given <see typeref="Envelope" />.
+    /// Creates a typed <see typeref="MessageContext" /> for the given <see typeref="Envelope" />.
     /// For better performance, it uses cached delegates to create the instance.
     /// </summary>
-    public class DefaultFilterContextFactory : IFilterContextFactory
+    public class DefaultMessageContextFactory : IMessageContextFactory
     {
-        private readonly ConcurrentDictionary<Type, Func<Envelope, FilterContext>> _cachedConstructorDelegates;
+        private readonly ConcurrentDictionary<Type, Func<Envelope, MessageContext>> _cachedConstructorDelegates;
 
-        public DefaultFilterContextFactory()
+        public DefaultMessageContextFactory()
         {
-            _cachedConstructorDelegates = new ConcurrentDictionary<Type, Func<Envelope, FilterContext>>();
+            _cachedConstructorDelegates = new ConcurrentDictionary<Type, Func<Envelope, MessageContext>>();
         }
 
-        public FilterContext CreateFilterContext(Envelope envelope)
+        public MessageContext CreateMessageContext(Envelope envelope)
         {
             Check.NotNull(envelope, nameof(envelope));
 
@@ -27,20 +27,20 @@ namespace Meceqs.Pipeline
 
             var ctorDelegate = GetOrAddConstructorDelegate(messageType);
 
-            FilterContext filterContext = ctorDelegate(envelope);
+            MessageContext messageContext = ctorDelegate(envelope);
 
-            return filterContext;
+            return messageContext;
         }
 
-        private Func<Envelope, FilterContext> GetOrAddConstructorDelegate(Type messageType)
+        private Func<Envelope, MessageContext> GetOrAddConstructorDelegate(Type messageType)
         {
             var ctorDelegate = _cachedConstructorDelegates.GetOrAdd(messageType, x =>
             {
                 // Resolve types
                 Type typedEnvelopeType = typeof(Envelope<>).MakeGenericType(x);
-                Type typedFilterContextType = typeof(FilterContext<>).MakeGenericType(x);
-                
-                ConstructorInfo constructor = typedFilterContextType.GetTypeInfo().DeclaredConstructors.First();
+                Type typedMessageContextType = typeof(MessageContext<>).MakeGenericType(x);
+
+                ConstructorInfo constructor = typedMessageContextType.GetTypeInfo().DeclaredConstructors.First();
 
                 // Create Expression
 
@@ -49,7 +49,7 @@ namespace Meceqs.Pipeline
                 var castedEnvelopeParam = Expression.Convert(envelopeParam, typedEnvelopeType);
 
                 // Create constructor call
-                var compiledDelegate = Expression.Lambda<Func<Envelope, FilterContext>>(
+                var compiledDelegate = Expression.Lambda<Func<Envelope, MessageContext>>(
                     Expression.New(constructor, castedEnvelopeParam),
                     envelopeParam
                 ).Compile();

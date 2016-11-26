@@ -21,7 +21,7 @@ namespace Microsoft.Extensions.DependencyInjection
             Check.NotNull(builder, nameof(builder));
             Check.NotNull(options, nameof(options));
 
-            builder.UseFilter<TypedHandlingFilter>(options);
+            builder.UseMiddleware<TypedHandlingMiddleware>(options);
         }
     }
 }

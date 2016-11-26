@@ -3,23 +3,23 @@ using System;
 namespace Meceqs.Pipeline
 {
     /// <summary>
-    /// Used for configuring the filters of a pipeline.
+    /// Used for configuring the middleware components of a pipeline.
     /// </summary>
     public interface IPipelineBuilder
     {
         /// <summary>
         /// <para>The root service provider of your application.</para>
-        /// <para>It will be used to do dependency injection on the constructors of your filters.</para>
+        /// <para>It will be used to do dependency injection on the constructors of your middleware components.</para>
         /// </summary>
         IServiceProvider ApplicationServices { get; }
 
         /// <summary>
-        /// Adds the given filter delegate to the pipeline.
+        /// Adds the given middleware delegate to the pipeline.
         /// </summary>
-        IPipelineBuilder Use(Func<FilterDelegate, FilterDelegate> filter);
+        IPipelineBuilder Use(Func<MessageDelegate, MessageDelegate> middleware);
 
         /// <summary>
-        /// Creates a pipeline with all configured filters.
+        /// Creates an executable pipeline with all configured middleware components.
         /// </summary>
         IPipeline Build(string pipelineName);
     }

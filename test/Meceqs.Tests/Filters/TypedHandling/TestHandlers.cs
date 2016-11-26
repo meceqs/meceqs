@@ -2,7 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Meceqs.TypedHandling;
 
-namespace Meceqs.Tests.Filters.TypedHandling
+namespace Meceqs.Tests.Middleware.TypedHandling
 {
     public class SimpleMessageIntHandler : IHandles<SimpleMessage, int>
     {

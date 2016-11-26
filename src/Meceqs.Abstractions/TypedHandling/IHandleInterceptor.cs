@@ -5,7 +5,7 @@ namespace Meceqs.TypedHandling
     /// <summary>
     /// <para>Interceptors are wrapped around the handler. This allows interceptors to execute logic
     /// before or after the handler is executed.</para>
-    /// <para>The main difference between "filters" is, that interceptors have access to the
+    /// <para>The main difference between interceptors and "middleware" is, that interceptors have access to the
     /// actual handler class and "Handle"-method - this allows them to e.g. access custom attributes.</para>
     /// </summary>
     public interface IHandleInterceptor

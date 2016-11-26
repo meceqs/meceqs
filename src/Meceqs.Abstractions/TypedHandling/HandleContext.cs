@@ -8,57 +8,57 @@ namespace Meceqs.TypedHandling
 {
     /// <summary>
     /// Contains the typed envelope and metadata about the current execution.
-    /// Use <see cref="HandleContext.FilterContext"/> to access the
-    /// <see cref="FilterContext"/> of the current execution.
+    /// Use <see cref="HandleContext.MessageContext"/> to access the
+    /// <see cref="MessageContext"/> of the current execution.
     /// </summary>
     public class HandleContext<TMessage> : HandleContext where TMessage : class
     {
         /// <summary>
-        /// Gets the filter context of the current execution.
+        /// Gets the message context of the current execution.
         /// </summary>
-        public new FilterContext<TMessage> FilterContext => (FilterContext<TMessage>)base.FilterContext;
+        public new MessageContext<TMessage> MessageContext => (MessageContext<TMessage>)base.MessageContext;
 
         /// <summary>
         /// Gets the typed envelope for which the pipeline is executed.
-        /// This is a shortcut for <see cref="FilterContext.Envelope"/>.
+        /// This is a shortcut for <see cref="MessageContext.Envelope"/>.
         /// <summary>
-        public new Envelope<TMessage> Envelope => FilterContext.Envelope;
+        public new Envelope<TMessage> Envelope => MessageContext.Envelope;
 
         /// <summary>
         /// Gets the typed message for which the pipeline is executed.
-        /// This is a shortcut for <see cref="FilterContext.Envelope.Message"/>.
+        /// This is a shortcut for <see cref="MessageContext.Envelope.Message"/>.
         /// <summary>
-        public new TMessage Message => FilterContext.Message;
+        public new TMessage Message => MessageContext.Message;
 
-        public HandleContext(FilterContext<TMessage> filterContext)
-            : base(filterContext)
+        public HandleContext(MessageContext<TMessage> messageContext)
+            : base(messageContext)
         {
         }
     }
 
     /// <summary>
     /// Contains the envelope and metadata about the current execution.
-    /// Use <see cref="HandleContext.FilterContext"/> to access the
-    /// <see cref="FilterContext"/> of the current execution.
+    /// Use <see cref="HandleContext.MessageContext"/> to access the
+    /// <see cref="MessageContext"/> of the current execution.
     /// </summary>
     public abstract class HandleContext
     {
         /// <summary>
-        /// Gets the filter context of the current execution.
+        /// Gets the message context of the current execution.
         /// </summary>
-        public FilterContext FilterContext { get; }
+        public MessageContext MessageContext { get; }
 
         /// <summary>
         /// Gets the envelope for which the pipeline is executed.
-        /// This is a shortcut for <see cref="FilterContext.Envelope"/>.
+        /// This is a shortcut for <see cref="MessageContext.Envelope"/>.
         /// <summary>
-        public Envelope Envelope => FilterContext.Envelope;
+        public Envelope Envelope => MessageContext.Envelope;
 
         /// <summary>
         /// Gets the message for which the pipeline is executed.
-        /// This is a shortcut for <see cref="FilterContext.Envelope.Message"/>.
+        /// This is a shortcut for <see cref="MessageContext.Envelope.Message"/>.
         /// <summary>
-        public object Message => FilterContext.Message;
+        public object Message => MessageContext.Message;
 
         /// <summary>
         /// Gets the handler which processes the envelope/message.
@@ -77,15 +77,15 @@ namespace Meceqs.TypedHandling
         public MethodInfo HandleMethod { get; private set; }
 
         /// <summary>
-        /// Gets a <see cref="IMessageSender"/>, resolved from <see cref="FilterContext.RequestServices"/>.
+        /// Gets a <see cref="IMessageSender"/>, resolved from <see cref="MessageContext.RequestServices"/>.
         /// </summary>
-        public IMessageSender MessageSender => (IMessageSender)FilterContext.RequestServices.GetService(typeof(IMessageSender));
+        public IMessageSender MessageSender => (IMessageSender)MessageContext.RequestServices.GetService(typeof(IMessageSender));
 
-        protected HandleContext(FilterContext filterContext)
+        protected HandleContext(MessageContext messageContext)
         {
-            Check.NotNull(filterContext, nameof(filterContext));
+            Check.NotNull(messageContext, nameof(messageContext));
 
-            FilterContext = filterContext;
+            MessageContext = messageContext;
         }
 
         /// <summary>

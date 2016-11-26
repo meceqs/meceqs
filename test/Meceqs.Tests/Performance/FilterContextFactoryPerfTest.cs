@@ -10,7 +10,7 @@ using Xunit;
 namespace Meceqs.Tests.Performance
 {
     // Make class public to actually run it.
-    internal class FilterContextFactoryPerfTest
+    internal class MessageContextFactoryPerfTest
     {
         private void RunTimed(string message, int loopCount, Action action)
         {
@@ -40,12 +40,12 @@ namespace Meceqs.Tests.Performance
 
             RunTimed("Activator.CreateInstance", loopCount, () =>
             {
-                var typedFilterContextType = typeCache.GetOrAdd(messageType, x =>
+                var typedMessageContextType = typeCache.GetOrAdd(messageType, x =>
                 {
-                    return typeof(FilterContext<>).MakeGenericType(x);
+                    return typeof(MessageContext<>).MakeGenericType(x);
                 });
 
-                FilterContext result = (FilterContext)Activator.CreateInstance(typedFilterContextType, envelope);
+                MessageContext result = (MessageContext)Activator.CreateInstance(typedMessageContextType, envelope);
             });
 
             // ConstructorInfo.Invoke
@@ -56,32 +56,32 @@ namespace Meceqs.Tests.Performance
             {
                 var ctor = constructorCache.GetOrAdd(messageType, x =>
                 {
-                    var typedFilterContextType = typeof(FilterContext<>).MakeGenericType(x);
-                    var constructor = typedFilterContextType.GetTypeInfo().DeclaredConstructors.First();
+                    var typedMessageContextType = typeof(MessageContext<>).MakeGenericType(x);
+                    var constructor = typedMessageContextType.GetTypeInfo().DeclaredConstructors.First();
 
                     return constructor;
                 });
 
-                FilterContext result = (FilterContext)ctor.Invoke(new object[] { envelope });
+                MessageContext result = (MessageContext)ctor.Invoke(new object[] { envelope });
             });
 
             // Compiled expression
 
-            var delegateCache = new ConcurrentDictionary<Type, Func<Envelope, FilterContext>>();
+            var delegateCache = new ConcurrentDictionary<Type, Func<Envelope, MessageContext>>();
 
             RunTimed("Expression.Lambda", loopCount, () =>
             {
                 var ctorDelegate = delegateCache.GetOrAdd(messageType, x =>
                 {
                     Type typedEnvelopeType = typeof(Envelope<>).MakeGenericType(x);
-                    Type typedFilterContextType = typeof(FilterContext<>).MakeGenericType(x);
+                    Type typedMessageContextType = typeof(MessageContext<>).MakeGenericType(x);
 
-                    ConstructorInfo constructor = typedFilterContextType.GetTypeInfo().DeclaredConstructors.First();
+                    ConstructorInfo constructor = typedMessageContextType.GetTypeInfo().DeclaredConstructors.First();
 
                     var envelopeParam = Expression.Parameter(typeof(Envelope), "envelope");
                     var castedEnvelopeParam = Expression.Convert(envelopeParam, typedEnvelopeType);
 
-                    var compiledDelegate = Expression.Lambda<Func<Envelope, FilterContext>>(
+                    var compiledDelegate = Expression.Lambda<Func<Envelope, MessageContext>>(
                         Expression.New(constructor, castedEnvelopeParam),
                         envelopeParam
                     ).Compile();
@@ -89,7 +89,7 @@ namespace Meceqs.Tests.Performance
                     return compiledDelegate;
                 });
 
-                FilterContext result = ctorDelegate(envelope);
+                MessageContext result = ctorDelegate(envelope);
             });
         }
     }

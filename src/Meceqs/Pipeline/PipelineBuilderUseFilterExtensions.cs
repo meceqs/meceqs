@@ -8,30 +8,30 @@ using Meceqs.Pipeline;
 namespace Microsoft.Extensions.DependencyInjection
 {
     /// <summary>
-    /// Extension methods for adding a typed filter.
+    /// Extension methods for adding a typed middleware.
     /// </summary>
-    public static class PipelineBuilderUseFilterExtensions
+    public static class PipelineBuilderUseMiddlewareExtensions
     {
         private const string InvokeMethodName = "Invoke";
 
-        private static readonly MethodInfo GetServiceInfo = typeof(PipelineBuilderUseFilterExtensions).GetMethod(nameof(GetService), BindingFlags.NonPublic | BindingFlags.Static);
+        private static readonly MethodInfo GetServiceInfo = typeof(PipelineBuilderUseMiddlewareExtensions).GetMethod(nameof(GetService), BindingFlags.NonPublic | BindingFlags.Static);
 
         /// <summary>
-        /// Adds a filter class to the pipeline.
+        /// Adds a middleware class to the pipeline.
         /// </summary>
-        public static IPipelineBuilder UseFilter<TFilter>(this IPipelineBuilder builder, params object[] args)
+        public static IPipelineBuilder UseMiddleware<TMiddleware>(this IPipelineBuilder builder, params object[] args)
         {
-            return builder.UseFilter(typeof(TFilter), args);
+            return builder.UseMiddleware(typeof(TMiddleware), args);
         }
 
         /// <summary>
-        /// Adds a filter class to the pipeline.
+        /// Adds a middleware class to the pipeline.
         /// </summary>
-        public static IPipelineBuilder UseFilter(this IPipelineBuilder builder, Type filter, params object[] args)
+        public static IPipelineBuilder UseMiddleware(this IPipelineBuilder builder, Type middleware, params object[] args)
         {
             return builder.Use(next =>
             {
-                var methods = filter.GetMethods(BindingFlags.Instance | BindingFlags.Public);
+                var methods = middleware.GetMethods(BindingFlags.Instance | BindingFlags.Public);
                 var invokeMethods = methods.Where(m => string.Equals(m.Name, InvokeMethodName, StringComparison.Ordinal)).ToArray();
                 if (invokeMethods.Length > 1)
                 {
@@ -50,18 +50,18 @@ namespace Microsoft.Extensions.DependencyInjection
                 }
 
                 var parameters = methodinfo.GetParameters();
-                if (parameters.Length == 0 || parameters[0].ParameterType != typeof(FilterContext))
+                if (parameters.Length == 0 || parameters[0].ParameterType != typeof(MessageContext))
                 {
-                    throw new InvalidOperationException($"The '{InvokeMethodName}' method's first argument must be of type '{nameof(FilterContext)}'.");
+                    throw new InvalidOperationException($"The '{InvokeMethodName}' method's first argument must be of type '{nameof(MessageContext)}'.");
                 }
 
                 var ctorArgs = new object[args.Length + 1];
                 ctorArgs[0] = next;
                 Array.Copy(args, 0, ctorArgs, 1, args.Length);
-                var instance = ActivatorUtilities.CreateInstance(builder.ApplicationServices, filter, ctorArgs);
+                var instance = ActivatorUtilities.CreateInstance(builder.ApplicationServices, middleware, ctorArgs);
                 if (parameters.Length == 1)
                 {
-                    return (FilterDelegate)methodinfo.CreateDelegate(typeof(FilterDelegate), instance);
+                    return (MessageDelegate)methodinfo.CreateDelegate(typeof(MessageDelegate), instance);
                 }
 
                 var factory = Compile<object>(methodinfo, parameters);
@@ -78,16 +78,16 @@ namespace Microsoft.Extensions.DependencyInjection
             });
         }
 
-        private static Func<T, FilterContext, IServiceProvider, Task> Compile<T>(MethodInfo methodinfo, ParameterInfo[] parameters)
+        private static Func<T, MessageContext, IServiceProvider, Task> Compile<T>(MethodInfo methodinfo, ParameterInfo[] parameters)
         {
-            var filterType = typeof(T);
+            var middlewareType = typeof(T);
 
-            var filterContextArg = Expression.Parameter(typeof(FilterContext), "filterContext");
+            var messageContextArg = Expression.Parameter(typeof(MessageContext), "messageContext");
             var providerArg = Expression.Parameter(typeof(IServiceProvider), "serviceProvider");
-            var instanceArg = Expression.Parameter(filterType, "filter");
+            var instanceArg = Expression.Parameter(middlewareType, "middleware");
 
             var methodArguments = new Expression[parameters.Length];
-            methodArguments[0] = filterContextArg;
+            methodArguments[0] = messageContextArg;
             for (int i = 1; i < parameters.Length; i++)
             {
                 var parameterType = parameters[i].ParameterType;
@@ -107,25 +107,25 @@ namespace Microsoft.Extensions.DependencyInjection
                 methodArguments[i] = Expression.Convert(getServiceCall, parameterType);
             }
 
-            Expression filterInstanceArg = instanceArg;
+            Expression middlewareInstanceArg = instanceArg;
             if (methodinfo.DeclaringType != typeof(T))
             {
-                filterInstanceArg = Expression.Convert(filterInstanceArg, methodinfo.DeclaringType);
+                middlewareInstanceArg = Expression.Convert(middlewareInstanceArg, methodinfo.DeclaringType);
             }
 
-            var body = Expression.Call(filterInstanceArg, methodinfo, methodArguments);
+            var body = Expression.Call(middlewareInstanceArg, methodinfo, methodArguments);
 
-            var lambda = Expression.Lambda<Func<T, FilterContext, IServiceProvider, Task>>(body, instanceArg, filterContextArg, providerArg);
+            var lambda = Expression.Lambda<Func<T, MessageContext, IServiceProvider, Task>>(body, instanceArg, messageContextArg, providerArg);
 
             return lambda.Compile();
         }
 
-        private static object GetService(IServiceProvider serviceProvider, Type type, Type filterType)
+        private static object GetService(IServiceProvider serviceProvider, Type type, Type middlewareType)
         {
             var service = serviceProvider.GetService(type);
             if (service == null)
             {
-                throw new InvalidOperationException($"Unable to resolve service for type '{type}' while attempting to Invoke filter '{filterType}'.");
+                throw new InvalidOperationException($"Unable to resolve service for type '{type}' while attempting to Invoke middleware '{middlewareType}'.");
             }
 
             return service;

@@ -10,21 +10,21 @@ using Xunit;
 
 namespace Meceqs.Tests.Pipeline
 {
-    public class PipelineBuilderUseFilterScopingTest
+    public class PipelineBuilderUseMiddlewareScopingTest
     {
-        private class FilterWithServices
+        private class MiddlewareWithServices
         {
-            private readonly FilterDelegate _next;
-            private readonly IFilterCtorService _ctorService;
+            private readonly MessageDelegate _next;
+            private readonly IMiddlewareCtorService _ctorService;
 
-            public FilterWithServices(FilterDelegate next, bool isTerminating, IFilterCtorService ctorService)
+            public MiddlewareWithServices(MessageDelegate next, bool isTerminating, IMiddlewareCtorService ctorService)
             {
                 _ctorService = ctorService;
-                if (!isTerminating) 
+                if (!isTerminating)
                     _next = next;
             }
 
-            public Task Invoke(FilterContext context, IFilterInvokeService invokeService)
+            public Task Invoke(MessageContext context, IMiddlewareInvokeService invokeService)
             {
                 _ctorService.InvokeCalled();
                 invokeService.InvokeCalled();
@@ -41,16 +41,16 @@ namespace Meceqs.Tests.Pipeline
             public override string ToString() => $"{nameof(InvokeCalled)}:{InvokeCalled};{nameof(DisposeCalled)}:{DisposeCalled}";
         }
 
-        private interface IFilterCtorService : IDisposable
+        private interface IMiddlewareCtorService : IDisposable
         {
             void InvokeCalled();
         }
 
-        private class FilterCtorService : IFilterCtorService
+        private class MiddlewareCtorService : IMiddlewareCtorService
         {
             private readonly CallCounter _callCounter;
 
-            public FilterCtorService(IList<CallCounter> callCounters = null)
+            public MiddlewareCtorService(IList<CallCounter> callCounters = null)
             {
                 _callCounter = new CallCounter();
                 callCounters?.Add(_callCounter);
@@ -60,16 +60,16 @@ namespace Meceqs.Tests.Pipeline
             public void Dispose() => _callCounter.DisposeCalled++;
         }
 
-        private interface IFilterInvokeService : IDisposable
+        private interface IMiddlewareInvokeService : IDisposable
         {
             void InvokeCalled();
         }
 
-        private class FilterInvokeService : IFilterInvokeService
+        private class MiddlewareInvokeService : IMiddlewareInvokeService
         {
             private readonly CallCounter _callCounter;
 
-            public FilterInvokeService(IList<CallCounter> callCounters = null)
+            public MiddlewareInvokeService(IList<CallCounter> callCounters = null)
             {
                 _callCounter = new CallCounter();
                 callCounters?.Add(_callCounter);
@@ -83,30 +83,30 @@ namespace Meceqs.Tests.Pipeline
         {
             var loggerFactory = Substitute.For<ILoggerFactory>();
             var builder = new DefaultPipelineBuilder(serviceProvider, loggerFactory, null);
-            
-            // two filters to make sure we can test scoped services.
-            builder.UseFilter<FilterWithServices>(false /* isTerminating */);
-            builder.UseFilter<FilterWithServices>(true /* isTerminating */);
-            
+
+            // two middleware components to make sure we can test scoped services.
+            builder.UseMiddleware<MiddlewareWithServices>(false /* isTerminating */);
+            builder.UseMiddleware<MiddlewareWithServices>(true /* isTerminating */);
+
             return builder.Build("pipeline");
         }
 
         [Fact]
-        public async Task Transient_FilterCtorService_should_only_be_created_once_per_filter()
+        public async Task Transient_MiddlewareCtorService_should_only_be_created_once_per_middleware()
         {
             var ctorServiceCalls = new List<CallCounter>();
-            
+
             // app start
             var services = new ServiceCollection();
-            services.AddTransient<IFilterCtorService>(_ => new FilterCtorService(ctorServiceCalls));
-            services.AddTransient<IFilterInvokeService>(_ => new FilterInvokeService());
+            services.AddTransient<IMiddlewareCtorService>(_ => new MiddlewareCtorService(ctorServiceCalls));
+            services.AddTransient<IMiddlewareInvokeService>(_ => new MiddlewareInvokeService());
             var serviceProvider = services.BuildServiceProvider();
             var pipeline = GetPipeline(serviceProvider);
 
             // multiple requests
             for (int i = 0; i < 5; i++)
             {
-                var context = TestObjects.FilterContext<SimpleMessage>(requestServices: serviceProvider);
+                var context = TestObjects.MessageContext<SimpleMessage>(requestServices: serviceProvider);
                 await pipeline.InvokeAsync(context);
             }
 
@@ -120,21 +120,21 @@ namespace Meceqs.Tests.Pipeline
         }
 
         [Fact]
-        public async Task Transient_FilterInvokeService_should_be_created_for_every_call()
+        public async Task Transient_MiddlewareInvokeService_should_be_created_for_every_call()
         {
             var invokeServiceCalls = new List<CallCounter>();
 
             // app start
             var services = new ServiceCollection();
-            services.AddTransient<IFilterCtorService>(_ => new FilterCtorService());
-            services.AddTransient<IFilterInvokeService>(_ => new FilterInvokeService(invokeServiceCalls));
+            services.AddTransient<IMiddlewareCtorService>(_ => new MiddlewareCtorService());
+            services.AddTransient<IMiddlewareInvokeService>(_ => new MiddlewareInvokeService(invokeServiceCalls));
             var serviceProvider = services.BuildServiceProvider();
             var pipeline = GetPipeline(serviceProvider);
 
             // multiple requests
             for (int i = 0; i < 5; i++)
             {
-                var context = TestObjects.FilterContext<SimpleMessage>(requestServices: serviceProvider);
+                var context = TestObjects.MessageContext<SimpleMessage>(requestServices: serviceProvider);
                 await pipeline.InvokeAsync(context);
             }
 
@@ -148,14 +148,14 @@ namespace Meceqs.Tests.Pipeline
         }
 
         [Fact]
-        public async Task Scoped_FilterInvokeService_should_be_created_once_per_scope()
+        public async Task Scoped_MiddlewareInvokeService_should_be_created_once_per_scope()
         {
             var invokeServiceCalls = new List<CallCounter>();
 
             // app start
             var services = new ServiceCollection();
-            services.AddTransient<IFilterCtorService>(_ => new FilterCtorService());
-            services.AddScoped<IFilterInvokeService>(_ => new FilterInvokeService(invokeServiceCalls));
+            services.AddTransient<IMiddlewareCtorService>(_ => new MiddlewareCtorService());
+            services.AddScoped<IMiddlewareInvokeService>(_ => new MiddlewareInvokeService(invokeServiceCalls));
             var serviceProvider = services.BuildServiceProvider();
             var pipeline = GetPipeline(serviceProvider);
 
@@ -165,7 +165,7 @@ namespace Meceqs.Tests.Pipeline
             {
                 using (var scope = serviceScopeFactory.CreateScope())
                 {
-                    var context = TestObjects.FilterContext<SimpleMessage>(requestServices: scope.ServiceProvider);
+                    var context = TestObjects.MessageContext<SimpleMessage>(requestServices: scope.ServiceProvider);
 
                     await pipeline.InvokeAsync(context);
                 }

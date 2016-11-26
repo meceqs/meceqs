@@ -25,7 +25,7 @@ namespace Meceqs.TypedHandling.Configuration
         {
             Check.NotNull(serviceProvider, nameof(serviceProvider));
 
-            // This doesn't use "GetRequiredService" because it's up to the filter
+            // This doesn't use "GetRequiredService" because it's up to the middleware
             // to decide whether unknown messages should throw or not.
             return (IHandles)serviceProvider.GetService(_handlerType);
         }

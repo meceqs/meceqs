@@ -6,18 +6,18 @@ using Microsoft.Extensions.Options;
 
 namespace Meceqs.AzureServiceBus.Sending
 {
-    public class ServiceBusSenderFilter : IDisposable
+    public class ServiceBusSenderMiddleware : IDisposable
     {
         // TODO MessageSender lifecycle - should it be transient?
 
         private readonly IServiceBusMessageSender _sender;
 
-        public ServiceBusSenderFilter(
-            FilterDelegate next,
+        public ServiceBusSenderMiddleware(
+            MessageDelegate next,
             IOptions<ServiceBusSenderOptions> options,
             IServiceBusMessageSenderFactory senderFactory)
         {
-            // "next" is not stored because this is a terminating filter.
+            // "next" is not stored because this is a terminating middleware.
 
             Check.NotNull(options?.Value, nameof(options));
             Check.NotNull(senderFactory, nameof(senderFactory));
@@ -25,7 +25,7 @@ namespace Meceqs.AzureServiceBus.Sending
             _sender = senderFactory.CreateMessageSender(options.Value.ConnectionString, options.Value.EntityPath);
         }
 
-        public Task Invoke(FilterContext context, IBrokeredMessageConverter brokeredMessageConverter)
+        public Task Invoke(MessageContext context, IBrokeredMessageConverter brokeredMessageConverter)
         {
             Check.NotNull(context, nameof(context));
             Check.NotNull(brokeredMessageConverter, nameof(brokeredMessageConverter));

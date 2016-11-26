@@ -1,13 +1,13 @@
 namespace Meceqs.Pipeline
 {
     /// <summary>
-    /// Creates a <see cref="FilterContext"/> for the given envelope.
+    /// Creates a <see cref="MessageContext"/> for the given envelope.
     /// </summary>
-    public interface IFilterContextFactory
+    public interface IMessageContextFactory
     {
         /// <summary>
-        /// Creates a <see cref="FilterContext"/> for the given <paramref name="envelope"/>.
+        /// Creates a <see cref="MessageContext"/> for the given <paramref name="envelope"/>.
         /// </summary>
-        FilterContext CreateFilterContext(Envelope envelope);
+        MessageContext CreateMessageContext(Envelope envelope);
     }
 }

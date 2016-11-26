@@ -4,14 +4,14 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Meceqs.Pipeline;
 
-namespace Meceqs.Filters.Auditing
+namespace Meceqs.Middleware.Auditing
 {
-    public class AuditingFilter
+    public class AuditingMiddleware
     {
-        private readonly FilterDelegate _next;
+        private readonly MessageDelegate _next;
         private readonly AuditingOptions _options;
 
-        public AuditingFilter(FilterDelegate next, AuditingOptions options)
+        public AuditingMiddleware(MessageDelegate next, AuditingOptions options)
         {
             Check.NotNull(next, nameof(next));
             Check.NotNull(options, nameof(options));
@@ -20,7 +20,7 @@ namespace Meceqs.Filters.Auditing
             _options = options;
         }
 
-        public Task Invoke(FilterContext context)
+        public Task Invoke(MessageContext context)
         {
             Check.NotNull(context, nameof(context));
 

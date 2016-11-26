@@ -4,6 +4,6 @@ namespace Meceqs.TypedHandling.Internal
 {
     public interface IHandleContextFactory
     {
-        HandleContext CreateHandleContext(FilterContext filterContext);
+        HandleContext CreateHandleContext(MessageContext messageContext);
     }
 }

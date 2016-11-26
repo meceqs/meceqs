@@ -10,7 +10,7 @@ namespace Meceqs.Tests.Receiving
 {
     public class MessageReceiverTest
     {
-        private IMessageReceiver GetMessageReceiver(Action<FilterContext> callback = null)
+        private IMessageReceiver GetMessageReceiver(Action<MessageContext> callback = null)
         {
             var services = new ServiceCollection()
                 .AddLogging()
@@ -31,16 +31,16 @@ namespace Meceqs.Tests.Receiving
             return envelope;
         }
 
-        private Task AssertFilterContext(Envelope envelope, Action<FilterContext> assertions)
+        private Task AssertMessageContext(Envelope envelope, Action<MessageContext> assertions)
         {
-            return AssertFilterContext(envelope, null, assertions);
+            return AssertMessageContext(envelope, null, assertions);
         }
 
-        private async Task AssertFilterContext(Envelope envelope, Type resultType, Action<FilterContext> assertions)
+        private async Task AssertMessageContext(Envelope envelope, Type resultType, Action<MessageContext> assertions)
         {
             // Assert callback
             var called = false;
-            var callback = new Action<FilterContext>(ctx =>
+            var callback = new Action<MessageContext>(ctx =>
             {
                 called = true;
                 assertions(ctx);
@@ -81,7 +81,7 @@ namespace Meceqs.Tests.Receiving
         {
             var envelope = GetEmptyEnvelope<SimpleMessage>();
 
-            await AssertFilterContext(envelope, (ctx) =>
+            await AssertMessageContext(envelope, (ctx) =>
             {
                 ctx.Envelope.MessageId.ShouldNotBe(Guid.Empty);
             });
@@ -93,7 +93,7 @@ namespace Meceqs.Tests.Receiving
             var envelope = GetEmptyEnvelope<SimpleMessage>();
             envelope.MessageId = Guid.NewGuid();
 
-            await AssertFilterContext(envelope, (ctx) =>
+            await AssertMessageContext(envelope, (ctx) =>
             {
                 ctx.Envelope.CorrelationId.ShouldBe(envelope.MessageId);
             });
@@ -104,7 +104,7 @@ namespace Meceqs.Tests.Receiving
         {
             var envelope = GetEmptyEnvelope<SimpleMessage>();
 
-            await AssertFilterContext(envelope, (ctx) =>
+            await AssertMessageContext(envelope, (ctx) =>
             {
                 ctx.Envelope.MessageId.ShouldNotBe(Guid.Empty);
                 ctx.Envelope.MessageId.ShouldBe(ctx.Envelope.CorrelationId);
@@ -116,7 +116,7 @@ namespace Meceqs.Tests.Receiving
         {
             var envelope = GetEmptyEnvelope<SimpleMessage>();
 
-            await AssertFilterContext(envelope, (ctx) =>
+            await AssertMessageContext(envelope, (ctx) =>
             {
                 ctx.Envelope.MessageType.ShouldBe(typeof(SimpleMessage).FullName);
             });
@@ -128,7 +128,7 @@ namespace Meceqs.Tests.Receiving
             var envelope = GetEmptyEnvelope<SimpleMessage>();
             envelope.MessageType = "wrong-value";
 
-            await AssertFilterContext(envelope, (ctx) =>
+            await AssertMessageContext(envelope, (ctx) =>
             {
                 ctx.Envelope.MessageType.ShouldBe(typeof(SimpleMessage).FullName);
             });
@@ -140,7 +140,7 @@ namespace Meceqs.Tests.Receiving
             var envelope = GetEmptyEnvelope<SimpleMessage>();
             DateTime now = DateTime.UtcNow;
 
-            await AssertFilterContext(envelope, (ctx) =>
+            await AssertMessageContext(envelope, (ctx) =>
             {
                 ctx.Envelope.CreatedOnUtc.HasValue.ShouldBeTrue();
 
@@ -150,23 +150,23 @@ namespace Meceqs.Tests.Receiving
         }
 
         [Fact]
-        public async Task ResultType_is_passed_to_FilterContext()
+        public async Task ResultType_is_passed_to_MessageContext()
         {
             var envelope = TestObjects.Envelope<SimpleMessage>();
             var resultType = typeof(string);
 
-            await AssertFilterContext(envelope, resultType, (ctx) =>
+            await AssertMessageContext(envelope, resultType, (ctx) =>
             {
                 ctx.ExpectedResultType.ShouldBe(resultType);
             });
         }
 
         [Fact]
-        public async Task Result_from_filter_is_returned()
+        public async Task Result_from_middleware_is_returned()
         {
             var envelope = TestObjects.Envelope<SimpleMessage>();
 
-            var callback = new Action<FilterContext>((ctx) => ctx.Result = "result");
+            var callback = new Action<MessageContext>((ctx) => ctx.Result = "result");
             var receiver = GetMessageReceiver(callback);
 
             string result = await receiver.ReceiveAsync<string>(envelope);

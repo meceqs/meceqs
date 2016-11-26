@@ -16,7 +16,7 @@ namespace Meceqs.Tests.Sending
             var serviceProvider = Substitute.For<IServiceProvider>();
 
             serviceProvider.GetService(typeof(IEnvelopeFactory)).Returns(new DefaultEnvelopeFactory());
-            serviceProvider.GetService(typeof(IFilterContextFactory)).Returns(new DefaultFilterContextFactory());
+            serviceProvider.GetService(typeof(IMessageContextFactory)).Returns(new DefaultMessageContextFactory());
 
             serviceProvider.GetService(typeof(IEnvelopeCorrelator)).Returns(envelopeCorrelator ?? Substitute.For<IEnvelopeCorrelator>());
 
@@ -51,7 +51,7 @@ namespace Meceqs.Tests.Sending
         }
 
         [Fact]
-        public async Task Saves_settings_in_FilterContext()
+        public async Task Saves_settings_in_MessageContext()
         {
             // Arrange
 
@@ -71,7 +71,7 @@ namespace Meceqs.Tests.Sending
                 {
                     called++;
 
-                    var ctx = x.Arg<FilterContext>();
+                    var ctx = x.Arg<MessageContext>();
                     Assert.Equal(resultEventId, ctx.Envelope.MessageId);
                     Assert.Equal(resultEvent, ctx.Envelope.Message);
                     Assert.Equal(cancellationSource.Token, ctx.Cancellation);
@@ -81,8 +81,8 @@ namespace Meceqs.Tests.Sending
 
             var sender = GetSender(pipeline: pipeline);
 
-            FilterContext filterContext = null;
-            await pipeline.InvokeAsync(Arg.Do<FilterContext>(x => filterContext = x));
+            MessageContext messageContext = null;
+            await pipeline.InvokeAsync(Arg.Do<MessageContext>(x => messageContext = x));
 
             // Act
 

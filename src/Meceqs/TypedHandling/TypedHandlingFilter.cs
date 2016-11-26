@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Meceqs.TypedHandling
 {
-    public class TypedHandlingFilter
+    public class TypedHandlingMiddleware
     {
         private readonly TypedHandlingOptions _options;
         private readonly IHandleContextFactory _handleContextFactory;
@@ -20,15 +20,15 @@ namespace Meceqs.TypedHandling
 
         private readonly Dictionary<HandleDefinition, IHandlerMetadata> _handlerMapping;
 
-        public TypedHandlingFilter(
-            FilterDelegate next,
+        public TypedHandlingMiddleware(
+            MessageDelegate next,
             TypedHandlingOptions options,
             IHandleContextFactory handleContextFactory,
             IHandleMethodResolver handleMethodResolver,
             IHandlerInvoker handlerInvoker,
             ILoggerFactory loggerFactory)
         {
-            // "next" is not stored because this is a terminating filter.
+            // "next" is not stored because this is a terminating middleware.
 
             Check.NotNull(options, nameof(options));
             Check.NotNull(handleContextFactory, nameof(handleContextFactory));
@@ -40,67 +40,67 @@ namespace Meceqs.TypedHandling
             _handleContextFactory = handleContextFactory;
             _handleMethodResolver = handleMethodResolver;
             _handlerInvoker = handlerInvoker;
-            _logger = loggerFactory.CreateLogger<TypedHandlingFilter>();
+            _logger = loggerFactory.CreateLogger<TypedHandlingMiddleware>();
 
             _handlerMapping = CreateHandlerMapping(options.Handlers);
         }
 
-        public async Task Invoke(FilterContext filterContext)
+        public async Task Invoke(MessageContext messageContext)
         {
-            Check.NotNull(filterContext, nameof(filterContext));
+            Check.NotNull(messageContext, nameof(messageContext));
 
-            // Since the public interfaces from this filter expect generic types, we can't call them directly.
+            // Since the public interfaces from this middleware expect generic types, we can't call them directly.
             // Separate services are responsible for invoking them by using e.g. reflection.
 
-            IHandles handler = CreateHandler(filterContext);
+            IHandles handler = CreateHandler(messageContext);
             if (handler == null)
             {
-                HandleUnknownMessageType(filterContext);
+                HandleUnknownMessageType(messageContext);
                 return;
             }
 
-            var handleContext = CreateHandleContext(filterContext, handler);
+            var handleContext = CreateHandleContext(messageContext, handler);
 
             var handleExecutionChain = CreateHandleExecutionChain(handleContext);
 
             await handleExecutionChain(handleContext);
         }
 
-        private IHandles CreateHandler(FilterContext filterContext)
+        private IHandles CreateHandler(MessageContext messageContext)
         {
-            if (filterContext.RequestServices == null)
+            if (messageContext.RequestServices == null)
             {
                 throw new ArgumentException(
-                    $"'{nameof(filterContext.RequestServices)}' wasn't set. It is required to resolve " +
+                    $"'{nameof(messageContext.RequestServices)}' wasn't set. It is required to resolve " +
                     $"handlers from the scope of the current web/message request. " +
-                    $"It can be set either by using a filter [e.g. UseAspNetCore()] or by " +
+                    $"It can be set either by using a middleware [e.g. UseAspNetCore()] or by " +
                     $"setting it yourself through 'SetRequestServices()' on the message sender/receiver",
-                    $"{nameof(filterContext)}.{nameof(filterContext.RequestServices)}"
+                    $"{nameof(messageContext)}.{nameof(messageContext.RequestServices)}"
                 );
             }
 
-            var key = new HandleDefinition(filterContext.MessageType, filterContext.ExpectedResultType);
+            var key = new HandleDefinition(messageContext.MessageType, messageContext.ExpectedResultType);
 
             IHandlerMetadata handlerMetadata;
             if (_handlerMapping.TryGetValue(key, out handlerMetadata))
             {
-                return handlerMetadata.CreateHandler(filterContext.RequestServices);
+                return handlerMetadata.CreateHandler(messageContext.RequestServices);
             }
 
             return null;
         }
 
-        private void HandleUnknownMessageType(FilterContext filterContext)
+        private void HandleUnknownMessageType(MessageContext messageContext)
         {
             switch (_options.UnknownMessageBehavior)
             {
                 case UnknownMessageBehavior.ThrowException:
                     throw new UnknownMessageException(
                         $"There was no handler configured for message/result types " +
-                        $"'{filterContext.MessageType}/{filterContext.ExpectedResultType}");
+                        $"'{messageContext.MessageType}/{messageContext.ExpectedResultType}");
 
                 case UnknownMessageBehavior.Skip:
-                    _logger.SkippingMessage(filterContext);
+                    _logger.SkippingMessage(messageContext);
                     break;
 
                 default:
@@ -111,11 +111,11 @@ namespace Meceqs.TypedHandling
             }
         }
 
-        private HandleContext CreateHandleContext(FilterContext filterContext, IHandles handler)
+        private HandleContext CreateHandleContext(MessageContext messageContext, IHandles handler)
         {
             var handlerType = handler.GetType();
-            var messageType = filterContext.MessageType;
-            var resultType = filterContext.ExpectedResultType;
+            var messageType = messageContext.MessageType;
+            var resultType = messageContext.ExpectedResultType;
 
             // This allows interceptors to e.g. look for custom attributes on the class or method.
             var handleMethod = _handleMethodResolver.GetHandleMethod(handlerType, messageType, resultType);
@@ -127,7 +127,7 @@ namespace Meceqs.TypedHandling
                     $"did not find a Handle-method for '{handlerType}.{messageType}/{resultType}'");
             }
 
-            HandleContext handleContext = _handleContextFactory.CreateHandleContext(filterContext);
+            HandleContext handleContext = _handleContextFactory.CreateHandleContext(messageContext);
 
             handleContext.Initialize(handler, handleMethod);
 
@@ -139,10 +139,10 @@ namespace Meceqs.TypedHandling
             // The call to handler itself is the innermost call.
             HandleExecutionDelegate chain = async (HandleContext context) =>
             {
-                context.FilterContext.Result = await _handlerInvoker.InvokeHandleAsync(
+                context.MessageContext.Result = await _handlerInvoker.InvokeHandleAsync(
                     context.Handler,
                     context,
-                    context.FilterContext.ExpectedResultType);
+                    context.MessageContext.ExpectedResultType);
             };
 
             // Wrap every existing interceptor around this call.
@@ -156,7 +156,7 @@ namespace Meceqs.TypedHandling
                 {
                     HandleExecutionDelegate interceptorCall = (HandleContext innerContext) =>
                     {
-                        var interceptor = metadata.CreateInterceptor(innerContext.FilterContext.RequestServices);
+                        var interceptor = metadata.CreateInterceptor(innerContext.MessageContext.RequestServices);
                         return interceptor.OnHandleExecutionAsync(innerContext, next);
                     };
                     return interceptorCall;

@@ -6,17 +6,17 @@ namespace Meceqs.Pipeline
 {
     public class DefaultPipeline : IPipeline
     {
-        private readonly FilterDelegate _pipeline;
+        private readonly MessageDelegate _pipeline;
         private readonly ILogger _logger;
-        private readonly IFilterContextEnricher _filterContextEnricher;
+        private readonly IMessageContextEnricher _messageContextEnricher;
 
         public string Name { get; }
 
         public DefaultPipeline(
-            FilterDelegate pipeline,
+            MessageDelegate pipeline,
             string pipelineName,
             ILoggerFactory loggerFactory,
-            IFilterContextEnricher filterContextEnricher)
+            IMessageContextEnricher messageContextEnricher)
         {
             Check.NotNull(pipeline, nameof(pipeline));
             Check.NotNullOrWhiteSpace(pipelineName, nameof(pipelineName));
@@ -24,32 +24,32 @@ namespace Meceqs.Pipeline
 
             _pipeline = pipeline;
             _logger = loggerFactory.CreateLogger<DefaultPipeline>();
-            _filterContextEnricher = filterContextEnricher;
+            _messageContextEnricher = messageContextEnricher;
 
             Name = pipelineName;
         }
 
-        public Task InvokeAsync(FilterContext context)
+        public Task InvokeAsync(MessageContext context)
         {
             Check.NotNull(context, nameof(context));
 
             return ExecutePipeline(context);
         }
 
-        private Task ExecutePipeline(FilterContext context)
+        private Task ExecutePipeline(MessageContext context)
         {
             // Give frameworks a chance to add additional properties to the context before
             // the pipeline is executed.
-            _filterContextEnricher?.EnrichFilterContext(context);
+            _messageContextEnricher?.EnrichMessageContext(context);
 
             _logger.ExecutingPipeline(context);
 
-            ValidateFilterContext(context);
+            ValidateMessageContext(context);
 
             return _pipeline(context);
         }
 
-        private void ValidateFilterContext(FilterContext context)
+        private void ValidateMessageContext(MessageContext context)
         {
             if (context.Envelope == null)
             {

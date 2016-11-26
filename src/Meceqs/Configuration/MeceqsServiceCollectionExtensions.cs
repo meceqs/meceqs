@@ -29,7 +29,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
         private static void AddPipeline(IServiceCollection services)
         {
-            services.TryAddSingleton<IFilterContextFactory, DefaultFilterContextFactory>();
+            services.TryAddSingleton<IMessageContextFactory, DefaultMessageContextFactory>();
             services.TryAddSingleton<IPipelineProvider, DefaultPipelineProvider>();
 
             // Every pipeline that should be built must get its own builder.

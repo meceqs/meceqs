@@ -21,24 +21,24 @@ namespace Meceqs.Tests
             return (Envelope<TMessage>)EnvelopeFactory().Create(message, id ?? Guid.NewGuid());
         }
 
-        public static FilterContext<TMessage> FilterContext<TMessage>(Type resultType = null, IServiceProvider requestServices = null)
+        public static MessageContext<TMessage> MessageContext<TMessage>(Type resultType = null, IServiceProvider requestServices = null)
             where TMessage : class, new()
         {
             var envelope = TestObjects.Envelope<TMessage>();
             requestServices = requestServices ?? Substitute.For<IServiceProvider>();
 
-            var filterContext = new FilterContext<TMessage>(envelope);
-            filterContext.Initialize("pipeline", requestServices, resultType);
+            var messageContext = new MessageContext<TMessage>(envelope);
+            messageContext.Initialize("pipeline", requestServices, resultType);
 
-            return filterContext;
+            return messageContext;
         }
 
-        public static HandleContext<TMessage> HandleContext<TMessage>(Type resultType, FilterContext<TMessage> filterContext = null)
+        public static HandleContext<TMessage> HandleContext<TMessage>(Type resultType, MessageContext<TMessage> messageContext = null)
             where TMessage : class, new()
         {
-            filterContext = filterContext ?? FilterContext<TMessage>(resultType);
+            messageContext = messageContext ?? MessageContext<TMessage>(resultType);
 
-            return new HandleContext<TMessage>(filterContext);
+            return new HandleContext<TMessage>(messageContext);
         }
     }
 }

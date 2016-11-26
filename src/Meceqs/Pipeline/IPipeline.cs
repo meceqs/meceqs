@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 namespace Meceqs.Pipeline
 {
     /// <summary>
-    /// A pipeline represents a list of independant filters.
+    /// A pipeline represents a list of independant middleware components.
     /// </summary>
     public interface IPipeline
     {
@@ -15,6 +15,6 @@ namespace Meceqs.Pipeline
         /// <summary>
         /// Processes the <paramref name="context"/> on the pipeline.
         /// </summary>
-        Task InvokeAsync(FilterContext context);
+        Task InvokeAsync(MessageContext context);
     }
 }

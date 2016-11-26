@@ -7,7 +7,7 @@ using Meceqs.TypedHandling.Internal;
 using Shouldly;
 using Xunit;
 
-namespace Meceqs.Tests.Filters.TypedHandling
+namespace Meceqs.Tests.Middleware.TypedHandling
 {
     public class HandleMethodResolverTest
     {

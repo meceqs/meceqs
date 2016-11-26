@@ -5,18 +5,18 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Meceqs.Tests
 {
-    public class CallbackFilter
+    public class CallbackMiddleware
     {
-        private readonly FilterDelegate _next;
-        private readonly Action<FilterContext> _callback;
+        private readonly MessageDelegate _next;
+        private readonly Action<MessageContext> _callback;
 
-        public CallbackFilter(FilterDelegate next, Action<FilterContext> callback)
+        public CallbackMiddleware(MessageDelegate next, Action<MessageContext> callback)
         {
             _next = next;
             _callback = callback;
         }
 
-        public Task Invoke(FilterContext context)
+        public Task Invoke(MessageContext context)
         {
             if (_callback != null)
             {
@@ -30,13 +30,13 @@ namespace Meceqs.Tests
         }
     }
 
-    public static class CallbackFilterPipelineBuilderExtensions
+    public static class CallbackMiddlewarePipelineBuilderExtensions
     {
-        public static void RunCallback(this IPipelineBuilder pipeline, Action<FilterContext> callback)
+        public static void RunCallback(this IPipelineBuilder pipeline, Action<MessageContext> callback)
         {
             Check.NotNull(pipeline, nameof(pipeline));
 
-            pipeline.UseFilter<CallbackFilter>(callback);
+            pipeline.UseMiddleware<CallbackMiddleware>(callback);
         }
     }
 }

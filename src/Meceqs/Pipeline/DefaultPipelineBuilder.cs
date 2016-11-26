@@ -7,28 +7,30 @@ namespace Meceqs.Pipeline
 {
     public class DefaultPipelineBuilder : IPipelineBuilder
     {
-        private readonly IList<Func<FilterDelegate, FilterDelegate>> _filters = new List<Func<FilterDelegate, FilterDelegate>>();
+        private readonly IList<Func<MessageDelegate, MessageDelegate>> _middlewareEntries;
         private readonly ILoggerFactory _loggerFactory;
-        private readonly IFilterContextEnricher _filterContextEnricher;
+        private readonly IMessageContextEnricher _messageContextEnricher;
 
         public IServiceProvider ApplicationServices { get; }
 
         public DefaultPipelineBuilder(
             IServiceProvider serviceProvider,
             ILoggerFactory loggerFactory,
-            IFilterContextEnricher filterContextEnricher = null)
+            IMessageContextEnricher messageContextEnricher = null)
         {
             Check.NotNull(serviceProvider, nameof(serviceProvider));
             Check.NotNull(loggerFactory, nameof(loggerFactory));
 
+            _middlewareEntries = new List<Func<MessageDelegate, MessageDelegate>>();
+
             ApplicationServices = serviceProvider;
             _loggerFactory = loggerFactory;
-            _filterContextEnricher = filterContextEnricher;
+            _messageContextEnricher = messageContextEnricher;
         }
 
-        public IPipelineBuilder Use(Func<FilterDelegate, FilterDelegate> filter)
+        public IPipelineBuilder Use(Func<MessageDelegate, MessageDelegate> middleware)
         {
-            _filters.Add(filter);
+            _middlewareEntries.Add(middleware);
             return this;
         }
 
@@ -36,18 +38,18 @@ namespace Meceqs.Pipeline
         {
             Check.NotNullOrWhiteSpace(pipelineName, nameof(pipelineName));
 
-            FilterDelegate pipeline = context =>
+            MessageDelegate pipeline = context =>
             {
-                // This filter will be executed last!
-                throw new InvalidOperationException("The message has not been handled by a terminating filter");
+                // This middleware will be executed last!
+                throw new InvalidOperationException("The message has not been handled by a terminating middleware");
             };
 
-            foreach (var filter in _filters.Reverse())
+            foreach (var middleware in _middlewareEntries.Reverse())
             {
-                pipeline = filter(pipeline);
+                pipeline = middleware(pipeline);
             }
 
-            return new DefaultPipeline(pipeline, pipelineName, _loggerFactory, _filterContextEnricher);
+            return new DefaultPipeline(pipeline, pipelineName, _loggerFactory, _messageContextEnricher);
         }
     }
 }

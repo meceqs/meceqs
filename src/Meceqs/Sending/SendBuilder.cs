@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Meceqs.Sending
 {
-    public class SendBuilder : FilterContextBuilder<ISendBuilder>, ISendBuilder
+    public class SendBuilder : MessageContextBuilder<ISendBuilder>, ISendBuilder
     {
         private readonly IEnvelopeCorrelator _envelopeCorrelator;
 

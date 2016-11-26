@@ -7,7 +7,7 @@ namespace Meceqs.Receiving
     /// <summary>
     /// Represents a builder object for receiving an existing envelope from an external caller/system.
     /// </summary>
-    public interface IReceiveBuilder : IFilterContextBuilder<IReceiveBuilder>
+    public interface IReceiveBuilder : IMessageContextBuilder<IReceiveBuilder>
     {
         /// <summary>
         /// Sends the envelope to the pipeline. If no pipeline name was configured,

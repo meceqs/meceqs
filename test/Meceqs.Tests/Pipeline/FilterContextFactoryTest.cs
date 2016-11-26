@@ -5,11 +5,11 @@ using Xunit;
 
 namespace Meceqs.Tests
 {
-    public class FilterContextFactoryTest
+    public class MessageContextFactoryTest
     {
-        private IFilterContextFactory GetFactory()
+        private IMessageContextFactory GetFactory()
         {
-            return new DefaultFilterContextFactory();
+            return new DefaultMessageContextFactory();
         }
 
         [Fact]
@@ -17,30 +17,30 @@ namespace Meceqs.Tests
         {
             var factory = GetFactory();
 
-            Should.Throw<ArgumentNullException>(() => factory.CreateFilterContext(null));
+            Should.Throw<ArgumentNullException>(() => factory.CreateMessageContext(null));
         }
 
         [Fact]
-        public void Creates_FilterContext_with_same_generic_MessageType()
+        public void Creates_MessageContext_with_same_generic_MessageType()
         {
             var envelope = TestObjects.Envelope<SimpleMessage>();
             var factory = GetFactory();
 
-            var filterContext = factory.CreateFilterContext(envelope);
+            var messageContext = factory.CreateMessageContext(envelope);
 
-            filterContext.ShouldBeOfType<FilterContext<SimpleMessage>>();
+            messageContext.ShouldBeOfType<MessageContext<SimpleMessage>>();
         }
 
         [Fact]
-        public void Creates_FilterContext_with_same_envelope()
+        public void Creates_MessageContext_with_same_envelope()
         {
             var envelope = TestObjects.Envelope<SimpleMessage>();
             var factory = GetFactory();
 
-            var filterContext = factory.CreateFilterContext(envelope);
+            var messageContext = factory.CreateMessageContext(envelope);
 
-            filterContext.Envelope.ShouldBe(envelope);
-            filterContext.Message.ShouldBe(envelope.Message);
+            messageContext.Envelope.ShouldBe(envelope);
+            messageContext.Message.ShouldBe(envelope.Message);
         }
 
         [Fact]
@@ -49,9 +49,9 @@ namespace Meceqs.Tests
             var envelope = TestObjects.Envelope<SimpleMessage>();
             var factory = GetFactory();
 
-            factory.CreateFilterContext(envelope);
-            factory.CreateFilterContext(envelope);
-            factory.CreateFilterContext(envelope);
+            factory.CreateMessageContext(envelope);
+            factory.CreateMessageContext(envelope);
+            factory.CreateMessageContext(envelope);
         }
 
         [Fact]
@@ -61,10 +61,10 @@ namespace Meceqs.Tests
             var envelope2 = TestObjects.Envelope<SimpleCommand>();
             var factory = GetFactory();
 
-            factory.CreateFilterContext(envelope1);
-            factory.CreateFilterContext(envelope2);
-            factory.CreateFilterContext(envelope1);
-            factory.CreateFilterContext(envelope2);
+            factory.CreateMessageContext(envelope1);
+            factory.CreateMessageContext(envelope2);
+            factory.CreateMessageContext(envelope1);
+            factory.CreateMessageContext(envelope2);
         }
     }
 }

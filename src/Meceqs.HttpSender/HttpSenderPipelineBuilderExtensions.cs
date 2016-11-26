@@ -10,7 +10,7 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             Check.NotNull(pipeline, nameof(pipeline));
 
-            pipeline.UseFilter<HttpSenderFilter>();
+            pipeline.UseMiddleware<HttpSenderMiddleware>();
 
             return pipeline;
         }

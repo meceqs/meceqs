@@ -10,7 +10,7 @@ using Microsoft.Extensions.Options;
 
 namespace Meceqs.HttpSender
 {
-    public class HttpSenderFilter
+    public class HttpSenderMiddleware
     {
         private readonly HttpSenderOptions _options;
         private readonly IServiceProvider _serviceProvider;
@@ -20,8 +20,8 @@ namespace Meceqs.HttpSender
 
         private readonly Dictionary<Type, Tuple<string, EndpointMessage>> _messageMapping;
 
-        public HttpSenderFilter(
-            FilterDelegate next,
+        public HttpSenderMiddleware(
+            MessageDelegate next,
             IOptions<HttpSenderOptions> options,
             IServiceProvider serviceProvider,
             IHttpClientProvider httpClientProvider,
@@ -34,7 +34,7 @@ namespace Meceqs.HttpSender
             Check.NotNull(httpRequestMessageConverter, nameof(httpRequestMessageConverter));
             Check.NotNull(resultDeserializer, nameof(resultDeserializer));
 
-            // "next" is not stored because this is a terminal filter.
+            // "next" is not stored because this is a terminal middleware.
             _options = options.Value;
             _serviceProvider = serviceProvider;
             _httpClientProvider = httpClientProvider;
@@ -46,7 +46,7 @@ namespace Meceqs.HttpSender
             CreateHttpClients();
         }
 
-        public async Task Invoke(FilterContext context)
+        public async Task Invoke(MessageContext context)
         {
             Check.NotNull(context, nameof(context));
 

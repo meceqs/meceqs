@@ -7,32 +7,32 @@ using Microsoft.Extensions.Options;
 
 namespace Meceqs.AzureEventHubs.Sending
 {
-    public class EventHubSenderFilter : IDisposable
+    public class EventHubSenderMiddleware : IDisposable
     {
         // TODO EventHubClient lifecycle - should it be transient?
 
         private readonly ILogger _logger;
         private readonly IEventHubClient _eventHubClient;
 
-        public EventHubSenderFilter(
-            FilterDelegate next,
+        public EventHubSenderMiddleware(
+            MessageDelegate next,
             IOptions<EventHubSenderOptions> options,
             ILoggerFactory loggerFactory,
             IEventHubClientFactory eventHubClientFactory)
         {
-            // "next" is not stored because this is a terminating filter
+            // "next" is not stored because this is a terminating middleware
 
             Check.NotNull(options?.Value, nameof(options.Value));
             Check.NotNull(loggerFactory, nameof(loggerFactory));
             Check.NotNull(eventHubClientFactory, nameof(eventHubClientFactory));
 
-            _logger = loggerFactory.CreateLogger<EventHubSenderFilter>();
+            _logger = loggerFactory.CreateLogger<EventHubSenderMiddleware>();
 
             var connection = new EventHubConnection(options.Value.EventHubConnectionString);
             _eventHubClient = eventHubClientFactory.CreateEventHubClient(connection);
         }
 
-        public async Task Invoke(FilterContext context, IEventDataConverter eventDataConverter)
+        public async Task Invoke(MessageContext context, IEventDataConverter eventDataConverter)
         {
             Check.NotNull(context, nameof(context));
             Check.NotNull(eventDataConverter, nameof(eventDataConverter));

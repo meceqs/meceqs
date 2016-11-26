@@ -18,7 +18,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             // Enricher
             builder.Services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            builder.Services.TryAddSingleton<IFilterContextEnricher, AspNetCoreEnricher>();
+            builder.Services.TryAddSingleton<IMessageContextEnricher, AspNetCoreEnricher>();
 
             // TODO should some be singleton?
             builder.Services.TryAddSingleton<IMessagePathConvention, DefaultMessagePathConvention>();

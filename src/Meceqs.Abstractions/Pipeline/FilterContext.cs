@@ -8,7 +8,7 @@ namespace Meceqs.Pipeline
     /// <summary>
     /// Contains the strongly typed envelope and metadata about the current execution.
     /// </summary>
-    public class FilterContext<TMessage> : FilterContext where TMessage : class
+    public class MessageContext<TMessage> : MessageContext where TMessage : class
     {
         /// <summary>
         /// Gets the envelope for which the pipeline is executed.
@@ -20,7 +20,7 @@ namespace Meceqs.Pipeline
         /// <summary>
         public new TMessage Message => (TMessage)base.Message;
 
-        public FilterContext(Envelope<TMessage> envelope)
+        public MessageContext(Envelope<TMessage> envelope)
             : base(envelope)
         {
         }
@@ -29,7 +29,7 @@ namespace Meceqs.Pipeline
     /// <summary>
     /// Contains the envelope and metadata about the current execution.
     /// </summary>
-    public abstract class FilterContext
+    public abstract class MessageContext
     {
         /// <summary>
         /// Gets the envelope for which the pipeline is executed.
@@ -47,7 +47,7 @@ namespace Meceqs.Pipeline
         public Type MessageType => Envelope.Message.GetType();
 
         /// <summary>
-        /// Gets the name of the pipeline on which the current filter is executed.
+        /// Gets the name of the pipeline on which the current middleware is executed.
         /// </summary>
         public string PipelineName { get; private set; }
 
@@ -73,16 +73,16 @@ namespace Meceqs.Pipeline
         public CancellationToken Cancellation { get; set; }
 
         /// <summary>
-        /// <see cref="Items"/> can be used to pass data from one filter to another.
+        /// <see cref="Items"/> can be used to pass data from one middleware to another.
         /// </summary>
-        public FilterContextItems Items { get; } = new FilterContextItems();
+        public MessageContextItems Items { get; } = new MessageContextItems();
 
         /// <summary>
         /// Gets or sets the user for the current execution.
         /// </summary>
         public ClaimsPrincipal User { get; set; }
 
-        protected FilterContext(Envelope envelope)
+        protected MessageContext(Envelope envelope)
         {
             Check.NotNull(envelope, nameof(envelope));
 

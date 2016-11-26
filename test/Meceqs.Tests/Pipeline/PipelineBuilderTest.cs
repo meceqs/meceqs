@@ -26,14 +26,14 @@ namespace Meceqs.Tests.Pipeline
         {
             var serviceProvider = Substitute.For<IServiceProvider>();
             var loggerFactory = Substitute.For<ILoggerFactory>();
-            var filterContextEnricher = Substitute.For<IFilterContextEnricher>();
+            var messageContextEnricher = Substitute.For<IMessageContextEnricher>();
 
-            Should.Throw<ArgumentNullException>(() => new DefaultPipelineBuilder(null, loggerFactory, filterContextEnricher));
-            Should.Throw<ArgumentNullException>(() => new DefaultPipelineBuilder(serviceProvider, null, filterContextEnricher));
+            Should.Throw<ArgumentNullException>(() => new DefaultPipelineBuilder(null, loggerFactory, messageContextEnricher));
+            Should.Throw<ArgumentNullException>(() => new DefaultPipelineBuilder(serviceProvider, null, messageContextEnricher));
         }
 
         [Fact]
-        public void Ctor_DoesNotThrow_if_filterContexEnricher_missing()
+        public void Ctor_DoesNotThrow_if_MessageContexEnricher_missing()
         {
             var serviceProvider = Substitute.For<IServiceProvider>();
             var loggerFactory = Substitute.For<ILoggerFactory>();
@@ -42,9 +42,9 @@ namespace Meceqs.Tests.Pipeline
         }
 
         [Fact]
-        public void Throws_if_no_filter_registered()
+        public void Throws_if_no_middleware_registered()
         {
-            var context = TestObjects.FilterContext<SimpleMessage>();
+            var context = TestObjects.MessageContext<SimpleMessage>();
             var builder = GetPipelineBuilder();
             var pipeline = builder.Build("pipeline");
 
@@ -52,9 +52,9 @@ namespace Meceqs.Tests.Pipeline
         }
 
         [Fact]
-        public void Throws_if_no_terminating_filter_registered()
+        public void Throws_if_no_terminating_middleware_registered()
         {
-            var context = TestObjects.FilterContext<SimpleMessage>();
+            var context = TestObjects.MessageContext<SimpleMessage>();
             var builder = GetPipelineBuilder();
 
             builder.Use((ctx, next) => next());
@@ -65,9 +65,9 @@ namespace Meceqs.Tests.Pipeline
         }
 
         [Fact]
-        public void Calls_multiple_filters_and_throws_if_no_terminating_filter()
+        public void Calls_multiple_middleware_and_throws_if_no_terminating_middleware()
         {
-            var context = TestObjects.FilterContext<SimpleMessage>();
+            var context = TestObjects.MessageContext<SimpleMessage>();
             var builder = GetPipelineBuilder();
 
             var called1 = 0;
@@ -85,9 +85,9 @@ namespace Meceqs.Tests.Pipeline
         }
 
         [Fact]
-        public async Task Calls_multiple_filters_with_terminating_filter()
+        public async Task Calls_multiple_middleware_with_terminating_middleware()
         {
-            var context = TestObjects.FilterContext<SimpleMessage>();
+            var context = TestObjects.MessageContext<SimpleMessage>();
             var builder = GetPipelineBuilder();
 
             var called1 = 0;
@@ -110,9 +110,9 @@ namespace Meceqs.Tests.Pipeline
 
 
         [Fact]
-        public async Task Calls_one_terminating_filter()
+        public async Task Calls_one_terminating_middleware()
         {
-            var context = TestObjects.FilterContext<SimpleMessage>();
+            var context = TestObjects.MessageContext<SimpleMessage>();
             var builder = GetPipelineBuilder();
 
             var called = 0;
@@ -126,9 +126,9 @@ namespace Meceqs.Tests.Pipeline
         }
 
         [Fact]
-        public async Task Doesnt_call_second_terminating_filter()
+        public async Task Doesnt_call_second_terminating_middleware()
         {
-            var context = TestObjects.FilterContext<SimpleMessage>();
+            var context = TestObjects.MessageContext<SimpleMessage>();
             var builder = GetPipelineBuilder();
 
             var called1 = 0;
@@ -146,9 +146,9 @@ namespace Meceqs.Tests.Pipeline
         }
 
         [Fact]
-        public async Task Doesnt_call_regular_filter_after_terminating_filter()
+        public async Task Doesnt_call_regular_middleware_after_terminating_middleware()
         {
-            var context = TestObjects.FilterContext<SimpleMessage>();
+            var context = TestObjects.MessageContext<SimpleMessage>();
             var builder = GetPipelineBuilder();
 
             var called1 = 0;

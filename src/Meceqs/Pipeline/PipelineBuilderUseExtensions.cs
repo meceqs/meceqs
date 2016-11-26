@@ -7,16 +7,16 @@ namespace Microsoft.Extensions.DependencyInjection
     public static class PipelineBuilderUseExtensions
     {
         /// <summary>
-        /// Adds an in-line filter to the pipeline.
+        /// Adds an in-line middleware to the pipeline.
         /// </summary>
-        public static IPipelineBuilder Use(this IPipelineBuilder builder, Func<FilterContext, Func<Task>, Task> filter)
+        public static IPipelineBuilder Use(this IPipelineBuilder builder, Func<MessageContext, Func<Task>, Task> middleware)
         {
-            return builder.Use(next => 
+            return builder.Use(next =>
             {
                 return context =>
                 {
                     Func<Task> simpleNext = () => next(context);
-                    return filter(context, simpleNext);
+                    return middleware(context, simpleNext);
                 };
             });
         }

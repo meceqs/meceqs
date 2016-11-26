@@ -6,12 +6,12 @@ using System.Threading;
 namespace Meceqs.Pipeline
 {
     /// <summary>
-    /// Contains common logic for building a <see cref="FilterContext"/>.
+    /// Contains common logic for building a <see cref="MessageContext"/>.
     /// This type is typically not used directly - use <see cref="Meceqs.Receiving.IReceiveBuilder"/>
     /// or <see cref="Meceqs.Sending.ISendBuilder"/> instead.
     /// </summary>
-    public interface IFilterContextBuilder<TBuilder>
-        where TBuilder : IFilterContextBuilder<TBuilder>
+    public interface IMessageContextBuilder<TBuilder>
+        where TBuilder : IMessageContextBuilder<TBuilder>
     {
         /// <summary>
         /// Returns the current instance. This is only required for derived types
@@ -21,12 +21,12 @@ namespace Meceqs.Pipeline
         TBuilder Instance { get; }
 
         /// <summary>
-        /// Writes the given cancellation token to <see cref="FilterContext.Cancellation"/>.
+        /// Writes the given cancellation token to <see cref="MessageContext.Cancellation"/>.
         /// </summary>
         TBuilder SetCancellationToken(CancellationToken cancellation);
 
         /// <summary>
-        /// Writes the given key:value pair to <see cref="FilterContext.Items"/>.
+        /// Writes the given key:value pair to <see cref="MessageContext.Items"/>.
         /// </summary>
         TBuilder SetContextItem(string key, object value);
 
@@ -36,14 +36,14 @@ namespace Meceqs.Pipeline
         TBuilder SetHeader(string headerName, object value);
 
         /// <summary>
-        /// Uses the given service provider for <see cref="FilterContext.RequestServices"/>
+        /// Uses the given service provider for <see cref="MessageContext.RequestServices"/>
         /// instead of the default (which is the same provider either <see cref="Meceqs.Receiving.IMessageReceiver"/>
         /// or <see cref="Meceqs.Sending.IMessageSender"/> was resolved from).
         /// </summary>
         TBuilder SetRequestServices(IServiceProvider requestServices);
 
         /// <summary>
-        /// Writes the given user to <see cref="FilterContext.User"/>.
+        /// Writes the given user to <see cref="MessageContext.User"/>.
         /// </summary>
         TBuilder SetUser(ClaimsPrincipal user);
 

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Security.Claims;
 
-namespace Meceqs.Filters.Auditing
+namespace Meceqs.Middleware.Auditing
 {
     public class AuditingOptions
     {

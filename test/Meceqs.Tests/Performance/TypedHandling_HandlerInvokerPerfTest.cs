@@ -35,10 +35,10 @@ namespace Meceqs.Test.Performance
             var envelope = TestObjects.Envelope<TMessage>();
             var serviceProvider = new ServiceCollection().BuildServiceProvider();
 
-            var filterContext = new FilterContext<TMessage>(envelope);
-            filterContext.Initialize("pipeline", serviceProvider, typeof(TResult));
+            var messageContext = new MessageContext<TMessage>(envelope);
+            messageContext.Initialize("pipeline", serviceProvider, typeof(TResult));
 
-            var handleContext = new HandleContext<TMessage>(filterContext);
+            var handleContext = new HandleContext<TMessage>(messageContext);
 
             return handleContext;
         }
@@ -107,7 +107,7 @@ namespace Meceqs.Test.Performance
             // Compiled Expression
             // ...................
 
-            
+
             // Create expression
 
             // Declaration of the object on which the method should be called
@@ -118,8 +118,8 @@ namespace Meceqs.Test.Performance
 
             // // Declaration of the actual method call
             var methodCall = Expression.Call(
-                Expression.Convert(instance, typedHandlerType), 
-                typedHandleMethod, 
+                Expression.Convert(instance, typedHandlerType),
+                typedHandleMethod,
                 Expression.Convert(contextArg, typedHandleContextType));
 
             // Compiles declaration into actual delegate

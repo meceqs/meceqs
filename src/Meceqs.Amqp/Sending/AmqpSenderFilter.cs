@@ -7,14 +7,14 @@ using Microsoft.Extensions.Options;
 
 namespace Meceqs.Amqp.Sending
 {
-    public class AmqpSenderFilter : IDisposable
+    public class AmqpSenderMiddleware : IDisposable
     {
         private readonly AmqpSenderOptions _options;
         private readonly Lazy<ISenderLink> _senderLink;
         private readonly IAmqpMessageConverter _messageConverter;
 
-        public AmqpSenderFilter(
-            FilterDelegate next,
+        public AmqpSenderMiddleware(
+            MessageDelegate next,
             IOptions<AmqpSenderOptions> options,
             ISenderLinkFactory senderLinkFactory,
             IAmqpMessageConverter messageConverter)
@@ -33,7 +33,7 @@ namespace Meceqs.Amqp.Sending
             });
         }
 
-        public async Task Invoke(FilterContext context)
+        public async Task Invoke(MessageContext context)
         {
             var message = _messageConverter.ConvertToAmqpMessage(context.Envelope);
 

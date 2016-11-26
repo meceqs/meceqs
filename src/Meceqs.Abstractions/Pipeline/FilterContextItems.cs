@@ -3,15 +3,15 @@ using System.Collections.Generic;
 namespace Meceqs.Pipeline
 {
     /// <summary>
-    /// Represents a dictionary of arbitrary items that are passed from filter to filter.
+    /// Represents a dictionary of arbitrary items that are passed from middleware to middleware.
     /// These items are not serialized in the envelope.
     /// </summary>
-    public class FilterContextItems : Dictionary<object, object>
+    public class MessageContextItems : Dictionary<object, object>
     {
         /// <summary>
         /// Adds all items from <paramref name="other"/> to this instance.
         /// </summary>
-        public void Add(FilterContextItems other)
+        public void Add(MessageContextItems other)
         {
             if (other == null || other.Count == 0)
                 return;

@@ -1,6 +1,6 @@
 using System;
 using Meceqs;
-using Meceqs.Filters.Auditing;
+using Meceqs.Middleware.Auditing;
 using Meceqs.Pipeline;
 
 namespace Microsoft.Extensions.DependencyInjection
@@ -14,7 +14,7 @@ namespace Microsoft.Extensions.DependencyInjection
             var options = new AuditingOptions();
             setupAction?.Invoke(options);
 
-            builder.UseFilter<AuditingFilter>(options);
+            builder.UseMiddleware<AuditingMiddleware>(options);
 
             return builder;
         }

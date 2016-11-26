@@ -8,7 +8,7 @@ namespace Meceqs.Sending
     /// Represents a builder object for sending a new message or for forwarding an existing envelope
     /// to a pipeline.
     /// </summary>
-    public interface ISendBuilder : IFilterContextBuilder<ISendBuilder>
+    public interface ISendBuilder : IMessageContextBuilder<ISendBuilder>
     {
         /// <summary>
         /// Correlates the envelope/message to be sent with the given envelope by

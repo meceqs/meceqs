@@ -10,33 +10,33 @@ namespace Meceqs.Tests.Pipeline
 {
     public class PipelineTest
     {
-        private IPipeline GetPipeline(FilterDelegate filterDelegate = null)
+        private IPipeline GetPipeline(MessageDelegate messageDelegate = null)
         {
-            if (filterDelegate == null)
-                filterDelegate = (ctx) => Task.CompletedTask;
+            if (messageDelegate == null)
+                messageDelegate = (ctx) => Task.CompletedTask;
 
-            return new DefaultPipeline(filterDelegate, "pipeline", Substitute.For<ILoggerFactory>(), null);
+            return new DefaultPipeline(messageDelegate, "pipeline", Substitute.For<ILoggerFactory>(), null);
         }
 
         [Fact]
         public void Ctor_throws_if_parameters_missing()
         {
-            FilterDelegate filterDelegate = ctx => Task.CompletedTask;
+            MessageDelegate messageDelegate = ctx => Task.CompletedTask;
             var loggerFactory = Substitute.For<ILoggerFactory>();
-            var filterContextEnricher = Substitute.For<IFilterContextEnricher>();
+            var messageContextEnricher = Substitute.For<IMessageContextEnricher>();
 
-            Should.Throw<ArgumentNullException>(() => new DefaultPipeline(null, "pipeline", loggerFactory, filterContextEnricher));
-            Should.Throw<ArgumentNullException>(() => new DefaultPipeline(filterDelegate, null, loggerFactory, filterContextEnricher));
-            Should.Throw<ArgumentNullException>(() => new DefaultPipeline(filterDelegate, "pipeline", null, filterContextEnricher));
+            Should.Throw<ArgumentNullException>(() => new DefaultPipeline(null, "pipeline", loggerFactory, messageContextEnricher));
+            Should.Throw<ArgumentNullException>(() => new DefaultPipeline(messageDelegate, null, loggerFactory, messageContextEnricher));
+            Should.Throw<ArgumentNullException>(() => new DefaultPipeline(messageDelegate, "pipeline", null, messageContextEnricher));
         }
 
         [Fact]
-        public void Ctor_DoesNotThrow_if_filterContextEnricher_missing()
+        public void Ctor_DoesNotThrow_if_MessageContextEnricher_missing()
         {
-            FilterDelegate filterDelegate = ctx => Task.CompletedTask;
+            MessageDelegate pipeline = ctx => Task.CompletedTask;
             var loggerFactory = Substitute.For<ILoggerFactory>();
 
-            new DefaultPipeline(filterDelegate, "pipeline", loggerFactory, null);
+            new DefaultPipeline(pipeline, "pipeline", loggerFactory, null);
         }
 
         [Fact]
@@ -44,20 +44,20 @@ namespace Meceqs.Tests.Pipeline
         {
             var pipeline = GetPipeline();
 
-            await Assert.ThrowsAsync<ArgumentNullException>(() => pipeline.InvokeAsync((FilterContext)null));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => pipeline.InvokeAsync((MessageContext)null));
         }
 
         [Fact]
-        public async Task Invoke_calls_filter_with_pipelineName()
+        public async Task Invoke_calls_middleware_with_pipelineName()
         {
             var called = 0;
-            FilterDelegate filter = (ctx) => {
+            MessageDelegate middleware = (ctx) => {
                 called++;
                 ctx.PipelineName.ShouldBe("pipeline");
                 return Task.CompletedTask;
             };
-            var pipeline = GetPipeline(filter);
-            var context = TestObjects.FilterContext<SimpleMessage>();
+            var pipeline = GetPipeline(middleware);
+            var context = TestObjects.MessageContext<SimpleMessage>();
 
             await pipeline.InvokeAsync(context);
 
@@ -65,16 +65,16 @@ namespace Meceqs.Tests.Pipeline
         }
 
         [Fact]
-        public async Task Invoke_calls_filter_with_ExpectedResultType()
+        public async Task Invoke_calls_middleware_with_ExpectedResultType()
         {
             var called = 0;
-            FilterDelegate filter = (ctx) => {
+            MessageDelegate middleware = (ctx) => {
                 called++;
                 ctx.ExpectedResultType.ShouldBe(typeof(string));
                 return Task.CompletedTask;
             };
-            var pipeline = GetPipeline(filter);
-            var context = TestObjects.FilterContext<SimpleMessage>(resultType: typeof(string));
+            var pipeline = GetPipeline(middleware);
+            var context = TestObjects.MessageContext<SimpleMessage>(resultType: typeof(string));
 
             await pipeline.InvokeAsync(context);
 
@@ -84,12 +84,12 @@ namespace Meceqs.Tests.Pipeline
         [Fact]
         public async Task Invoke_with_expectedResultType_returns_result()
         {
-            FilterDelegate filter = (ctx) => {
+            MessageDelegate middleware = (ctx) => {
                 ctx.Result = "result";
                 return Task.CompletedTask;
             };
-            var pipeline = GetPipeline(filter);
-            var context = TestObjects.FilterContext<SimpleMessage>(resultType: typeof(string));
+            var pipeline = GetPipeline(middleware);
+            var context = TestObjects.MessageContext<SimpleMessage>(resultType: typeof(string));
 
             await pipeline.InvokeAsync(context);
 

@@ -8,51 +8,51 @@ using Meceqs.Pipeline;
 namespace Meceqs.TypedHandling.Internal
 {
     /// <summary>
-    /// Creates a typed <see typeref="HandleContext" /> for the given <see typeref="FilterContext" />.
+    /// Creates a typed <see typeref="HandleContext" /> for the given <see typeref="MessageContext" />.
     /// For better performance, it uses cached delegates to create the instance.
     /// </summary>
     public class DefaultHandleContextFactory : IHandleContextFactory
     {
-        private readonly ConcurrentDictionary<Type, Func<FilterContext, HandleContext>> _cachedConstructorDelegates;
+        private readonly ConcurrentDictionary<Type, Func<MessageContext, HandleContext>> _cachedConstructorDelegates;
 
         public DefaultHandleContextFactory()
         {
-            _cachedConstructorDelegates = new ConcurrentDictionary<Type, Func<FilterContext, HandleContext>>();
+            _cachedConstructorDelegates = new ConcurrentDictionary<Type, Func<MessageContext, HandleContext>>();
         }
 
-        public HandleContext CreateHandleContext(FilterContext filterContext)
+        public HandleContext CreateHandleContext(MessageContext messageContext)
         {
-            Check.NotNull(filterContext, nameof(filterContext));
+            Check.NotNull(messageContext, nameof(messageContext));
 
-            Type messageType = filterContext.MessageType;
+            Type messageType = messageContext.MessageType;
 
             var ctorDelegate = GetOrAddConstructorDelegate(messageType);
 
-            HandleContext handleContext = ctorDelegate(filterContext);
+            HandleContext handleContext = ctorDelegate(messageContext);
 
             return handleContext;
         }
 
-        private Func<FilterContext, HandleContext> GetOrAddConstructorDelegate(Type messageType)
+        private Func<MessageContext, HandleContext> GetOrAddConstructorDelegate(Type messageType)
         {
             var ctorDelegate = _cachedConstructorDelegates.GetOrAdd(messageType, x =>
             {
                 // Resolve types
                 Type typedHandleContextType = typeof(HandleContext<>).MakeGenericType(messageType);
-                Type typedFilterContextType = typeof(FilterContext<>).MakeGenericType(messageType);
+                Type typedMessageContextType = typeof(MessageContext<>).MakeGenericType(messageType);
 
                 ConstructorInfo constructor = typedHandleContextType.GetTypeInfo().DeclaredConstructors.First();
 
                 // Create Expression
 
                 // parameters for constructor
-                var filterContextParam = Expression.Parameter(typeof(FilterContext), "filterContext");
-                var castedFilterContextParam = Expression.Convert(filterContextParam, typedFilterContextType);
+                var messageContextParam = Expression.Parameter(typeof(MessageContext), "messageContext");
+                var castedMessageContextParam = Expression.Convert(messageContextParam, typedMessageContextType);
 
                 // Create constructor call
-                var compiledDelegate = Expression.Lambda<Func<FilterContext, HandleContext>>(
-                    Expression.New(constructor, castedFilterContextParam),
-                    filterContextParam
+                var compiledDelegate = Expression.Lambda<Func<MessageContext, HandleContext>>(
+                    Expression.New(constructor, castedMessageContextParam),
+                    messageContextParam
                 ).Compile();
 
                 return compiledDelegate;

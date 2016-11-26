@@ -7,7 +7,7 @@ using Microsoft.Extensions.Primitives;
 
 namespace Meceqs.AspNetCore
 {
-    public class AspNetCoreEnricher : IFilterContextEnricher
+    public class AspNetCoreEnricher : IMessageContextEnricher
     {
         private readonly AspNetCoreEnricherOptions _options;
         private readonly IHttpContextAccessor _httpContextAccessor;
@@ -23,7 +23,7 @@ namespace Meceqs.AspNetCore
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public void EnrichFilterContext(FilterContext context)
+        public void EnrichMessageContext(MessageContext context)
         {
             Check.NotNull(context, nameof(context));
 
@@ -36,58 +36,58 @@ namespace Meceqs.AspNetCore
             AddHistoryEntry(context, httpContext);
         }
 
-        private void AttachToHttpContext(FilterContext filterContext, HttpContext httpContext)
+        private void AttachToHttpContext(MessageContext messageContext, HttpContext httpContext)
         {
             // HttpContext is null e.g. when a message is sent on a background thread.
             if (httpContext == null)
                 return;
 
-            if (filterContext.User == null)
+            if (messageContext.User == null)
             {
-                filterContext.User = httpContext.User;
+                messageContext.User = httpContext.User;
             }
 
-            if (filterContext.Cancellation == default(CancellationToken))
+            if (messageContext.Cancellation == default(CancellationToken))
             {
-                filterContext.Cancellation = httpContext.RequestAborted;
+                messageContext.Cancellation = httpContext.RequestAborted;
             }
-            else if (filterContext.Cancellation != httpContext.RequestAborted)
+            else if (messageContext.Cancellation != httpContext.RequestAborted)
             {
                 // Someone provided a custom cancellation. To make sure the operation still is cancelled
                 // when the ASP.NET request is cancelled, the two cancellation tokens are combined.
                 var compositeCancellation = CancellationTokenSource.CreateLinkedTokenSource(
-                    filterContext.Cancellation,
+                    messageContext.Cancellation,
                     httpContext.RequestAborted
                 );
-                filterContext.Cancellation = compositeCancellation.Token;
+                messageContext.Cancellation = compositeCancellation.Token;
             }
         }
 
-        private void AddRemoteUserHeaders(FilterContext filterContext, HttpContext httpContext)
+        private void AddRemoteUserHeaders(MessageContext messageContext, HttpContext httpContext)
         {
             if (!_options.AddRemoteUserHeaders || httpContext == null)
                 return;
 
-            if (!filterContext.Envelope.Headers.ContainsKey(_options.RemoteUserIpAddressHeaderName))
+            if (!messageContext.Envelope.Headers.ContainsKey(_options.RemoteUserIpAddressHeaderName))
             {
-                filterContext.Envelope.Headers.Add(_options.RemoteUserIpAddressHeaderName, httpContext.Connection?.RemoteIpAddress.ToString());
+                messageContext.Envelope.Headers.Add(_options.RemoteUserIpAddressHeaderName, httpContext.Connection?.RemoteIpAddress.ToString());
             }
 
-            if (!filterContext.Envelope.Headers.ContainsKey(_options.RemoteUserAgentHeaderName))
+            if (!messageContext.Envelope.Headers.ContainsKey(_options.RemoteUserAgentHeaderName))
             {
                 StringValues userAgent;
                 if (httpContext.Request.Headers.TryGetValue("User-Agent", out userAgent))
                 {
-                    filterContext.Envelope.Headers.Add(_options.RemoteUserAgentHeaderName, userAgent.ToString());
+                    messageContext.Envelope.Headers.Add(_options.RemoteUserAgentHeaderName, userAgent.ToString());
                 }
             }
         }
 
-        private void AddHistoryEntry(FilterContext filterContext, HttpContext httpContext)
+        private void AddHistoryEntry(MessageContext messageContext, HttpContext httpContext)
         {
             var historyEntry = new EnvelopeHistoryEntry
             {
-                Pipeline = filterContext.PipelineName,
+                Pipeline = messageContext.PipelineName,
                 Host = _options.HostName,
                 Endpoint = _options.EndpointName,
                 CreatedOnUtc = DateTime.UtcNow
@@ -99,7 +99,7 @@ namespace Meceqs.AspNetCore
                 historyEntry.Properties.Add(_options.HistoryPropertyRequestPath, httpContext.Request.Path.Value);
             }
 
-            filterContext.Envelope.History.Add(historyEntry);
+            messageContext.Envelope.History.Add(historyEntry);
         }
     }
 }

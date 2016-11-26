@@ -21,14 +21,14 @@ namespace Meceqs.Transport
         private Action<IPipelineBuilder> _pipeline;
 
         /// <summary>
-        /// Allows derived classes to modify the user-defined pipeline by adding additional filters
-        /// at the beginning.
+        /// Allows derived classes to modify the user-defined pipeline by adding additional
+        /// middleware components at the beginning.
         /// </summary>
         protected Action<IPipelineBuilder> PipelineStartHook { get; set; }
 
         /// <summary>
-        /// Allows derived classes to modify the user-defined pipeline by adding additional filters
-        /// at the end.
+        /// Allows derived classes to modify the user-defined pipeline by adding additional
+        /// middleware components at the end.
         /// </summary>
         protected Action<IPipelineBuilder> PipelineEndHook { get; set; }
 
@@ -138,7 +138,7 @@ namespace Meceqs.Transport
                 }
             }
 
-            // Add the filter to the end of the pipeline.
+            // Add the middleware to the end of the pipeline.
             PipelineEndHook = pipeline =>
             {
                 pipeline.RunTypedHandling(options);

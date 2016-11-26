@@ -5,7 +5,7 @@ using Meceqs.Pipeline;
 
 namespace Meceqs.Receiving
 {
-    public class ReceiveBuilder : FilterContextBuilder<IReceiveBuilder>, IReceiveBuilder
+    public class ReceiveBuilder : MessageContextBuilder<IReceiveBuilder>, IReceiveBuilder
     {
         public override IReceiveBuilder Instance => this;
 
