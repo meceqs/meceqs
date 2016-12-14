@@ -1,7 +1,6 @@
 using Customers.Core.CommandHandlers;
 using Customers.Core.Repositories;
 using Customers.Hosts.WebApi.Infrastructure;
-using Meceqs.AspNetCore.Swagger;
 using Meceqs.AzureEventHubs.Sending;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -108,9 +107,9 @@ namespace Customers.Hosts.WebApi
         {
             app.UseDeveloperExceptionPage();
 
-            app.UseMiddleware<SwaggerMiddleware>();
-
             app.UseAspNetCoreReceiver();
+
+            app.UseSwagger();
         }
     }
 }

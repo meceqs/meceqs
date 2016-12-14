@@ -2,6 +2,7 @@ using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("Meceqs.Amqp")]
 [assembly: InternalsVisibleTo("Meceqs.AspNetCore")]
+[assembly: InternalsVisibleTo("Meceqs.AspNetCore.Swagger")]
 [assembly: InternalsVisibleTo("Meceqs.AzureEventHubs")]
 [assembly: InternalsVisibleTo("Meceqs.AzureEventHubs.FileFake")]
 [assembly: InternalsVisibleTo("Meceqs.AzureServiceBus")]

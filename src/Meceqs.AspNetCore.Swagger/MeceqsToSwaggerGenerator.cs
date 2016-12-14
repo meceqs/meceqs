@@ -46,9 +46,8 @@ namespace Meceqs.AspNetCore.Swagger
                 Version = _settings.Version
             };
 
-            var schemaResolver = new SchemaResolver();
-            var schemaDefinitionAppender = new SwaggerDocumentSchemaDefinitionAppender(document, _settings.TypeNameGenerator);
-            var swaggerGenerator = new SwaggerGenerator(_schemaGenerator, _settings, schemaResolver, schemaDefinitionAppender);
+            var schemaResolver = new SwaggerSchemaResolver(document, _settings);
+            var swaggerGenerator = new SwaggerGenerator(_schemaGenerator, _settings, schemaResolver);
 
             foreach (var messageType in _options.MessageTypes)
             {
@@ -115,7 +114,7 @@ namespace Meceqs.AspNetCore.Swagger
             document.Paths[operationDescription.Path][operationDescription.Method] = operationDescription.Operation;
         }
 
-        private void AppendRequiredSchemasToDefinitions(SwaggerDocument document, ISchemaResolver schemaResolver)
+        private void AppendRequiredSchemasToDefinitions(SwaggerDocument document, SwaggerSchemaResolver schemaResolver)
         {
             foreach (var schema in schemaResolver.Schemas)
             {
