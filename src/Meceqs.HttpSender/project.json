@@ -19,9 +19,6 @@
       }
     },
     "netstandard1.3": {
-      "dependencies": {
-        "System.Net.Http": "4.3.0"
-      }
     }
   }
 }

@@ -16,8 +16,6 @@
     "netstandard1.3": {
       "dependencies": {
         "System.Collections.NonGeneric": "4.3.0",
-        "System.Diagnostics.Tools": "4.3.0",
-        "System.Threading.Timer": "4.3.0",
         "System.Reflection.Emit.Lightweight": "4.3.0",
         "System.Runtime.Serialization.Primitives": "4.3.0"
       }

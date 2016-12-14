@@ -8,12 +8,8 @@
   "frameworks": {
     "netstandard1.3": {
       "dependencies": {
+        "NETStandard.Library": "1.6.1",
         "System.ComponentModel": "4.3.0",
-        "System.Collections": "4.3.0",
-        "System.Diagnostics.Debug": "4.3.0",
-        "System.Globalization": "4.3.0",
-        "System.Reflection": "4.3.0",
-        "System.Runtime.Extensions": "4.3.0",
         "System.Security.Claims": "4.3.0"
       }
     }
