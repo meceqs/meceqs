@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Meceqs.Sending
@@ -9,8 +8,6 @@ namespace Meceqs.Sending
     /// for "forwarding an existing envelope" to a pipeline.
     public interface IMessageSender
     {
-        // TODO @cweiss remove handling of multiple messages?
-
         /// <summary>
         /// <para>Creates a builder that sends an existing <see cref="Envelope"/> to a pipeline.
         /// This can be used to forward an envelope from a receiver to a sender.</para>
@@ -25,12 +22,6 @@ namespace Meceqs.Sending
         ISendBuilder ForMessage(object message, Guid? messageId = null);
 
         /// <summary>
-        /// <para>Creates a builder that sends a list of <paramref name="messages"/> to a pipeline.</para>
-        /// <para>If you don't specify a pipeline name, the default "Send" pipeline will be used.</para>
-        /// </summary>
-        ISendBuilder ForMessages(IEnumerable<object> messages);
-
-        /// <summary>
         /// Sends the message to the default "Send" pipeline. If you want to use a different pipeline
         /// or change some other behavior, use the builder pattern with <see cref="ForMessage"/>.
         /// </summary>
@@ -42,12 +33,5 @@ namespace Meceqs.Sending
         /// use the builder pattern with <see cref="ForMessage"/>.
         /// </summary>
         Task<TResult> SendAsync<TResult>(object message, Guid? messageId = null);
-
-        /// <summary>
-        /// Sends the messages to the default "Send" pipeline. If you want to use a different pipeline
-        /// or change some other behavior, use the builder pattern with <see cref="ForMessage"/>.
-        /// </summary>
-        Task SendAsync(IEnumerable<object> messages);
-
     }
 }

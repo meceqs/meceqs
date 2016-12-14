@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Meceqs.Pipeline;
@@ -54,10 +53,6 @@ namespace Meceqs.Tests.Sending
             var envelope = TestObjects.Envelope<SimpleMessage>();
             Should.Throw<ArgumentNullException>(() => new SendBuilder((Envelope)null, serviceProvider));
             Should.Throw<ArgumentNullException>(() => new SendBuilder(envelope, null));
-
-            var envelopes = new List<Envelope>();
-            Should.Throw<ArgumentNullException>(() => new SendBuilder(envelopes, null));
-            Should.Throw<ArgumentNullException>(() => new SendBuilder((IList<Envelope>)null, serviceProvider));
         }
 
         [Fact]

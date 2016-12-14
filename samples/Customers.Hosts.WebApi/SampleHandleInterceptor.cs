@@ -1,4 +1,3 @@
-using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Customers.Core;
@@ -29,16 +28,14 @@ namespace Customers.Hosts.WebApi.Infrastructure
         {
             _logger.LogInformation("OnHandleExecuting for {MessageType}", context.Message.GetType());
 
-            var customAttribute = context.HandleMethod.CustomAttributes
-                .FirstOrDefault(x => x.AttributeType == typeof(CustomLogicAttribute));
+            var customAttribute = context.HandleMethod.GetCustomAttribute(typeof(CustomLogicAttribute));
 
             if (customAttribute != null)
             {
                 _logger.LogWarning("Custom attribute found on method");
             }
 
-            customAttribute = context.HandlerType.GetTypeInfo().CustomAttributes
-                .FirstOrDefault(x => x.AttributeType == typeof(CustomLogicAttribute));
+            customAttribute = context.HandlerType.GetCustomAttribute(typeof(CustomLogicAttribute));
 
             if (customAttribute != null)
             {

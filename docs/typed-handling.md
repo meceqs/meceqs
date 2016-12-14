@@ -105,16 +105,14 @@ public class SampleHandleInterceptor : IHandleInterceptor
 
     private void OnHandleExecuting(HandleContext context)
     {
-        var customAttribute = context.HandleMethod.CustomAttributes
-            .FirstOrDefault(x => x.AttributeType == typeof(CustomLogicAttribute));
+        var customAttribute = context.HandleMethod.GetCustomAttribute(typeof(CustomLogicAttribute));
 
         if (customAttribute != null)
         {
             _logger.LogInformation("Custom attribute found on method");
         }
 
-        customAttribute = context.HandlerType.GetTypeInfo().CustomAttributes
-            .FirstOrDefault(x => x.AttributeType == typeof(CustomLogicAttribute));
+        customAttribute = context.HandlerType.GetCustomAttribute(typeof(CustomLogicAttribute));
 
         if (customAttribute != null)
         {

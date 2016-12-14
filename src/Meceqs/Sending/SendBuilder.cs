@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Meceqs.Configuration;
 using Meceqs.Pipeline;
@@ -19,24 +18,9 @@ namespace Meceqs.Sending
             _envelopeCorrelator = serviceProvider.GetRequiredService<IEnvelopeCorrelator>();
         }
 
-        public SendBuilder(IEnumerable<Envelope> envelopes, IServiceProvider serviceProvider)
-            : base(MeceqsDefaults.SendPipelineName, envelopes, serviceProvider)
-        {
-            _envelopeCorrelator = serviceProvider.GetRequiredService<IEnvelopeCorrelator>();
-        }
-
         public ISendBuilder CorrelateWith(Envelope source)
         {
-            _envelopeCorrelator.CorrelateSourceWithTarget(source, FirstEnvelope);
-
-            if (AdditionalEnvelopes != null)
-            {
-                foreach (var envelope in AdditionalEnvelopes)
-                {
-                    _envelopeCorrelator.CorrelateSourceWithTarget(source, envelope);
-                }
-            }
-
+            _envelopeCorrelator.CorrelateSourceWithTarget(source, Envelope);
             return this;
         }
 

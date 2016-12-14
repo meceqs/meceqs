@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,16 +12,7 @@ namespace Meceqs.Pipeline
         private readonly IMessageContextFactory _messageContextFactory;
         private readonly IPipelineProvider _pipelineProvider;
 
-        /// <summary>
-        /// In most cases we send just a single envelope. To make sure we don't have to wrap it in a list
-        /// every time, this property always holds the single/first envelope (if there is one).
-        /// </summary>
-        protected Envelope FirstEnvelope { get; }
-
-        /// <summary>
-        /// Contains the 2nd, 3rd... envelope. <c>null</c> if there's no or only one envelope!
-        /// </summary>
-        protected List<Envelope> AdditionalEnvelopes { get; }
+        protected Envelope Envelope { get; }
 
         protected CancellationToken Cancellation { get; private set; }
         protected MessageContextItems ContextItems { get; private set; }
@@ -40,34 +30,7 @@ namespace Meceqs.Pipeline
         {
             Check.NotNull(envelope, nameof(envelope));
 
-            FirstEnvelope = envelope;
-        }
-
-        protected MessageContextBuilder(string defaultPipelineName, IEnumerable<Envelope> envelopes, IServiceProvider serviceProvider)
-            : this(defaultPipelineName, serviceProvider)
-        {
-            Check.NotNull(envelopes, nameof(envelopes));
-
-            // Store the first envelope in the main property and the rest in a separate list.
-            // If we get a list, it's possible that there's no envelope at all.
-            // This will result in a no-op send!
-
-            foreach (var envelope in envelopes)
-            {
-                if (FirstEnvelope == null)
-                {
-                    FirstEnvelope = envelope;
-                }
-                else
-                {
-                    if (AdditionalEnvelopes == null)
-                    {
-                        AdditionalEnvelopes = new List<Envelope>();
-                    }
-
-                    AdditionalEnvelopes.Add(envelope);
-                }
-            }
+            Envelope = envelope;
         }
 
         private MessageContextBuilder(string defaultPipelineName, IServiceProvider serviceProvider)
@@ -123,19 +86,7 @@ namespace Meceqs.Pipeline
 
         public TBuilder SetHeader(string headerName, object value)
         {
-            if (FirstEnvelope != null)
-            {
-                FirstEnvelope.Headers[headerName] = value;
-            }
-
-            if (AdditionalEnvelopes != null)
-            {
-                foreach (var envelope in AdditionalEnvelopes)
-                {
-                    envelope.Headers[headerName] = value;
-                }
-            }
-
+            Envelope.Headers[headerName] = value;
             return Instance;
         }
 
@@ -162,29 +113,16 @@ namespace Meceqs.Pipeline
         {
             var pipeline = _pipelineProvider.GetPipeline(PipelineName);
 
-            if (FirstEnvelope != null)
-            {
-                var messageContext = CreateMessageContext(FirstEnvelope, resultType: null);
-                await pipeline.InvokeAsync(messageContext);
-            }
+            var messageContext = CreateMessageContext(Envelope, resultType: null);
 
-            if (AdditionalEnvelopes != null)
-            {
-                foreach (var envelope in AdditionalEnvelopes)
-                {
-                    var messageContext = CreateMessageContext(envelope, resultType: null);
-                    await pipeline.InvokeAsync(messageContext);
-                }
-            }
+            await pipeline.InvokeAsync(messageContext);
         }
 
         protected async Task<TResult> InvokePipelineAsync<TResult>()
         {
-            EnsureExactlyOneEnvelope();
-
             var pipeline = _pipelineProvider.GetPipeline(PipelineName);
 
-            var messageContext = CreateMessageContext(FirstEnvelope, typeof(TResult));
+            var messageContext = CreateMessageContext(Envelope, typeof(TResult));
 
             await pipeline.InvokeAsync(messageContext);
 
@@ -193,32 +131,13 @@ namespace Meceqs.Pipeline
 
         protected async Task<object> InvokePipelineAsync(Type resultType)
         {
-            EnsureExactlyOneEnvelope();
-
             var pipeline = _pipelineProvider.GetPipeline(PipelineName);
 
-            var messageContext = CreateMessageContext(FirstEnvelope, resultType);
+            var messageContext = CreateMessageContext(Envelope, resultType);
 
             await pipeline.InvokeAsync(messageContext);
 
             return messageContext.Result;
-        }
-
-        private void EnsureExactlyOneEnvelope()
-        {
-            if (FirstEnvelope == null)
-            {
-                throw new InvalidOperationException(
-                    $"'{nameof(InvokePipelineAsync)}' with a result-type can only be called if there's exactly one envelope. " +
-                    $"Actual Count: 0");
-            }
-
-            if (AdditionalEnvelopes != null)
-            {
-                throw new InvalidOperationException(
-                    $"'{nameof(InvokePipelineAsync)}' with a result-type can only be called if there's exactly one envelope. " +
-                    $"Actual Count: {1 + AdditionalEnvelopes.Count}");
-            }
         }
     }
 }

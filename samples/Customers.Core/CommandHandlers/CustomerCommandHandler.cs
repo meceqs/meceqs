@@ -64,9 +64,12 @@ namespace Customers.Core.CommandHandlers
         {
             var events = customer.GetChanges();
 
-            await _sender.ForMessages(events)
-                .CorrelateWith(sourceMessage)
-                .SendAsync();
+            foreach (var evt in events)
+            {
+                await _sender.ForMessage(evt)
+                    .CorrelateWith(sourceMessage)
+                    .SendAsync();
+            }
 
             customer.ClearChanges();
         }

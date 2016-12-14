@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -45,34 +44,6 @@ namespace Meceqs.Sending
             return ForEnvelope(envelope);
         }
 
-        public ISendBuilder ForMessages(IEnumerable<object> messages)
-        {
-            Check.NotNull(messages, nameof(messages));
-
-            Guid? correlationId = null;
-            var envelopes = new List<Envelope>();
-
-            foreach (var message in messages)
-            {
-                var envelope = _envelopeFactory.Create(message, messageId: Guid.NewGuid());
-
-                // In case no-one correlates these messages with another message, we at least want
-                // all of them to have the same correlation-id (from the first message).
-                if (correlationId.HasValue)
-                {
-                    envelope.CorrelationId = correlationId.Value;
-                }
-                else
-                {
-                    correlationId = envelope.CorrelationId;
-                }
-
-                envelopes.Add(envelope);
-            }
-
-            return new SendBuilder(envelopes, _serviceProvider);
-        }
-
         /// <summary>
         /// Sends the message to the default "Send" pipeline. If you want to use a different pipeline
         /// or change some other behavior, use the builder pattern with <see cref="ForMessage"/>.
@@ -90,15 +61,6 @@ namespace Meceqs.Sending
         public Task<TResult> SendAsync<TResult>(object message, Guid? messageId = null)
         {
             return ForMessage(message, messageId).SendAsync<TResult>();
-        }
-
-        /// <summary>
-        /// Sends the messages to the default "Send" pipeline. If you want to use a different pipeline
-        /// or change some other behavior, use the builder pattern with <see cref="ForMessage"/>.
-        /// </summary>
-        public Task SendAsync(IEnumerable<object> messages)
-        {
-            return ForMessages(messages).SendAsync();
         }
     }
 }
