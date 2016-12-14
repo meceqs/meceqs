@@ -19,8 +19,8 @@ namespace Meceqs.TypedHandling
 
             builder.CorrelateWith(context.Envelope);
 
-            builder.SetCancellationToken(context.MessageContext.Cancellation);
-            builder.SetUser(context.MessageContext.User);
+            builder.SetCancellationToken(context.Cancellation);
+            builder.SetUser(context.User);
 
             return builder.Instance;
         }
@@ -37,8 +37,8 @@ namespace Meceqs.TypedHandling
 
             builder.CorrelateWith(context.Envelope);
 
-            builder.SetCancellationToken(context.MessageContext.Cancellation);
-            builder.SetUser(context.MessageContext.User);
+            builder.SetCancellationToken(context.Cancellation);
+            builder.SetUser(context.User);
 
             return builder.Instance;
         }

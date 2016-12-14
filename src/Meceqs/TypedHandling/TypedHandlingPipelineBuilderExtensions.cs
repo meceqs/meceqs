@@ -7,7 +7,6 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class TypedHandlingPipelineBuilderExtensions
     {
-
         public static void RunTypedHandling(this IPipelineBuilder builder, Action<TypedHandlingOptions> options)
         {
             var handlingOptions = new TypedHandlingOptions();

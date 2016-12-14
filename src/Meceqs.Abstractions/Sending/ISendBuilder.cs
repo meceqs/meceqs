@@ -5,8 +5,8 @@ using Meceqs.Pipeline;
 namespace Meceqs.Sending
 {
     /// <summary>
-    /// Represents a builder object for sending a new message or for forwarding an existing envelope
-    /// to a pipeline.
+    /// Represents a builder object for sending a new message to a pipeline
+    /// or for forwarding an existing envelope to a pipeline.
     /// </summary>
     public interface ISendBuilder : IMessageContextBuilder<ISendBuilder>
     {

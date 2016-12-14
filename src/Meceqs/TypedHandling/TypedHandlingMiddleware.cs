@@ -178,7 +178,7 @@ namespace Meceqs.TypedHandling
             if (handlers.Count == 0)
             {
                 throw new MeceqsException(
-                    $"The options don't contain any handler. " +
+                    $"The options don't contain any handlers. " +
                     $"Handlers can be added by calling '{nameof(HandlerCollection)}.{nameof(HandlerCollection.Add)}' " +
                     $"or '{nameof(HandlerCollection)}.{nameof(HandlerCollection.AddService)}'.");
             }

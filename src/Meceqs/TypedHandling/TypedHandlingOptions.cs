@@ -11,14 +11,16 @@ namespace Meceqs.TypedHandling
 
         public UnknownMessageBehavior UnknownMessageBehavior { get; set; } = UnknownMessageBehavior.ThrowException;
 
-        public void ThrowOnUnknownMessage()
+        public TypedHandlingOptions ThrowOnUnknownMessage()
         {
             UnknownMessageBehavior = UnknownMessageBehavior.ThrowException;
+            return this;
         }
 
-        public void SkipUnknownMessages()
+        public TypedHandlingOptions SkipUnknownMessages()
         {
             UnknownMessageBehavior = UnknownMessageBehavior.Skip;
+            return this;
         }
     }
 }

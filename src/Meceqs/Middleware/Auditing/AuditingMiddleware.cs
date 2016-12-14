@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Meceqs.Pipeline;
@@ -44,7 +43,7 @@ namespace Meceqs.Middleware.Auditing
         {
             foreach (var claimType in claimTypes)
             {
-                var claim = user.Claims?.FirstOrDefault(x => x.Type == claimType);
+                var claim = user.FindFirst(x => x.Type == claimType);
                 if (claim?.Value != null)
                     return claim.Value;
             }
