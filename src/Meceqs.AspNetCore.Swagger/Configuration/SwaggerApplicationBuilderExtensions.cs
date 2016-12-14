@@ -11,30 +11,41 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class SwaggerApplicationBuilderExtensions
     {
-        public static IApplicationBuilder UseSwagger(this IApplicationBuilder app, Action<SwaggerUiOptions> options = null)
+        public static IApplicationBuilder UseSwagger(this IApplicationBuilder app, Action<SwaggerUiOptions> options)
         {
             Check.NotNull(app, nameof(app));
-
-            // Swagger Definition
-            app.UseMiddleware<SwaggerMiddleware>();
-
-            // Swagger UI Options
+            Check.NotNull(options, nameof(options));
 
             var swaggerUiOptions = new SwaggerUiOptions();
             options?.Invoke(swaggerUiOptions);
 
-            if (swaggerUiOptions.IndexConfig.JSConfig.SwaggerEndpoints.Count == 0)
+            return UseSwagger(app, swaggerUiOptions);
+        }
+
+        public static IApplicationBuilder UseSwagger(this IApplicationBuilder app, SwaggerUiOptions options = null)
+        {
+            Check.NotNull(app, nameof(app));
+
+            options = options ?? new SwaggerUiOptions();
+
+            if (options.IndexConfig.JSConfig.SwaggerEndpoints.Count == 0)
             {
-                swaggerUiOptions.SwaggerEndpoint("/swagger/v1/swagger.json", "API Definition");
+                options.SwaggerEndpoint("/swagger/v1/swagger.json", "API Definition");
             }
 
+            // Swagger Definition
+            app.UseMiddleware<SwaggerMiddleware>();
+
+            // Swagger UI redirect from BasePath
+            app.UseMiddleware<RedirectMiddleware>(options.BaseRoute, options.IndexPath);
+
             // Custom Swagger UI index file
-            app.UseMiddleware<SwaggerUiMiddleware>(swaggerUiOptions);
+            app.UseMiddleware<SwaggerUiMiddleware>(options);
 
             // Swagger UI static files
             var fileServerOptions = new FileServerOptions
             {
-                RequestPath = $"/{swaggerUiOptions.BaseRoute}",
+                RequestPath = $"/{options.BaseRoute}",
                 EnableDefaultFiles = false,
                 FileProvider = new EmbeddedFileProvider(
                     typeof(SwaggerApplicationBuilderExtensions).GetTypeInfo().Assembly,
