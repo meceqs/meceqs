@@ -139,7 +139,7 @@ IPipelineProvider pipelineProvider;
 IPipeline pipeline = pipelineProvider.GetPipeline("Send");
 
 // This will invoke the pipeline for your message.
-await pipeline.ProcessAsync(messageContext);
+await pipeline.InvokeAsync(messageContext);
 ```
 
 It's important to understand that invoking a pipeline is a simple in-process method call that
