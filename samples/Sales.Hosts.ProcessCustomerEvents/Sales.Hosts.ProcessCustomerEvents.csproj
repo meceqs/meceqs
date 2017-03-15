@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net46</TargetFramework>
+    <DebugType>portable</DebugType>
+    <AssemblyName>Sales.Hosts.ProcessCustomerEvents</AssemblyName>
+    <OutputType>Exe</OutputType>
+    <PackageId>Sales.Hosts.ProcessCustomerEvents</PackageId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SampleConfig\SampleConfig.csproj" />
+    <ProjectReference Include="..\Customers.Contracts\Customers.Contracts.csproj" />
+    <ProjectReference Include="..\..\src\Meceqs\Meceqs.csproj" />
+    <ProjectReference Include="..\..\src\Meceqs.Serialization.Json\Meceqs.Serialization.Json.csproj" />
+    <ProjectReference Include="..\..\src\Meceqs.AzureEventHubs\Meceqs.AzureEventHubs.csproj" />
+    <ProjectReference Include="..\..\src\Meceqs.AzureEventHubs.FileFake\Meceqs.AzureEventHubs.FileFake.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="1.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="1.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="1.1.1" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
+    <Reference Include="System" />
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+
+</Project>

@@ -1,14 +1,14 @@
 Properties {
-    
+
     # This number will be appended to all nuget package versions and to the service fabric app versions
     # This should be overwritten by a CI system like VSTS, AppVeyor, TeamCity, ...
     $BuildNumber = "loc" + ((Get-Date).ToUniversalTime().ToString("yyyyMMddHHmm"))
 
     # The build configuration used for compilation
     $BuildConfiguration = "Release"
-    
+
     # The folder in which all output packages should be placed
-    $ArtifactsPath = "artifacts"
+    $ArtifactsPath = Join-Path $PWD "artifacts"
 
     # Artifacts-subfolder in which test results will be placed
     $ArtifactsPathTests = "tests"
@@ -47,10 +47,11 @@ Task init {
     Assert ($ArtifactsPath -ne $null) "Property 'ArtifactsPath' may not be null."
     Assert ($ArtifactsPathTests -ne $null) "Property 'ArtifactsPathTests' may not be null."
     Assert ($ArtifactsPathNuGet -ne $null) "Property 'ArtifactsPathNuGet' may not be null."
+
 }
 
 Task clean {
-    
+
     if (Test-Path $ArtifactsPath) { Remove-Item -Path $ArtifactsPath -Recurse -Force -ErrorAction Ignore }
     New-Item $ArtifactsPath -ItemType Directory -ErrorAction Ignore | Out-Null
 
@@ -58,18 +59,18 @@ Task clean {
 }
 
 Task dotnet-install {
-    
+
     if (Get-Command "dotnet.exe" -ErrorAction SilentlyContinue) {
         Write-Host "dotnet SDK already installed"
         exec { dotnet --version }
     } else {
         Write-Host "Installing dotnet SDK"
-        
+
         $installScript = Join-Path $ArtifactsPath "dotnet-install.ps1"
-        
+
         Invoke-WebRequest "https://raw.githubusercontent.com/dotnet/cli/rel/1.0.0/scripts/obtain/dotnet-install.ps1" `
             -OutFile $installScript
-            
+
         & $installScript
     }
 }
@@ -81,7 +82,7 @@ Task dotnet-restore {
 
 Task dotnet-build {
 
-    exec { dotnet build **\project.json -c $BuildConfiguration --version-suffix $BuildNumber }
+    exec { dotnet build -c $BuildConfiguration --version-suffix $BuildNumber }
 }
 
 Task dotnet-test {
@@ -91,23 +92,18 @@ Task dotnet-test {
 
     $testsFailed = $false
 
-    Get-ChildItem -Filter project.json -Recurse | ForEach-Object {
+    Get-ChildItem .\test -Filter *.csproj -Recurse | ForEach-Object {
 
-        $projectJson = Get-Content -Path $_.FullName -Raw -ErrorAction Ignore | ConvertFrom-Json -ErrorAction Ignore
+        $library = Split-Path $_.DirectoryName -Leaf
+        $testResultOutput = Join-Path $testOutput "$library.trx"
 
-        if ($projectJson -and $projectJson.testRunner -ne $null)
-        {
-            $library = Split-Path $_.DirectoryName -Leaf
-            $testResultOutput = Join-Path $testOutput "$library.xml"
+        Write-Host ""
+        Write-Host "Testing $library"
+        Write-Host ""
 
-            Write-Host ""
-            Write-Host "Testing $library"
-            Write-Host ""
-            
-            dotnet test $_.Directory -c $BuildConfiguration --no-build -xml $testResultOutput
-            if ($LASTEXITCODE -ne 0) {
-                $testsFailed = $true
-            }
+        dotnet test $_.FullName -c $BuildConfiguration --no-build --logger "trx;LogFileName=$testResultOutput"
+        if ($LASTEXITCODE -ne 0) {
+            $testsFailed = $true
         }
     }
 
@@ -117,14 +113,14 @@ Task dotnet-test {
 }
 
 Task dotnet-pack {
-    
+
     if ($NugetLibraries -eq $null -or $NugetLibraries.Count -eq 0) {
         Write-Host "No NugetLibraries configured"
         return
     }
 
     $NugetLibraries | ForEach-Object {
-            
+
         $library = $_
         $libraryOutput = Join-Path $ArtifactsPath $ArtifactsPathNuGet
 

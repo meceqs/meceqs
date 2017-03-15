@@ -1,49 +1,51 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26228.9
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{533B5245-71ED-4437-9A25-0F7967C3A97F}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Meceqs.Serialization.Json", "src\Meceqs.Serialization.Json\Meceqs.Serialization.Json.xproj", "{4041CB42-0EFA-4519-9C2F-D5579506E34E}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Meceqs", "src\Meceqs\Meceqs.xproj", "{4448F229-B7AD-44B0-81D4-EF95BDF765CA}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{08815AAF-8A8A-41D5-A109-001F776B7E92}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{BE0A911D-D501-4DE2-B8C4-B6CD0186FCA2}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Meceqs.AspNetCore", "src\Meceqs.AspNetCore\Meceqs.AspNetCore.xproj", "{DB993979-FB70-443D-BA0F-B73CBFEC9478}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Meceqs.Serialization.Json", "src\Meceqs.Serialization.Json\Meceqs.Serialization.Json.csproj", "{4041CB42-0EFA-4519-9C2F-D5579506E34E}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Meceqs.Tests", "test\Meceqs.Tests\Meceqs.Tests.xproj", "{43B1BC8C-4340-407E-8400-5219BF9DA866}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Meceqs", "src\Meceqs\Meceqs.csproj", "{4448F229-B7AD-44B0-81D4-EF95BDF765CA}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Customers.Hosts.WebApi", "samples\Customers.Hosts.WebApi\Customers.Hosts.WebApi.xproj", "{AB2D2CB3-5290-4E2A-8F41-7769CEF69DB6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Meceqs.AspNetCore", "src\Meceqs.AspNetCore\Meceqs.AspNetCore.csproj", "{DB993979-FB70-443D-BA0F-B73CBFEC9478}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Customers.Contracts", "samples\Customers.Contracts\Customers.Contracts.xproj", "{0FFDEEEA-ECB5-40A7-B710-98450471F3B0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Meceqs.Tests", "test\Meceqs.Tests\Meceqs.Tests.csproj", "{43B1BC8C-4340-407E-8400-5219BF9DA866}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Customers.Core", "samples\Customers.Core\Customers.Core.xproj", "{7A0C1272-4318-4FCA-8173-0F343FDB8DF5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Customers.Hosts.WebApi", "samples\Customers.Hosts.WebApi\Customers.Hosts.WebApi.csproj", "{AB2D2CB3-5290-4E2A-8F41-7769CEF69DB6}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Meceqs.AzureEventHubs", "src\Meceqs.AzureEventHubs\Meceqs.AzureEventHubs.xproj", "{5C52EAC9-5161-40CC-BE01-277FE541DBF1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Customers.Contracts", "samples\Customers.Contracts\Customers.Contracts.csproj", "{0FFDEEEA-ECB5-40A7-B710-98450471F3B0}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Meceqs.AzureEventHubs.FileFake", "src\Meceqs.AzureEventHubs.FileFake\Meceqs.AzureEventHubs.FileFake.xproj", "{90ADB3CB-3BAA-45C5-B8F5-E678D6F0339D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Customers.Core", "samples\Customers.Core\Customers.Core.csproj", "{7A0C1272-4318-4FCA-8173-0F343FDB8DF5}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "SampleConfig", "samples\SampleConfig\SampleConfig.xproj", "{E933A6AE-5745-4195-A62D-751BF53CA8A0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Meceqs.AzureEventHubs", "src\Meceqs.AzureEventHubs\Meceqs.AzureEventHubs.csproj", "{5C52EAC9-5161-40CC-BE01-277FE541DBF1}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Sales.Hosts.ProcessOrders", "samples\Sales.Hosts.ProcessOrders\Sales.Hosts.ProcessOrders.xproj", "{AB57EBAF-17C7-4036-8453-B2A0B711E22D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Meceqs.AzureEventHubs.FileFake", "src\Meceqs.AzureEventHubs.FileFake\Meceqs.AzureEventHubs.FileFake.csproj", "{90ADB3CB-3BAA-45C5-B8F5-E678D6F0339D}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Meceqs.AzureServiceBus", "src\Meceqs.AzureServiceBus\Meceqs.AzureServiceBus.xproj", "{FB6F0363-0CDC-44A3-8C22-715E3D608AA5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SampleConfig", "samples\SampleConfig\SampleConfig.csproj", "{E933A6AE-5745-4195-A62D-751BF53CA8A0}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Meceqs.AzureServiceBus.FileFake", "src\Meceqs.AzureServiceBus.FileFake\Meceqs.AzureServiceBus.FileFake.xproj", "{1E632F25-969A-4198-885F-DEF47C259612}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sales.Hosts.ProcessOrders", "samples\Sales.Hosts.ProcessOrders\Sales.Hosts.ProcessOrders.csproj", "{AB57EBAF-17C7-4036-8453-B2A0B711E22D}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Sales.Contracts", "samples\Sales.Contracts\Sales.Contracts.xproj", "{E475B9FE-6F9C-4D28-8E33-B3E37F0FAC98}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Meceqs.AzureServiceBus", "src\Meceqs.AzureServiceBus\Meceqs.AzureServiceBus.csproj", "{FB6F0363-0CDC-44A3-8C22-715E3D608AA5}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Sales.Hosts.ProcessCustomerEvents", "samples\Sales.Hosts.ProcessCustomerEvents\Sales.Hosts.ProcessCustomerEvents.xproj", "{AC7E9844-24D1-4008-9F62-FE0CA3F6278E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Meceqs.AzureServiceBus.FileFake", "src\Meceqs.AzureServiceBus.FileFake\Meceqs.AzureServiceBus.FileFake.csproj", "{1E632F25-969A-4198-885F-DEF47C259612}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "TrafficGenerator", "samples\TrafficGenerator\TrafficGenerator.xproj", "{53F0C520-0045-4860-B457-6C9B723B4DD1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sales.Contracts", "samples\Sales.Contracts\Sales.Contracts.csproj", "{E475B9FE-6F9C-4D28-8E33-B3E37F0FAC98}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Meceqs.Abstractions", "src\Meceqs.Abstractions\Meceqs.Abstractions.xproj", "{F486C425-FCD7-4F56-840A-902CD1E292E4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sales.Hosts.ProcessCustomerEvents", "samples\Sales.Hosts.ProcessCustomerEvents\Sales.Hosts.ProcessCustomerEvents.csproj", "{AC7E9844-24D1-4008-9F62-FE0CA3F6278E}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Meceqs.HttpSender", "src\Meceqs.HttpSender\Meceqs.HttpSender.xproj", "{2D05E7F5-AE6C-4559-8EB3-B88B9561CA6F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrafficGenerator", "samples\TrafficGenerator\TrafficGenerator.csproj", "{53F0C520-0045-4860-B457-6C9B723B4DD1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Meceqs.Abstractions", "src\Meceqs.Abstractions\Meceqs.Abstractions.csproj", "{F486C425-FCD7-4F56-840A-902CD1E292E4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Meceqs.HttpSender", "src\Meceqs.HttpSender\Meceqs.HttpSender.csproj", "{2D05E7F5-AE6C-4559-8EB3-B88B9561CA6F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Meceqs.AspNetCore.Swagger", "src\Meceqs.AspNetCore.Swagger\Meceqs.AspNetCore.Swagger.csproj", "{640511C8-A8F2-4D13-9CC2-574BD8805501}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -123,6 +125,10 @@ Global
 		{2D05E7F5-AE6C-4559-8EB3-B88B9561CA6F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2D05E7F5-AE6C-4559-8EB3-B88B9561CA6F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2D05E7F5-AE6C-4559-8EB3-B88B9561CA6F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{640511C8-A8F2-4D13-9CC2-574BD8805501}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{640511C8-A8F2-4D13-9CC2-574BD8805501}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{640511C8-A8F2-4D13-9CC2-574BD8805501}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{640511C8-A8F2-4D13-9CC2-574BD8805501}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -146,5 +152,6 @@ Global
 		{53F0C520-0045-4860-B457-6C9B723B4DD1} = {08815AAF-8A8A-41D5-A109-001F776B7E92}
 		{F486C425-FCD7-4F56-840A-902CD1E292E4} = {533B5245-71ED-4437-9A25-0F7967C3A97F}
 		{2D05E7F5-AE6C-4559-8EB3-B88B9561CA6F} = {533B5245-71ED-4437-9A25-0F7967C3A97F}
+		{640511C8-A8F2-4D13-9CC2-574BD8805501} = {533B5245-71ED-4437-9A25-0F7967C3A97F}
 	EndGlobalSection
 EndGlobal
