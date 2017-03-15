@@ -11,7 +11,7 @@ param (
 # Settings
 
 # The current version will be read from this file
-$projectFile = "src\Meceqs\project.json"
+$projectFile = "src\Meceqs\Meceqs.csproj"
 
 # All projects and dependencies starting with this name will be updated.
 $packagePrefix = "Meceqs"
@@ -23,14 +23,14 @@ $packagePrefix = "Meceqs"
 $selectedSwitches = 0
 if ($Major -eq $true) { $selectedSwitches++ }
 if ($Minor -eq $true) { $selectedSwitches++ }
-if ($Patch -eq $true) { $selectedSwitches++ } 
+if ($Patch -eq $true) { $selectedSwitches++ }
 
 if ([String]::IsNullOrWhiteSpace($Version) -and $selectedSwitches -eq 0) {
     throw "There must be either a version switch (-Major, -Minor, -Patch) or a fixed version string (-Version)"
 }
 
 if (![String]::IsNullOrWhiteSpace($Version) -and $selectedSwitches -gt 0) {
-    throw "'-Version' can not be used in combination with version switches" 
+    throw "'-Version' can not be used in combination with version switches"
 }
 
 if ($selectedSwitches -gt 1) {
@@ -41,9 +41,9 @@ if ($selectedSwitches -gt 1) {
 #########################
 # Get current version from main project
 
-$projectFileJson = Get-Content -Path $projectFile -Raw | ConvertFrom-Json -ErrorAction Ignore
+$projectFileXml = [XML] (Get-Content -Path $projectFile)
 
-$currentVersion = $projectFileJson.version
+$currentVersion = $projectFileXml.SelectSingleNode("/Project/PropertyGroup/VersionPrefix").InnerText
 
 $versionParts = $currentVersion.TrimEnd("*-").Split(".")
 $currentMajor = [Convert]::ToInt32($versionParts[0])
@@ -91,40 +91,25 @@ Write-Output "New version: $newVersion"
 # That's why we use simple string replace for the actual file update.
 # There's a higher chance for this to go wrong, but meeh...
 
-Get-ChildItem -Filter project.json -Recurse -Depth 5 | ForEach-Object {
+Get-ChildItem -Filter *.csproj -Recurse -Depth 5 | ForEach-Object {
     Write-Output ("Processing " + $_.DirectoryName)
 
     $fileChanged = $false
     $fileContent = [IO.File]::ReadAllText($_.FullName)
-    $json = $fileContent | ConvertFrom-Json -ErrorAction Ignore
+    $xml = [XML] $fileContent
+
+    $projectVersion = $xml.SelectSingleNode("/Project/PropertyGroup/VersionPrefix").InnerText
 
     # Should we update the library version?
-    if ($_.Directory.Name.StartsWith($packagePrefix) -eq $true -and $json.version -ne $null) {
-        
+    if ($_.Directory.Name.StartsWith($packagePrefix) -eq $true -and -not [String]::IsNullOrEmpty($projectVersion)) {
+
         $oldFileContent = $fileContent
-        $fileContent = $fileContent.Replace("""version"": ""$currentVersion""", """version"": ""$newVersion""")
+        $fileContent = $fileContent.Replace("<VersionPrefix>$currentVersion</VersionPrefix>", "<VersionPrefix>$newVersion</VersionPrefix>")
         $fileChanged = $true
 
         if ($oldFileContent -eq $fileContent) { throw "string.Replace for version failed!" }
 
         Write-Output " - Changed version"
-    }
-
-    if ($json.dependencies -ne $null) {
-        $json.dependencies `
-            | Get-Member -MemberType NoteProperty `
-            | Where-Object { $_.Name.StartsWith($packagePrefix) } `
-            | Foreach-Object {
-                $name = $_.Name
-
-                $oldFileContent = $fileContent
-                $fileContent = $fileContent.Replace("""$name"": ""$currentVersion""", """$name"": ""$newVersion""")
-                $fileChanged = $true
-
-                if ($oldFileContent -eq $fileContent) { throw "string.Replace for dependency '$name' failed!" }
-
-                Write-Output "  - Updated dependency '$name'"
-            }
     }
 
     if ($fileChanged -eq $true) {
