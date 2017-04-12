@@ -19,8 +19,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Routing" Version="1.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="1.1.1" />
     <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="1.1.0" />
-    <PackageReference Include="NSwag.CodeGeneration" Version="8.0.6186.17339" />
-    <PackageReference Include="NSwag.Core" Version="8.0.6186.17339" />
+    <PackageReference Include="NSwag.SwaggerGeneration" Version="10.1.6309.31529" />
   </ItemGroup>
 
 </Project>

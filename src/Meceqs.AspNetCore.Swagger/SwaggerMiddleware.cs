@@ -39,7 +39,7 @@ namespace Meceqs.AspNetCore.Swagger
             if (string.Equals(context.Request.Path, SwaggerPath, StringComparison.OrdinalIgnoreCase))
             {
                 context.Response.StatusCode = 200;
-                await context.Response.WriteAsync(GenerateSwagger(context));
+                await context.Response.WriteAsync(await GenerateSwagger(context));
             }
             else
             {
@@ -47,29 +47,20 @@ namespace Meceqs.AspNetCore.Swagger
             }
         }
 
-        /// <summary>Generates the Swagger specification.</summary>
-        /// <param name="context">The context.</param>
-        /// <returns>The Swagger specification.</returns>
-        protected virtual string GenerateSwagger(HttpContext context)
+        private async Task<string> GenerateSwagger(HttpContext context)
         {
             if (_swaggerJson == null)
             {
-                lock (_lock)
-                {
-                    if (_swaggerJson == null)
-                    {
-                        var settings = new MeceqsToSwaggerGeneratorSettings();
+                var settings = new MeceqsToSwaggerGeneratorSettings();
 
-                        var generator = new MeceqsToSwaggerGenerator(settings, _options, _messagePathConvention, _hostingEnvironment);
-                        var document = generator.CreateSwaggerDocument();
+                var generator = new MeceqsToSwaggerGenerator(settings, _options, _messagePathConvention, _hostingEnvironment);
+                var document = await generator.CreateSwaggerDocument();
 
-                        document.Host = context.Request.Host.Value ?? "";
-                        document.Schemes.Add(context.Request.Scheme == "http" ? SwaggerSchema.Http : SwaggerSchema.Https);
-                        document.BasePath = "/" + context.Request.PathBase; //.Value?.Substring(0, context.Request.PathBase.Value.Length - _settings.MiddlewareBasePath?.Length ?? 0) ?? "";
+                document.Host = context.Request.Host.Value ?? "";
+                document.Schemes.Add(context.Request.IsHttps ? SwaggerSchema.Https : SwaggerSchema.Http);
+                document.BasePath = "/" + context.Request.PathBase; //.Value?.Substring(0, context.Request.PathBase.Value.Length - _settings.MiddlewareBasePath?.Length ?? 0) ?? "";
 
-                        _swaggerJson = document.ToJson();
-                    }
-                }
+                _swaggerJson = document.ToJson();
             }
 
             return _swaggerJson;
