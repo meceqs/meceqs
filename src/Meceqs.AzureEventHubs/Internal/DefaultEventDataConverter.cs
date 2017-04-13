@@ -1,7 +1,7 @@
 using System.IO;
 using Meceqs.Serialization;
 using Meceqs.Transport;
-using Microsoft.ServiceBus.Messaging;
+using Microsoft.Azure.EventHubs;
 
 namespace Meceqs.AzureEventHubs.Internal
 {
@@ -43,7 +43,7 @@ namespace Meceqs.AzureEventHubs.Internal
             string contentType = (string)eventData.Properties[TransportHeaderNames.ContentType];
             string messageType = (string)eventData.Properties[TransportHeaderNames.MessageType];
 
-            Stream serializedEnvelope = eventData.GetBodyStream();
+            byte[] serializedEnvelope = eventData.Body.Array;
 
             return _deserializer.DeserializeEnvelope(contentType, serializedEnvelope, messageType);
         }

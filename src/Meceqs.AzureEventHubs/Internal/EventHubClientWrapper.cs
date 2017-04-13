@@ -1,5 +1,5 @@
 using System.Threading.Tasks;
-using Microsoft.ServiceBus.Messaging;
+using Microsoft.Azure.EventHubs;
 
 namespace Meceqs.AzureEventHubs.Internal
 {
@@ -14,9 +14,9 @@ namespace Meceqs.AzureEventHubs.Internal
             _client = client;
         }
 
-        public Task SendAsync(EventData data)
+        public Task SendAsync(EventData data, string partitionKey)
         {
-            return _client.SendAsync(data);
+            return _client.SendAsync(data, partitionKey);
         }
 
         public void Close()

@@ -4,8 +4,6 @@
     <VersionPrefix>0.4.0</VersionPrefix>
     <TargetFramework>net46</TargetFramework>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <AssemblyName>Meceqs.AzureServiceBus.FileFake</AssemblyName>
-    <PackageId>Meceqs.AzureServiceBus.FileFake</PackageId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,11 +12,6 @@
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
 
 </Project>

@@ -3,13 +3,6 @@
   <PropertyGroup>
     <TargetFramework>netstandard1.0</TargetFramework>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <AssemblyName>Sales.Contracts</AssemblyName>
-    <PackageId>Sales.Contracts</PackageId>
   </PropertyGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.0' ">
-    <PackageReference Include="System.Collections" Version="4.3.0" />
-    <PackageReference Include="System.Runtime" Version="4.3.0" />
-  </ItemGroup>
 
 </Project>

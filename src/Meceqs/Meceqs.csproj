@@ -4,8 +4,6 @@
     <VersionPrefix>0.4.0</VersionPrefix>
     <TargetFramework>netstandard1.3</TargetFramework>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <AssemblyName>Meceqs</AssemblyName>
-    <PackageId>Meceqs</PackageId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,7 +16,7 @@
     <PackageReference Include="Microsoft.Extensions.Options" Version="1.1.1" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
+  <ItemGroup>
     <PackageReference Include="System.Reflection.TypeExtensions" Version="4.3.0" />
   </ItemGroup>
 

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -88,7 +89,20 @@ namespace Meceqs.AzureEventHubs.FileFake
 
             // Start processing.
 
-            var newEvents = File.ReadLines(_fileName).Skip(_sequenceNumber).ToList();
+            List<string> newEvents = null;
+            int count = 0;
+            while (newEvents == null)
+            {
+                try
+                {
+                    count++;
+                    newEvents = File.ReadLines(_fileName).Skip(_sequenceNumber).ToList();
+                }
+                catch (Exception) when (count <= 3)
+                {
+                    await Task.Delay(35);
+                }
+            }
 
             _logger.LogInformation("Processing {Count} events, SequenceNumber: {SequenceNumber}", newEvents.Count,  _sequenceNumber);
 

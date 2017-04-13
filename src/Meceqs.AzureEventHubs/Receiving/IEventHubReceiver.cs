@@ -1,6 +1,6 @@
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.ServiceBus.Messaging;
+using Microsoft.Azure.EventHubs;
 
 namespace Meceqs.AzureEventHubs.Receiving
 {

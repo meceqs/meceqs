@@ -4,8 +4,6 @@
     <VersionPrefix>0.4.0</VersionPrefix>
     <TargetFramework>netstandard1.3</TargetFramework>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <AssemblyName>Meceqs.Serialization.Json</AssemblyName>
-    <PackageId>Meceqs.Serialization.Json</PackageId>
   </PropertyGroup>
 
   <ItemGroup>

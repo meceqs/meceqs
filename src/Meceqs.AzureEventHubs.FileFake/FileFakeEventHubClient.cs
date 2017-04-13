@@ -2,8 +2,8 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using Meceqs.AzureEventHubs.Internal;
+using Microsoft.Azure.EventHubs;
 using Microsoft.Extensions.Logging;
-using Microsoft.ServiceBus.Messaging;
 
 namespace Meceqs.AzureEventHubs.FileFake
 {
@@ -20,11 +20,13 @@ namespace Meceqs.AzureEventHubs.FileFake
             _fileName = fileName;
             _logger = loggerFactory.CreateLogger<FileFakeEventHubClient>();
 
-            EnsureFileExists();
+            EnsureDirectoryExists();
         }
 
-        public Task SendAsync(EventData data)
+        public Task SendAsync(EventData data, string partitionKey)
         {
+            // TODO @cweiss partition algorithm?
+
             string serializedEventData = FileFakeEventDataSerializer.Serialize(data);
 
             InvokeWithRetry(3, () =>
@@ -50,36 +52,26 @@ namespace Meceqs.AzureEventHubs.FileFake
                     action();
                     break;
                 }
-                catch (Exception ex)
+                catch (Exception ex) when (attempt <= attempts)
                 {
-                    if (attempt >= attempts)
-                    {
-                        throw;
-                    }
-
                     _logger.LogWarning(0, ex, "Retrying");
 
                     // if someone deleted the root folder...
                     if (ex is DirectoryNotFoundException)
                     {
-                        EnsureFileExists();
+                        EnsureDirectoryExists();
                     }
                 }
 
             } while (true);
         }
 
-        private void EnsureFileExists()
+        private void EnsureDirectoryExists()
         {
             var directory = Path.GetDirectoryName(_fileName);
             if (!Directory.Exists(directory))
             {
                 Directory.CreateDirectory(directory);
-            }
-
-            if (!File.Exists(_fileName))
-            {
-                File.Create(_fileName);
             }
         }
     }

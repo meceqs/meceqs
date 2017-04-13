@@ -1,4 +1,4 @@
-using Microsoft.ServiceBus.Messaging;
+using Microsoft.Azure.EventHubs;
 
 namespace Meceqs.AzureEventHubs.Internal
 {

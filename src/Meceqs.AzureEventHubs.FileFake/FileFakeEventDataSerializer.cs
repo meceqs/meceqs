@@ -1,8 +1,10 @@
 using System;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Text;
 using Meceqs.Transport;
-using Microsoft.ServiceBus.Messaging;
+using Microsoft.Azure.EventHubs;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -10,13 +12,15 @@ namespace Meceqs.AzureEventHubs.FileFake
 {
     public static class FileFakeEventDataSerializer
     {
+        private static readonly PropertyInfo SystemPropertiesSetter = typeof(EventData).GetProperty("SystemProperties");
+        private static readonly ConstructorInfo SystemPropertiesCtor = typeof(EventData.SystemPropertiesCollection).GetTypeInfo().DeclaredConstructors.First();
+        private static readonly PropertyInfo SystemPropertyEnqueuedTimeUtc = typeof(EventData.SystemPropertiesCollection).GetProperty("EnqueuedTimeUtc");
+        private static readonly PropertyInfo SystemPropertyOffset = typeof(EventData.SystemPropertiesCollection).GetProperty("Offset");
+        private static readonly PropertyInfo SystemPropertySequenceNumber = typeof(EventData.SystemPropertiesCollection).GetProperty("SequenceNumber");
+
         public static string Serialize(EventData eventData)
         {
-            string serializedEnvelope;
-            using (StreamReader reader = new StreamReader(eventData.GetBodyStream(), Encoding.UTF8))
-            {
-                serializedEnvelope = reader.ReadToEnd();
-            }
+            string serializedEnvelope = Encoding.UTF8.GetString(eventData.Body.Array);
 
             var sb = new StringBuilder();
             var sw = new StringWriter(sb);
@@ -31,7 +35,7 @@ namespace Meceqs.AzureEventHubs.FileFake
                     writer.WriteValue(kvp.Value);
                 }
 
-                writer.WritePropertyName(nameof(eventData.EnqueuedTimeUtc));
+                writer.WritePropertyName(nameof(eventData.SystemProperties.EnqueuedTimeUtc));
                 writer.WriteValue(DateTime.UtcNow);
 
                 writer.WritePropertyName("Body");
@@ -56,20 +60,19 @@ namespace Meceqs.AzureEventHubs.FileFake
                 eventData.Properties[header] = value;
             }
 
-            // Receiver properties are internal - that's why we need reflection :(
+            // System properties are internal - that's why we need reflection :(
 
-            SetPropertyValue(eventData, nameof(eventData.SequenceNumber), sequenceNumber);
-            SetPropertyValue(eventData, nameof(eventData.Offset), sequenceNumber.ToString());
+            var systemProperties = (EventData.SystemPropertiesCollection)SystemPropertiesCtor.Invoke(new object[] { });
 
-            var enqueuedTimeUtc = (DateTime)jsonEventData.GetValue(nameof(eventData.EnqueuedTimeUtc)).ToObject(typeof(DateTime));
-            SetPropertyValue(eventData, nameof(eventData.EnqueuedTimeUtc), enqueuedTimeUtc);
+            SystemPropertySequenceNumber.SetValue(systemProperties, sequenceNumber);
+            SystemPropertyOffset.SetValue(systemProperties, sequenceNumber.ToString());
+
+            var enqueuedTimeUtc = (DateTime)jsonEventData.GetValue(nameof(systemProperties.EnqueuedTimeUtc)).ToObject(typeof(DateTime));
+            SystemPropertyEnqueuedTimeUtc.SetValue(systemProperties, enqueuedTimeUtc);
+
+            SystemPropertiesSetter.SetValue(eventData, systemProperties);
 
             return eventData;
-        }
-
-        private static void SetPropertyValue(EventData eventData, string propertyName, object value)
-        {
-            typeof(EventData).GetProperty(propertyName).SetValue(eventData, value);
         }
     }
 }

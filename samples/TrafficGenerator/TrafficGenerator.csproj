@@ -4,9 +4,7 @@
     <TargetFramework>net46</TargetFramework>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <DebugType>portable</DebugType>
-    <AssemblyName>TrafficGenerator</AssemblyName>
     <OutputType>Exe</OutputType>
-    <PackageId>TrafficGenerator</PackageId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -24,11 +22,6 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="1.1.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="1.1.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="1.1.1" />
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
 
 </Project>

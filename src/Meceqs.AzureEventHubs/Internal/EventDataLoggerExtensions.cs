@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using Meceqs.AzureEventHubs.Internal;
-using Microsoft.ServiceBus.Messaging;
+using Microsoft.Azure.EventHubs;
 
 namespace Microsoft.Extensions.Logging
 {
@@ -71,11 +71,11 @@ namespace Microsoft.Extensions.Logging
                     switch (index)
                     {
                         case 0:
-                            return new KeyValuePair<string, object>(nameof(_eventData.Offset), _eventData.Offset);
+                            return new KeyValuePair<string, object>(nameof(_eventData.SystemProperties.Offset), _eventData.SystemProperties.Offset);
                         case 1:
-                            return new KeyValuePair<string, object>(nameof(_eventData.SequenceNumber), _eventData.SequenceNumber);
+                            return new KeyValuePair<string, object>(nameof(_eventData.SystemProperties.SequenceNumber), _eventData.SystemProperties.SequenceNumber);
                         case 2:
-                            return new KeyValuePair<string, object>(nameof(_eventData.EnqueuedTimeUtc), _eventData.EnqueuedTimeUtc);
+                            return new KeyValuePair<string, object>(nameof(_eventData.SystemProperties.EnqueuedTimeUtc), _eventData.SystemProperties.EnqueuedTimeUtc);
                         default:
                             throw new IndexOutOfRangeException(nameof(index));
                     }
@@ -89,9 +89,9 @@ namespace Microsoft.Extensions.Logging
                     _cachedToString = string.Format(
                         CultureInfo.InvariantCulture,
                         "Offset:{0} Sequence:{1} Enqueued:{2}",
-                        _eventData.Offset,
-                        _eventData.SequenceNumber,
-                        _eventData.EnqueuedTimeUtc
+                        _eventData.SystemProperties.Offset,
+                        _eventData.SystemProperties.SequenceNumber,
+                        _eventData.SystemProperties.EnqueuedTimeUtc
                     );
                 }
 
@@ -134,11 +134,11 @@ namespace Microsoft.Extensions.Logging
                     switch (index)
                     {
                         case 0:
-                            return new KeyValuePair<string, object>(nameof(_eventData.Offset), _eventData.Offset);
+                            return new KeyValuePair<string, object>(nameof(_eventData.SystemProperties.Offset), _eventData.SystemProperties.Offset);
                         case 1:
-                            return new KeyValuePair<string, object>(nameof(_eventData.SequenceNumber), _eventData.SequenceNumber);
+                            return new KeyValuePair<string, object>(nameof(_eventData.SystemProperties.SequenceNumber), _eventData.SystemProperties.SequenceNumber);
                         case 2:
-                            return new KeyValuePair<string, object>(nameof(_eventData.EnqueuedTimeUtc), _eventData.EnqueuedTimeUtc);
+                            return new KeyValuePair<string, object>(nameof(_eventData.SystemProperties.EnqueuedTimeUtc), _eventData.SystemProperties.EnqueuedTimeUtc);
                         default:
                             throw new IndexOutOfRangeException(nameof(index));
                     }
@@ -152,9 +152,9 @@ namespace Microsoft.Extensions.Logging
                     _cachedToString = string.Format(
                         CultureInfo.InvariantCulture,
                         "Receive starting Offset:{0} Sequence:{1} Enqueued:{2}",
-                        _eventData.Offset,
-                        _eventData.SequenceNumber,
-                        _eventData.EnqueuedTimeUtc);
+                        _eventData.SystemProperties.Offset,
+                        _eventData.SystemProperties.SequenceNumber,
+                        _eventData.SystemProperties.EnqueuedTimeUtc);
                 }
 
                 return _cachedToString;

@@ -4,8 +4,6 @@
     <VersionPrefix>0.4.0</VersionPrefix>
     <TargetFramework>net46</TargetFramework>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <AssemblyName>Meceqs.AzureServiceBus</AssemblyName>
-    <PackageId>Meceqs.AzureServiceBus</PackageId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -15,13 +13,6 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="1.1.1" />
     <PackageReference Include="WindowsAzure.ServiceBus" Version="3.4.2" />
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
-    <Reference Include="System.IO" />
-    <Reference Include="System.Threading.Tasks" />
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
 
 </Project>

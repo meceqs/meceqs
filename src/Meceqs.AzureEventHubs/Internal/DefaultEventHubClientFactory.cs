@@ -1,4 +1,4 @@
-using Microsoft.ServiceBus.Messaging;
+using Microsoft.Azure.EventHubs;
 
 namespace Meceqs.AzureEventHubs.Internal
 {
@@ -8,7 +8,12 @@ namespace Meceqs.AzureEventHubs.Internal
         {
             Check.NotNull(connection, nameof(connection));
 
-            var client = EventHubClient.CreateFromConnectionString(connection.ConnectionString, connection.EventHubName);
+            var connectionBuilder = new EventHubsConnectionStringBuilder(connection.ConnectionString);
+
+            connectionBuilder.EntityPath = connection.EventHubName;
+
+            var client = EventHubClient.CreateFromConnectionString(connectionBuilder.ToString());
+
             return new EventHubClientWrapper(client);
         }
     }

@@ -4,12 +4,9 @@
     <VersionPrefix>0.4.0</VersionPrefix>
     <TargetFramework>netstandard1.3</TargetFramework>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <AssemblyName>Meceqs.Abstractions</AssemblyName>
-    <PackageId>Meceqs.Abstractions</PackageId>
-    <NetStandardImplicitPackageVersion>1.6.1</NetStandardImplicitPackageVersion>
   </PropertyGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
+  <ItemGroup>
     <PackageReference Include="System.ComponentModel" Version="4.3.0" />
     <PackageReference Include="System.Security.Claims" Version="4.3.0" />
   </ItemGroup>

@@ -5,10 +5,10 @@ using System.Threading.Tasks;
 using Meceqs.AzureEventHubs.Internal;
 using Meceqs.Receiving;
 using Meceqs.Transport;
+using Microsoft.Azure.EventHubs;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.ServiceBus.Messaging;
 
 namespace Meceqs.AzureEventHubs.Receiving
 {

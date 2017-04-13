@@ -4,8 +4,6 @@
     <VersionPrefix>0.4.0</VersionPrefix>
     <TargetFrameworks>net46;netstandard1.5</TargetFrameworks>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <AssemblyName>Meceqs.AspNetCore</AssemblyName>
-    <PackageId>Meceqs.AspNetCore</PackageId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -16,12 +14,6 @@
     <PackageReference Include="Microsoft.AspNetCore.Http" Version="1.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Extensions" Version="1.1.1" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="1.1.1" />
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
-    <Reference Include="System.Threading.Tasks" />
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
 
 </Project>

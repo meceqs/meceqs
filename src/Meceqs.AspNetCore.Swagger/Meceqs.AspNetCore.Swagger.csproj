@@ -4,8 +4,6 @@
     <VersionPrefix>0.4.0</VersionPrefix>
     <TargetFrameworks>net46;netstandard1.5</TargetFrameworks>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <AssemblyName>Meceqs.AspNetCore.Swagger</AssemblyName>
-    <PackageId>Meceqs.AspNetCore.Swagger</PackageId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -23,11 +21,6 @@
     <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="1.1.0" />
     <PackageReference Include="NSwag.CodeGeneration" Version="8.0.6186.17339" />
     <PackageReference Include="NSwag.Core" Version="8.0.6186.17339" />
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
 
 </Project>
