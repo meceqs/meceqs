@@ -1,11 +1,11 @@
 using System.Threading.Tasks;
-using Microsoft.ServiceBus.Messaging;
+using Microsoft.Azure.ServiceBus;
 
 namespace Meceqs.AzureServiceBus.Internal
 {
     public interface IServiceBusMessageSender
     {
-        Task SendAsync(BrokeredMessage message);
+        Task SendAsync(Message message);
 
         void Close();
     }

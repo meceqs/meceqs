@@ -4,20 +4,20 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using Meceqs.AzureServiceBus.Internal;
-using Microsoft.ServiceBus.Messaging;
+using Microsoft.Azure.ServiceBus;
 
 namespace Microsoft.Extensions.Logging
 {
-    internal static class BrokeredMessageLoggerExtensions
+    internal static class ServiceBusMessageLoggerExtensions
     {
         private static readonly double TimestampToTicks = TimeSpan.TicksPerSecond / (double)Stopwatch.Frequency;
 
-        public static IDisposable BrokeredMessageScope(this ILogger logger, BrokeredMessage message)
+        public static IDisposable ServiceBusMessageScope(this ILogger logger, Message message)
         {
-            return logger.BeginScope(new BrokeredMessageLogScope(message));
+            return logger.BeginScope(new ServiceBusMessageLogScope(message));
         }
 
-        public static void ReceiveStarting(this ILogger logger, BrokeredMessage message)
+        public static void ReceiveStarting(this ILogger logger, Message message)
         {
             if (logger.IsEnabled(LogLevel.Information))
             {
@@ -30,7 +30,7 @@ namespace Microsoft.Extensions.Logging
             }
         }
 
-        public static void ReceiveFailed(this ILogger logger, BrokeredMessage message, Exception ex)
+        public static void ReceiveFailed(this ILogger logger, Message message, Exception ex)
         {
             logger.LogError(LoggerEventIds.ReceiveFailed, ex, "Receive failed with exception");
         }
@@ -51,13 +51,13 @@ namespace Microsoft.Extensions.Logging
             }
         }
 
-        internal class BrokeredMessageLogScope : IReadOnlyList<KeyValuePair<string, object>>
+        internal class ServiceBusMessageLogScope : IReadOnlyList<KeyValuePair<string, object>>
         {
-            private readonly BrokeredMessage _message;
+            private readonly Message _message;
 
             private string _cachedToString;
 
-            public BrokeredMessageLogScope(BrokeredMessage message)
+            public ServiceBusMessageLogScope(Message message)
             {
                 _message = message;
             }
@@ -113,11 +113,11 @@ namespace Microsoft.Extensions.Logging
         {
             internal static readonly Func<object, Exception, string> Callback = (state, exception) => ((ReceiveStartingState)state).ToString();
 
-            private readonly BrokeredMessage _message;
+            private readonly Message _message;
 
             private string _cachedToString;
 
-            public ReceiveStartingState(BrokeredMessage message)
+            public ReceiveStartingState(Message message)
             {
                 _message = message;
             }
@@ -131,11 +131,11 @@ namespace Microsoft.Extensions.Logging
                     switch (index)
                     {
                         case 0:
-                            return new KeyValuePair<string, object>("SequenceNumber", _message.SequenceNumber);
+                            return new KeyValuePair<string, object>("SequenceNumber", _message.SystemProperties.SequenceNumber);
                         case 1:
-                            return new KeyValuePair<string, object>("DeliveryCount", _message.DeliveryCount);
+                            return new KeyValuePair<string, object>("DeliveryCount", _message.SystemProperties.DeliveryCount);
                         case 2:
-                            return new KeyValuePair<string, object>("EnqueuedTimeUtc", _message.EnqueuedTimeUtc);
+                            return new KeyValuePair<string, object>("EnqueuedTimeUtc", _message.SystemProperties.EnqueuedTimeUtc);
                         case 3:
                             return new KeyValuePair<string, object>("CorrelationId", _message.CorrelationId);
                         case 4:
@@ -153,9 +153,9 @@ namespace Microsoft.Extensions.Logging
                     _cachedToString = string.Format(
                         CultureInfo.InvariantCulture,
                         "Receive starting SequenceNr:{0} DeliveryCount:{1} Enqueued:{2}",
-                        _message.SequenceNumber,
-                        _message.DeliveryCount,
-                        _message.EnqueuedSequenceNumber);
+                        _message.SystemProperties.SequenceNumber,
+                        _message.SystemProperties.DeliveryCount,
+                        _message.SystemProperties.EnqueuedSequenceNumber);
                 }
 
                 return _cachedToString;

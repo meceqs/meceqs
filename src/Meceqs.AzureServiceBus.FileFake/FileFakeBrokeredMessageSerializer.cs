@@ -1,7 +1,8 @@
 using System.IO;
+using System.Reflection;
 using System.Text;
 using Meceqs.Transport;
-using Microsoft.ServiceBus.Messaging;
+using Microsoft.Azure.ServiceBus;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -9,13 +10,9 @@ namespace Meceqs.AzureServiceBus.FileFake
 {
     public static class FileFakeBrokeredMessageSerializer
     {
-        public static string Serialize(BrokeredMessage message)
+        public static string Serialize(Message message)
         {
-            string serializedEnvelope;
-            using (StreamReader reader = new StreamReader(message.GetBody<Stream>(), Encoding.UTF8))
-            {
-                serializedEnvelope = reader.ReadToEnd();
-            }
+            string serializedEnvelope = Encoding.UTF8.GetString(message.Body);
 
             var sb = new StringBuilder();
             var sw = new StringWriter(sb);
@@ -24,7 +21,7 @@ namespace Meceqs.AzureServiceBus.FileFake
             {
                 writer.WriteStartObject();
 
-                foreach (var kvp in message.Properties)
+                foreach (var kvp in message.UserProperties)
                 {
                     writer.WritePropertyName(kvp.Key);
                     writer.WriteValue(kvp.Value);
@@ -45,38 +42,37 @@ namespace Meceqs.AzureServiceBus.FileFake
             return sb.ToString();
         }
 
-        public static BrokeredMessage Deserialize(string serializedBrokeredMessage)
+        public static Message Deserialize(string serializedServiceBusMessage)
         {
-            JObject jsonMessage = JObject.Parse(serializedBrokeredMessage);
+            JObject jsonMessage = JObject.Parse(serializedServiceBusMessage);
 
             string serializedEnvelope = jsonMessage.GetValue("Body").ToString();
-            MemoryStream payloadStream = new MemoryStream(Encoding.UTF8.GetBytes(serializedEnvelope));
-            BrokeredMessage brokeredMessage = new BrokeredMessage(payloadStream, ownsStream: true);
+            Message message = new Message(Encoding.UTF8.GetBytes(serializedEnvelope));
 
             foreach (var header in TransportHeaderNames.AsList())
             {
                 string value = jsonMessage.GetValue(header)?.ToString();
-                brokeredMessage.Properties[header] = value;
+                message.UserProperties[header] = value;
             }
 
-            brokeredMessage.ContentType = brokeredMessage.Properties[TransportHeaderNames.ContentType].ToString();
-            brokeredMessage.MessageId = brokeredMessage.Properties[TransportHeaderNames.MessageId].ToString();
+            message.ContentType = message.UserProperties[TransportHeaderNames.ContentType].ToString();
+            message.MessageId = message.UserProperties[TransportHeaderNames.MessageId].ToString();
 
-            brokeredMessage.CorrelationId = jsonMessage.GetValue(nameof(brokeredMessage.CorrelationId)).ToString();
+            message.CorrelationId = jsonMessage.GetValue(nameof(message.CorrelationId)).ToString();
 
             // Receiver properties are internal - that's why we need reflection :(
             // (if these properties are not set, accessing them will throw an exception.)
 
-            SetPropertyValue(brokeredMessage, nameof(brokeredMessage.DeliveryCount), 1);
-            SetPropertyValue(brokeredMessage, nameof(brokeredMessage.SequenceNumber), 1);
-            SetPropertyValue(brokeredMessage, nameof(brokeredMessage.EnqueuedSequenceNumber), 1);
+            SetPropertyValue(message, nameof(message.DeliveryCount), 1);
+            SetPropertyValue(message, nameof(message.SequenceNumber), 1);
+            SetPropertyValue(message, nameof(message.EnqueuedSequenceNumber), 1);
 
-            return brokeredMessage;
+            return message;
         }
 
-        private static void SetPropertyValue(BrokeredMessage message, string propertyName, object value)
+        private static void SetPropertyValue(Message message, string propertyName, object value)
         {
-            typeof(BrokeredMessage).GetProperty(propertyName).SetValue(message, value);
+            typeof(Message).GetProperty(propertyName).SetValue(message, value);
         }
     }
 }

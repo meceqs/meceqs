@@ -4,10 +4,10 @@ using System.Threading.Tasks;
 using Meceqs.AzureServiceBus.Configuration;
 using Meceqs.AzureServiceBus.Internal;
 using Meceqs.Receiving;
+using Microsoft.Azure.ServiceBus;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.ServiceBus.Messaging;
 
 namespace Meceqs.AzureServiceBus.Receiving
 {
@@ -16,51 +16,51 @@ namespace Meceqs.AzureServiceBus.Receiving
         private readonly ServiceBusReceiverOptions _options;
         private readonly ILogger _logger;
         private readonly IServiceScopeFactory _serviceScopeFactory;
-        private readonly IBrokeredMessageInvoker _brokeredMessageInvoker;
+        private readonly IServiceBusMessageInvoker _serviceBusMessageInvoker;
 
         public DefaultServiceBusReceiver(
             IOptions<ServiceBusReceiverOptions> options,
             ILoggerFactory loggerFactory,
             IServiceScopeFactory serviceScopeFactory,
-            IBrokeredMessageInvoker brokeredMessageInvoker)
+            IServiceBusMessageInvoker serviceBusMessageInvoker)
         {
             Guard.NotNull(options?.Value, nameof(options));
             Guard.NotNull(loggerFactory, nameof(loggerFactory));
             Guard.NotNull(serviceScopeFactory, nameof(serviceScopeFactory));
-            Guard.NotNull(brokeredMessageInvoker, nameof(brokeredMessageInvoker));
+            Guard.NotNull(serviceBusMessageInvoker, nameof(serviceBusMessageInvoker));
 
             _options = options.Value;
             _logger = loggerFactory.CreateLogger<DefaultServiceBusReceiver>();
             _serviceScopeFactory = serviceScopeFactory;
-            _brokeredMessageInvoker = brokeredMessageInvoker;
+            _serviceBusMessageInvoker = serviceBusMessageInvoker;
         }
 
-        public async Task ReceiveAsync(BrokeredMessage brokeredMessage, CancellationToken cancellation)
+        public async Task ReceiveAsync(Message message, CancellationToken cancellation)
         {
-            Guard.NotNull(brokeredMessage, nameof(brokeredMessage));
+            Guard.NotNull(message, nameof(message));
 
             // Make sure each log message contains data about the currently processed message.
-            using (_logger.BrokeredMessageScope(brokeredMessage))
+            using (_logger.ServiceBusMessageScope(message))
             {
-                _logger.ReceiveStarting(brokeredMessage);
+                _logger.ReceiveStarting(message);
 
                 long startTimestamp = DateTime.UtcNow.Ticks;
                 bool success = false;
 
                 try
                 {
-                    await ResolveServicesAndInvokeReceiver(brokeredMessage, cancellation);
+                    await ResolveServicesAndInvokeReceiver(message, cancellation);
 
-                    await _brokeredMessageInvoker.CompleteAsync(brokeredMessage);
+                    await _serviceBusMessageInvoker.CompleteAsync(message);
                     success = true;
                 }
                 catch (Exception ex)
                 {
                     success = false;
 
-                    _logger.ReceiveFailed(brokeredMessage, ex);
+                    _logger.ReceiveFailed(message, ex);
 
-                    await _brokeredMessageInvoker.AbandonAsync(brokeredMessage);
+                    await _serviceBusMessageInvoker.AbandonAsync(message);
 
                     // TODO @cweiss !!! remove this!
                     throw;
@@ -72,7 +72,7 @@ namespace Meceqs.AzureServiceBus.Receiving
             }
         }
 
-        private async Task ResolveServicesAndInvokeReceiver(BrokeredMessage brokeredMessage, CancellationToken cancellation)
+        private async Task ResolveServicesAndInvokeReceiver(Message message, CancellationToken cancellation)
         {
             // Handling a message from an underlying transport is similar to handling a HTTP-request.
             // We must make sure processing of one message doesn't have an effect on other messages.
@@ -80,10 +80,10 @@ namespace Meceqs.AzureServiceBus.Receiving
             // lifetime of one handling process.
             using (IServiceScope scope = _serviceScopeFactory.CreateScope())
             {
-                var brokeredMessageConverter = scope.ServiceProvider.GetRequiredService<IBrokeredMessageConverter>();
+                var serviceBusMessageConverter = scope.ServiceProvider.GetRequiredService<IServiceBusMessageConverter>();
                 var messageReceiver = scope.ServiceProvider.GetRequiredService<IMessageReceiver>();
 
-                Envelope envelope = brokeredMessageConverter.ConvertToEnvelope(brokeredMessage);
+                Envelope envelope = serviceBusMessageConverter.ConvertToEnvelope(message);
 
                 await messageReceiver.ForEnvelope(envelope)
                     .SetCancellationToken(cancellation)
