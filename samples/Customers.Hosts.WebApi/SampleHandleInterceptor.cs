@@ -35,7 +35,7 @@ namespace Customers.Hosts.WebApi.Infrastructure
                 _logger.LogWarning("Custom attribute found on method");
             }
 
-            customAttribute = context.HandlerType.GetCustomAttribute(typeof(CustomLogicAttribute));
+            customAttribute = context.HandlerType.GetTypeInfo().GetCustomAttribute(typeof(CustomLogicAttribute));
 
             if (customAttribute != null)
             {

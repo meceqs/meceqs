@@ -29,7 +29,6 @@ Meceqs ships with the following integrations:
   * Send messages to Azure Event Hubs
   * Receive messages from Azure Event Hubs
   * Use a a file-based mock which makes local development very easy.
-  * *NOTE: There's no official .NET standard compatible Azure Event Hubs library yet so this integration only works on the full .NET framework*
 * JSON serialization
 
 ## A first look

@@ -3,8 +3,6 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp1.1</TargetFramework>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
-    <RuntimeFrameworkVersion>1.1.1</RuntimeFrameworkVersion>
   </PropertyGroup>
 
   <ItemGroup>
