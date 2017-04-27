@@ -8,7 +8,7 @@ namespace Meceqs.TypedHandling.Configuration
     /// </summary>
     public class ServiceHandlerMetadata : IHandlerMetadata
     {
-        private readonly Type _handlerType;
+        public Type HandlerType { get; }
 
         public IEnumerable<HandleDefinition> ImplementedHandles { get; }
 
@@ -17,7 +17,7 @@ namespace Meceqs.TypedHandling.Configuration
             Check.NotNull(handlerType, nameof(handlerType));
             Check.NotNull(implementedHandles, nameof(implementedHandles));
 
-            _handlerType = handlerType;
+            HandlerType = handlerType;
             ImplementedHandles = implementedHandles;
         }
 
@@ -27,7 +27,7 @@ namespace Meceqs.TypedHandling.Configuration
 
             // This doesn't use "GetRequiredService" because it's up to the middleware
             // to decide whether unknown messages should throw or not.
-            return (IHandles)serviceProvider.GetService(_handlerType);
+            return (IHandles)serviceProvider.GetService(HandlerType);
         }
     }
 }

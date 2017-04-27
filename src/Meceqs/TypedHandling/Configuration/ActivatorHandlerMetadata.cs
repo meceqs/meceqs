@@ -9,25 +9,24 @@ namespace Meceqs.TypedHandling.Configuration
     /// </summary>
     public class ActivatorHandlerMetadata : IHandlerMetadata
     {
-        private readonly Type _handlerType;
-        private readonly IEnumerable<HandleDefinition> _implementedHandles;
+        public Type HandlerType { get; }
 
-        public IEnumerable<HandleDefinition> ImplementedHandles => _implementedHandles;
+        public IEnumerable<HandleDefinition> ImplementedHandles { get; }
 
         public ActivatorHandlerMetadata(Type handlerType, IEnumerable<HandleDefinition> implementedHandles)
         {
             Check.NotNull(handlerType, nameof(handlerType));
             Check.NotNull(implementedHandles, nameof(implementedHandles));
 
-            _handlerType = handlerType;
-            _implementedHandles = implementedHandles;
+            HandlerType = handlerType;
+            ImplementedHandles = implementedHandles;
         }
 
         public IHandles CreateHandler(IServiceProvider serviceProvider)
         {
             Check.NotNull(serviceProvider, nameof(serviceProvider));
 
-            return (IHandles)ActivatorUtilities.CreateInstance(serviceProvider, _handlerType);
+            return (IHandles)ActivatorUtilities.CreateInstance(serviceProvider, HandlerType);
         }
     }
 }

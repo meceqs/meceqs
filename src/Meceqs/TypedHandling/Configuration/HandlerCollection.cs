@@ -1,13 +1,17 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
 
 namespace Meceqs.TypedHandling.Configuration
 {
-    public class HandlerCollection : Collection<IHandlerMetadata>
+    public class HandlerCollection : IEnumerable<IHandlerMetadata>
     {
+        private readonly List<IHandlerMetadata> _handlerMetadatas = new List<IHandlerMetadata>();
+
+        public int Count => _handlerMetadatas.Count;
+
         /// <summary>
         /// Adds a type representing a <see cref="IHandles"/>.
         /// </summary>
@@ -39,6 +43,35 @@ namespace Meceqs.TypedHandling.Configuration
             var implementedHandles = GetImplementedHandles(handlerType);
             var factory = new ActivatorHandlerMetadata(handlerType, implementedHandles);
             Add(factory);
+        }
+
+        /// <summary>
+        /// Adds a <see cref="IHandlerMetadata"/> instance.
+        /// </summary>
+        public void Add(IHandlerMetadata handlerMetadata)
+        {
+            Check.NotNull(handlerMetadata, nameof(handlerMetadata));
+
+            if (_handlerMetadatas.Any(x => x.HandlerType == handlerMetadata.HandlerType))
+            {
+                throw new InvalidOperationException($"The handler type '{handlerMetadata.HandlerType}' has already been added.");
+            }
+
+            // Ensure there are no duplicate IHandles implementations in different handler types
+            foreach (var existing in _handlerMetadatas)
+            {
+                var duplicates = handlerMetadata.ImplementedHandles.Where(x => existing.ImplementedHandles.Contains(x)).ToList();
+                if (duplicates.Count > 0)
+                {
+                    throw new InvalidOperationException(
+                        $"The handler '{handlerMetadata.HandlerType}' can not be added because it contains the following " +
+                        $"'{nameof(IHandles)}' implementations which have already been added by the handler '{existing.HandlerType}': " +
+                        string.Join(";", duplicates.Select(x => $"{x.MessageType}/{x.ResultType}"))
+                    );
+                }
+            }
+
+            _handlerMetadatas.Add(handlerMetadata);
         }
 
         /// <summary>
@@ -115,6 +148,10 @@ namespace Meceqs.TypedHandling.Configuration
             var factory = new ServiceHandlerMetadata(handlerType, implementedHandles);
             Add(factory);
         }
+
+        public IEnumerator<IHandlerMetadata> GetEnumerator() => _handlerMetadatas.GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator() => _handlerMetadatas.GetEnumerator();
 
         private static void EnsureValidHandler(Type handlerType)
         {
