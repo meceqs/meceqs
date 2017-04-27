@@ -12,12 +12,12 @@ namespace Meceqs.Pipeline
     {
         /// <summary>
         /// Gets the envelope for which the pipeline is executed.
-        /// <summary>
+        /// </summary>
         public new Envelope<TMessage> Envelope => (Envelope<TMessage>)base.Envelope;
 
         /// <summary>
         /// Gets the message for which the pipeline is executed. This is a shortcut for <see cref="Envelope.Message"/>.
-        /// <summary>
+        /// </summary>
         public new TMessage Message => (TMessage)base.Message;
 
         public MessageContext(Envelope<TMessage> envelope)
@@ -33,12 +33,12 @@ namespace Meceqs.Pipeline
     {
         /// <summary>
         /// Gets the envelope for which the pipeline is executed.
-        /// <summary>
+        /// </summary>
         public Envelope Envelope { get; }
 
         /// <summary>
         /// Gets the message for which the pipeline is executed. This is a shortcut for <see cref="Envelope.Message"/>.
-        /// <summary>
+        /// </summary>
         public object Message => Envelope.Message; // just for faster access to the message
 
         /// <summary>

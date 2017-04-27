@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 namespace Meceqs.TypedHandling.Internal
 {
     /// <summary>
-    /// Uses reflection and compiled lambdas to invoke either <see typeref="IHandles<,>.HandleAsync" />
-    /// or <see typeref="IHandles<>.HandleAsync" />.
+    /// Uses reflection and compiled lambdas to invoke either <see typeref="IHandles{,}.HandleAsync" />
+    /// or <see typeref="IHandles{}.HandleAsync" />.
     /// Delegates are cached for better performance! This means, only the first message per type
     /// has bad performance.
     /// </summary>

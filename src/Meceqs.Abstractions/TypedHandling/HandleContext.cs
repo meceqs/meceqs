@@ -22,14 +22,14 @@ namespace Meceqs.TypedHandling
 
         /// <summary>
         /// Gets the typed envelope for which the pipeline is executed.
-        /// This is a shortcut for <see cref="MessageContext.Envelope"/>.
-        /// <summary>
+        /// This is a shortcut for accessing the property on <see cref="MessageContext"/>.
+        /// </summary>
         public new Envelope<TMessage> Envelope => MessageContext.Envelope;
 
         /// <summary>
         /// Gets the typed message for which the pipeline is executed.
-        /// This is a shortcut for <see cref="MessageContext.Envelope.Message"/>.
-        /// <summary>
+        /// This is a shortcut for accessing the property on <see cref="MessageContext"/>.
+        /// </summary>
         public new TMessage Message => MessageContext.Message;
 
         public HandleContext(MessageContext<TMessage> messageContext)
@@ -64,6 +64,7 @@ namespace Meceqs.TypedHandling
         /// <summary>
         /// Gets the "HandleAsync" method which processes the envelope/message.
         /// This can be used to read custom attributes of that method - e.g. by an interceptor.
+        /// </summary>
         public MethodInfo HandleMethod { get; private set; }
 
         #region MessageContext Shortcuts
@@ -71,13 +72,13 @@ namespace Meceqs.TypedHandling
         /// <summary>
         /// Gets the envelope for which the pipeline is executed.
         /// This is a shortcut for <see cref="MessageContext.Envelope"/>.
-        /// <summary>
+        /// </summary>
         public Envelope Envelope => MessageContext.Envelope;
 
         /// <summary>
         /// Gets the message for which the pipeline is executed.
         /// This is a shortcut for <see cref="MessageContext.Message"/>.
-        /// <summary>
+        /// </summary>
         public object Message => MessageContext.Message;
 
         /// <summary>

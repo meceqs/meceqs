@@ -6,6 +6,7 @@ namespace Meceqs.Sending
     /// <summary>
     /// This interface is used for "sending a newly created message" or
     /// for "forwarding an existing envelope" to a pipeline.
+    /// </summary>
     public interface IMessageSender
     {
         /// <summary>

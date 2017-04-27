@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net46</TargetFramework>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <DebugType>portable</DebugType>
     <OutputType>Exe</OutputType>
   </PropertyGroup>

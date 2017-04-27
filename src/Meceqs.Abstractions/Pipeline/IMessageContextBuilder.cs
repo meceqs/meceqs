@@ -51,6 +51,7 @@ namespace Meceqs.Pipeline
         /// Uses a pipeline with the given name instead of the default pipeline
         /// (which would be "Receive" for <see cref="Meceqs.Receiving.IMessageReceiver"/>
         /// or "Send" for <see cref="Meceqs.Sending.IMessageSender"/>).
+        /// </summary>
         TBuilder UsePipeline(string pipelineName);
     }
 }

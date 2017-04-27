@@ -170,7 +170,7 @@ namespace Meceqs.TypedHandling
 
         /// <summary>
         /// Returns a dictionary which returns a <see cref="IHandlerMetadata"/> for a given a message type and result type.
-        /// <summary>
+        /// </summary>
         private static Dictionary<HandleDefinition, IHandlerMetadata> CreateHandlerMapping(HandlerCollection handlers)
         {
             Check.NotNull(handlers, nameof(handlers));
