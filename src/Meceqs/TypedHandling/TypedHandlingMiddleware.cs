@@ -97,7 +97,7 @@ namespace Meceqs.TypedHandling
                 case UnknownMessageBehavior.ThrowException:
                     throw new UnknownMessageException(
                         $"There was no handler configured for message/result types " +
-                        $"'{messageContext.MessageType}/{messageContext.ExpectedResultType}");
+                        $"'{messageContext.MessageType}/{messageContext.ExpectedResultType ?? typeof(void)}");
 
                 case UnknownMessageBehavior.Skip:
                     _logger.SkippingMessage(messageContext);

@@ -59,7 +59,7 @@ namespace Meceqs.Pipeline
         /// <summary>
         /// Gets the type of the result expected by the caller.
         /// </summary>
-        public Type ExpectedResultType { get; private set; }
+        public Type ExpectedResultType { get; private set; } // TODO @cweiss set to void by default?
 
         /// <summary>
         /// Gets or sets the result of the current execution. This object must match the type of <see cref="ExpectedResultType"/>
