@@ -1,11 +1,23 @@
 <Project>
   <PropertyGroup>
     <VersionPrefix>0.4.0</VersionPrefix>
-    <VersionSuffix></VersionSuffix>
+    <!--<VersionSuffix>$(VersionSuffix)</VersionSuffix>-->
     <Authors>C3 Loyalty Services</Authors>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(OutputType)'=='library'">
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup>
-    <NoWarn>1591</NoWarn>
+    <!-- Makes sure debugging packages with VS2017 "Enable source link support" works -->
+    <DebugType>embedded</DebugType>
   </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Also required for "Enable source link support" -->
+    <PackageReference Include="SourceLink.Create.CommandLine" Version="2.1.0" PrivateAssets="All" />
+  </ItemGroup>
 </Project>

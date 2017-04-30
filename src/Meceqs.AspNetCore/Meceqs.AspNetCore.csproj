@@ -4,8 +4,6 @@
 
   <PropertyGroup>
     <TargetFrameworks>net46;netstandard1.5</TargetFrameworks>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
