@@ -1,0 +1,17 @@
+<Project>
+  <!-- Embed source files during RELEASE mode to enable local debugging! -->
+  <Target Name="PopulateEmbeddedFiles" AfterTargets="BeforeCompile" BeforeTargets="CoreCompile"
+    Condition="'$(Configuration)'=='Release'">
+
+    <Message Importance="High" Text="  SKIPPED source file embedding for $(MSBuildProjectName) - DebugType: $(DebugType)"
+      Condition="'$(DebugType)'!='embedded' and '$(DebugType)'!='portable'" />
+
+    <Message Importance="High" Text="$(MSBuildProjectName) -> Embedding source files"
+      Condition="'$(DebugType)'=='embedded' or '$(DebugType)'=='portable'" />
+
+    <ItemGroup Condition="'$(DebugType)'=='embedded' or '$(DebugType)'=='portable'">
+      <EmbeddedFiles Include="@(Compile)" />
+    </ItemGroup>
+  </Target>
+
+</Project>

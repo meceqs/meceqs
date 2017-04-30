@@ -10,13 +10,10 @@
     <DebugType>embedded</DebugType>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(OutputType)'=='library'">
+  <!-- Create XML documentation for libraries -->
+  <PropertyGroup Condition="'$(OutputType)'=='library' and '$(Configuration)'=='Release'">
     <NoWarn>$(NoWarn);CS1591</NoWarn>
-    <GenerateDocumentationFile Condition="'$(Configuration)'=='Release'">true</GenerateDocumentationFile>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
-  <ItemGroup Condition="'$(Configuration)'=='Release'">
-    <!-- Also required for "Enable source link support" -->
-    <PackageReference Include="SourceLink.Create.CommandLine" Version="2.1.0" PrivateAssets="All" />
-  </ItemGroup>
 </Project>
