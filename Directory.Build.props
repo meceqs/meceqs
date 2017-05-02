@@ -2,12 +2,10 @@
   <PropertyGroup>
     <VersionPrefix>0.4.0</VersionPrefix>
     <Authors>C3 Loyalty Services</Authors>
-    <Copyright>Copyright (c) C3 Loyalty Services.</Copyright>
+    <Copyright>Copyright (c) C3 Loyalty Services</Copyright>
 
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-
-    <!-- Makes sure debugging packages with VS2017 "Enable source link support" works -->
-    <DebugType>embedded</DebugType>
+    <DebugType>portable</DebugType>
   </PropertyGroup>
 
   <!-- Create XML documentation for libraries -->
