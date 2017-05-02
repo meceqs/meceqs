@@ -131,7 +131,7 @@ Task dotnet-pack {
         Write-Host "Packaging $library to $libraryOutput"
         Write-Host ""
 
-        exec { dotnet pack $library -c $BuildConfiguration --version-suffix $BuildNumber --no-build  --include-symbols -o $libraryOutput }
+        exec { dotnet pack $library -c $BuildConfiguration --version-suffix $BuildNumber --no-build --include-source --include-symbols -o $libraryOutput }
     }
 
     # HACK!! We want to include the PDB files in the regular nupkg so people can debug into them
