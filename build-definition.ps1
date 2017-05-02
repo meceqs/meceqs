@@ -84,7 +84,8 @@ Task dotnet-restore {
 
 Task dotnet-build {
 
-    exec { dotnet build -c $BuildConfiguration --version-suffix $BuildNumber }
+    # --no-incremental to ensure that CI builds always result in a clean build
+    exec { dotnet build -c $BuildConfiguration --version-suffix $BuildNumber --no-incremental }
 }
 
 Task dotnet-test {
@@ -135,7 +136,7 @@ Task dotnet-pack {
     }
 
     # HACK!! We want to include the PDB files in the regular nupkg so people can debug into them
-    # without having to go through an internal symbol server
+    # without having to go through an (internal) symbol server
     Write-Host ""
     Write-Host "Replacing regular .nupkg files with .symbols.nupkg content"
     Get-ChildItem -Path $libraryOutput -Filter *.symbols.nupkg | ForEach-Object {
