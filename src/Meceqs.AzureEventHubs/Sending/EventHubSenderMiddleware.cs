@@ -43,7 +43,7 @@ namespace Meceqs.AzureEventHubs.Sending
             var eventData = eventDataConverter.ConvertToEventData(context.Envelope);
 
             // TODO @cweiss move magic string somewhere.
-            string partitionKey = context.Items.Get<string>("PartitionKey");
+            string partitionKey = context.Items.Get<object>("PartitionKey")?.ToString();
 
             await _eventHubClient.SendAsync(eventData, partitionKey);
         }
