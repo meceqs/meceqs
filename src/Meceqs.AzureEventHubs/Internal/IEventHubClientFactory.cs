@@ -5,6 +5,6 @@ namespace Meceqs.AzureEventHubs.Internal
     /// </summary>
     public interface IEventHubClientFactory
     {
-        IEventHubClient CreateEventHubClient(EventHubConnection connection);
+        IEventHubClient CreateEventHubClient(string connectionString);
     }
 }

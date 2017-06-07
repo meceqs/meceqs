@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.IO;
 using Meceqs.AzureEventHubs.Internal;
+using Microsoft.Azure.EventHubs;
 using Microsoft.Extensions.Logging;
 
 namespace Meceqs.AzureEventHubs.FileFake
@@ -10,7 +11,7 @@ namespace Meceqs.AzureEventHubs.FileFake
         private readonly string _directory;
         private readonly ILoggerFactory _loggerFactory;
 
-        private readonly ConcurrentDictionary<EventHubConnection, IEventHubClient> _clients = new ConcurrentDictionary<EventHubConnection, IEventHubClient>();
+        private readonly ConcurrentDictionary<string, IEventHubClient> _clients = new ConcurrentDictionary<string, IEventHubClient>();
 
         public FileFakeEventHubClientFactory(string directory, ILoggerFactory loggerFactory)
         {
@@ -23,13 +24,15 @@ namespace Meceqs.AzureEventHubs.FileFake
             EnsureDirectoryExists();
         }
 
-        public IEventHubClient CreateEventHubClient(EventHubConnection connection)
+        public IEventHubClient CreateEventHubClient(string connectionString)
         {
-            Check.NotNull(connection, nameof(connection));
+            Check.NotNullOrWhiteSpace(connectionString, nameof(connectionString));
 
-            return _clients.GetOrAdd(connection, key => 
+            return _clients.GetOrAdd(connectionString, key =>
             {
-                string fileName = Path.Combine(_directory, $"{connection.EventHubName}.txt");
+                string entityPath = new EventHubsConnectionStringBuilder(connectionString).EntityPath;
+
+                string fileName = Path.Combine(_directory, $"{entityPath}.txt");
 
                 return new FileFakeEventHubClient(fileName, _loggerFactory);
             });

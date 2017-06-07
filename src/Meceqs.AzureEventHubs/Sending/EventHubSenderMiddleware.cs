@@ -28,8 +28,7 @@ namespace Meceqs.AzureEventHubs.Sending
 
             _logger = loggerFactory.CreateLogger<EventHubSenderMiddleware>();
 
-            var connection = new EventHubConnection(options.Value.EventHubConnectionString);
-            _eventHubClient = eventHubClientFactory.CreateEventHubClient(connection);
+            _eventHubClient = eventHubClientFactory.CreateEventHubClient(options.Value.EventHubConnectionString);
         }
 
         public async Task Invoke(MessageContext context, IEventDataConverter eventDataConverter)

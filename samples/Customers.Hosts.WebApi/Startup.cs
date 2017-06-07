@@ -44,7 +44,7 @@ namespace Customers.Hosts.WebApi
             // tell Meceqs to resolve it from there.
             services.AddSingleton<SingletonHandleInterceptor>();
 
-            services.Configure<EventHubSenderOptions>(x => x.EventHubConnectionString = "customers|dummy");
+            services.Configure<EventHubSenderOptions>(x => x.EventHubConnectionString = "Endpoint=sb://dummy;EntityPath=customers");
 
             services.AddMeceqs(builder =>
             {

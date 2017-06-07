@@ -4,14 +4,11 @@ namespace Meceqs.AzureEventHubs.Internal
 {
     public class DefaultEventHubClientFactory : IEventHubClientFactory
     {
-        public IEventHubClient CreateEventHubClient(EventHubConnection connection)
+        public IEventHubClient CreateEventHubClient(string connectionString)
         {
-            Check.NotNull(connection, nameof(connection));
+            Check.NotNullOrWhiteSpace(connectionString, nameof(connectionString));
 
-            var connectionBuilder = new EventHubsConnectionStringBuilder(connection.ConnectionString);
-
-            connectionBuilder.EntityPath = connection.EventHubName;
-
+            var connectionBuilder = new EventHubsConnectionStringBuilder(connectionString);
             var client = EventHubClient.CreateFromConnectionString(connectionBuilder.ToString());
 
             return new EventHubClientWrapper(client);
