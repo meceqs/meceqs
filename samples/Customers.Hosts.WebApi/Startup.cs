@@ -46,61 +46,65 @@ namespace Customers.Hosts.WebApi
 
             services.Configure<EventHubSenderOptions>(x => x.EventHubConnectionString = "customers|dummy");
 
-            services.AddMeceqs()
+            services.AddMeceqs(builder =>
+            {
+                builder
 
-                // This allows all components to use JSON serialization.
-                .AddJsonSerialization()
+                    // This allows all components to use JSON serialization.
+                    .AddJsonSerialization()
 
-                // Pass HttpContext.RequestServices, .User, etc to every processed message.
-                // (this will also be called by AddAspNetCoreReceiver so it wouldn't be necessary here,
-                // it's just here for clarity).
-                .AddAspNetCore()
+                    // Pass HttpContext.RequestServices, .User, etc to every processed message.
+                    // (this will also be called by AddAspNetCoreReceiver so it wouldn't be necessary here,
+                    // it's just here for clarity).
+                    .AddAspNetCore()
 
-                // The Web API will process incoming requests.
-                .AddAspNetCoreReceiver(receiver =>
-                {
-                    // Throwing an exception is the default behavior.
-                    // We could also skip unknown message types but this doesn't make much sense
-                    // for a Web API.
-                    receiver.ThrowOnUnknownMessage();
-
-                    receiver.UseTypedHandling(options =>
+                    // The Web API will process incoming requests.
+                    .AddAspNetCoreReceiver(receiver =>
                     {
-                        // In this example, the context only handles messages from this Web API
-                        // so we can just add every handler.
-                        options.Handlers.AddFromAssembly<CustomerCommandHandler>();
+                        // Throwing an exception is the default behavior.
+                        // We could also skip unknown message types but this doesn't make much sense
+                        // for a Web API.
+                        receiver.ThrowOnUnknownMessage();
 
-                        // Interceptors know about the executing handler
-                        // (e.g. to check for attributes on the handler)
+                        receiver.UseTypedHandling(options =>
+                        {
+                            // In this example, the context only handles messages from this Web API
+                            // so we can just add every handler.
+                            options.Handlers.AddFromAssembly<CustomerCommandHandler>();
 
-                        // This interceptor is created for each message.
-                        // (It doesn't need to be registered in the DI framework
-                        // because Meceqs uses ActivatorUtilities to create the instance.)
-                        options.Interceptors.Add<SampleHandleInterceptor>();
+                            // Interceptors know about the executing handler
+                            // (e.g. to check for attributes on the handler)
 
-                        // this interceptor will use the lifecycle from the DI framework.
-                        options.Interceptors.AddService<SingletonHandleInterceptor>();
-                    });
+                            // This interceptor is created for each message.
+                            // (It doesn't need to be registered in the DI framework
+                            // because Meceqs uses ActivatorUtilities to create the instance.)
+                            options.Interceptors.Add<SampleHandleInterceptor>();
 
-                    // This adds a custom middleware to the pipeline.
-                    // They are executed in this order before the Typed Handling middleware is executed.
-                    receiver.ConfigurePipeline(pipeline =>
+                            // this interceptor will use the lifecycle from the DI framework.
+                            options.Interceptors.AddService<SingletonHandleInterceptor>();
+                        });
+
+                        // This adds a custom middleware to the pipeline.
+                        // They are executed in this order before the Typed Handling middleware is executed.
+                        receiver.ConfigurePipeline(pipeline =>
+                        {
+                            // add user id to message if not present
+                            pipeline.UseAuditing();
+                        });
+                    })
+
+                    // This Web API will also send messages to an Azure Event Hub.
+                    .AddEventHubSender(sender =>
                     {
-                        // add user id to message if not present
-                        pipeline.UseAuditing();
-                    });
-                })
+                        sender.ConfigurePipeline(pipeline =>
+                        {
+                            pipeline.UseAuditing(); // add user id to message if not present
+                        });
+                    })
 
-                // This Web API will also send messages to an Azure Event Hub.
-                .AddEventHubSender(sender =>
-                {
-                    sender.ConfigurePipeline(pipeline => {
-                        pipeline.UseAuditing(); // add user id to message if not present
-                    });
-                })
-
-                // Fake for the EventHubSender which will send events to a local file.
-                .AddFileFakeEventHubSender(SampleConfiguration.FileFakeEventHubDirectory);
+                    // Fake for the EventHubSender which will send events to a local file.
+                    .AddFileFakeEventHubSender(SampleConfiguration.FileFakeEventHubDirectory);
+            });
         }
 
         public void Configure(IApplicationBuilder app)

@@ -16,33 +16,36 @@ namespace Sales.Hosts.ProcessCustomerEvents
             services.AddLogging();
             services.AddOptions();
 
-            services.AddMeceqs()
-                .AddJsonSerialization()
+            services.AddMeceqs(builder =>
+            {
+                builder
+                    .AddJsonSerialization()
 
-                .AddEventHubReceiver(receiver =>
-                {
-                    receiver
-                        .SkipUnknownMessages()
+                    .AddEventHubReceiver(receiver =>
+                    {
+                        receiver
+                            .SkipUnknownMessages()
 
-                        .UseTypedHandling(options =>
-                        {
-                            options.Handlers.Add<CustomerEventsHandler>();
-                        })
+                            .UseTypedHandling(options =>
+                            {
+                                options.Handlers.Add<CustomerEventsHandler>();
+                            })
 
-                        // RunTypedHandling will be added at the end automatically!
-                        .ConfigurePipeline(x =>
-                        {
-                            x.UseAuditing();
-                        });
-                })
+                            // RunTypedHandling will be added at the end automatically!
+                            .ConfigurePipeline(x =>
+                            {
+                                x.UseAuditing();
+                            });
+                    })
 
-                // Fake for the EventHubReceiver which will read events from a local file.
-                .AddFileFakeEventHubProcessor(options =>
-                {
-                    options.Directory = SampleConfiguration.FileFakeEventHubDirectory;
-                    options.ClearEventHubOnStart = true;
-                    options.EventHubName = "customers";
-                });
+                    // Fake for the EventHubReceiver which will read events from a local file.
+                    .AddFileFakeEventHubProcessor(options =>
+                    {
+                        options.Directory = SampleConfiguration.FileFakeEventHubDirectory;
+                        options.ClearEventHubOnStart = true;
+                        options.EventHubName = "customers";
+                    });
+            });
         }
 
         public static void Main(string[] args)

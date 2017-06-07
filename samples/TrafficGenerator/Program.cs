@@ -23,27 +23,30 @@ namespace TrafficGenerator
                 x.EntityPath = SampleConfiguration.PlaceOrderQueue;
             });
 
-            services.AddMeceqs()
-                .AddJsonSerialization()
+            services.AddMeceqs(builder =>
+            {
+                builder
+                    .AddJsonSerialization()
 
-                .AddHttpSender(sender =>
-                {
-                    sender.AddEndpoint("Customers", options =>
+                    .AddHttpSender(sender =>
                     {
-                        options.BaseAddress = SampleConfiguration.CustomersWebApiUrl;
+                        sender.AddEndpoint("Customers", options =>
+                        {
+                            options.BaseAddress = SampleConfiguration.CustomersWebApiUrl;
 
-                        // Write your own extension method if you have a base class for alle messages
-                        options.AddMessagesFromAssembly<CreateCustomerCommand>(t => t.Name.EndsWith("Command") || t.Name.EndsWith("Query"));
-                    });
-                })
+                            // Write your own extension method if you have a base class for alle messages
+                            options.AddMessagesFromAssembly<CreateCustomerCommand>(t => t.Name.EndsWith("Command") || t.Name.EndsWith("Query"));
+                        });
+                    })
 
-                .AddServiceBusSender(sender =>
-                {
-                    sender.SetPipelineName("ServiceBus");
-                })
+                    .AddServiceBusSender(sender =>
+                    {
+                        sender.SetPipelineName("ServiceBus");
+                    })
 
-                // send messages to a local file instead of the actual Service Bus.
-                .AddFileFakeServiceBusSender(SampleConfiguration.FileFakeServiceBusDirectory);
+                    // send messages to a local file instead of the actual Service Bus.
+                    .AddFileFakeServiceBusSender(SampleConfiguration.FileFakeServiceBusDirectory);
+            });
         }
 
         public static void Main(string[] args)

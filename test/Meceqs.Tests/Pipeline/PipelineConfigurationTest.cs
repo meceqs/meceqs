@@ -14,9 +14,12 @@ namespace Meceqs.Tests.Pipeline
             var services = new ServiceCollection()
                 .AddOptions();
 
-            services.AddMeceqs()
-                .AddPipeline("pipeline", pipeline => { })
-                .AddPipeline("pipeline", pipeline => { });
+            services.AddMeceqs(builder =>
+            {
+                builder
+                    .AddPipeline("pipeline", pipeline => { })
+                    .AddPipeline("pipeline", pipeline => { });
+            });
 
             var serviceProvider = services.BuildServiceProvider();
 

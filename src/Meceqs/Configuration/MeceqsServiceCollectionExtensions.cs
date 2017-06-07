@@ -1,3 +1,4 @@
+using System;
 using Meceqs;
 using Meceqs.Configuration;
 using Meceqs.Pipeline;
@@ -25,6 +26,16 @@ namespace Microsoft.Extensions.DependencyInjection
             AddTypedHandling(services);
 
             return new MeceqsBuilder(services);
+        }
+
+        /// <summary>
+        /// Adds Meceqs core services and allows to add or configure Meceqs features.
+        /// </summary>
+        public static IServiceCollection AddMeceqs(this IServiceCollection services, Action<IMeceqsBuilder> builder)
+        {
+            IMeceqsBuilder builderInstance = AddMeceqs(services);
+            builder?.Invoke(builderInstance);
+            return services;
         }
 
         private static void AddPipeline(IServiceCollection services)

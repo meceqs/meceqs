@@ -16,23 +16,26 @@ namespace Sales.Hosts.ProcessOrders
             services.AddLogging();
             services.AddOptions();
 
-            services.AddMeceqs()
-                .AddJsonSerialization()
+            services.AddMeceqs(builder =>
+            {
+                builder
+                    .AddJsonSerialization()
 
-                .AddServiceBusReceiver(receiver =>
-                {
-                    receiver.UseTypedHandling(options =>
+                    .AddServiceBusReceiver(receiver =>
                     {
-                        options.Handlers.AddFromAssembly<Program>();
-                    });
-                })
+                        receiver.UseTypedHandling(options =>
+                        {
+                            options.Handlers.AddFromAssembly<Program>();
+                        });
+                    })
 
-                // Fake for the ServiceBusReceiver which will read messages from local file system.
-                .AddFileFakeServiceBusProcessor(options =>
-                {
-                    options.Directory = SampleConfiguration.FileFakeServiceBusDirectory;
-                    options.EntityPath = SampleConfiguration.PlaceOrderQueue;
-                });
+                    // Fake for the ServiceBusReceiver which will read messages from local file system.
+                    .AddFileFakeServiceBusProcessor(options =>
+                    {
+                        options.Directory = SampleConfiguration.FileFakeServiceBusDirectory;
+                        options.EntityPath = SampleConfiguration.PlaceOrderQueue;
+                    });
+            });
         }
 
         public static void Main(string[] args)
