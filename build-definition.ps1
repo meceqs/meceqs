@@ -30,6 +30,11 @@ Properties {
     )
 }
 
+# VSTS Overrides
+if ($env:BUILD_BUILDNUMBER) { $BuildNumber = $env:BUILD_BUILDNUMBER }
+if ($env:BUILD_ARTIFACTSTAGINGDIRECTORY) { $ArtifactsPath = $env:BUILD_ARTIFACTSTAGINGDIRECTORY }
+
+
 FormatTaskName ("`n" + ("-"*25) + "[{0}]" + ("-"*25) + "`n")
 
 Task Default -depends init, clean, dotnet-install, dotnet-restore, dotnet-build, dotnet-test, dotnet-pack
