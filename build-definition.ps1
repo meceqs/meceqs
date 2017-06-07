@@ -1,34 +1,33 @@
-Properties {
+# Default properties
 
-    # This number will be appended to all nuget package versions and to the service fabric app versions
-    # This should be overwritten by a CI system like VSTS, AppVeyor, TeamCity, ...
-    $BuildNumber = "loc" + ((Get-Date).ToUniversalTime().ToString("yyyyMMddHHmm"))
+# This number will be appended to all nuget package versions and to the service fabric app versions
+# This should be overwritten by a CI system like VSTS, AppVeyor, TeamCity, ...
+$BuildNumber = "loc" + ((Get-Date).ToUniversalTime().ToString("yyyyMMddHHmm"))
 
-    # The build configuration used for compilation
-    $BuildConfiguration = "Release"
+# The build configuration used for compilation
+$BuildConfiguration = "Release"
 
-    # The folder in which all output packages should be placed
-    $ArtifactsPath = Join-Path $PWD "artifacts"
+# The folder in which all output packages should be placed
+$ArtifactsPath = Join-Path $PWD "artifacts"
 
-    # Artifacts-subfolder in which test results will be placed
-    $ArtifactsPathTests = "Tests"
+# Artifacts-subfolder in which test results will be placed
+$ArtifactsPathTests = "Tests"
 
-    # Artifacts-subfolder in which NuGet packages will be placed
-    $ArtifactsPathNuGet = "NuGet"
+# Artifacts-subfolder in which NuGet packages will be placed
+$ArtifactsPathNuGet = "NuGet"
 
-    # A list of projects for which NuGet packages should be created
-    $NugetLibraries = @(
-        "src/Meceqs",
-        "src/Meceqs.Abstractions",
-        "src/Meceqs.AspNetCore",
-        "src/Meceqs.AzureEventHubs",
-        "src/Meceqs.AzureEventHubs.FileFake",
-        "src/Meceqs.AzureServiceBus",
-        "src/Meceqs.AzureServiceBus.FileFake",
-        "src/Meceqs.HttpSender",
-        "src/Meceqs.Serialization.Json"
-    )
-}
+# A list of projects for which NuGet packages should be created
+$NugetLibraries = @(
+    "src/Meceqs",
+    "src/Meceqs.Abstractions",
+    "src/Meceqs.AspNetCore",
+    "src/Meceqs.AzureEventHubs",
+    "src/Meceqs.AzureEventHubs.FileFake",
+    "src/Meceqs.AzureServiceBus",
+    "src/Meceqs.AzureServiceBus.FileFake",
+    "src/Meceqs.HttpSender",
+    "src/Meceqs.Serialization.Json"
+)
 
 # VSTS Overrides
 if ($env:BUILD_BUILDNUMBER) { $BuildNumber = $env:BUILD_BUILDNUMBER }
@@ -52,7 +51,6 @@ Task init {
     Assert ($ArtifactsPath -ne $null) "Property 'ArtifactsPath' may not be null."
     Assert ($ArtifactsPathTests -ne $null) "Property 'ArtifactsPathTests' may not be null."
     Assert ($ArtifactsPathNuGet -ne $null) "Property 'ArtifactsPathNuGet' may not be null."
-
 }
 
 Task clean {
