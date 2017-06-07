@@ -11,10 +11,10 @@ Properties {
     $ArtifactsPath = Join-Path $PWD "artifacts"
 
     # Artifacts-subfolder in which test results will be placed
-    $ArtifactsPathTests = "tests"
+    $ArtifactsPathTests = "Tests"
 
     # Artifacts-subfolder in which NuGet packages will be placed
-    $ArtifactsPathNuGet = "nuget"
+    $ArtifactsPathNuGet = "NuGet"
 
     # A list of projects for which NuGet packages should be created
     $NugetLibraries = @(
