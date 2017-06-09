@@ -21,6 +21,7 @@ $NugetLibraries = @(
     "src/Meceqs",
     "src/Meceqs.Abstractions",
     "src/Meceqs.AspNetCore",
+    "src/Meceqs.AspNetCore.Swagger",
     "src/Meceqs.AzureEventHubs",
     "src/Meceqs.AzureEventHubs.FileFake",
     "src/Meceqs.AzureServiceBus",
