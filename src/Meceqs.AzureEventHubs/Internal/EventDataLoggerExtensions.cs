@@ -125,7 +125,7 @@ namespace Microsoft.Extensions.Logging
                 _eventData = eventData;
             }
 
-            public int Count => 5;
+            public int Count => 3;
 
             public KeyValuePair<string, object> this[int index]
             {
@@ -183,13 +183,7 @@ namespace Microsoft.Extensions.Logging
 
             private string _cachedToString;
 
-            public int Count
-            {
-                get
-                {
-                    return 2;
-                }
-            }
+            public int Count => 2;
 
             public KeyValuePair<string, object> this[int index]
             {
