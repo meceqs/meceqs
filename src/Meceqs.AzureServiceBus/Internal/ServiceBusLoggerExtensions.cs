@@ -8,7 +8,7 @@ using Microsoft.Azure.ServiceBus;
 
 namespace Microsoft.Extensions.Logging
 {
-    internal static class ServiceBusMessageLoggerExtensions
+    internal static class ServiceBusLoggerExtensions
     {
         private static readonly double TimestampToTicks = TimeSpan.TicksPerSecond / (double)Stopwatch.Frequency;
 

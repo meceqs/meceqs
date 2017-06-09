@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using Microsoft.Azure.ServiceBus;
+using Microsoft.Azure.ServiceBus.Core;
 
 namespace Meceqs.AzureServiceBus.Internal
 {
@@ -21,7 +22,7 @@ namespace Meceqs.AzureServiceBus.Internal
 
         public void Close()
         {
-            _sender.Close();
+            _sender.CloseAsync().GetAwaiter().GetResult();
         }
     }
 }

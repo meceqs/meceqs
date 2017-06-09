@@ -1,5 +1,6 @@
 using System.IO;
 using Meceqs.AzureServiceBus.Internal;
+using Microsoft.Azure.ServiceBus;
 using Microsoft.Extensions.Logging;
 
 namespace Meceqs.AzureServiceBus.FileFake
@@ -20,10 +21,11 @@ namespace Meceqs.AzureServiceBus.FileFake
             EnsureDirectoryExists();
         }
 
-        public IServiceBusMessageSender CreateMessageSender(string connectionString, string entityPath)
+        public IServiceBusMessageSender CreateMessageSender(string connectionString)
         {
-            Guard.NotNullOrWhiteSpace(entityPath, nameof(entityPath));
+            Guard.NotNullOrWhiteSpace(connectionString, nameof(connectionString));
 
+            string entityPath = new ServiceBusConnectionStringBuilder(connectionString).EntityPath;
             string entityPathDirectory = Path.Combine(_directory, entityPath);
 
             return new FileFakeServiceBusMessageSender(entityPathDirectory, _loggerFactory);

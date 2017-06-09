@@ -17,7 +17,6 @@ namespace Microsoft.Extensions.DependencyInjection
             Guard.NotNull(builder, nameof(builder));
 
             builder.Services.TryAddSingleton<IServiceBusMessageConverter, DefaultServiceBusMessageConverter>();
-            builder.Services.TryAddSingleton<IServiceBusMessageInvoker, DefaultServiceBusMessageInvoker>();
             builder.Services.TryAddSingleton<IServiceBusMessageSenderFactory, DefaultServiceBusMessageSenderFactory>();
             builder.Services.TryAddSingleton<IServiceBusReceiver, DefaultServiceBusReceiver>();
 

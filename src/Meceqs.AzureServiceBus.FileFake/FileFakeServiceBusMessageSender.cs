@@ -2,8 +2,8 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using Meceqs.AzureServiceBus.Internal;
+using Microsoft.Azure.ServiceBus;
 using Microsoft.Extensions.Logging;
-using Microsoft.ServiceBus.Messaging;
 
 namespace Meceqs.AzureServiceBus.FileFake
 {
@@ -23,11 +23,11 @@ namespace Meceqs.AzureServiceBus.FileFake
             EnsureDirectoryExists();
         }
 
-        public Task SendAsync(BrokeredMessage message)
+        public Task SendAsync(Message message)
         {
             string fileName = Path.Combine(_entityPathDirectory, $"{message.MessageId}.json");
 
-            string serializedMessage = FileFakeBrokeredMessageSerializer.Serialize(message);
+            string serializedMessage = FileFakeServiceBusMessageSerializer.Serialize(message);
 
             InvokeWithRetry(3, () =>
             {

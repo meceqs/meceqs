@@ -33,8 +33,6 @@ namespace Microsoft.Extensions.DependencyInjection
             builder.Services.AddSingleton(processorOptions);
             builder.Services.AddSingleton<FileFakeServiceBusProcessor>();
 
-            builder.Services.AddSingleton<IServiceBusMessageInvoker, FileFakeServiceBusMessageInvoker>();
-
             return builder;
         }
     }

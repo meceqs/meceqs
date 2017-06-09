@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Reflection;
 using System.Text;
@@ -8,8 +9,12 @@ using Newtonsoft.Json.Linq;
 
 namespace Meceqs.AzureServiceBus.FileFake
 {
-    public static class FileFakeBrokeredMessageSerializer
+    public static class FileFakeServiceBusMessageSerializer
     {
+        private static readonly PropertyInfo SystemPropertyEnqueuedTimeUtc = typeof(Message.SystemPropertiesCollection).GetProperty("EnqueuedTimeUtc");
+        private static readonly PropertyInfo SystemPropertyDeliveryCount = typeof(Message.SystemPropertiesCollection).GetProperty("DeliveryCount");
+        private static readonly PropertyInfo SystemPropertySequenceNumber = typeof(Message.SystemPropertiesCollection).GetProperty("SequenceNumber");
+
         public static string Serialize(Message message)
         {
             string serializedEnvelope = Encoding.UTF8.GetString(message.Body);
@@ -32,6 +37,9 @@ namespace Meceqs.AzureServiceBus.FileFake
 
                 writer.WritePropertyName(nameof(message.CorrelationId));
                 writer.WriteValue(message.CorrelationId);
+
+                writer.WritePropertyName(nameof(message.SystemProperties.EnqueuedTimeUtc));
+                writer.WriteValue(DateTime.UtcNow);
 
                 writer.WritePropertyName("Body");
                 writer.WriteValue(serializedEnvelope);
@@ -60,12 +68,15 @@ namespace Meceqs.AzureServiceBus.FileFake
 
             message.CorrelationId = jsonMessage.GetValue(nameof(message.CorrelationId)).ToString();
 
-            // Receiver properties are internal - that's why we need reflection :(
-            // (if these properties are not set, accessing them will throw an exception.)
+            // System properties are internal - that's why we need reflection :(
 
-            SetPropertyValue(message, nameof(message.DeliveryCount), 1);
-            SetPropertyValue(message, nameof(message.SequenceNumber), 1);
-            SetPropertyValue(message, nameof(message.EnqueuedSequenceNumber), 1);
+            var systemProperties = message.SystemProperties;
+
+            SystemPropertyDeliveryCount.SetValue(systemProperties, 1);
+            SystemPropertySequenceNumber.SetValue(systemProperties, 1);
+
+            var enqueuedTimeUtc = (DateTime)jsonMessage.GetValue(nameof(systemProperties.EnqueuedTimeUtc)).ToObject(typeof(DateTime));
+            SystemPropertyEnqueuedTimeUtc.SetValue(systemProperties, enqueuedTimeUtc);
 
             return message;
         }

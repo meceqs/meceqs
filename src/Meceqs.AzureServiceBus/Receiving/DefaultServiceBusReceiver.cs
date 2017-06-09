@@ -16,23 +16,19 @@ namespace Meceqs.AzureServiceBus.Receiving
         private readonly ServiceBusReceiverOptions _options;
         private readonly ILogger _logger;
         private readonly IServiceScopeFactory _serviceScopeFactory;
-        private readonly IServiceBusMessageInvoker _serviceBusMessageInvoker;
 
         public DefaultServiceBusReceiver(
             IOptions<ServiceBusReceiverOptions> options,
             ILoggerFactory loggerFactory,
-            IServiceScopeFactory serviceScopeFactory,
-            IServiceBusMessageInvoker serviceBusMessageInvoker)
+            IServiceScopeFactory serviceScopeFactory)
         {
-            Guard.NotNull(options?.Value, nameof(options));
-            Guard.NotNull(loggerFactory, nameof(loggerFactory));
-            Guard.NotNull(serviceScopeFactory, nameof(serviceScopeFactory));
-            Guard.NotNull(serviceBusMessageInvoker, nameof(serviceBusMessageInvoker));
+            Check.NotNull(options?.Value, nameof(options));
+            Check.NotNull(loggerFactory, nameof(loggerFactory));
+            Check.NotNull(serviceScopeFactory, nameof(serviceScopeFactory));
 
             _options = options.Value;
             _logger = loggerFactory.CreateLogger<DefaultServiceBusReceiver>();
             _serviceScopeFactory = serviceScopeFactory;
-            _serviceBusMessageInvoker = serviceBusMessageInvoker;
         }
 
         public async Task ReceiveAsync(Message message, CancellationToken cancellation)
@@ -50,19 +46,12 @@ namespace Meceqs.AzureServiceBus.Receiving
                 try
                 {
                     await ResolveServicesAndInvokeReceiver(message, cancellation);
-
-                    await _serviceBusMessageInvoker.CompleteAsync(message);
                     success = true;
                 }
                 catch (Exception ex)
                 {
                     success = false;
-
                     _logger.ReceiveFailed(message, ex);
-
-                    await _serviceBusMessageInvoker.AbandonAsync(message);
-
-                    // TODO @cweiss !!! remove this!
                     throw;
                 }
                 finally

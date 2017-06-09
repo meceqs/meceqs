@@ -22,7 +22,7 @@ namespace Meceqs.AzureServiceBus.Sending
             Guard.NotNull(options?.Value, nameof(options));
             Guard.NotNull(senderFactory, nameof(senderFactory));
 
-            _sender = senderFactory.CreateMessageSender(options.Value.ConnectionString, options.Value.EntityPath);
+            _sender = senderFactory.CreateMessageSender(options.Value.ConnectionString);
         }
 
         public Task Invoke(MessageContext context, IServiceBusMessageConverter serviceBusMessageConverter)
