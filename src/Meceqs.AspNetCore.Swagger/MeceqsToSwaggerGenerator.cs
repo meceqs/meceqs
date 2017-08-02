@@ -80,6 +80,7 @@ namespace Meceqs.AspNetCore.Swagger
 
             var typeDescription = JsonObjectTypeDescription.FromType(
                 envelopeType,
+                _settings.ResolveContract(envelopeType),
                 Enumerable.Empty<Attribute>(),
                 _settings.DefaultEnumHandling);
 
