@@ -27,7 +27,7 @@ namespace Meceqs.AzureEventHubs.FileFake
 
         public FileFakeEventHubProcessor(FileFakeEventHubProcessorOptions options, IEventHubReceiver eventHubReceiver, ILoggerFactory loggerFactory)
         {
-            Check.NotNull(options, nameof(options));
+            Guard.NotNull(options, nameof(options));
 
             _options = options;
             _eventHubReceiver = eventHubReceiver;
@@ -142,7 +142,7 @@ namespace Meceqs.AzureEventHubs.FileFake
 
         private async Task ProcessEvent(string serializedEvent, int sequenceNumber)
         {
-            Check.NotNull(serializedEvent, nameof(serializedEvent));
+            Guard.NotNull(serializedEvent, nameof(serializedEvent));
 
             var eventData = FileFakeEventDataSerializer.Deserialize(serializedEvent, sequenceNumber);
 

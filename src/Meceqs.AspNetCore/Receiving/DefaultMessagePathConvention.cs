@@ -15,7 +15,7 @@ namespace Meceqs.AspNetCore.Receiving
 
         public string GetPathForMessage(Type messageType)
         {
-            Check.NotNull(messageType, nameof(messageType));
+            Guard.NotNull(messageType, nameof(messageType));
 
             string messageName = messageType.Name;
 

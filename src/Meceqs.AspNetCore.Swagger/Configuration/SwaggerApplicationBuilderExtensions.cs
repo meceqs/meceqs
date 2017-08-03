@@ -13,8 +13,8 @@ namespace Microsoft.Extensions.DependencyInjection
     {
         public static IApplicationBuilder UseSwagger(this IApplicationBuilder app, Action<SwaggerUiOptions> options)
         {
-            Check.NotNull(app, nameof(app));
-            Check.NotNull(options, nameof(options));
+            Guard.NotNull(app, nameof(app));
+            Guard.NotNull(options, nameof(options));
 
             var swaggerUiOptions = new SwaggerUiOptions();
             options?.Invoke(swaggerUiOptions);
@@ -24,7 +24,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
         public static IApplicationBuilder UseSwagger(this IApplicationBuilder app, SwaggerUiOptions options = null)
         {
-            Check.NotNull(app, nameof(app));
+            Guard.NotNull(app, nameof(app));
 
             options = options ?? new SwaggerUiOptions();
 

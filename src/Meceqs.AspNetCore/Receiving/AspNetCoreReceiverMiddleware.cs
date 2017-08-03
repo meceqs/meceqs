@@ -24,10 +24,10 @@ namespace Meceqs.AspNetCore.Receiving
             IMessagePathConvention messagePathConvention,
             ILoggerFactory loggerFactory)
         {
-            Check.NotNull(next, nameof(next));
-            Check.NotNull(options?.Value, nameof(options));
-            Check.NotNull(messagePathConvention, nameof(messagePathConvention));
-            Check.NotNull(loggerFactory, nameof(loggerFactory));
+            Guard.NotNull(next, nameof(next));
+            Guard.NotNull(options?.Value, nameof(options));
+            Guard.NotNull(messagePathConvention, nameof(messagePathConvention));
+            Guard.NotNull(loggerFactory, nameof(loggerFactory));
 
             _next = next;
             _options = options.Value;
@@ -38,8 +38,8 @@ namespace Meceqs.AspNetCore.Receiving
 
         public Task Invoke(HttpContext httpContext, IAspNetCoreReceiver aspNetCoreReceiver)
         {
-            Check.NotNull(httpContext, nameof(httpContext));
-            Check.NotNull(aspNetCoreReceiver, nameof(aspNetCoreReceiver));
+            Guard.NotNull(httpContext, nameof(httpContext));
+            Guard.NotNull(aspNetCoreReceiver, nameof(aspNetCoreReceiver));
 
             MessageMetadata messageMetadata;
             if (_pathLookup.TryGetValue(httpContext.Request.Path, out messageMetadata))

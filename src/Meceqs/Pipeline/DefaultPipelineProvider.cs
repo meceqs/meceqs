@@ -13,8 +13,8 @@ namespace Meceqs.Pipeline
             IOptions<PipelineOptions> options,
             IServiceProvider serviceProvider)
         {
-            Check.NotNull(options, nameof(options));
-            Check.NotNull(serviceProvider, nameof(serviceProvider));
+            Guard.NotNull(options, nameof(options));
+            Guard.NotNull(serviceProvider, nameof(serviceProvider));
 
             BuildPipelines(serviceProvider, options.Value);
         }
@@ -43,7 +43,7 @@ namespace Meceqs.Pipeline
 
         public IPipeline GetPipeline(string pipelineName)
         {
-            Check.NotNullOrWhiteSpace(pipelineName, nameof(pipelineName));
+            Guard.NotNullOrWhiteSpace(pipelineName, nameof(pipelineName));
 
             IPipeline pipeline;
             if (!_pipelines.TryGetValue(pipelineName, out pipeline))

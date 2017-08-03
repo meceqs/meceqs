@@ -6,8 +6,8 @@ namespace Meceqs.AzureServiceBus.Internal
     {
         public IServiceBusMessageSender CreateMessageSender(string connectionString, string entityPath)
         {
-            Check.NotNullOrWhiteSpace(connectionString, nameof(connectionString));
-            Check.NotNullOrWhiteSpace(entityPath, nameof(entityPath));
+            Guard.NotNullOrWhiteSpace(connectionString, nameof(connectionString));
+            Guard.NotNullOrWhiteSpace(entityPath, nameof(entityPath));
 
             var messagingFactory = MessagingFactory.CreateFromConnectionString(connectionString);
             var messageSender = messagingFactory.CreateMessageSender(entityPath);

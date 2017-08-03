@@ -14,8 +14,8 @@ namespace Meceqs.TypedHandling.Configuration
 
         public ServiceHandlerMetadata(Type handlerType, IEnumerable<HandleDefinition> implementedHandles)
         {
-            Check.NotNull(handlerType, nameof(handlerType));
-            Check.NotNull(implementedHandles, nameof(implementedHandles));
+            Guard.NotNull(handlerType, nameof(handlerType));
+            Guard.NotNull(implementedHandles, nameof(implementedHandles));
 
             HandlerType = handlerType;
             ImplementedHandles = implementedHandles;
@@ -23,7 +23,7 @@ namespace Meceqs.TypedHandling.Configuration
 
         public IHandles CreateHandler(IServiceProvider serviceProvider)
         {
-            Check.NotNull(serviceProvider, nameof(serviceProvider));
+            Guard.NotNull(serviceProvider, nameof(serviceProvider));
 
             // This doesn't use "GetRequiredService" because it's up to the middleware
             // to decide whether unknown messages should throw or not.

@@ -22,7 +22,7 @@ namespace Meceqs.TypedHandling.Internal
 
         public HandleContext CreateHandleContext(MessageContext messageContext)
         {
-            Check.NotNull(messageContext, nameof(messageContext));
+            Guard.NotNull(messageContext, nameof(messageContext));
 
             Type messageType = messageContext.MessageType;
 

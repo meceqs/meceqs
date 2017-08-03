@@ -14,7 +14,7 @@ namespace Microsoft.Extensions.DependencyInjection
     {
         private static IMeceqsBuilder AddServiceBusServices(this IMeceqsBuilder builder)
         {
-            Check.NotNull(builder, nameof(builder));
+            Guard.NotNull(builder, nameof(builder));
 
             builder.Services.TryAddSingleton<IBrokeredMessageConverter, DefaultBrokeredMessageConverter>();
             builder.Services.TryAddSingleton<IBrokeredMessageInvoker, DefaultBrokeredMessageInvoker>();
@@ -29,8 +29,8 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         public static IMeceqsBuilder AddServiceBusReceiver(this IMeceqsBuilder builder, Action<IServiceBusReceiverBuilder> receiver)
         {
-            Check.NotNull(builder, nameof(builder));
-            Check.NotNull(receiver, nameof(receiver));
+            Guard.NotNull(builder, nameof(builder));
+            Guard.NotNull(receiver, nameof(receiver));
 
             var receiverBuilder = new ServiceBusReceiverBuilder();
             receiver?.Invoke(receiverBuilder);
@@ -69,8 +69,8 @@ namespace Microsoft.Extensions.DependencyInjection
             IConfiguration configuration,
             Action<IServiceBusSenderBuilder> sender)
         {
-            Check.NotNull(builder, nameof(builder));
-            Check.NotNull(sender, nameof(sender));
+            Guard.NotNull(builder, nameof(builder));
+            Guard.NotNull(sender, nameof(sender));
 
             if (configuration != null)
             {

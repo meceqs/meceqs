@@ -8,7 +8,7 @@ namespace Meceqs.Configuration
 
         public MeceqsBuilder(IServiceCollection services)
         {
-            Check.NotNull(services, nameof(services));
+            Guard.NotNull(services, nameof(services));
 
             Services = services;
         }

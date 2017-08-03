@@ -17,8 +17,8 @@ namespace Meceqs.TypedHandling.Internal
 
         public MethodInfo GetHandleMethod(Type handlerType, Type messageType, Type resultType)
         {
-            Check.NotNull(handlerType, nameof(handlerType));
-            Check.NotNull(messageType, nameof(messageType));
+            Guard.NotNull(handlerType, nameof(handlerType));
+            Guard.NotNull(messageType, nameof(messageType));
 
             var cacheKey = new Tuple<Type, Type, Type>(handlerType, messageType, resultType);
 

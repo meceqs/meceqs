@@ -21,7 +21,7 @@ namespace Meceqs.Pipeline
 
         public MessageContext CreateMessageContext(Envelope envelope)
         {
-            Check.NotNull(envelope, nameof(envelope));
+            Guard.NotNull(envelope, nameof(envelope));
 
             Type messageType = envelope.Message.GetType();
 

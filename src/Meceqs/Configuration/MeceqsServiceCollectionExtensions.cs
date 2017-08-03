@@ -17,7 +17,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         public static IMeceqsBuilder AddMeceqs(this IServiceCollection services)
         {
-            Check.NotNull(services, nameof(services));
+            Guard.NotNull(services, nameof(services));
 
             AddPipeline(services);
             AddReceiving(services);

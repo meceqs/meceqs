@@ -22,9 +22,9 @@ namespace Meceqs.AzureEventHubs.Sending
         {
             // "next" is not stored because this is a terminating middleware
 
-            Check.NotNull(options?.Value, nameof(options.Value));
-            Check.NotNull(loggerFactory, nameof(loggerFactory));
-            Check.NotNull(eventHubClientFactory, nameof(eventHubClientFactory));
+            Guard.NotNull(options?.Value, nameof(options.Value));
+            Guard.NotNull(loggerFactory, nameof(loggerFactory));
+            Guard.NotNull(eventHubClientFactory, nameof(eventHubClientFactory));
 
             _logger = loggerFactory.CreateLogger<EventHubSenderMiddleware>();
 
@@ -33,8 +33,8 @@ namespace Meceqs.AzureEventHubs.Sending
 
         public async Task Invoke(MessageContext context, IEventDataConverter eventDataConverter)
         {
-            Check.NotNull(context, nameof(context));
-            Check.NotNull(eventDataConverter, nameof(eventDataConverter));
+            Guard.NotNull(context, nameof(context));
+            Guard.NotNull(eventDataConverter, nameof(eventDataConverter));
 
             // TODO @cweiss which LogLevel?
             _logger.LogInformation("Sending message {MessageType}/{MessageId}", context.Envelope.MessageType, context.Envelope.MessageId);

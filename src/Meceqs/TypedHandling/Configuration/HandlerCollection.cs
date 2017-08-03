@@ -36,7 +36,7 @@ namespace Meceqs.TypedHandling.Configuration
         /// </remarks>
         public void Add(Type handlerType)
         {
-            Check.NotNull(handlerType, nameof(handlerType));
+            Guard.NotNull(handlerType, nameof(handlerType));
 
             EnsureValidHandler(handlerType);
 
@@ -50,7 +50,7 @@ namespace Meceqs.TypedHandling.Configuration
         /// </summary>
         public void Add(IHandlerMetadata handlerMetadata)
         {
-            Check.NotNull(handlerMetadata, nameof(handlerMetadata));
+            Guard.NotNull(handlerMetadata, nameof(handlerMetadata));
 
             if (_handlerMetadatas.Any(x => x.HandlerType == handlerMetadata.HandlerType))
             {
@@ -102,7 +102,7 @@ namespace Meceqs.TypedHandling.Configuration
         /// </remarks>
         public void AddFromAssembly(Assembly assembly, Predicate<Type> filter = null)
         {
-            Check.NotNull(assembly, nameof(assembly));
+            Guard.NotNull(assembly, nameof(assembly));
 
             var handlers = from type in assembly.GetTypes()
                            where type.GetTypeInfo().IsClass && !type.GetTypeInfo().IsAbstract
@@ -140,7 +140,7 @@ namespace Meceqs.TypedHandling.Configuration
         /// </remarks>
         public void AddService(Type handlerType)
         {
-            Check.NotNull(handlerType, nameof(handlerType));
+            Guard.NotNull(handlerType, nameof(handlerType));
 
             EnsureValidHandler(handlerType);
 

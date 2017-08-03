@@ -18,8 +18,8 @@ namespace Meceqs.Pipeline
             ILoggerFactory loggerFactory,
             IMessageContextEnricher messageContextEnricher = null)
         {
-            Check.NotNull(serviceProvider, nameof(serviceProvider));
-            Check.NotNull(loggerFactory, nameof(loggerFactory));
+            Guard.NotNull(serviceProvider, nameof(serviceProvider));
+            Guard.NotNull(loggerFactory, nameof(loggerFactory));
 
             _middlewareEntries = new List<Func<MiddlewareDelegate, MiddlewareDelegate>>();
 
@@ -36,7 +36,7 @@ namespace Meceqs.Pipeline
 
         public IPipeline Build(string pipelineName)
         {
-            Check.NotNullOrWhiteSpace(pipelineName, nameof(pipelineName));
+            Guard.NotNullOrWhiteSpace(pipelineName, nameof(pipelineName));
 
             MiddlewareDelegate pipeline = context =>
             {

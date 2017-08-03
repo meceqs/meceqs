@@ -9,14 +9,14 @@ namespace Meceqs.Receiving
 
         public MessageReceiver(IServiceProvider serviceProvider)
         {
-            Check.NotNull(serviceProvider, nameof(serviceProvider));
+            Guard.NotNull(serviceProvider, nameof(serviceProvider));
 
             _serviceProvider = serviceProvider;
         }
 
         public IReceiveBuilder ForEnvelope(Envelope envelope)
         {
-            Check.NotNull(envelope, nameof(envelope));
+            Guard.NotNull(envelope, nameof(envelope));
 
             // If we get an envelope from an external system, we want to make sure
             // that the minimum requirements are satisfied.

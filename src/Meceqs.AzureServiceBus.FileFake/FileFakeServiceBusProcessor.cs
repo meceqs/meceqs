@@ -25,7 +25,7 @@ namespace Meceqs.AzureServiceBus.FileFake
             IServiceBusReceiver serviceBusReceiver,
             ILoggerFactory loggerFactory)
         {
-            Check.NotNull(options, nameof(options));
+            Guard.NotNull(options, nameof(options));
 
             _serviceBusReceiver = serviceBusReceiver;
             _logger = loggerFactory.CreateLogger<FileFakeServiceBusProcessor>();

@@ -11,7 +11,7 @@ namespace Microsoft.Extensions.DependencyInjection
     {
         public static IMeceqsBuilder AddFileFakeEventHubSender(this IMeceqsBuilder builder, string directory)
         {
-            Check.NotNull(builder, nameof(builder));
+            Guard.NotNull(builder, nameof(builder));
 
             builder.Services.AddSingleton<IEventHubClientFactory>(serviceProvider =>
             {
@@ -25,7 +25,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
         public static IMeceqsBuilder AddFileFakeEventHubProcessor(this IMeceqsBuilder builder, Action<FileFakeEventHubProcessorOptions> options)
         {
-            Check.NotNull(builder, nameof(builder));
+            Guard.NotNull(builder, nameof(builder));
 
             var processorOptions = new FileFakeEventHubProcessorOptions();
             options?.Invoke(processorOptions);

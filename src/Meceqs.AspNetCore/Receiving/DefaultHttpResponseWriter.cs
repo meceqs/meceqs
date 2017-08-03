@@ -10,7 +10,7 @@ namespace Meceqs.AspNetCore.Receiving
 
         public DefaultHttpResponseWriter(IResultSerializer resultSerializer)
         {
-            Check.NotNull(resultSerializer, nameof(resultSerializer));
+            Guard.NotNull(resultSerializer, nameof(resultSerializer));
 
             _resultSerializer = resultSerializer;
         }

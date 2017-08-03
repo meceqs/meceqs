@@ -13,7 +13,7 @@ namespace Meceqs.Serialization.Json
 
         public JsonEnvelopeDeserializer(IEnvelopeTypeLoader envelopetypeLoader)
         {
-            Check.NotNull(envelopetypeLoader, nameof(envelopetypeLoader));
+            Guard.NotNull(envelopetypeLoader, nameof(envelopetypeLoader));
 
             _envelopeTypeLoader = envelopetypeLoader;
         }
@@ -34,9 +34,9 @@ namespace Meceqs.Serialization.Json
 
         public Envelope DeserializeEnvelope(string contentType, byte[] serializedEnvelope, string messageType)
         {
-            Check.NotNullOrWhiteSpace(contentType, nameof(contentType));
-            Check.NotNull(serializedEnvelope, nameof(serializedEnvelope));
-            Check.NotNullOrWhiteSpace(messageType, nameof(messageType));
+            Guard.NotNullOrWhiteSpace(contentType, nameof(contentType));
+            Guard.NotNull(serializedEnvelope, nameof(serializedEnvelope));
+            Guard.NotNullOrWhiteSpace(messageType, nameof(messageType));
 
             if (!string.Equals(contentType, ContentType, StringComparison.OrdinalIgnoreCase))
             {

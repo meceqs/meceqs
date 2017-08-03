@@ -8,7 +8,7 @@ namespace Microsoft.Extensions.DependencyInjection
     {
         public static void RunServiceBusSender(this IPipelineBuilder pipeline)
         {
-            Check.NotNull(pipeline, nameof(pipeline));
+            Guard.NotNull(pipeline, nameof(pipeline));
 
             pipeline.UseMiddleware<ServiceBusSenderMiddleware>();
         }

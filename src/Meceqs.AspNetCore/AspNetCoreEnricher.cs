@@ -16,8 +16,8 @@ namespace Meceqs.AspNetCore
             IOptions<AspNetCoreEnricherOptions> options,
             IHttpContextAccessor httpContextAccessor)
         {
-            Check.NotNull(options?.Value, nameof(options));
-            Check.NotNull(httpContextAccessor, nameof(httpContextAccessor));
+            Guard.NotNull(options?.Value, nameof(options));
+            Guard.NotNull(httpContextAccessor, nameof(httpContextAccessor));
 
             _options = options.Value;
             _httpContextAccessor = httpContextAccessor;
@@ -25,7 +25,7 @@ namespace Meceqs.AspNetCore
 
         public void EnrichMessageContext(MessageContext context)
         {
-            Check.NotNull(context, nameof(context));
+            Guard.NotNull(context, nameof(context));
 
             var httpContext = _httpContextAccessor.HttpContext;
 

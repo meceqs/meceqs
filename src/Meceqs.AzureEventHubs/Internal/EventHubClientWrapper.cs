@@ -9,7 +9,7 @@ namespace Meceqs.AzureEventHubs.Internal
 
         public EventHubClientWrapper(EventHubClient client)
         {
-            Check.NotNull(client, nameof(client));
+            Guard.NotNull(client, nameof(client));
 
             _client = client;
         }

@@ -16,9 +16,9 @@ namespace Meceqs.AspNetCore.Receiving
             IMessageReceiver messageReceiver,
             IHttpResponseWriter httpResponseWriter)
         {
-            Check.NotNull(httpRequestReader, nameof(httpRequestReader));
-            Check.NotNull(messageReceiver, nameof(messageReceiver));
-            Check.NotNull(httpResponseWriter, nameof(httpResponseWriter));
+            Guard.NotNull(httpRequestReader, nameof(httpRequestReader));
+            Guard.NotNull(messageReceiver, nameof(messageReceiver));
+            Guard.NotNull(httpResponseWriter, nameof(httpResponseWriter));
 
             _httpRequestReader = httpRequestReader;
             _messageReceiver = messageReceiver;

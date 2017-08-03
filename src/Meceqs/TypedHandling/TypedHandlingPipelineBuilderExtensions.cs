@@ -17,8 +17,8 @@ namespace Microsoft.Extensions.DependencyInjection
 
         public static void RunTypedHandling(this IPipelineBuilder builder, TypedHandlingOptions options)
         {
-            Check.NotNull(builder, nameof(builder));
-            Check.NotNull(options, nameof(options));
+            Guard.NotNull(builder, nameof(builder));
+            Guard.NotNull(options, nameof(options));
 
             builder.UseMiddleware<TypedHandlingMiddleware>(options);
         }

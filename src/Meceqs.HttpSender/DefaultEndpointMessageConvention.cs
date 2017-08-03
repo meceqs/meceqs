@@ -19,7 +19,7 @@ namespace Meceqs.HttpSender
 
         public EndpointMessage GetEndpointMessage(Type messageType)
         {
-            Check.NotNull(messageType, nameof(messageType));
+            Guard.NotNull(messageType, nameof(messageType));
 
             var endpointMessage = new EndpointMessage
             {
@@ -32,7 +32,7 @@ namespace Meceqs.HttpSender
 
         private string GetRelativePathForMessage(Type messageType)
         {
-            Check.NotNull(messageType, nameof(messageType));
+            Guard.NotNull(messageType, nameof(messageType));
 
             string messageName = messageType.Name;
 

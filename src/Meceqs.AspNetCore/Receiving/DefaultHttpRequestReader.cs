@@ -10,15 +10,15 @@ namespace Meceqs.AspNetCore.Receiving
 
         public DefaultHttpRequestReader(IEnvelopeDeserializer envelopeDeserializer)
         {
-            Check.NotNull(envelopeDeserializer, nameof(envelopeDeserializer));
+            Guard.NotNull(envelopeDeserializer, nameof(envelopeDeserializer));
 
             _envelopeDeserializer = envelopeDeserializer;
         }
 
         public Envelope ConvertToEnvelope(HttpContext httpContext, Type messageType)
         {
-            Check.NotNull(httpContext, nameof(httpContext));
-            Check.NotNull(messageType, nameof(messageType));
+            Guard.NotNull(httpContext, nameof(httpContext));
+            Guard.NotNull(messageType, nameof(messageType));
 
             // TODO error handling etc
             // TODO charset/encoding?

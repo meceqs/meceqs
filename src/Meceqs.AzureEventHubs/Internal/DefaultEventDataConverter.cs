@@ -12,8 +12,8 @@ namespace Meceqs.AzureEventHubs.Internal
 
         public DefaultEventDataConverter(IEnvelopeSerializer serializer, IEnvelopeDeserializer deserializer)
         {
-            Check.NotNull(serializer, nameof(serializer));
-            Check.NotNull(deserializer, nameof(deserializer));
+            Guard.NotNull(serializer, nameof(serializer));
+            Guard.NotNull(deserializer, nameof(deserializer));
 
             _serializer = serializer;
             _deserializer = deserializer;
@@ -21,7 +21,7 @@ namespace Meceqs.AzureEventHubs.Internal
 
         public EventData ConvertToEventData(Envelope envelope)
         {
-            Check.NotNull(envelope, nameof(envelope));
+            Guard.NotNull(envelope, nameof(envelope));
 
             byte[] serializedEnvelope = _serializer.SerializeEnvelopeToByteArray(envelope);
 
@@ -37,7 +37,7 @@ namespace Meceqs.AzureEventHubs.Internal
 
         public Envelope ConvertToEnvelope(EventData eventData)
         {
-            Check.NotNull(eventData, nameof(eventData));
+            Guard.NotNull(eventData, nameof(eventData));
 
             // TODO @cweiss validations?
             string contentType = (string)eventData.Properties[TransportHeaderNames.ContentType];

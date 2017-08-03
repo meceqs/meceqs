@@ -14,7 +14,7 @@ namespace Microsoft.Extensions.DependencyInjection
     {
         public static IMeceqsBuilder AddAspNetCore(this IMeceqsBuilder builder)
         {
-            Check.NotNull(builder, nameof(builder));
+            Guard.NotNull(builder, nameof(builder));
 
             // Enricher
             builder.Services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
@@ -37,7 +37,7 @@ namespace Microsoft.Extensions.DependencyInjection
             this IMeceqsBuilder builder,
             Action<IAspNetCoreReceiverBuilder> options)
         {
-            Check.NotNull(builder, nameof(builder));
+            Guard.NotNull(builder, nameof(builder));
 
             var receiverBuilder = new AspNetCoreReceiverBuilder();
             options?.Invoke(receiverBuilder);
@@ -64,7 +64,7 @@ namespace Microsoft.Extensions.DependencyInjection
             this IMeceqsBuilder builder,
             Action<AspNetCoreEnricherOptions> options)
         {
-            Check.NotNull(builder, nameof(builder));
+            Guard.NotNull(builder, nameof(builder));
 
             if (options != null)
             {

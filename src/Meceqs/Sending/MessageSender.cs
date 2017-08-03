@@ -11,7 +11,7 @@ namespace Meceqs.Sending
 
         public MessageSender(IServiceProvider serviceProvider)
         {
-            Check.NotNull(serviceProvider, nameof(serviceProvider));
+            Guard.NotNull(serviceProvider, nameof(serviceProvider));
 
             _serviceProvider = serviceProvider;
             _envelopeFactory = serviceProvider.GetRequiredService<IEnvelopeFactory>();
@@ -19,7 +19,7 @@ namespace Meceqs.Sending
 
         public ISendBuilder ForEnvelope(Envelope envelope)
         {
-            Check.NotNull(envelope, nameof(envelope));
+            Guard.NotNull(envelope, nameof(envelope));
 
             // If we get an envelope from an external system, we want to make sure
             // that the minimum requirements are satisfied.
@@ -37,7 +37,7 @@ namespace Meceqs.Sending
 
         public ISendBuilder ForMessage(object message, Guid? messageId = null)
         {
-            Check.NotNull(message, nameof(message));
+            Guard.NotNull(message, nameof(message));
 
             var envelope = _envelopeFactory.Create(message, messageId ?? Guid.NewGuid());
 

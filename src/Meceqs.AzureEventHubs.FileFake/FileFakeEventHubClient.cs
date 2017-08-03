@@ -14,8 +14,8 @@ namespace Meceqs.AzureEventHubs.FileFake
 
         public FileFakeEventHubClient(string fileName, ILoggerFactory loggerFactory)
         {
-            Check.NotNullOrWhiteSpace(fileName, nameof(fileName));
-            Check.NotNull(loggerFactory, nameof(loggerFactory));
+            Guard.NotNullOrWhiteSpace(fileName, nameof(fileName));
+            Guard.NotNull(loggerFactory, nameof(loggerFactory));
 
             _fileName = fileName;
             _logger = loggerFactory.CreateLogger<FileFakeEventHubClient>();

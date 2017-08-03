@@ -15,8 +15,8 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         public static IMeceqsBuilder AddReceivePipeline(this IMeceqsBuilder builder, Action<IPipelineBuilder> pipeline)
         {
-            Check.NotNull(builder, nameof(builder));
-            Check.NotNull(pipeline, nameof(pipeline));
+            Guard.NotNull(builder, nameof(builder));
+            Guard.NotNull(pipeline, nameof(pipeline));
 
             builder.AddPipeline(MeceqsDefaults.ReceivePipelineName, pipeline);
 
@@ -29,8 +29,8 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         public static IMeceqsBuilder AddSendPipeline(this IMeceqsBuilder builder, Action<IPipelineBuilder> pipeline)
         {
-            Check.NotNull(builder, nameof(builder));
-            Check.NotNull(pipeline, nameof(pipeline));
+            Guard.NotNull(builder, nameof(builder));
+            Guard.NotNull(pipeline, nameof(pipeline));
 
             builder.AddPipeline(MeceqsDefaults.SendPipelineName, pipeline);
 
@@ -43,9 +43,9 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         public static IMeceqsBuilder AddPipeline(this IMeceqsBuilder builder, string pipelineName, Action<IPipelineBuilder> pipeline)
         {
-            Check.NotNull(builder, nameof(builder));
-            Check.NotNullOrWhiteSpace(pipelineName, nameof(pipelineName));
-            Check.NotNull(pipeline, nameof(pipeline));
+            Guard.NotNull(builder, nameof(builder));
+            Guard.NotNullOrWhiteSpace(pipelineName, nameof(pipelineName));
+            Guard.NotNull(pipeline, nameof(pipeline));
 
             builder.Services.Configure<PipelineOptions>(options => options.Pipelines.Add(pipelineName, pipeline));
 
@@ -69,8 +69,8 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         public static IMeceqsBuilder AddDeserializationAssembly(this IMeceqsBuilder builder, params Assembly[] assemblies)
         {
-            Check.NotNull(builder, nameof(builder));
-            Check.NotNull(assemblies, nameof(assemblies));
+            Guard.NotNull(builder, nameof(builder));
+            Guard.NotNull(assemblies, nameof(assemblies));
 
             builder.Services.Configure<EnvelopeTypeLoaderOptions>(options => options.TryAddContractAssembly(assemblies));
 

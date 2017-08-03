@@ -69,7 +69,7 @@ namespace Meceqs.Transport
 
         public TTransportReceiverBuilder AddMessageType(Type messageType, Type resultType = null)
         {
-            Check.NotNull(messageType, nameof(messageType));
+            Guard.NotNull(messageType, nameof(messageType));
 
             _receiverOptions += x => x.AddMessageType(messageType, resultType);
 
@@ -101,7 +101,7 @@ namespace Meceqs.Transport
 
         public TTransportReceiverBuilder SetPipelineName(string pipelineName)
         {
-            Check.NotNullOrWhiteSpace(pipelineName, nameof(pipelineName));
+            Guard.NotNullOrWhiteSpace(pipelineName, nameof(pipelineName));
 
             _pipelineName = pipelineName;
             return Instance;
@@ -109,7 +109,7 @@ namespace Meceqs.Transport
 
         public TTransportReceiverBuilder ConfigurePipeline(Action<IPipelineBuilder> pipeline)
         {
-            Check.NotNull(pipeline, nameof(pipeline));
+            Guard.NotNull(pipeline, nameof(pipeline));
 
             _pipeline = pipeline;
             return Instance;
@@ -117,7 +117,7 @@ namespace Meceqs.Transport
 
         public TTransportReceiverBuilder UseTypedHandling(Action<TypedHandlingOptions> options)
         {
-            Check.NotNull(options, nameof(options));
+            Guard.NotNull(options, nameof(options));
 
             var handlingOptions = new TypedHandlingOptions();
             options(handlingOptions);
@@ -127,7 +127,7 @@ namespace Meceqs.Transport
 
         public TTransportReceiverBuilder UseTypedHandling(TypedHandlingOptions options)
         {
-            Check.NotNull(options, nameof(options));
+            Guard.NotNull(options, nameof(options));
 
             // We must also tell the actual transport that it should accept the message types!
             foreach (var handler in options.Handlers)

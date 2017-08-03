@@ -30,11 +30,11 @@ namespace Meceqs.TypedHandling
         {
             // "next" is not stored because this is a terminating middleware.
 
-            Check.NotNull(options, nameof(options));
-            Check.NotNull(handleContextFactory, nameof(handleContextFactory));
-            Check.NotNull(handleMethodResolver, nameof(handleMethodResolver));
-            Check.NotNull(handlerInvoker, nameof(handlerInvoker));
-            Check.NotNull(loggerFactory, nameof(loggerFactory));
+            Guard.NotNull(options, nameof(options));
+            Guard.NotNull(handleContextFactory, nameof(handleContextFactory));
+            Guard.NotNull(handleMethodResolver, nameof(handleMethodResolver));
+            Guard.NotNull(handlerInvoker, nameof(handlerInvoker));
+            Guard.NotNull(loggerFactory, nameof(loggerFactory));
 
             _options = options;
             _handleContextFactory = handleContextFactory;
@@ -47,7 +47,7 @@ namespace Meceqs.TypedHandling
 
         public async Task Invoke(MessageContext messageContext)
         {
-            Check.NotNull(messageContext, nameof(messageContext));
+            Guard.NotNull(messageContext, nameof(messageContext));
 
             // Since the public interfaces from this middleware expect generic types, we can't call them directly.
             // Separate services are responsible for invoking them by using e.g. reflection.
@@ -173,7 +173,7 @@ namespace Meceqs.TypedHandling
         /// </summary>
         private static Dictionary<HandleDefinition, IHandlerMetadata> CreateHandlerMapping(HandlerCollection handlers)
         {
-            Check.NotNull(handlers, nameof(handlers));
+            Guard.NotNull(handlers, nameof(handlers));
 
             if (handlers.Count == 0)
             {

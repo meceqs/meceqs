@@ -6,7 +6,7 @@ namespace Meceqs.AzureEventHubs.Internal
     {
         public IEventHubClient CreateEventHubClient(string connectionString)
         {
-            Check.NotNullOrWhiteSpace(connectionString, nameof(connectionString));
+            Guard.NotNullOrWhiteSpace(connectionString, nameof(connectionString));
 
             var connectionBuilder = new EventHubsConnectionStringBuilder(connectionString);
             var client = EventHubClient.CreateFromConnectionString(connectionBuilder.ToString());

@@ -12,8 +12,8 @@ namespace Meceqs.Middleware.Auditing
 
         public AuditingMiddleware(MiddlewareDelegate next, AuditingOptions options)
         {
-            Check.NotNull(next, nameof(next));
-            Check.NotNull(options, nameof(options));
+            Guard.NotNull(next, nameof(next));
+            Guard.NotNull(options, nameof(options));
 
             _next = next;
             _options = options;
@@ -21,7 +21,7 @@ namespace Meceqs.Middleware.Auditing
 
         public Task Invoke(MessageContext context)
         {
-            Check.NotNull(context, nameof(context));
+            Guard.NotNull(context, nameof(context));
 
             if (context.User != null)
             {

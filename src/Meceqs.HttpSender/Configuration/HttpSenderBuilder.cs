@@ -15,8 +15,8 @@ namespace Meceqs.HttpSender.Configuration
 
         public IHttpSenderBuilder AddEndpoint(string endpointName, Action<EndpointOptions> options)
         {
-            Check.NotNullOrWhiteSpace(endpointName, nameof(endpointName));
-            Check.NotNull(options, nameof(options));
+            Guard.NotNullOrWhiteSpace(endpointName, nameof(endpointName));
+            Guard.NotNull(options, nameof(options));
 
             SenderOptions += o => o.AddEndpoint(endpointName, options);
             return this;

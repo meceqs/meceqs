@@ -10,8 +10,8 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         public static void Run(this IPipelineBuilder builder, MiddlewareDelegate middleware)
         {
-            Check.NotNull(builder, nameof(builder));
-            Check.NotNull(middleware, nameof(middleware));
+            Guard.NotNull(builder, nameof(builder));
+            Guard.NotNull(middleware, nameof(middleware));
 
             builder.Use(_ => middleware);
         }

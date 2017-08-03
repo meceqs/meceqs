@@ -8,7 +8,7 @@ namespace Microsoft.AspNetCore.Builder
     {
         public static IApplicationBuilder UseAspNetCoreReceiver(this IApplicationBuilder builder, PathString? pathMatch = null)
         {
-            Check.NotNull(builder, nameof(builder));
+            Guard.NotNull(builder, nameof(builder));
 
             if (!string.IsNullOrWhiteSpace(pathMatch))
             {

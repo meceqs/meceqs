@@ -9,8 +9,8 @@ namespace Meceqs.HttpSender
 
         public void AddHttpClient(string endpointName, HttpClient client)
         {
-            Check.NotNullOrWhiteSpace(endpointName, nameof(endpointName));
-            Check.NotNull(client, nameof(client));
+            Guard.NotNullOrWhiteSpace(endpointName, nameof(endpointName));
+            Guard.NotNull(client, nameof(client));
 
             _clients.Add(endpointName, client);
         }
@@ -18,7 +18,7 @@ namespace Meceqs.HttpSender
 
         public HttpClient GetHttpClient(string endpointName)
         {
-            Check.NotNullOrWhiteSpace(endpointName, nameof(endpointName));
+            Guard.NotNullOrWhiteSpace(endpointName, nameof(endpointName));
 
             return _clients[endpointName];
         }

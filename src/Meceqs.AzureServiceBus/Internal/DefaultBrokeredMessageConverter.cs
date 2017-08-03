@@ -12,8 +12,8 @@ namespace Meceqs.AzureServiceBus.Internal
 
         public DefaultBrokeredMessageConverter(IEnvelopeSerializer serializer, IEnvelopeDeserializer deserializer)
         {
-            Check.NotNull(serializer, nameof(serializer));
-            Check.NotNull(deserializer, nameof(deserializer));
+            Guard.NotNull(serializer, nameof(serializer));
+            Guard.NotNull(deserializer, nameof(deserializer));
 
             _serializer = serializer;
             _deserializer = deserializer;
@@ -21,7 +21,7 @@ namespace Meceqs.AzureServiceBus.Internal
 
         public BrokeredMessage ConvertToBrokeredMessage(Envelope envelope)
         {
-            Check.NotNull(envelope, nameof(envelope));
+            Guard.NotNull(envelope, nameof(envelope));
 
             byte[] serializedEnvelope = _serializer.SerializeEnvelopeToByteArray(envelope);
             MemoryStream payloadStream = new MemoryStream(serializedEnvelope);
@@ -45,7 +45,7 @@ namespace Meceqs.AzureServiceBus.Internal
 
         public Envelope ConvertToEnvelope(BrokeredMessage brokeredMessage)
         {
-            Check.NotNull(brokeredMessage, nameof(brokeredMessage));
+            Guard.NotNull(brokeredMessage, nameof(brokeredMessage));
 
             // TODO @cweiss validations?
             string contentType = brokeredMessage.ContentType ?? (string)brokeredMessage.Properties[TransportHeaderNames.ContentType];

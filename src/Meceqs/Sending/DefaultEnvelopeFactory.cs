@@ -20,8 +20,8 @@ namespace Meceqs.Sending
 
         public Envelope Create(object message, Guid messageId)
         {
-            Check.NotNull(message, nameof(message));
-            Check.NotEmpty(messageId, nameof(messageId));
+            Guard.NotNull(message, nameof(message));
+            Guard.NotEmpty(messageId, nameof(messageId));
 
             Type messageType = message.GetType();
 

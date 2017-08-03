@@ -51,7 +51,7 @@ namespace Meceqs.Transport
 
         public TTransportSenderBuilder SetPipelineName(string pipelineName)
         {
-            Check.NotNullOrWhiteSpace(pipelineName, nameof(pipelineName));
+            Guard.NotNullOrWhiteSpace(pipelineName, nameof(pipelineName));
 
             _pipelineName = pipelineName;
             return Instance;
@@ -59,7 +59,7 @@ namespace Meceqs.Transport
 
         public TTransportSenderBuilder ConfigurePipeline(Action<IPipelineBuilder> pipeline)
         {
-            Check.NotNull(pipeline, nameof(pipeline));
+            Guard.NotNull(pipeline, nameof(pipeline));
 
             _pipeline = pipeline;
             return Instance;

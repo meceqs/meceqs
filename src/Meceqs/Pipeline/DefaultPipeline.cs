@@ -18,9 +18,9 @@ namespace Meceqs.Pipeline
             ILoggerFactory loggerFactory,
             IMessageContextEnricher messageContextEnricher)
         {
-            Check.NotNull(pipeline, nameof(pipeline));
-            Check.NotNullOrWhiteSpace(pipelineName, nameof(pipelineName));
-            Check.NotNull(loggerFactory, nameof(loggerFactory));
+            Guard.NotNull(pipeline, nameof(pipeline));
+            Guard.NotNullOrWhiteSpace(pipelineName, nameof(pipelineName));
+            Guard.NotNull(loggerFactory, nameof(loggerFactory));
 
             _pipeline = pipeline;
             _logger = loggerFactory.CreateLogger<DefaultPipeline>();
@@ -31,7 +31,7 @@ namespace Meceqs.Pipeline
 
         public Task InvokeAsync(MessageContext context)
         {
-            Check.NotNull(context, nameof(context));
+            Guard.NotNull(context, nameof(context));
 
             return ExecutePipeline(context);
         }

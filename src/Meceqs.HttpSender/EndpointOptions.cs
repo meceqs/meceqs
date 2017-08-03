@@ -39,7 +39,7 @@ namespace Meceqs.HttpSender
 
         public void AddDelegatingHandler(Type delegatingHandler)
         {
-            Check.NotNull(delegatingHandler, nameof(delegatingHandler));
+            Guard.NotNull(delegatingHandler, nameof(delegatingHandler));
 
             if (!typeof(DelegatingHandler).IsAssignableFrom(delegatingHandler))
             {
@@ -56,8 +56,8 @@ namespace Meceqs.HttpSender
 
         public void AddMessagesFromAssembly(Assembly assembly, Predicate<Type> filter)
         {
-            Check.NotNull(assembly, nameof(assembly));
-            Check.NotNull(filter, nameof(filter));
+            Guard.NotNull(assembly, nameof(assembly));
+            Guard.NotNull(filter, nameof(filter));
 
             var messages = from type in assembly.GetTypes()
                            where type.GetTypeInfo().IsClass && !type.GetTypeInfo().IsAbstract
@@ -85,7 +85,7 @@ namespace Meceqs.HttpSender
         /// </summary>
         public void AddMessage(Type messageType)
         {
-            Check.NotNull(messageType, nameof(messageType));
+            Guard.NotNull(messageType, nameof(messageType));
 
             var endpointMessage = MessageConvention.GetEndpointMessage(messageType);
 

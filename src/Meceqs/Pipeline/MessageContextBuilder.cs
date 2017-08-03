@@ -28,15 +28,15 @@ namespace Meceqs.Pipeline
         protected MessageContextBuilder(string defaultPipelineName, Envelope envelope, IServiceProvider serviceProvider)
             : this(defaultPipelineName, serviceProvider)
         {
-            Check.NotNull(envelope, nameof(envelope));
+            Guard.NotNull(envelope, nameof(envelope));
 
             Envelope = envelope;
         }
 
         private MessageContextBuilder(string defaultPipelineName, IServiceProvider serviceProvider)
         {
-            Check.NotNullOrWhiteSpace(defaultPipelineName, nameof(defaultPipelineName));
-            Check.NotNull(serviceProvider, nameof(serviceProvider));
+            Guard.NotNullOrWhiteSpace(defaultPipelineName, nameof(defaultPipelineName));
+            Guard.NotNull(serviceProvider, nameof(serviceProvider));
 
             _messageContextFactory = serviceProvider.GetRequiredService<IMessageContextFactory>();
             _pipelineProvider = serviceProvider.GetRequiredService<IPipelineProvider>();
@@ -64,7 +64,7 @@ namespace Meceqs.Pipeline
 
         public TBuilder SetRequestServices(IServiceProvider requestServices)
         {
-            Check.NotNull(requestServices, nameof(requestServices));
+            Guard.NotNull(requestServices, nameof(requestServices));
 
             RequestServices = requestServices;
             return Instance;
@@ -78,7 +78,7 @@ namespace Meceqs.Pipeline
 
         public TBuilder UsePipeline(string pipelineName)
         {
-            Check.NotNullOrWhiteSpace(pipelineName, nameof(pipelineName));
+            Guard.NotNullOrWhiteSpace(pipelineName, nameof(pipelineName));
 
             PipelineName = pipelineName;
             return Instance;
@@ -92,7 +92,7 @@ namespace Meceqs.Pipeline
 
         protected virtual MessageContext CreateMessageContext(Envelope envelope, Type resultType)
         {
-            Check.NotNull(envelope, nameof(envelope));
+            Guard.NotNull(envelope, nameof(envelope));
 
             var context = _messageContextFactory.CreateMessageContext(envelope);
 

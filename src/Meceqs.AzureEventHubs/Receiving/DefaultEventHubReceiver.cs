@@ -23,9 +23,9 @@ namespace Meceqs.AzureEventHubs.Receiving
             ILoggerFactory loggerFactory,
             IServiceScopeFactory serviceScopeFactory)
         {
-            Check.NotNull(options?.Value, nameof(options));
-            Check.NotNull(loggerFactory, nameof(loggerFactory));
-            Check.NotNull(serviceScopeFactory, nameof(serviceScopeFactory));
+            Guard.NotNull(options?.Value, nameof(options));
+            Guard.NotNull(loggerFactory, nameof(loggerFactory));
+            Guard.NotNull(serviceScopeFactory, nameof(serviceScopeFactory));
 
             _options = options.Value;
             _logger = loggerFactory.CreateLogger<DefaultEventHubReceiver>();
@@ -34,7 +34,7 @@ namespace Meceqs.AzureEventHubs.Receiving
 
         public async Task ReceiveAsync(EventData eventData, CancellationToken cancellation)
         {
-            Check.NotNull(eventData, nameof(eventData));
+            Guard.NotNull(eventData, nameof(eventData));
 
             // Make sure each log message contains data about the currently processed message.
             using (_logger.EventDataScope(eventData))

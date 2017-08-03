@@ -9,7 +9,7 @@ namespace Meceqs.Transport
 
         public MessageMetadata(Type messageType, Type resultType)
         {
-            Check.NotNull(messageType, nameof(messageType));
+            Guard.NotNull(messageType, nameof(messageType));
             // resultType may be null!
 
             MessageType = messageType;

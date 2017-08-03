@@ -24,10 +24,10 @@ namespace Meceqs.AzureServiceBus.Receiving
             IServiceScopeFactory serviceScopeFactory,
             IBrokeredMessageInvoker brokeredMessageInvoker)
         {
-            Check.NotNull(options?.Value, nameof(options));
-            Check.NotNull(loggerFactory, nameof(loggerFactory));
-            Check.NotNull(serviceScopeFactory, nameof(serviceScopeFactory));
-            Check.NotNull(brokeredMessageInvoker, nameof(brokeredMessageInvoker));
+            Guard.NotNull(options?.Value, nameof(options));
+            Guard.NotNull(loggerFactory, nameof(loggerFactory));
+            Guard.NotNull(serviceScopeFactory, nameof(serviceScopeFactory));
+            Guard.NotNull(brokeredMessageInvoker, nameof(brokeredMessageInvoker));
 
             _options = options.Value;
             _logger = loggerFactory.CreateLogger<DefaultServiceBusReceiver>();
@@ -37,7 +37,7 @@ namespace Meceqs.AzureServiceBus.Receiving
 
         public async Task ReceiveAsync(BrokeredMessage brokeredMessage, CancellationToken cancellation)
         {
-            Check.NotNull(brokeredMessage, nameof(brokeredMessage));
+            Guard.NotNull(brokeredMessage, nameof(brokeredMessage));
 
             // Make sure each log message contains data about the currently processed message.
             using (_logger.BrokeredMessageScope(brokeredMessage))

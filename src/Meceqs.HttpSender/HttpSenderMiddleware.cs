@@ -28,11 +28,11 @@ namespace Meceqs.HttpSender
             IHttpRequestMessageConverter httpRequestMessageConverter,
             IResultDeserializer resultDeserializer)
         {
-            Check.NotNull(options?.Value, nameof(options));
-            Check.NotNull(serviceProvider, nameof(serviceProvider));
-            Check.NotNull(httpClientProvider, nameof(httpClientProvider));
-            Check.NotNull(httpRequestMessageConverter, nameof(httpRequestMessageConverter));
-            Check.NotNull(resultDeserializer, nameof(resultDeserializer));
+            Guard.NotNull(options?.Value, nameof(options));
+            Guard.NotNull(serviceProvider, nameof(serviceProvider));
+            Guard.NotNull(httpClientProvider, nameof(httpClientProvider));
+            Guard.NotNull(httpRequestMessageConverter, nameof(httpRequestMessageConverter));
+            Guard.NotNull(resultDeserializer, nameof(resultDeserializer));
 
             // "next" is not stored because this is a terminal middleware.
             _options = options.Value;
@@ -48,7 +48,7 @@ namespace Meceqs.HttpSender
 
         public async Task Invoke(MessageContext context)
         {
-            Check.NotNull(context, nameof(context));
+            Guard.NotNull(context, nameof(context));
 
             Tuple<string, EndpointMessage> mapping;
             if (!_messageMapping.TryGetValue(context.MessageType, out mapping))

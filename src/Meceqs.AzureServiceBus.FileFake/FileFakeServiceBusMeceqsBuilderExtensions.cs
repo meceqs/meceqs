@@ -11,7 +11,7 @@ namespace Microsoft.Extensions.DependencyInjection
     {
         public static IMeceqsBuilder AddFileFakeServiceBusSender(this IMeceqsBuilder builder, string directory)
         {
-            Check.NotNull(builder, nameof(builder));
+            Guard.NotNull(builder, nameof(builder));
 
             builder.Services.AddSingleton<IServiceBusMessageSenderFactory>(serviceProvider =>
             {
@@ -25,7 +25,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
         public static IMeceqsBuilder AddFileFakeServiceBusProcessor(this IMeceqsBuilder builder, Action<FileFakeServiceBusProcessorOptions> options)
         {
-            Check.NotNull(builder, nameof(builder));
+            Guard.NotNull(builder, nameof(builder));
 
             var processorOptions = new FileFakeServiceBusProcessorOptions();
             options?.Invoke(processorOptions);

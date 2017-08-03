@@ -12,14 +12,14 @@ namespace Meceqs.TypedHandling.Configuration
 
         public ServiceInterceptorMetadata(Type interceptorType)
         {
-            Check.NotNull(interceptorType, nameof(interceptorType));
+            Guard.NotNull(interceptorType, nameof(interceptorType));
 
             _interceptorType = interceptorType;
         }
 
         public IHandleInterceptor CreateInterceptor(IServiceProvider serviceProvider)
         {
-            Check.NotNull(serviceProvider, nameof(serviceProvider));
+            Guard.NotNull(serviceProvider, nameof(serviceProvider));
 
             return (IHandleInterceptor)serviceProvider.GetRequiredService(_interceptorType);
         }

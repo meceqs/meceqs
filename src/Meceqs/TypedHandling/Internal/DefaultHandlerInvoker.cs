@@ -29,8 +29,8 @@ namespace Meceqs.TypedHandling.Internal
 
         public async Task<object> InvokeHandleAsync(IHandles handler, HandleContext context, Type resultType)
         {
-            Check.NotNull(handler, nameof(handler));
-            Check.NotNull(context, nameof(context));
+            Guard.NotNull(handler, nameof(handler));
+            Guard.NotNull(context, nameof(context));
 
             Type messageType = context.Message.GetType();
 
@@ -48,7 +48,7 @@ namespace Meceqs.TypedHandling.Internal
             else
             {
                 Func<Task, object> getResultDelegate = GetOrAddResultGetterDelegate(resultType);
-                
+
                 object result = getResultDelegate(resultTask);
 
                 return result;

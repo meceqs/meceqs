@@ -11,8 +11,8 @@ namespace Meceqs.AzureServiceBus.FileFake
 
         public FileFakeServiceBusMessageSenderFactory(string directory, ILoggerFactory loggerFactory)
         {
-            Check.NotNullOrWhiteSpace(directory, nameof(directory));
-            Check.NotNull(loggerFactory, nameof(loggerFactory));
+            Guard.NotNullOrWhiteSpace(directory, nameof(directory));
+            Guard.NotNull(loggerFactory, nameof(loggerFactory));
 
             _directory = directory;
             _loggerFactory = loggerFactory;
@@ -22,7 +22,7 @@ namespace Meceqs.AzureServiceBus.FileFake
 
         public IServiceBusMessageSender CreateMessageSender(string connectionString, string entityPath)
         {
-            Check.NotNullOrWhiteSpace(entityPath, nameof(entityPath));
+            Guard.NotNullOrWhiteSpace(entityPath, nameof(entityPath));
 
             string entityPathDirectory = Path.Combine(_directory, entityPath);
 

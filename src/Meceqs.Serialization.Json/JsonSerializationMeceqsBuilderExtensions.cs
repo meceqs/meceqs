@@ -10,7 +10,7 @@ namespace Microsoft.Extensions.DependencyInjection
     {
         public static IMeceqsBuilder AddJsonSerialization(this IMeceqsBuilder builder, JsonSerializerSettings settings = null)
         {
-            Check.NotNull(builder, nameof(builder));
+            Guard.NotNull(builder, nameof(builder));
 
             var serializer = new JsonEnvelopeSerializer(settings);
 

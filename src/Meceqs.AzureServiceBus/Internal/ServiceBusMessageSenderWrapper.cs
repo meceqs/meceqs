@@ -9,7 +9,7 @@ namespace Meceqs.AzureServiceBus.Internal
 
         public ServiceBusMessageSenderWrapper(MessageSender sender)
         {
-            Check.NotNull(sender, nameof(sender));
+            Guard.NotNull(sender, nameof(sender));
 
             _sender = sender;
         }

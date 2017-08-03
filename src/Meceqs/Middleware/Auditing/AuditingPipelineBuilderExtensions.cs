@@ -9,7 +9,7 @@ namespace Microsoft.Extensions.DependencyInjection
     {
         public static IPipelineBuilder UseAuditing(this IPipelineBuilder builder, Action<AuditingOptions> setupAction = null)
         {
-            Check.NotNull(builder, nameof(builder));
+            Guard.NotNull(builder, nameof(builder));
 
             var options = new AuditingOptions();
             setupAction?.Invoke(options);

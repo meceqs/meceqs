@@ -30,7 +30,7 @@ namespace Meceqs.TypedHandling.Configuration
         /// </remarks>
         public void Add(Type interceptorType)
         {
-            Check.NotNull(interceptorType, nameof(interceptorType));
+            Guard.NotNull(interceptorType, nameof(interceptorType));
 
             EnsureValidInterceptor(interceptorType);
 
@@ -62,7 +62,7 @@ namespace Meceqs.TypedHandling.Configuration
         /// </remarks>
         public void AddService(Type interceptorType)
         {
-            Check.NotNull(interceptorType, nameof(interceptorType));
+            Guard.NotNull(interceptorType, nameof(interceptorType));
 
             EnsureValidInterceptor(interceptorType);
 

@@ -12,7 +12,7 @@ namespace Microsoft.Extensions.DependencyInjection
     {
         private static IMeceqsBuilder AddHttpSenderServices(this IMeceqsBuilder builder)
         {
-            Check.NotNull(builder, nameof(builder));
+            Guard.NotNull(builder, nameof(builder));
 
             builder.Services.TryAddSingleton<IHttpClientProvider, DefaultHttpClientProvider>();
             builder.Services.TryAddSingleton<IHttpRequestMessageConverter, DefaultHttpRequestMessageConverter>();
@@ -30,7 +30,7 @@ namespace Microsoft.Extensions.DependencyInjection
             IConfiguration configuration,
             Action<IHttpSenderBuilder> sender = null)
         {
-            Check.NotNull(builder, nameof(builder));
+            Guard.NotNull(builder, nameof(builder));
 
             if (configuration != null)
             {

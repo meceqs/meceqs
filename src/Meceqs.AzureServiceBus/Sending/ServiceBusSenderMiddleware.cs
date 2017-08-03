@@ -19,16 +19,16 @@ namespace Meceqs.AzureServiceBus.Sending
         {
             // "next" is not stored because this is a terminating middleware.
 
-            Check.NotNull(options?.Value, nameof(options));
-            Check.NotNull(senderFactory, nameof(senderFactory));
+            Guard.NotNull(options?.Value, nameof(options));
+            Guard.NotNull(senderFactory, nameof(senderFactory));
 
             _sender = senderFactory.CreateMessageSender(options.Value.ConnectionString, options.Value.EntityPath);
         }
 
         public Task Invoke(MessageContext context, IBrokeredMessageConverter brokeredMessageConverter)
         {
-            Check.NotNull(context, nameof(context));
-            Check.NotNull(brokeredMessageConverter, nameof(brokeredMessageConverter));
+            Guard.NotNull(context, nameof(context));
+            Guard.NotNull(brokeredMessageConverter, nameof(brokeredMessageConverter));
 
             var brokeredMessage = brokeredMessageConverter.ConvertToBrokeredMessage(context.Envelope);
 

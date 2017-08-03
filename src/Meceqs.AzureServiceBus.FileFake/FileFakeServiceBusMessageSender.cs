@@ -14,8 +14,8 @@ namespace Meceqs.AzureServiceBus.FileFake
 
         public FileFakeServiceBusMessageSender(string entityPathDirectory, ILoggerFactory loggerFactory)
         {
-            Check.NotNullOrWhiteSpace(entityPathDirectory, nameof(entityPathDirectory));
-            Check.NotNull(loggerFactory, nameof(loggerFactory));
+            Guard.NotNullOrWhiteSpace(entityPathDirectory, nameof(entityPathDirectory));
+            Guard.NotNull(loggerFactory, nameof(loggerFactory));
 
             _entityPathDirectory = entityPathDirectory;
             _logger = loggerFactory.CreateLogger<FileFakeServiceBusMessageSender>();
@@ -26,7 +26,7 @@ namespace Meceqs.AzureServiceBus.FileFake
         public Task SendAsync(BrokeredMessage message)
         {
             string fileName = Path.Combine(_entityPathDirectory, $"{message.MessageId}.json");
-            
+
             string serializedMessage = FileFakeBrokeredMessageSerializer.Serialize(message);
 
             InvokeWithRetry(3, () =>

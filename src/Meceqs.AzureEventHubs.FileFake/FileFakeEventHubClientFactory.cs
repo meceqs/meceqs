@@ -15,8 +15,8 @@ namespace Meceqs.AzureEventHubs.FileFake
 
         public FileFakeEventHubClientFactory(string directory, ILoggerFactory loggerFactory)
         {
-            Check.NotNullOrWhiteSpace(directory, nameof(directory));
-            Check.NotNull(loggerFactory, nameof(loggerFactory));
+            Guard.NotNullOrWhiteSpace(directory, nameof(directory));
+            Guard.NotNull(loggerFactory, nameof(loggerFactory));
 
             _directory = directory;
             _loggerFactory = loggerFactory;
@@ -26,7 +26,7 @@ namespace Meceqs.AzureEventHubs.FileFake
 
         public IEventHubClient CreateEventHubClient(string connectionString)
         {
-            Check.NotNullOrWhiteSpace(connectionString, nameof(connectionString));
+            Guard.NotNullOrWhiteSpace(connectionString, nameof(connectionString));
 
             return _clients.GetOrAdd(connectionString, key =>
             {

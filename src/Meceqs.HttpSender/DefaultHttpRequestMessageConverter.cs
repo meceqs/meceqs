@@ -10,15 +10,15 @@ namespace Meceqs.HttpSender
 
         public DefaultHttpRequestMessageConverter(IEnvelopeSerializer envelopeSerializer)
         {
-            Check.NotNull(envelopeSerializer, nameof(envelopeSerializer));
+            Guard.NotNull(envelopeSerializer, nameof(envelopeSerializer));
 
             _envelopeSerializer = envelopeSerializer;
         }
 
         public HttpRequestMessage ConvertToRequestMessage(Envelope envelope, string relativePath)
         {
-            Check.NotNull(envelope, nameof(envelope));
-            Check.NotNullOrWhiteSpace(relativePath, nameof(relativePath));
+            Guard.NotNull(envelope, nameof(envelope));
+            Guard.NotNullOrWhiteSpace(relativePath, nameof(relativePath));
 
             var request = new HttpRequestMessage(HttpMethod.Post, relativePath);
 

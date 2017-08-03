@@ -14,7 +14,7 @@ namespace Microsoft.Extensions.DependencyInjection
     {
         private static IMeceqsBuilder AddEventHubServices(this IMeceqsBuilder builder)
         {
-            Check.NotNull(builder, nameof(builder));
+            Guard.NotNull(builder, nameof(builder));
 
             builder.Services.TryAddSingleton<IEventDataConverter, DefaultEventDataConverter>();
             builder.Services.TryAddSingleton<IEventHubClientFactory, DefaultEventHubClientFactory>();
@@ -30,8 +30,8 @@ namespace Microsoft.Extensions.DependencyInjection
             this IMeceqsBuilder builder,
             Action<IEventHubReceiverBuilder> receiver)
         {
-            Check.NotNull(builder, nameof(builder));
-            Check.NotNull(receiver, nameof(receiver));
+            Guard.NotNull(builder, nameof(builder));
+            Guard.NotNull(receiver, nameof(receiver));
 
             var receiverBuilder = new EventHubReceiverBuilder();
             receiver?.Invoke(receiverBuilder);
@@ -70,8 +70,8 @@ namespace Microsoft.Extensions.DependencyInjection
             IConfiguration configuration,
             Action<IEventHubSenderBuilder> sender)
         {
-            Check.NotNull(builder, nameof(builder));
-            Check.NotNull(sender, nameof(sender));
+            Guard.NotNull(builder, nameof(builder));
+            Guard.NotNull(sender, nameof(sender));
 
             if (configuration != null)
             {

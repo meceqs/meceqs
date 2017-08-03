@@ -34,7 +34,7 @@ namespace Meceqs.Tests
     {
         public static void RunCallback(this IPipelineBuilder pipeline, Action<MessageContext> callback)
         {
-            Check.NotNull(pipeline, nameof(pipeline));
+            Guard.NotNull(pipeline, nameof(pipeline));
 
             pipeline.UseMiddleware<CallbackMiddleware>(callback);
         }
