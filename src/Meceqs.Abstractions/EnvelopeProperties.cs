@@ -13,7 +13,7 @@ namespace Meceqs
 
         public T Get<T>(string key)
         {
-            Check.NotNullOrWhiteSpace(key, nameof(key));
+            Guard.NotNullOrWhiteSpace(key, nameof(key));
 
             object value;
             if (TryGetValue(key, out value))
@@ -26,7 +26,7 @@ namespace Meceqs
 
         public T GetRequired<T>(string key)
         {
-            Check.NotNullOrWhiteSpace(key, nameof(key));
+            Guard.NotNullOrWhiteSpace(key, nameof(key));
 
             object value;
             if (TryGetValue(key, out value))

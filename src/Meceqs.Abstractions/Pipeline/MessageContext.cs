@@ -84,7 +84,7 @@ namespace Meceqs.Pipeline
 
         protected MessageContext(Envelope envelope)
         {
-            Check.NotNull(envelope, nameof(envelope));
+            Guard.NotNull(envelope, nameof(envelope));
 
             Envelope = envelope;
         }
@@ -95,8 +95,8 @@ namespace Meceqs.Pipeline
         [EditorBrowsable(EditorBrowsableState.Never)]
         public void Initialize(string pipelineName, IServiceProvider requestServices, Type expectedResultType)
         {
-            Check.NotNullOrWhiteSpace(pipelineName, nameof(pipelineName));
-            Check.NotNull(requestServices, nameof(requestServices));
+            Guard.NotNullOrWhiteSpace(pipelineName, nameof(pipelineName));
+            Guard.NotNull(requestServices, nameof(requestServices));
 
             PipelineName = pipelineName;
             RequestServices = requestServices;

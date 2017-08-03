@@ -14,8 +14,8 @@ namespace Meceqs.TypedHandling
         /// </summary>
         public static ISendBuilder ChildOf(this ISendBuilder builder, HandleContext context)
         {
-            Check.NotNull(builder, nameof(builder));
-            Check.NotNull(context, nameof(context));
+            Guard.NotNull(builder, nameof(builder));
+            Guard.NotNull(context, nameof(context));
 
             builder.CorrelateWith(context.Envelope);
 
@@ -32,8 +32,8 @@ namespace Meceqs.TypedHandling
         /// </summary>
         public static ISendBuilder FollowsFrom(this ISendBuilder builder, HandleContext context)
         {
-            Check.NotNull(builder, nameof(builder));
-            Check.NotNull(context, nameof(context));
+            Guard.NotNull(builder, nameof(builder));
+            Guard.NotNull(context, nameof(context));
 
             builder.CorrelateWith(context.Envelope);
 

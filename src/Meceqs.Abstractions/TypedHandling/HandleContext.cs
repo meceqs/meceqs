@@ -126,7 +126,7 @@ namespace Meceqs.TypedHandling
 
         protected HandleContext(MessageContext messageContext)
         {
-            Check.NotNull(messageContext, nameof(messageContext));
+            Guard.NotNull(messageContext, nameof(messageContext));
 
             MessageContext = messageContext;
         }
@@ -137,8 +137,8 @@ namespace Meceqs.TypedHandling
         [EditorBrowsable(EditorBrowsableState.Never)]
         public void Initialize(IHandles handler, MethodInfo handleMethod)
         {
-            Check.NotNull(handler, nameof(handler));
-            Check.NotNull(handleMethod, nameof(handleMethod));
+            Guard.NotNull(handler, nameof(handler));
+            Guard.NotNull(handleMethod, nameof(handleMethod));
 
             Handler = handler;
             HandlerType = handler.GetType();

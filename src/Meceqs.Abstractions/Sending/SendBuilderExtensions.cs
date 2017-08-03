@@ -9,14 +9,14 @@ namespace Meceqs.Sending
 
         public static ISendBuilder SetCreationReason(this ISendBuilder builder, string reason)
         {
-            Check.NotNull(builder, nameof(builder));
+            Guard.NotNull(builder, nameof(builder));
 
             return builder.SetHeader("CreationReason", reason);
         }
 
         public static ISendBuilder UsePartitionKey(this ISendBuilder builder, object partitionKey)
         {
-            Check.NotNull(builder, nameof(builder));
+            Guard.NotNull(builder, nameof(builder));
 
             return builder.SetContextItem("PartitionKey", partitionKey);
         }

@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 namespace Meceqs
 {
     [DebuggerStepThrough]
-    internal static class Check
+    internal static class Guard
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void NotNull(object value, string parameterName)

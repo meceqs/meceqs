@@ -79,8 +79,8 @@ namespace Meceqs
 
         protected Envelope(object message, Guid messageId)
         {
-            Check.NotNull(message, nameof(message));
-            Check.NotEmpty(messageId, nameof(messageId));
+            Guard.NotNull(message, nameof(message));
+            Guard.NotEmpty(messageId, nameof(messageId));
 
             Message = message;
             MessageId = messageId;
@@ -94,9 +94,9 @@ namespace Meceqs
         /// </summary>
         public void EnsureValid()
         {
-            Check.NotNull(Message, nameof(Message));
-            Check.NotEmpty(MessageId, nameof(MessageId));
-            Check.NotNullOrWhiteSpace(MessageType, nameof(MessageType));
+            Guard.NotNull(Message, nameof(Message));
+            Guard.NotEmpty(MessageId, nameof(MessageId));
+            Guard.NotNullOrWhiteSpace(MessageType, nameof(MessageType));
         }
 
         /// <summary>
