@@ -26,7 +26,6 @@ namespace TrafficGenerator
             services.AddMeceqs(builder =>
             {
                 builder
-                    .AddJsonSerialization()
 
                     .AddHttpSender(sender =>
                     {

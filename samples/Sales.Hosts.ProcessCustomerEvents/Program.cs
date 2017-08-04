@@ -19,7 +19,6 @@ namespace Sales.Hosts.ProcessCustomerEvents
             services.AddMeceqs(builder =>
             {
                 builder
-                    .AddJsonSerialization()
 
                     .AddEventHubReceiver(receiver =>
                     {

@@ -9,7 +9,6 @@
     <ProjectReference Include="..\..\src\Meceqs\Meceqs.csproj" />
     <ProjectReference Include="..\..\src\Meceqs.AspNetCore\Meceqs.AspNetCore.csproj" />
     <ProjectReference Include="..\..\src\Meceqs.AspNetCore.Swagger\Meceqs.AspNetCore.Swagger.csproj" />
-    <ProjectReference Include="..\..\src\Meceqs.Serialization.Json\Meceqs.Serialization.Json.csproj" />
     <ProjectReference Include="..\..\src\Meceqs.AzureEventHubs\Meceqs.AzureEventHubs.csproj" />
     <ProjectReference Include="..\..\src\Meceqs.AzureEventHubs.FileFake\Meceqs.AzureEventHubs.FileFake.csproj" />
   </ItemGroup>

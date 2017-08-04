@@ -7,7 +7,6 @@
     <ProjectReference Include="..\SampleConfig\SampleConfig.csproj" />
     <ProjectReference Include="..\Sales.Contracts\Sales.Contracts.csproj" />
     <ProjectReference Include="..\..\src\Meceqs\Meceqs.csproj" />
-    <ProjectReference Include="..\..\src\Meceqs.Serialization.Json\Meceqs.Serialization.Json.csproj" />
     <ProjectReference Include="..\..\src\Meceqs.AzureServiceBus\Meceqs.AzureServiceBus.csproj" />
     <ProjectReference Include="..\..\src\Meceqs.AzureServiceBus.FileFake\Meceqs.AzureServiceBus.FileFake.csproj" />
   </ItemGroup>

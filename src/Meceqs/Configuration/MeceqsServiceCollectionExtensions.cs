@@ -20,6 +20,7 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             Guard.NotNull(services, nameof(services));
 
+            // Core Services
             AddHosting(services);
             AddPipeline(services);
             AddReceiving(services);
@@ -27,7 +28,12 @@ namespace Microsoft.Extensions.DependencyInjection
             AddSerialization(services);
             AddTypedHandling(services);
 
-            return new MeceqsBuilder(services);
+            var meceqsBuilder = new MeceqsBuilder(services);
+
+            // Default Configuration
+            meceqsBuilder.AddJsonSerialization();
+
+            return meceqsBuilder;
         }
 
         /// <summary>

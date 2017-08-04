@@ -34,9 +34,6 @@ namespace Customers.Hosts.WebApi
 
                     meceqs
 
-                        // This allows all components to use JSON serialization.
-                        .AddJsonSerialization()
-
                         // The Web API will process incoming requests.
                         .AddAspNetCoreReceiver(receiver =>
                         {
