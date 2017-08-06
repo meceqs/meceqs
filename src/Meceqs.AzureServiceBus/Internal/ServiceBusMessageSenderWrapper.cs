@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
-using Microsoft.ServiceBus.Messaging;
+using Microsoft.Azure.ServiceBus;
+using Microsoft.Azure.ServiceBus.Core;
 
 namespace Meceqs.AzureServiceBus.Internal
 {
@@ -14,14 +15,14 @@ namespace Meceqs.AzureServiceBus.Internal
             _sender = sender;
         }
 
-        public Task SendAsync(BrokeredMessage message)
+        public Task SendAsync(Message message)
         {
             return _sender.SendAsync(message);
         }
 
         public void Close()
         {
-            _sender.Close();
+            _sender.CloseAsync().GetAwaiter().GetResult();
         }
     }
 }

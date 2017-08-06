@@ -128,7 +128,7 @@ namespace Meceqs.AzureServiceBus.FileFake
 
         private async Task ProcessFile(string fileContent)
         {
-            var brokeredMessage = FileFakeBrokeredMessageSerializer.Deserialize(fileContent);
+            var brokeredMessage = FileFakeServiceBusMessageSerializer.Deserialize(fileContent);
 
             // The receiver will create a new scope, so we don't have to do it here.
             var cancellationToken = CancellationToken.None; // TODO @cweiss CancellationToken???

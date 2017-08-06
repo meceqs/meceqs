@@ -1,16 +1,16 @@
-using Microsoft.ServiceBus.Messaging;
+using Microsoft.Azure.ServiceBus;
+using Microsoft.Azure.ServiceBus.Core;
 
 namespace Meceqs.AzureServiceBus.Internal
 {
     public class DefaultServiceBusMessageSenderFactory : IServiceBusMessageSenderFactory
     {
-        public IServiceBusMessageSender CreateMessageSender(string connectionString, string entityPath)
+        public IServiceBusMessageSender CreateMessageSender(string connectionString)
         {
             Guard.NotNullOrWhiteSpace(connectionString, nameof(connectionString));
-            Guard.NotNullOrWhiteSpace(entityPath, nameof(entityPath));
 
-            var messagingFactory = MessagingFactory.CreateFromConnectionString(connectionString);
-            var messageSender = messagingFactory.CreateMessageSender(entityPath);
+            var connectionBuilder = new ServiceBusConnectionStringBuilder(connectionString);
+            var messageSender = new MessageSender(connectionBuilder);
 
             return new ServiceBusMessageSenderWrapper(messageSender);
         }

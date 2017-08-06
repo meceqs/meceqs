@@ -22,17 +22,17 @@ namespace Meceqs.AzureServiceBus.Sending
             Guard.NotNull(options?.Value, nameof(options));
             Guard.NotNull(senderFactory, nameof(senderFactory));
 
-            _sender = senderFactory.CreateMessageSender(options.Value.ConnectionString, options.Value.EntityPath);
+            _sender = senderFactory.CreateMessageSender(options.Value.ConnectionString);
         }
 
-        public Task Invoke(MessageContext context, IBrokeredMessageConverter brokeredMessageConverter)
+        public Task Invoke(MessageContext context, IServiceBusMessageConverter serviceBusMessageConverter)
         {
             Guard.NotNull(context, nameof(context));
-            Guard.NotNull(brokeredMessageConverter, nameof(brokeredMessageConverter));
+            Guard.NotNull(serviceBusMessageConverter, nameof(serviceBusMessageConverter));
 
-            var brokeredMessage = brokeredMessageConverter.ConvertToBrokeredMessage(context.Envelope);
+            var serviceBusMessage = serviceBusMessageConverter.ConvertToServiceBusMessage(context.Envelope);
 
-            return _sender.SendAsync(brokeredMessage);
+            return _sender.SendAsync(serviceBusMessage);
         }
 
         public void Dispose()
