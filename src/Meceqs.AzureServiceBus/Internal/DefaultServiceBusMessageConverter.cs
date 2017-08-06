@@ -11,8 +11,8 @@ namespace Meceqs.AzureServiceBus.Internal
 
         public DefaultServiceBusMessageConverter(IEnvelopeSerializer serializer, IEnvelopeDeserializer deserializer)
         {
-            Check.NotNull(serializer, nameof(serializer));
-            Check.NotNull(deserializer, nameof(deserializer));
+            Guard.NotNull(serializer, nameof(serializer));
+            Guard.NotNull(deserializer, nameof(deserializer));
 
             _serializer = serializer;
             _deserializer = deserializer;
@@ -20,7 +20,7 @@ namespace Meceqs.AzureServiceBus.Internal
 
         public Message ConvertToServiceBusMessage(Envelope envelope)
         {
-            Check.NotNull(envelope, nameof(envelope));
+            Guard.NotNull(envelope, nameof(envelope));
 
             byte[] serializedEnvelope = _serializer.SerializeEnvelopeToByteArray(envelope);
 
@@ -43,7 +43,7 @@ namespace Meceqs.AzureServiceBus.Internal
 
         public Envelope ConvertToEnvelope(Message serviceBusMessage)
         {
-            Check.NotNull(serviceBusMessage, nameof(serviceBusMessage));
+            Guard.NotNull(serviceBusMessage, nameof(serviceBusMessage));
 
             // TODO @cweiss validations?
             string contentType = serviceBusMessage.ContentType ?? (string)serviceBusMessage.UserProperties[TransportHeaderNames.ContentType];

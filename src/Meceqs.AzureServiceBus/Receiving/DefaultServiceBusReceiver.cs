@@ -22,9 +22,9 @@ namespace Meceqs.AzureServiceBus.Receiving
             ILoggerFactory loggerFactory,
             IServiceScopeFactory serviceScopeFactory)
         {
-            Check.NotNull(options?.Value, nameof(options));
-            Check.NotNull(loggerFactory, nameof(loggerFactory));
-            Check.NotNull(serviceScopeFactory, nameof(serviceScopeFactory));
+            Guard.NotNull(options?.Value, nameof(options));
+            Guard.NotNull(loggerFactory, nameof(loggerFactory));
+            Guard.NotNull(serviceScopeFactory, nameof(serviceScopeFactory));
 
             _options = options.Value;
             _logger = loggerFactory.CreateLogger<DefaultServiceBusReceiver>();

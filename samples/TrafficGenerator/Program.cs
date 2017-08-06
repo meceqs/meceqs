@@ -19,7 +19,7 @@ namespace TrafficGenerator
             services.AddOptions();
 
             services.Configure<ServiceBusSenderOptions>(x => {
-                x.ConnectionString = $"Endpoint=sb://dummy;EntityPath={SampleConfiguration.PlaceOrderQueue}";
+                x.ConnectionString = $"Endpoint=sb://dummy.example.com;EntityPath={SampleConfiguration.PlaceOrderQueue}";
             });
 
             services.AddMeceqs(builder =>
