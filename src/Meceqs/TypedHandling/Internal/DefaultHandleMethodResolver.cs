@@ -19,8 +19,9 @@ namespace Meceqs.TypedHandling.Internal
         {
             Guard.NotNull(handlerType, nameof(handlerType));
             Guard.NotNull(messageType, nameof(messageType));
+            Guard.NotNull(resultType, nameof(resultType));
 
-            var cacheKey = new Tuple<Type, Type, Type>(handlerType, messageType, resultType);
+            var cacheKey = Tuple.Create(handlerType, messageType, resultType);
 
             var method = _methodCache.GetOrAdd(cacheKey, x =>
             {
@@ -30,7 +31,7 @@ namespace Meceqs.TypedHandling.Internal
 
                 var query =
                     from mi in handler.GetTypeInfo().GetDeclaredMethods("HandleAsync")
-                    where mi.ReturnType == (result == null ? typeof(Task) : typeof(Task<>).MakeGenericType(result))
+                    where mi.ReturnType == (result == typeof(void) ? typeof(Task) : typeof(Task<>).MakeGenericType(result))
                     let parameter = mi.GetParameters().FirstOrDefault()
                     where parameter != null
                     where parameter.ParameterType == typeof(HandleContext<>).MakeGenericType(message)

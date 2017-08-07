@@ -27,42 +27,38 @@ namespace Meceqs.TypedHandling.Internal
             _cachedTaskResultGetterDelegates = new ConcurrentDictionary<Type, Func<Task, object>>();
         }
 
-        public async Task<object> InvokeHandleAsync(IHandles handler, HandleContext context, Type resultType)
+        public async Task InvokeHandleAsync(IHandles handler, HandleContext context)
         {
             Guard.NotNull(handler, nameof(handler));
             Guard.NotNull(context, nameof(context));
 
             Type messageType = context.Message.GetType();
+            Type resultType = context.MessageContext.ExpectedResultType;
 
             Func<IHandles, HandleContext, Task> handleDelegate = GetOrAddHandleDelegate(messageType, resultType);
 
             // Invoke Method
             // (this throws an InvalidCastOperationException, if the handler does not have the correct types)
             Task resultTask = handleDelegate(handler, context);
+
             await resultTask;
 
-            if (resultType == null)
-            {
-                return null;
-            }
-            else
+            if (resultType != typeof(void))
             {
                 Func<Task, object> getResultDelegate = GetOrAddResultGetterDelegate(resultType);
 
-                object result = getResultDelegate(resultTask);
-
-                return result;
+                context.MessageContext.Result = getResultDelegate(resultTask);
             }
         }
 
         private Func<IHandles, HandleContext, Task> GetOrAddHandleDelegate(Type messageType, Type resultType)
         {
-            var cacheKey = new Tuple<Type, Type>(messageType, resultType);
+            var cacheKey = Tuple.Create(messageType, resultType);
 
             Func<IHandles, HandleContext, Task> handleDelegate = _cachedHandleDelegates.GetOrAdd(cacheKey, x =>
             {
                 // resolve correct type based on whether there should be a result.
-                Type typedHandlerType = x.Item2 != null
+                Type typedHandlerType = x.Item2 != typeof(void)
                     ? typeof(IHandles<,>).MakeGenericType(x.Item1, x.Item2)
                     : typeof(IHandles<>).MakeGenericType(x.Item1);
 

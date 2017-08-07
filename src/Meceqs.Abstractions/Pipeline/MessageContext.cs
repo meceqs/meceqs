@@ -31,6 +31,12 @@ namespace Meceqs.Pipeline
     /// </summary>
     public abstract class MessageContext
     {
+        private bool _initialized;
+        private string _pipelineName;
+        private IServiceProvider _requestServices;
+        private Type _expectedResultType;
+        private MessageContextItems _messageContextItems;
+
         /// <summary>
         /// Gets the envelope for which the pipeline is executed.
         /// </summary>
@@ -49,17 +55,38 @@ namespace Meceqs.Pipeline
         /// <summary>
         /// Gets the name of the pipeline on which the current middleware is executed.
         /// </summary>
-        public string PipelineName { get; private set; }
+        public string PipelineName
+        {
+            get
+            {
+                EnsureInitialized();
+                return _pipelineName;
+            }
+        }
 
         /// <summary>
         /// Gets the service provider for the current execution.
         /// </summary>
-        public IServiceProvider RequestServices { get; private set; }
+        public IServiceProvider RequestServices
+        {
+            get
+            {
+                EnsureInitialized();
+                return _requestServices;
+            }
+        }
 
         /// <summary>
         /// Gets the type of the result expected by the caller.
         /// </summary>
-        public Type ExpectedResultType { get; private set; } // TODO @cweiss set to void by default?
+        public Type ExpectedResultType
+        {
+            get
+            {
+                EnsureInitialized();
+                return _expectedResultType;
+            }
+        }
 
         /// <summary>
         /// Gets or sets the result of the current execution. This object must match the type of <see cref="ExpectedResultType"/>
@@ -75,7 +102,13 @@ namespace Meceqs.Pipeline
         /// <summary>
         /// <see cref="Items"/> can be used to pass data from one middleware to another.
         /// </summary>
-        public MessageContextItems Items { get; } = new MessageContextItems();
+        public MessageContextItems Items
+        {
+            get
+            {
+                return _messageContextItems ?? (_messageContextItems = new MessageContextItems());
+            }
+        }
 
         /// <summary>
         /// Gets or sets the user for the current execution.
@@ -97,10 +130,20 @@ namespace Meceqs.Pipeline
         {
             Guard.NotNullOrWhiteSpace(pipelineName, nameof(pipelineName));
             Guard.NotNull(requestServices, nameof(requestServices));
+            Guard.NotNull(expectedResultType, nameof(expectedResultType));
 
-            PipelineName = pipelineName;
-            RequestServices = requestServices;
-            ExpectedResultType = expectedResultType;
+            _pipelineName = pipelineName;
+            _requestServices = requestServices;
+            _expectedResultType = expectedResultType;
+            _initialized = true;
+        }
+
+        private void EnsureInitialized()
+        {
+            if (!_initialized)
+            {
+                throw new InvalidOperationException($"'{nameof(Initialize)}' has not been called.");
+            }
         }
     }
 }

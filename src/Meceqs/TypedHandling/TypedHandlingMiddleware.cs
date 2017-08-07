@@ -61,24 +61,13 @@ namespace Meceqs.TypedHandling
 
             var handleContext = CreateHandleContext(messageContext, handler);
 
-            var handleExecutionChain = CreateHandleExecutionChain(handleContext);
+            var handleExecutionChain = CreateHandleExecutionChain(handler, handleContext);
 
             await handleExecutionChain(handleContext);
         }
 
         private IHandles CreateHandler(MessageContext messageContext)
         {
-            if (messageContext.RequestServices == null)
-            {
-                throw new ArgumentException(
-                    $"'{nameof(messageContext.RequestServices)}' wasn't set. It is required to resolve " +
-                    $"handlers from the scope of the current web/message request. " +
-                    $"It can be set either by using a middleware [e.g. UseAspNetCore()] or by " +
-                    $"setting it yourself through 'SetRequestServices()' on the message sender/receiver",
-                    $"{nameof(messageContext)}.{nameof(messageContext.RequestServices)}"
-                );
-            }
-
             var key = new HandleDefinition(messageContext.MessageType, messageContext.ExpectedResultType);
 
             IHandlerMetadata handlerMetadata;
@@ -97,7 +86,7 @@ namespace Meceqs.TypedHandling
                 case UnknownMessageBehavior.ThrowException:
                     throw new UnknownMessageException(
                         $"There was no handler configured for message/result types " +
-                        $"'{messageContext.MessageType}/{messageContext.ExpectedResultType ?? typeof(void)}");
+                        $"'{messageContext.MessageType}/{messageContext.ExpectedResultType}");
 
                 case UnknownMessageBehavior.Skip:
                     _logger.SkippingMessage(messageContext);
@@ -129,20 +118,17 @@ namespace Meceqs.TypedHandling
 
             HandleContext handleContext = _handleContextFactory.CreateHandleContext(messageContext);
 
-            handleContext.Initialize(handler, handleMethod);
+            handleContext.Initialize(handlerType, handleMethod);
 
             return handleContext;
         }
 
-        private HandleExecutionDelegate CreateHandleExecutionChain(HandleContext handleContext)
+        private HandleExecutionDelegate CreateHandleExecutionChain(IHandles handler, HandleContext handleContext)
         {
             // The call to handler itself is the innermost call.
-            HandleExecutionDelegate chain = async (HandleContext context) =>
+            HandleExecutionDelegate chain = (HandleContext context) =>
             {
-                context.MessageContext.Result = await _handlerInvoker.InvokeHandleAsync(
-                    context.Handler,
-                    context,
-                    context.MessageContext.ExpectedResultType);
+                return _handlerInvoker.InvokeHandleAsync(handler, context);
             };
 
             // Wrap every existing interceptor around this call.
@@ -156,7 +142,7 @@ namespace Meceqs.TypedHandling
                 {
                     HandleExecutionDelegate interceptorCall = (HandleContext innerContext) =>
                     {
-                        var interceptor = metadata.CreateInterceptor(innerContext.MessageContext.RequestServices);
+                        var interceptor = metadata.CreateInterceptor(innerContext.RequestServices);
                         return interceptor.OnHandleExecutionAsync(innerContext, next);
                     };
                     return interceptorCall;

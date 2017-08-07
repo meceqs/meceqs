@@ -45,27 +45,40 @@ namespace Meceqs.TypedHandling
     /// </summary>
     public abstract class HandleContext
     {
+        private bool _initialized;
+        private Type _handlerType;
+        private MethodInfo _handleMethod;
+
         /// <summary>
         /// Gets the message context of the current execution.
         /// </summary>
         public MessageContext MessageContext { get; }
 
         /// <summary>
-        /// Gets the handler which processes the envelope/message.
-        /// </summary>
-        public IHandles Handler { get; private set; }
-
-        /// <summary>
         /// Gets the type of the handler which processes the envelope/message.
         /// This can be used to read custom attributes of that type - e.g. by an interceptor.
         /// </summary>
-        public Type HandlerType { get; private set; }
+        public Type HandlerType
+        {
+            get
+            {
+                EnsureInitialized();
+                return _handlerType;
+            }
+        }
 
         /// <summary>
         /// Gets the "HandleAsync" method which processes the envelope/message.
         /// This can be used to read custom attributes of that method - e.g. by an interceptor.
         /// </summary>
-        public MethodInfo HandleMethod { get; private set; }
+        public MethodInfo HandleMethod
+        {
+            get
+            {
+                EnsureInitialized();
+                return _handleMethod;
+            }
+        }
 
         #region MessageContext Shortcuts
 
@@ -135,14 +148,22 @@ namespace Meceqs.TypedHandling
         /// Brings the context into a valid state before the first interceptor/handler is invoked.
         /// </summary>
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public void Initialize(IHandles handler, MethodInfo handleMethod)
+        public void Initialize(Type handlerType, MethodInfo handleMethod)
         {
-            Guard.NotNull(handler, nameof(handler));
+            Guard.NotNull(handlerType, nameof(handlerType));
             Guard.NotNull(handleMethod, nameof(handleMethod));
 
-            Handler = handler;
-            HandlerType = handler.GetType();
-            HandleMethod = handleMethod;
+            _handlerType = handlerType;
+            _handleMethod = handleMethod;
+            _initialized = true;
+        }
+
+        private void EnsureInitialized()
+        {
+            if (!_initialized)
+            {
+                throw new InvalidOperationException($"'{nameof(Initialize)}' has not been called.");
+            }
         }
     }
 }

@@ -64,7 +64,7 @@ namespace Meceqs.HttpSender
 
             response.EnsureSuccessStatusCode();
 
-            if (context.ExpectedResultType != null)
+            if (context.ExpectedResultType != typeof(void))
             {
                 context.Result = _resultDeserializer.DeserializeResultFromStream(
                     response.Content.Headers.ContentType.MediaType,

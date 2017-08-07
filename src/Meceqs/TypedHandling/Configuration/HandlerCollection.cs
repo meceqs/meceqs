@@ -90,6 +90,8 @@ namespace Meceqs.TypedHandling.Configuration
             AddFromAssembly(assembly, filter);
         }
 
+        // TODO @cweiss AddFromExecutingAssembly?
+
         /// <summary>
         /// Adds all types representing an <see cref="IHandles"/> from the given assembly.
         /// </summary>
@@ -210,7 +212,7 @@ namespace Meceqs.TypedHandling.Configuration
                     }
 
                     Type messageType = implementedInterface.GenericTypeArguments[0];
-                    Type resultType = implementedInterface.GenericTypeArguments.Length > 1 ? implementedInterface.GenericTypeArguments[1] : null;
+                    Type resultType = implementedInterface.GenericTypeArguments.Length > 1 ? implementedInterface.GenericTypeArguments[1] : typeof(void);
 
                     yield return new HandleDefinition(messageType, resultType);
                 }
