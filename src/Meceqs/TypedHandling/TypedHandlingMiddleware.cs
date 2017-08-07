@@ -15,10 +15,10 @@ namespace Meceqs.TypedHandling
         private readonly TypedHandlingOptions _options;
         private readonly IHandleContextFactory _handleContextFactory;
         private readonly IHandleMethodResolver _handleMethodResolver;
-        private readonly IHandlerInvoker _handlerInvoker;
         private readonly ILogger _logger;
 
         private readonly Dictionary<HandleDefinition, IHandlerMetadata> _handlerMapping;
+        private readonly HandleExecutionDelegate _handleExecutionChain;
 
         public TypedHandlingMiddleware(
             MiddlewareDelegate next,
@@ -39,10 +39,10 @@ namespace Meceqs.TypedHandling
             _options = options;
             _handleContextFactory = handleContextFactory;
             _handleMethodResolver = handleMethodResolver;
-            _handlerInvoker = handlerInvoker;
             _logger = loggerFactory.CreateLogger<TypedHandlingMiddleware>();
 
             _handlerMapping = CreateHandlerMapping(options.Handlers);
+            _handleExecutionChain = CreateHandleExecutionChain(handlerInvoker, _options.Interceptors);
         }
 
         public async Task Invoke(MessageContext messageContext)
@@ -61,9 +61,7 @@ namespace Meceqs.TypedHandling
 
             var handleContext = CreateHandleContext(messageContext, handler);
 
-            var handleExecutionChain = CreateHandleExecutionChain(handler, handleContext);
-
-            await handleExecutionChain(handleContext);
+            await _handleExecutionChain(handleContext);
         }
 
         private IHandles CreateHandler(MessageContext messageContext)
@@ -118,27 +116,27 @@ namespace Meceqs.TypedHandling
 
             HandleContext handleContext = _handleContextFactory.CreateHandleContext(messageContext);
 
-            handleContext.Initialize(handlerType, handleMethod);
+            handleContext.Initialize(handler, handleMethod);
 
             return handleContext;
         }
 
-        private HandleExecutionDelegate CreateHandleExecutionChain(IHandles handler, HandleContext handleContext)
+        private static HandleExecutionDelegate CreateHandleExecutionChain(IHandlerInvoker handlerInvoker, InterceptorCollection interceptors)
         {
             // The call to handler itself is the innermost call.
             HandleExecutionDelegate chain = (HandleContext context) =>
             {
-                return _handlerInvoker.InvokeHandleAsync(handler, context);
+                return handlerInvoker.InvokeHandleAsync(context);
             };
 
             // Wrap every existing interceptor around this call.
-            foreach (var metadata in _options.Interceptors.Reverse())
+            foreach (var metadata in interceptors.Reverse())
             {
                 // This creates a delegate that contains a delegate :)
                 // The outer delegate is used to create the chain.
                 // The inner delegate represents the actual call to the interceptor and
                 // is executed when the chain is executed.
-                Func<HandleContext, HandleExecutionDelegate, HandleExecutionDelegate> interceptorFunc = (context, next) =>
+                Func<HandleExecutionDelegate, HandleExecutionDelegate> interceptorFunc = (next) =>
                 {
                     HandleExecutionDelegate interceptorCall = (HandleContext innerContext) =>
                     {
@@ -148,7 +146,7 @@ namespace Meceqs.TypedHandling
                     return interceptorCall;
                 };
 
-                chain = interceptorFunc(handleContext, chain);
+                chain = interceptorFunc(chain);
             }
 
             return chain;

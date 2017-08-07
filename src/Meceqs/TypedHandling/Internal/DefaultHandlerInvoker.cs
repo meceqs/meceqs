@@ -27,9 +27,8 @@ namespace Meceqs.TypedHandling.Internal
             _cachedTaskResultGetterDelegates = new ConcurrentDictionary<Type, Func<Task, object>>();
         }
 
-        public async Task InvokeHandleAsync(IHandles handler, HandleContext context)
+        public async Task InvokeHandleAsync(HandleContext context)
         {
-            Guard.NotNull(handler, nameof(handler));
             Guard.NotNull(context, nameof(context));
 
             Type messageType = context.Message.GetType();
@@ -39,7 +38,7 @@ namespace Meceqs.TypedHandling.Internal
 
             // Invoke Method
             // (this throws an InvalidCastOperationException, if the handler does not have the correct types)
-            Task resultTask = handleDelegate(handler, context);
+            Task resultTask = handleDelegate(context.Handler, context);
 
             await resultTask;
 

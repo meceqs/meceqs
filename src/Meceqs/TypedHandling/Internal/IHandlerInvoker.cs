@@ -5,6 +5,6 @@ namespace Meceqs.TypedHandling.Internal
 {
     public interface IHandlerInvoker
     {
-        Task InvokeHandleAsync(IHandles handler, HandleContext handleContext);
+        Task InvokeHandleAsync(HandleContext handleContext);
     }
 }

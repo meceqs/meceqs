@@ -46,7 +46,7 @@ namespace Meceqs.TypedHandling
     public abstract class HandleContext
     {
         private bool _initialized;
-        private Type _handlerType;
+        private IHandles _handler;
         private MethodInfo _handleMethod;
 
         /// <summary>
@@ -55,17 +55,22 @@ namespace Meceqs.TypedHandling
         public MessageContext MessageContext { get; }
 
         /// <summary>
-        /// Gets the type of the handler which processes the envelope/message.
-        /// This can be used to read custom attributes of that type - e.g. by an interceptor.
+        /// Gets the handler which processes the envelope/message.
         /// </summary>
-        public Type HandlerType
+        public IHandles Handler
         {
             get
             {
                 EnsureInitialized();
-                return _handlerType;
+                return _handler;
             }
         }
+
+        /// <summary>
+        /// Gets the type of the handler which processes the envelope/message.
+        /// This can be used to read custom attributes of that type - e.g. by an interceptor.
+        /// </summary>
+        public Type HandlerType => Handler.GetType();
 
         /// <summary>
         /// Gets the "HandleAsync" method which processes the envelope/message.
@@ -148,12 +153,12 @@ namespace Meceqs.TypedHandling
         /// Brings the context into a valid state before the first interceptor/handler is invoked.
         /// </summary>
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public void Initialize(Type handlerType, MethodInfo handleMethod)
+        public void Initialize(IHandles handler, MethodInfo handleMethod)
         {
-            Guard.NotNull(handlerType, nameof(handlerType));
+            Guard.NotNull(handler, nameof(handler));
             Guard.NotNull(handleMethod, nameof(handleMethod));
 
-            _handlerType = handlerType;
+            _handler = handler;
             _handleMethod = handleMethod;
             _initialized = true;
         }

@@ -23,7 +23,7 @@ namespace Meceqs.Tests.Middleware.TypedHandling
             var handleMethodResolver = new DefaultHandleMethodResolver();
             MethodInfo handleMethod = handleMethodResolver.GetHandleMethod(handler.GetType(), typeof(TMessage), resultType);
 
-            context.Initialize(handler.GetType(), handleMethod);
+            context.Initialize(handler, handleMethod);
 
             return context;
         }
@@ -33,12 +33,9 @@ namespace Meceqs.Tests.Middleware.TypedHandling
         {
             // Arrange
             var invoker = GetInvoker();
-            var handler = new SimpleMessageIntHandler(1);
-            var context = GetHandleContext<SimpleMessage>(typeof(int), handler);
 
             // Act & Assert
-            await Assert.ThrowsAsync<ArgumentNullException>(() => invoker.InvokeHandleAsync(null, context));
-            await Assert.ThrowsAsync<ArgumentNullException>(() => invoker.InvokeHandleAsync(handler, null));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => invoker.InvokeHandleAsync(null));
         }
 
         [Fact]
@@ -50,7 +47,7 @@ namespace Meceqs.Tests.Middleware.TypedHandling
             var context = GetHandleContext<SimpleMessage>(typeof(int), handler);
 
             // Act
-            await invoker.InvokeHandleAsync(handler, context);
+            await invoker.InvokeHandleAsync(context);
 
             // Assert
             context.MessageContext.Result.ShouldBe(1);
@@ -66,7 +63,7 @@ namespace Meceqs.Tests.Middleware.TypedHandling
             var context = GetHandleContext<SimpleMessage>(typeof(void), handler);
 
             // Act
-            await invoker.InvokeHandleAsync(handler, context);
+            await invoker.InvokeHandleAsync(context);
 
             // Assert
             handlerCalled.ShouldBeTrue();
@@ -83,7 +80,7 @@ namespace Meceqs.Tests.Middleware.TypedHandling
             var context = GetHandleContext<SimpleMessage>(typeof(SimpleResult), handler);
 
             // Act
-            await invoker.InvokeHandleAsync(handler, context);
+            await invoker.InvokeHandleAsync(context);
 
             // Assert
             context.MessageContext.Result.ShouldBe(expectedResult);
