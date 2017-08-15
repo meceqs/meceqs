@@ -96,7 +96,7 @@ namespace Meceqs.Pipeline
 
             var context = _messageContextFactory.CreateMessageContext(envelope);
 
-            context.Initialize(PipelineName, RequestServices, resultType);
+            context.Initialize(PipelineName, RequestServices, resultType ?? typeof(void));
 
             context.Cancellation = Cancellation;
             context.User = User;
@@ -113,7 +113,7 @@ namespace Meceqs.Pipeline
         {
             var pipeline = _pipelineProvider.GetPipeline(PipelineName);
 
-            var messageContext = CreateMessageContext(Envelope, resultType: null);
+            var messageContext = CreateMessageContext(Envelope, resultType: typeof(void));
 
             await pipeline.InvokeAsync(messageContext);
         }

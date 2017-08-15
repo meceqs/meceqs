@@ -98,7 +98,7 @@ namespace Meceqs.AspNetCore.Swagger
             // Response
 
             SwaggerResponse response;
-            if (messageType.ResultType != null)
+            if (messageType.ResultType != typeof(void))
             {
                 response = new SwaggerResponse
                 {

@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
-    <TargetFramework>netcoreapp1.1</TargetFramework>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\SampleConfig\SampleConfig.csproj" />
@@ -9,19 +9,10 @@
     <ProjectReference Include="..\..\src\Meceqs\Meceqs.csproj" />
     <ProjectReference Include="..\..\src\Meceqs.AspNetCore\Meceqs.AspNetCore.csproj" />
     <ProjectReference Include="..\..\src\Meceqs.AspNetCore.Swagger\Meceqs.AspNetCore.Swagger.csproj" />
-    <ProjectReference Include="..\..\src\Meceqs.Serialization.Json\Meceqs.Serialization.Json.csproj" />
     <ProjectReference Include="..\..\src\Meceqs.AzureEventHubs\Meceqs.AzureEventHubs.csproj" />
     <ProjectReference Include="..\..\src\Meceqs.AzureEventHubs.FileFake\Meceqs.AzureEventHubs.FileFake.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Diagnostics" Version="1.1.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Server.IISIntegration" Version="1.1.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Server.Kestrel" Version="1.1.2" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="1.1.2" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="1.1.2" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="1.1.2" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="1.1.2" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="1.1.2" />
-    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="1.1.2" />
+    <PackageReference Include="Microsoft.AspNetCore" Version="2.0.0" />
   </ItemGroup>
 </Project>

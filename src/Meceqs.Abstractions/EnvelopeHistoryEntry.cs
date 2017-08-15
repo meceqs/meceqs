@@ -25,7 +25,7 @@ namespace Meceqs
         /// <summary>
         /// The time at which the message has been processed by the application.
         /// </summary>
-        public DateTime CreatedOnUtc { get; set; }
+        public DateTime CreatedOnUtc { get; set; } // TODO @cweiss DateTimeOffset?
 
         /// <summary>
         /// Additional information that is specific to the application which processed the message.

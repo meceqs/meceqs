@@ -23,7 +23,7 @@ namespace Meceqs.Tests.Middleware.TypedHandling
             var resolver = GetResolver();
             var handlerType = typeof(SimpleMessageNoResultHandler);
             var messageType = typeof(SimpleMessage);
-            Type resultType = null;
+            Type resultType = typeof(void);
 
             // Act & Assert
             Should.Throw<ArgumentNullException>(() => resolver.GetHandleMethod(null, messageType, resultType));
@@ -37,7 +37,7 @@ namespace Meceqs.Tests.Middleware.TypedHandling
             var resolver = GetResolver();
             var handlerType = typeof(SimpleMessageNoResultHandler);
             var messageType = typeof(SimpleMessage);
-            Type resultType = null;
+            Type resultType = typeof(void);
 
             // Act
             var method = resolver.GetHandleMethod(handlerType, messageType, resultType);
@@ -69,7 +69,7 @@ namespace Meceqs.Tests.Middleware.TypedHandling
             var resolver = GetResolver();
             var handlerType = typeof(MultipleMessagesHandler);
             var messageType = typeof(SimpleMessage);
-            Type resultType = null;
+            Type resultType = typeof(void);
 
             // Act
             var method = resolver.GetHandleMethod(handlerType, messageType, resultType);
@@ -146,7 +146,7 @@ namespace Meceqs.Tests.Middleware.TypedHandling
         {
             var handleContextType = typeof(HandleContext<>).MakeGenericType(messageType);
 
-            var resultTaskType = resultType != null
+            var resultTaskType = resultType != typeof(void)
                 ? typeof(Task<>).MakeGenericType(resultType)
                 : typeof(Task);
 

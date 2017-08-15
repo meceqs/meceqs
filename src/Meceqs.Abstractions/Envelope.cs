@@ -61,7 +61,7 @@ namespace Meceqs
         /// <summary>
         /// The creation date of the message.
         /// </summary>
-        public DateTime? CreatedOnUtc { get; set; }
+        public DateTime? CreatedOnUtc { get; set; } // TODO @cweiss Use DateTimeOffset?
 
         /// <summary>
         /// Contains additional, non-typed information about the message.
@@ -71,7 +71,7 @@ namespace Meceqs
         /// <summary>
         /// Contains a list of all endpoints that processed the message for tracing-scenarios.
         /// </summary>
-        public List<EnvelopeHistoryEntry> History { get; set; } = new List<EnvelopeHistoryEntry>();
+        public List<EnvelopeHistoryEntry> History { get; set; } = new List<EnvelopeHistoryEntry>(); // TODO @cweiss Remove in favor of OpenTracing?
 
         protected Envelope()
         {

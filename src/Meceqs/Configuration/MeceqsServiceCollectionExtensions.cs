@@ -1,6 +1,7 @@
 using System;
 using Meceqs;
 using Meceqs.Configuration;
+using Meceqs.Hosting;
 using Meceqs.Pipeline;
 using Meceqs.Receiving;
 using Meceqs.Sending;
@@ -19,13 +20,20 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             Guard.NotNull(services, nameof(services));
 
+            // Core Services
+            AddHosting(services);
             AddPipeline(services);
             AddReceiving(services);
             AddSending(services);
             AddSerialization(services);
             AddTypedHandling(services);
 
-            return new MeceqsBuilder(services);
+            var meceqsBuilder = new MeceqsBuilder(services);
+
+            // Default Configuration
+            meceqsBuilder.AddJsonSerialization();
+
+            return meceqsBuilder;
         }
 
         /// <summary>
@@ -36,6 +44,11 @@ namespace Microsoft.Extensions.DependencyInjection
             IMeceqsBuilder builderInstance = AddMeceqs(services);
             builder?.Invoke(builderInstance);
             return services;
+        }
+
+        private static void AddHosting(IServiceCollection services)
+        {
+            services.TryAddSingleton<MeceqsInitializer>();
         }
 
         private static void AddPipeline(IServiceCollection services)

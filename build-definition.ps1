@@ -26,8 +26,7 @@ $NugetLibraries = @(
     "src/Meceqs.AzureEventHubs.FileFake",
     "src/Meceqs.AzureServiceBus",
     "src/Meceqs.AzureServiceBus.FileFake",
-    "src/Meceqs.HttpSender",
-    "src/Meceqs.Serialization.Json"
+    "src/Meceqs.HttpSender"
 )
 
 # VSTS Overrides
@@ -89,7 +88,7 @@ Task dotnet-restore {
 Task dotnet-build {
 
     # --no-incremental to ensure that CI builds always result in a clean build
-    exec { dotnet build -c $BuildConfiguration --version-suffix $BuildNumber --no-incremental }
+    exec { dotnet build -c $BuildConfiguration --version-suffix $BuildNumber --no-restore --no-incremental }
 }
 
 Task dotnet-test {
@@ -108,7 +107,7 @@ Task dotnet-test {
         Write-Host "Testing $library"
         Write-Host ""
 
-        dotnet test $_.FullName -c $BuildConfiguration --no-build --logger "trx;LogFileName=$testResultOutput"
+        dotnet test $_.FullName -c $BuildConfiguration --no-restore --no-build --logger "trx;LogFileName=$testResultOutput"
         if ($LASTEXITCODE -ne 0) {
             $testsFailed = $true
         }
@@ -136,7 +135,7 @@ Task dotnet-pack {
         Write-Host "Packaging $library to $libraryOutput"
         Write-Host ""
 
-        exec { dotnet pack $library -c $BuildConfiguration --version-suffix $BuildNumber --no-build --include-source --include-symbols -o $libraryOutput }
+        exec { dotnet pack $library -c $BuildConfiguration --version-suffix $BuildNumber --no-restore --no-build --include-source --include-symbols -o $libraryOutput }
     }
 
     # HACK!! We want to include the PDB files in the regular nupkg so people can debug into them

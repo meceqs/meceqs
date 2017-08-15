@@ -4,6 +4,8 @@ using Meceqs;
 using Meceqs.Configuration;
 using Meceqs.Pipeline;
 using Meceqs.Serialization;
+using Meceqs.Serialization.Json;
+using Newtonsoft.Json;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -48,6 +50,21 @@ namespace Microsoft.Extensions.DependencyInjection
             Guard.NotNull(pipeline, nameof(pipeline));
 
             builder.Services.Configure<PipelineOptions>(options => options.Pipelines.Add(pipelineName, pipeline));
+
+            return builder;
+        }
+
+        public static IMeceqsBuilder AddJsonSerialization(this IMeceqsBuilder builder, JsonSerializerSettings settings = null)
+        {
+            Guard.NotNull(builder, nameof(builder));
+
+            var serializer = new JsonEnvelopeSerializer(settings);
+
+            builder.Services.AddSingleton<IEnvelopeSerializer>(serializer);
+            builder.Services.AddSingleton<IResultSerializer>(serializer);
+
+            builder.Services.AddSingleton<IEnvelopeDeserializer, JsonEnvelopeDeserializer>();
+            builder.Services.AddSingleton<IResultDeserializer, JsonEnvelopeDeserializer>();
 
             return builder;
         }

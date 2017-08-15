@@ -44,29 +44,9 @@ namespace Meceqs.Pipeline
 
             _logger.ExecutingPipeline(context);
 
-            ValidateMessageContext(context);
-
-            return _pipeline(context);
-        }
-
-        private void ValidateMessageContext(MessageContext context)
-        {
-            if (context.Envelope == null)
-            {
-                throw new ArgumentNullException($"{nameof(context)}.{nameof(context.Envelope)}");
-            }
-
             context.Envelope.EnsureValid();
 
-            if (string.IsNullOrWhiteSpace(context.PipelineName))
-            {
-                throw new ArgumentNullException($"{nameof(context)}.{nameof(context.PipelineName)}");
-            }
-
-            if (context.RequestServices == null)
-            {
-                throw new ArgumentNullException($"{nameof(context)}.{nameof(context.RequestServices)}");
-            }
+            return _pipeline(context);
         }
     }
 }

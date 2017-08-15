@@ -11,7 +11,7 @@ namespace Meceqs.TypedHandling.Configuration
         public HandleDefinition(Type messageType, Type resultType)
         {
             Guard.NotNull(messageType, nameof(messageType));
-            // Result type may be null!
+            Guard.NotNull(resultType, nameof(resultType));
 
             MessageType = messageType;
             ResultType = resultType;

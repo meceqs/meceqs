@@ -19,7 +19,6 @@ namespace Sales.Hosts.ProcessOrders
             services.AddMeceqs(builder =>
             {
                 builder
-                    .AddJsonSerialization()
 
                     .AddServiceBusReceiver(receiver =>
                     {

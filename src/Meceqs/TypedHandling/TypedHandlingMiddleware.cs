@@ -15,10 +15,10 @@ namespace Meceqs.TypedHandling
         private readonly TypedHandlingOptions _options;
         private readonly IHandleContextFactory _handleContextFactory;
         private readonly IHandleMethodResolver _handleMethodResolver;
-        private readonly IHandlerInvoker _handlerInvoker;
         private readonly ILogger _logger;
 
         private readonly Dictionary<HandleDefinition, IHandlerMetadata> _handlerMapping;
+        private readonly HandleExecutionDelegate _handleExecutionChain;
 
         public TypedHandlingMiddleware(
             MiddlewareDelegate next,
@@ -39,10 +39,10 @@ namespace Meceqs.TypedHandling
             _options = options;
             _handleContextFactory = handleContextFactory;
             _handleMethodResolver = handleMethodResolver;
-            _handlerInvoker = handlerInvoker;
             _logger = loggerFactory.CreateLogger<TypedHandlingMiddleware>();
 
             _handlerMapping = CreateHandlerMapping(options.Handlers);
+            _handleExecutionChain = CreateHandleExecutionChain(handlerInvoker, _options.Interceptors);
         }
 
         public async Task Invoke(MessageContext messageContext)
@@ -61,24 +61,11 @@ namespace Meceqs.TypedHandling
 
             var handleContext = CreateHandleContext(messageContext, handler);
 
-            var handleExecutionChain = CreateHandleExecutionChain(handleContext);
-
-            await handleExecutionChain(handleContext);
+            await _handleExecutionChain(handleContext);
         }
 
         private IHandles CreateHandler(MessageContext messageContext)
         {
-            if (messageContext.RequestServices == null)
-            {
-                throw new ArgumentException(
-                    $"'{nameof(messageContext.RequestServices)}' wasn't set. It is required to resolve " +
-                    $"handlers from the scope of the current web/message request. " +
-                    $"It can be set either by using a middleware [e.g. UseAspNetCore()] or by " +
-                    $"setting it yourself through 'SetRequestServices()' on the message sender/receiver",
-                    $"{nameof(messageContext)}.{nameof(messageContext.RequestServices)}"
-                );
-            }
-
             var key = new HandleDefinition(messageContext.MessageType, messageContext.ExpectedResultType);
 
             IHandlerMetadata handlerMetadata;
@@ -97,7 +84,7 @@ namespace Meceqs.TypedHandling
                 case UnknownMessageBehavior.ThrowException:
                     throw new UnknownMessageException(
                         $"There was no handler configured for message/result types " +
-                        $"'{messageContext.MessageType}/{messageContext.ExpectedResultType ?? typeof(void)}");
+                        $"'{messageContext.MessageType}/{messageContext.ExpectedResultType}");
 
                 case UnknownMessageBehavior.Skip:
                     _logger.SkippingMessage(messageContext);
@@ -134,35 +121,32 @@ namespace Meceqs.TypedHandling
             return handleContext;
         }
 
-        private HandleExecutionDelegate CreateHandleExecutionChain(HandleContext handleContext)
+        private static HandleExecutionDelegate CreateHandleExecutionChain(IHandlerInvoker handlerInvoker, InterceptorCollection interceptors)
         {
             // The call to handler itself is the innermost call.
-            HandleExecutionDelegate chain = async (HandleContext context) =>
+            HandleExecutionDelegate chain = (HandleContext context) =>
             {
-                context.MessageContext.Result = await _handlerInvoker.InvokeHandleAsync(
-                    context.Handler,
-                    context,
-                    context.MessageContext.ExpectedResultType);
+                return handlerInvoker.InvokeHandleAsync(context);
             };
 
             // Wrap every existing interceptor around this call.
-            foreach (var metadata in _options.Interceptors.Reverse())
+            foreach (var metadata in interceptors.Reverse())
             {
                 // This creates a delegate that contains a delegate :)
                 // The outer delegate is used to create the chain.
                 // The inner delegate represents the actual call to the interceptor and
                 // is executed when the chain is executed.
-                Func<HandleContext, HandleExecutionDelegate, HandleExecutionDelegate> interceptorFunc = (context, next) =>
+                Func<HandleExecutionDelegate, HandleExecutionDelegate> interceptorFunc = (next) =>
                 {
                     HandleExecutionDelegate interceptorCall = (HandleContext innerContext) =>
                     {
-                        var interceptor = metadata.CreateInterceptor(innerContext.MessageContext.RequestServices);
+                        var interceptor = metadata.CreateInterceptor(innerContext.RequestServices);
                         return interceptor.OnHandleExecutionAsync(innerContext, next);
                     };
                     return interceptorCall;
                 };
 
-                chain = interceptorFunc(handleContext, chain);
+                chain = interceptorFunc(chain);
             }
 
             return chain;

@@ -28,7 +28,7 @@ namespace Meceqs.Tests
             requestServices = requestServices ?? Substitute.For<IServiceProvider>();
 
             var messageContext = new MessageContext<TMessage>(envelope);
-            messageContext.Initialize("pipeline", requestServices, resultType);
+            messageContext.Initialize("pipeline", requestServices, resultType ?? typeof(void));
 
             return messageContext;
         }

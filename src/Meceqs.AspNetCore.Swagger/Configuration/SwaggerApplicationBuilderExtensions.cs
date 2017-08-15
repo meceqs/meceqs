@@ -11,6 +11,26 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class SwaggerApplicationBuilderExtensions
     {
+        public static IApplicationBuilder UseAspNetCoreReceiverWithSwagger(this IApplicationBuilder app, Action<SwaggerUiOptions> options)
+        {
+            Guard.NotNull(app, nameof(app));
+
+            app.UseAspNetCoreReceiver();
+            app.UseSwagger(options);
+
+            return app;
+        }
+
+        public static IApplicationBuilder UseAspNetCoreReceiverWithSwagger(this IApplicationBuilder app, SwaggerUiOptions options = null)
+        {
+            Guard.NotNull(app, nameof(app));
+
+            app.UseAspNetCoreReceiver();
+            app.UseSwagger(options);
+
+            return app;
+        }
+
         public static IApplicationBuilder UseSwagger(this IApplicationBuilder app, Action<SwaggerUiOptions> options)
         {
             Guard.NotNull(app, nameof(app));
