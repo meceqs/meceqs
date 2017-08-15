@@ -5,7 +5,4 @@
   <ItemGroup>
     <ProjectReference Include="..\Meceqs.AzureServiceBus\Meceqs.AzureServiceBus.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
-  </ItemGroup>
 </Project>

@@ -3,16 +3,15 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <EmbeddedResource Include="SwaggerUi\dist\**\*;SwaggerUi\CustomAssets\index.html" Exclude="bin\**;obj\**;**\*.xproj;packages\**;@(EmbeddedResource)" />
+    <EmbeddedResource Include="SwaggerUi\dist\**\*;SwaggerUi\CustomAssets\index.html" Exclude="bin\**;obj\**;**\*.csproj;packages\**;@(EmbeddedResource)" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Meceqs.AspNetCore\Meceqs.AspNetCore.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.0.0-preview2-final" />
-    <PackageReference Include="Microsoft.AspNetCore.Routing" Version="2.0.0-preview2-final" />
-    <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.0.0-preview2-final" />
-    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="2.0.0-preview2-final" />
-    <PackageReference Include="NSwag.SwaggerGeneration" Version="11.3.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Routing" Version="2.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.0.0" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="2.0.0" />
+    <PackageReference Include="NSwag.SwaggerGeneration" Version="11.3.5" />
   </ItemGroup>
 </Project>
