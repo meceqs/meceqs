@@ -35,7 +35,7 @@ namespace Meceqs.AspNetCore.Receiving
                 .SetCancellationToken(httpContext.RequestAborted)
                 .ReceiveAsync(metadata.ResultType);
 
-            await _httpResponseWriter.HandleResult(result, httpContext);
+            _httpResponseWriter.WriteResult(result, httpContext);
         }
     }
 }

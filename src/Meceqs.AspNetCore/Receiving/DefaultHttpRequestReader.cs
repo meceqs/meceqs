@@ -6,13 +6,13 @@ namespace Meceqs.AspNetCore.Receiving
 {
     public class DefaultHttpRequestReader : IHttpRequestReader
     {
-        private readonly IEnvelopeDeserializer _envelopeDeserializer;
+        private readonly ISerializationProvider _serializationProvider;
 
-        public DefaultHttpRequestReader(IEnvelopeDeserializer envelopeDeserializer)
+        public DefaultHttpRequestReader(ISerializationProvider serializationProvider)
         {
-            Guard.NotNull(envelopeDeserializer, nameof(envelopeDeserializer));
+            Guard.NotNull(serializationProvider, nameof(serializationProvider));
 
-            _envelopeDeserializer = envelopeDeserializer;
+            _serializationProvider = serializationProvider;
         }
 
         public Envelope ConvertToEnvelope(HttpContext httpContext, Type messageType)
@@ -24,14 +24,9 @@ namespace Meceqs.AspNetCore.Receiving
             // TODO charset/encoding?
 
             var requestHeaders = httpContext.Request.GetTypedHeaders();
+            string contentType = requestHeaders.ContentType.MediaType.ToString();
 
-            // TODO @cweiss should this get the actual messageType object?
-            Envelope envelope = _envelopeDeserializer.DeserializeEnvelope(
-                requestHeaders.ContentType.MediaType.ToString(),
-                httpContext.Request.Body,
-                messageType.FullName);
-
-            return envelope;
+            return _serializationProvider.DeserializeEnvelope(contentType, httpContext.Request.Body, messageType.FullName);
         }
     }
 }

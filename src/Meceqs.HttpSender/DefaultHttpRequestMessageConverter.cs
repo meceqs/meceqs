@@ -1,18 +1,19 @@
+using System.IO;
 using System.Net.Http;
-using System.Text;
+using System.Net.Http.Headers;
 using Meceqs.Serialization;
 
 namespace Meceqs.HttpSender
 {
     public class DefaultHttpRequestMessageConverter : IHttpRequestMessageConverter
     {
-        private readonly IEnvelopeSerializer _envelopeSerializer;
+        private readonly ISerializationProvider _serializationProvider;
 
-        public DefaultHttpRequestMessageConverter(IEnvelopeSerializer envelopeSerializer)
+        public DefaultHttpRequestMessageConverter(ISerializationProvider serializationProvider)
         {
-            Guard.NotNull(envelopeSerializer, nameof(envelopeSerializer));
+            Guard.NotNull(serializationProvider, nameof(serializationProvider));
 
-            _envelopeSerializer = envelopeSerializer;
+            _serializationProvider = serializationProvider;
         }
 
         public HttpRequestMessage ConvertToRequestMessage(Envelope envelope, string relativePath)
@@ -20,11 +21,17 @@ namespace Meceqs.HttpSender
             Guard.NotNull(envelope, nameof(envelope));
             Guard.NotNullOrWhiteSpace(relativePath, nameof(relativePath));
 
+            var serializer = _serializationProvider.GetDefaultSerializer();
+
             var request = new HttpRequestMessage(HttpMethod.Post, relativePath);
 
-            string serializedEnvelope = _envelopeSerializer.SerializeEnvelopeToString(envelope);
+            using (MemoryStream stream = new MemoryStream())
+            {
+                serializer.SerializeToStream(envelope, stream);
 
-            request.Content = new StringContent(serializedEnvelope, Encoding.UTF8, _envelopeSerializer.ContentType);
+                request.Content = new ByteArrayContent(stream.ToArray());
+                request.Content.Headers.ContentType = new MediaTypeHeaderValue(serializer.ContentType);
+            }
 
             return request;
         }

@@ -16,7 +16,7 @@ namespace Meceqs.HttpSender
         private readonly IServiceProvider _serviceProvider;
         private readonly IHttpClientProvider _httpClientProvider;
         private readonly IHttpRequestMessageConverter _httpRequestMessageConverter;
-        private readonly IResultDeserializer _resultDeserializer;
+        private readonly ISerializationProvider _serializationProvider;
 
         private readonly Dictionary<Type, Tuple<string, EndpointMessage>> _messageMapping;
 
@@ -26,20 +26,20 @@ namespace Meceqs.HttpSender
             IServiceProvider serviceProvider,
             IHttpClientProvider httpClientProvider,
             IHttpRequestMessageConverter httpRequestMessageConverter,
-            IResultDeserializer resultDeserializer)
+            ISerializationProvider serializationProvider)
         {
             Guard.NotNull(options?.Value, nameof(options));
             Guard.NotNull(serviceProvider, nameof(serviceProvider));
             Guard.NotNull(httpClientProvider, nameof(httpClientProvider));
             Guard.NotNull(httpRequestMessageConverter, nameof(httpRequestMessageConverter));
-            Guard.NotNull(resultDeserializer, nameof(resultDeserializer));
+            Guard.NotNull(serializationProvider, nameof(serializationProvider));
 
             // "next" is not stored because this is a terminal middleware.
             _options = options.Value;
             _serviceProvider = serviceProvider;
             _httpClientProvider = httpClientProvider;
             _httpRequestMessageConverter = httpRequestMessageConverter;
-            _resultDeserializer = resultDeserializer;
+            _serializationProvider = serializationProvider;
 
             _messageMapping = BuildMessageMapping();
 
@@ -66,10 +66,13 @@ namespace Meceqs.HttpSender
 
             if (context.ExpectedResultType != typeof(void))
             {
-                context.Result = _resultDeserializer.DeserializeResultFromStream(
-                    response.Content.Headers.ContentType.MediaType,
-                    await response.Content.ReadAsStreamAsync(),
-                    context.ExpectedResultType);
+                string contentType = response.Content.Headers.ContentType.ToString();
+                if (!_serializationProvider.TryGetSerializer(contentType, out ISerializer serializer))
+                {
+                    throw new NotSupportedException($"ContentType '{contentType}' is not supported.");
+                }
+
+                context.Result = serializer.Deserialize(context.ExpectedResultType, await response.Content.ReadAsStreamAsync());
             }
         }
 

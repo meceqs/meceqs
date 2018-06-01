@@ -1,4 +1,4 @@
-using System.Threading.Tasks;
+using System.Collections.Generic;
 using Meceqs.Serialization;
 using Microsoft.AspNetCore.Http;
 
@@ -6,25 +6,40 @@ namespace Meceqs.AspNetCore.Receiving
 {
     public class DefaultHttpResponseWriter : IHttpResponseWriter
     {
-        private readonly IResultSerializer _resultSerializer;
+        private readonly ISerializationProvider _serializationProvider;
 
-        public DefaultHttpResponseWriter(IResultSerializer resultSerializer)
+        public DefaultHttpResponseWriter(ISerializationProvider serializationProvider)
         {
-            Guard.NotNull(resultSerializer, nameof(resultSerializer));
+            Guard.NotNull(serializationProvider, nameof(serializationProvider));
 
-            _resultSerializer = resultSerializer;
+            _serializationProvider = serializationProvider;
         }
 
-        public Task HandleResult(object result, HttpContext httpContext)
+        public void WriteResult(object result, HttpContext httpContext)
         {
             if (result == null)
-                return Task.CompletedTask;
+                return;
 
-            httpContext.Response.ContentType = _resultSerializer.ContentType;
+            IEnumerable<string> supportedContentTypes = GetSupportedContentTypes(httpContext);
 
-            string response = _resultSerializer.SerializeResultToString(result);
+            ISerializer serializer = _serializationProvider.GetSerializer(supportedContentTypes);
 
-            return httpContext.Response.WriteAsync(response);
+            httpContext.Response.ContentType = serializer.ContentType;
+
+            serializer.SerializeToStream(result, httpContext.Response.Body);
+        }
+
+        private IEnumerable<string> GetSupportedContentTypes(HttpContext httpContext)
+        {
+            var headers = httpContext.Request.GetTypedHeaders();
+
+            if (headers.Accept != null)
+            {
+                foreach (var accept in headers.Accept)
+                {
+                    yield return accept.MediaType.ToString();
+                }
+            }
         }
     }
 }

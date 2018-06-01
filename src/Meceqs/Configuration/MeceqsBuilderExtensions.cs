@@ -58,13 +58,9 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             Guard.NotNull(builder, nameof(builder));
 
-            var serializer = new JsonEnvelopeSerializer(settings);
+            var serializer = new Meceqs.Serialization.Json.JsonSerializer(settings);
 
-            builder.Services.AddSingleton<IEnvelopeSerializer>(serializer);
-            builder.Services.AddSingleton<IResultSerializer>(serializer);
-
-            builder.Services.AddSingleton<IEnvelopeDeserializer, JsonEnvelopeDeserializer>();
-            builder.Services.AddSingleton<IResultDeserializer, JsonEnvelopeDeserializer>();
+            builder.Services.AddSingleton<ISerializer>(serializer);
 
             return builder;
         }

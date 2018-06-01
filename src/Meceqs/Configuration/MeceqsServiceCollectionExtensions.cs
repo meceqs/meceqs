@@ -79,6 +79,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
         private static void AddSerialization(IServiceCollection services)
         {
+            services.TryAddSingleton<ISerializationProvider, DefaultSerializationProvider>();
             services.TryAddSingleton<IEnvelopeTypeLoader, DefaultEnvelopeTypeLoader>();
         }
 

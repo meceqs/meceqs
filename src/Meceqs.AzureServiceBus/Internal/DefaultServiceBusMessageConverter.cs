@@ -6,31 +6,30 @@ namespace Meceqs.AzureServiceBus.Internal
 {
     public class DefaultServiceBusMessageConverter : IServiceBusMessageConverter
     {
-        private readonly IEnvelopeSerializer _serializer;
-        private readonly IEnvelopeDeserializer _deserializer;
+        private readonly ISerializationProvider _serializationProvider;
 
-        public DefaultServiceBusMessageConverter(IEnvelopeSerializer serializer, IEnvelopeDeserializer deserializer)
+        public DefaultServiceBusMessageConverter(ISerializationProvider serializationProvider)
         {
-            Guard.NotNull(serializer, nameof(serializer));
-            Guard.NotNull(deserializer, nameof(deserializer));
+            Guard.NotNull(serializationProvider, nameof(serializationProvider));
 
-            _serializer = serializer;
-            _deserializer = deserializer;
+            _serializationProvider = serializationProvider;
         }
 
         public Message ConvertToServiceBusMessage(Envelope envelope)
         {
             Guard.NotNull(envelope, nameof(envelope));
 
-            byte[] serializedEnvelope = _serializer.SerializeEnvelopeToByteArray(envelope);
+            ISerializer serializer = _serializationProvider.GetDefaultSerializer();
+
+            byte[] serializedEnvelope = serializer.SerializeToByteArray(envelope);
 
             Message serviceBusMessage = new Message(serializedEnvelope);
 
             // Some properties are written to the object and to the headers-dictionary
             // to be consistent with other transports that only have header-dictionaries.
 
-            serviceBusMessage.ContentType = _serializer.ContentType;
-            serviceBusMessage.UserProperties[TransportHeaderNames.ContentType] = _serializer.ContentType;
+            serviceBusMessage.ContentType = serializer.ContentType;
+            serviceBusMessage.UserProperties[TransportHeaderNames.ContentType] = serializer.ContentType;
 
             serviceBusMessage.MessageId = envelope.MessageId.ToString();
             serviceBusMessage.UserProperties[TransportHeaderNames.MessageId] = envelope.MessageId;
@@ -51,7 +50,7 @@ namespace Meceqs.AzureServiceBus.Internal
 
             byte[] serializedEnvelope = serviceBusMessage.Body;
 
-            return _deserializer.DeserializeEnvelope(contentType, serializedEnvelope, messageType);
+            return _serializationProvider.DeserializeEnvelope(contentType, serializedEnvelope, messageType);
         }
     }
 }
