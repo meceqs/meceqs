@@ -12,11 +12,13 @@ namespace Meceqs.AzureEventHubs.FileFake
 {
     public static class FileFakeEventDataSerializer
     {
+        // From https://github.com/Azure/azure-event-hubs-dotnet/blob/dev/src/Microsoft.Azure.EventHubs/Primitives/ClientConstants.cs
+        private const string EnqueuedTimeUtcName = "x-opt-enqueued-time";
+        private const string SequenceNumberName = "x-opt-sequence-number";
+        private const string OffsetName = "x-opt-offset";
+
         private static readonly PropertyInfo SystemPropertiesSetter = typeof(EventData).GetProperty("SystemProperties");
         private static readonly ConstructorInfo SystemPropertiesCtor = typeof(EventData.SystemPropertiesCollection).GetTypeInfo().DeclaredConstructors.First();
-        private static readonly PropertyInfo SystemPropertyEnqueuedTimeUtc = typeof(EventData.SystemPropertiesCollection).GetProperty("EnqueuedTimeUtc");
-        private static readonly PropertyInfo SystemPropertyOffset = typeof(EventData.SystemPropertiesCollection).GetProperty("Offset");
-        private static readonly PropertyInfo SystemPropertySequenceNumber = typeof(EventData.SystemPropertiesCollection).GetProperty("SequenceNumber");
 
         public static string Serialize(EventData eventData)
         {
@@ -35,7 +37,7 @@ namespace Meceqs.AzureEventHubs.FileFake
                     writer.WriteValue(kvp.Value);
                 }
 
-                writer.WritePropertyName(nameof(eventData.SystemProperties.EnqueuedTimeUtc));
+                writer.WritePropertyName(EnqueuedTimeUtcName);
                 writer.WriteValue(DateTime.UtcNow);
 
                 writer.WritePropertyName("Body");
@@ -61,14 +63,13 @@ namespace Meceqs.AzureEventHubs.FileFake
             }
 
             // System properties are internal - that's why we need reflection :(
+            // Header names: https://github.com/Azure/azure-event-hubs-dotnet/blob/dev/src/Microsoft.Azure.EventHubs/Primitives/ClientConstants.cs
 
             var systemProperties = (EventData.SystemPropertiesCollection)SystemPropertiesCtor.Invoke(new object[] { });
 
-            SystemPropertySequenceNumber.SetValue(systemProperties, sequenceNumber);
-            SystemPropertyOffset.SetValue(systemProperties, sequenceNumber.ToString());
-
-            var enqueuedTimeUtc = (DateTime)jsonEventData.GetValue(nameof(systemProperties.EnqueuedTimeUtc)).ToObject(typeof(DateTime));
-            SystemPropertyEnqueuedTimeUtc.SetValue(systemProperties, enqueuedTimeUtc);
+            systemProperties[EnqueuedTimeUtcName] = (DateTime)jsonEventData.GetValue(EnqueuedTimeUtcName).ToObject(typeof(DateTime));
+            systemProperties[SequenceNumberName] = sequenceNumber;
+            systemProperties[OffsetName] = sequenceNumber.ToString();
 
             SystemPropertiesSetter.SetValue(eventData, systemProperties);
 
