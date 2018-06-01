@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -11,7 +12,7 @@ using Xunit;
 
 namespace Meceqs.Test.Performance
 {
-    // Make class public to actually run it.
+    [SuppressMessage("xUnit", "xUnit1000", Justification = "Make class public to actually run it.")]
     internal class TypedHandling_HandlerInvokerPerfTest
     {
         private class SimpleMessageStringHandler : IHandles<SimpleMessage, string>

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -9,7 +10,7 @@ using Xunit;
 
 namespace Meceqs.Tests.Performance
 {
-    // Make class public to actually run it.
+    [SuppressMessage("xUnit", "xUnit1000", Justification = "Make class public to actually run it.")]
     internal class MessageContextFactoryPerfTest
     {
         private void RunTimed(string message, int loopCount, Action action)

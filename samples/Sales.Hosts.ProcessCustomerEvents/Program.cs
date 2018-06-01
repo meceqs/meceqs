@@ -1,107 +1,75 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.IO;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using SampleConfig;
 
 namespace Sales.Hosts.ProcessCustomerEvents
 {
-    /// <summary>
-    /// This class configures the DI framework and launches the <see cref="Worker"/>.
-    /// </summary>
     public class Program
     {
-        private static void ConfigureServices(IServiceCollection services)
-        {
-            services.AddLogging();
-            services.AddOptions();
-
-            services.AddMeceqs(builder =>
-            {
-                builder
-
-                    .AddEventHubReceiver(receiver =>
-                    {
-                        receiver
-                            .SkipUnknownMessages()
-
-                            .UseTypedHandling(options =>
-                            {
-                                options.Handlers.Add<CustomerEventsHandler>();
-                            })
-
-                            // RunTypedHandling will be added at the end automatically!
-                            .ConfigurePipeline(x =>
-                            {
-                                x.UseAuditing();
-                            });
-                    })
-
-                    // Fake for the EventHubReceiver which will read events from a local file.
-                    .AddFileFakeEventHubProcessor(options =>
-                    {
-                        options.Directory = SampleConfiguration.FileFakeEventHubDirectory;
-                        options.ClearEventHubOnStart = true;
-                        options.EventHubName = "customers";
-                    });
-            });
-        }
-
         public static void Main(string[] args)
         {
-            Console.WriteLine("Sales.Hosts.ProcessCustomerEvents!");
-            Console.WriteLine("==================================");
-            Console.WriteLine();
-            Console.WriteLine("Press [ENTER] to close application");
-            Console.WriteLine();
+            CreateHostBuilder(args).Build().Run();
+        }
 
-            // Logging
+        public static IHostBuilder CreateHostBuilder(string[] args)
+        {
+            // Based on https://github.com/aspnet/MetaPackages/blob/dev/src/Microsoft.AspNetCore/WebHost.cs
+            return new HostBuilder()
+                .UseContentRoot(Directory.GetCurrentDirectory())
+                .ConfigureAppConfiguration((hostingContext, config) =>
+                {
+                    var env = hostingContext.HostingEnvironment;
 
-            var loggerFactory = new LoggerFactory();
-            loggerFactory.AddConsole(LogLevel.Debug);
+                    config.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                          .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: true);
 
-            var logger = loggerFactory.CreateLogger<Program>();
+                    config.AddEnvironmentVariables();
 
-            // From now on, we can actually do something with startup exceptions
+                    if (args != null)
+                    {
+                        config.AddCommandLine(args);
+                    }
+                })
+                .ConfigureLogging((hostingContext, logging) =>
+                {
+                    logging.AddConfiguration(hostingContext.Configuration.GetSection("Logging"));
+                    logging.AddConsole();
+                    logging.AddDebug();
+                })
+                .ConfigureServices((hostingContext, services) =>
+                {
+                    services.AddHostedService<EventProcessorService>();
 
-            IServiceProvider applicationServices = null;
-            try
-            {
-                logger.LogInformation("Logging initialized");
-
-                // Dependency Injection
-
-                var services = new ServiceCollection();
-                services.AddSingleton<ILoggerFactory>(loggerFactory);
-
-                ConfigureServices(services);
-
-                applicationServices = services.BuildServiceProvider();
-
-                // Start Worker on new Thread
-
-                var worker = (Worker)ActivatorUtilities.CreateInstance(applicationServices, typeof(Worker));
-                Task.Factory.StartNew(worker.Run);
-
-                // Wait for cancellation
-
-                Console.ReadLine();
-            }
-            catch (Exception ex)
-            {
-                logger?.LogError(0, ex, "Unhandled exception");
-            }
-            finally
-            {
-                // Close application
-
-                logger.LogInformation("Closing application");
-                (applicationServices as IDisposable)?.Dispose();
-                loggerFactory?.Dispose();
-
-                // Empty line just for nicer output in console.
-                Console.WriteLine();
-            }
+                    services.AddOptions();
+                    services.AddMeceqs(builder =>
+                    {
+                        builder
+                            .AddEventHubReceiver(receiver =>
+                            {
+                                receiver
+                                    .SkipUnknownMessages()
+                                    .UseTypedHandling(options =>
+                                    {
+                                        options.Handlers.Add<CustomerEventsHandler>();
+                                    })
+                                    // RunTypedHandling will be added at the end automatically!
+                                    .ConfigurePipeline(x =>
+                                    {
+                                        x.UseAuditing();
+                                    });
+                            })
+                            // Fake for the EventHubReceiver which will read events from a local file.
+                            .AddFileFakeEventHubProcessor(options =>
+                            {
+                                options.Directory = SampleConfiguration.FileFakeEventHubDirectory;
+                                options.ClearEventHubOnStart = true;
+                                options.EventHubName = "customers";
+                            });
+                    });
+                });
         }
     }
 }

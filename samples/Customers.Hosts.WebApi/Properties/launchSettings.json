@@ -8,15 +8,15 @@
     }
   },
   "profiles": {
+    "Customers.Hosts.WebApi": {
+      "commandName": "Project"
+    },
     "IIS Express": {
       "commandName": "IISExpress",
       "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
-    },
-    "Customers.Hosts.WebApi": {
-      "commandName": "Project"
     }
   }
 }

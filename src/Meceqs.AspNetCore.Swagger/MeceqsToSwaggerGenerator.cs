@@ -6,7 +6,7 @@ using Meceqs.AspNetCore.Configuration;
 using Meceqs.AspNetCore.Receiving;
 using Meceqs.Transport;
 using Microsoft.AspNetCore.Hosting;
-using NJsonSchema.Generation;
+using NJsonSchema;
 using NSwag;
 using NSwag.SwaggerGeneration;
 
@@ -52,7 +52,7 @@ namespace Meceqs.AspNetCore.Swagger
 
             foreach (var messageType in _options.MessageTypes)
             {
-                await AddMessageType(document, messageType, swaggerGenerator);
+                await AddMessageType(messageType, document, schemaResolver, swaggerGenerator);
             }
 
             AppendRequiredSchemasToDefinitions(document, schemaResolver);
@@ -61,7 +61,11 @@ namespace Meceqs.AspNetCore.Swagger
             return document;
         }
 
-        private async Task AddMessageType(SwaggerDocument document, MessageMetadata messageType, SwaggerGenerator swaggerGenerator)
+        private async Task AddMessageType(
+            MessageMetadata messageType,
+            SwaggerDocument document,
+            SwaggerSchemaResolver schemaResolver,
+            SwaggerGenerator swaggerGenerator)
         {
             string path = _messagePathConvention.GetPathForMessage(messageType.MessageType);
             var operationDescription = new SwaggerOperationDescription
@@ -76,21 +80,16 @@ namespace Meceqs.AspNetCore.Swagger
 
             // Body Parameters
 
-            var envelopeType = typeof(Envelope<>).MakeGenericType(messageType.MessageType);
-
-            var typeDescription = JsonObjectTypeDescription.FromType(
-                envelopeType,
-                _settings.ResolveContract(envelopeType),
-                Enumerable.Empty<Attribute>(),
-                _settings.DefaultEnumHandling);
-
             var parameter = new SwaggerParameter
             {
-                Name = "envelope",
+                Name = "message",
                 Kind = SwaggerParameterKind.Body,
                 IsRequired = true,
                 IsNullableRaw = false,
-                Schema = await swaggerGenerator.GenerateAndAppendSchemaFromTypeAsync(envelopeType, false, Enumerable.Empty<Attribute>())
+                Schema = await _schemaGenerator.GenerateWithReference<JsonSchema4>(
+                    messageType.MessageType,
+                    Enumerable.Empty<Attribute>(),
+                    schemaResolver)
             };
 
             operationDescription.Operation.Parameters.Add(parameter);
@@ -102,7 +101,10 @@ namespace Meceqs.AspNetCore.Swagger
             {
                 response = new SwaggerResponse
                 {
-                    Schema = await swaggerGenerator.GenerateAndAppendSchemaFromTypeAsync(messageType.ResultType, false, Enumerable.Empty<Attribute>())
+                    Schema = await _schemaGenerator.GenerateWithReference<JsonSchema4>(
+                        messageType.ResultType,
+                        Enumerable.Empty<Attribute>(),
+                        schemaResolver)
                 };
             }
             else
@@ -112,7 +114,7 @@ namespace Meceqs.AspNetCore.Swagger
 
             operationDescription.Operation.Responses.Add("200", response);
 
-            document.Paths[operationDescription.Path] = new SwaggerOperations();
+            document.Paths[operationDescription.Path] = new SwaggerPathItem();
             document.Paths[operationDescription.Path][operationDescription.Method] = operationDescription.Operation;
         }
 

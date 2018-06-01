@@ -15,7 +15,12 @@ namespace Customers.Hosts.WebApi
     {
         public static void Main(string[] args)
         {
-            var host = WebHost.CreateDefaultBuilder()
+            CreateWebHostBuilder(args).Build().Run();
+        }
+
+        public static IWebHostBuilder CreateWebHostBuilder(string[] args)
+        {
+            return WebHost.CreateDefaultBuilder()
                 .UseUrls(SampleConfiguration.CustomersWebApiUrl)
                 .ConfigureServices(services =>
                 {
@@ -85,10 +90,7 @@ namespace Customers.Hosts.WebApi
                 {
                     app.UseDeveloperExceptionPage();
                     app.UseAspNetCoreReceiverWithSwagger();
-                })
-                .Build();
-
-            host.Run();
+                });
         }
     }
 }
