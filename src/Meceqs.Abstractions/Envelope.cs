@@ -68,11 +68,6 @@ namespace Meceqs
         /// </summary>
         public EnvelopeProperties Headers { get; set; } = new EnvelopeProperties();
 
-        /// <summary>
-        /// Contains a list of all endpoints that processed the message for tracing-scenarios.
-        /// </summary>
-        public List<EnvelopeHistoryEntry> History { get; set; } = new List<EnvelopeHistoryEntry>(); // TODO @cweiss Remove in favor of OpenTracing?
-
         protected Envelope()
         {
         }

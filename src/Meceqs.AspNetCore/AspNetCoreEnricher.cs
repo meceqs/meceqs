@@ -1,4 +1,3 @@
-using System;
 using System.Threading;
 using Meceqs.Pipeline;
 using Microsoft.AspNetCore.Http;
@@ -32,8 +31,6 @@ namespace Meceqs.AspNetCore
             AttachToHttpContext(context, httpContext);
 
             AddRemoteUserHeaders(context, httpContext);
-
-            AddHistoryEntry(context, httpContext);
         }
 
         private void AttachToHttpContext(MessageContext messageContext, HttpContext httpContext)
@@ -81,25 +78,6 @@ namespace Meceqs.AspNetCore
                     messageContext.Envelope.Headers.Add(_options.RemoteUserAgentHeaderName, userAgent.ToString());
                 }
             }
-        }
-
-        private void AddHistoryEntry(MessageContext messageContext, HttpContext httpContext)
-        {
-            var historyEntry = new EnvelopeHistoryEntry
-            {
-                Pipeline = messageContext.PipelineName,
-                Host = _options.HostName,
-                Endpoint = _options.EndpointName,
-                CreatedOnUtc = DateTime.UtcNow
-            };
-
-            if (httpContext != null)
-            {
-                historyEntry.Properties.Add(_options.HistoryPropertyRequestId, httpContext.TraceIdentifier);
-                historyEntry.Properties.Add(_options.HistoryPropertyRequestPath, httpContext.Request.Path.Value);
-            }
-
-            messageContext.Envelope.History.Add(historyEntry);
         }
     }
 }
