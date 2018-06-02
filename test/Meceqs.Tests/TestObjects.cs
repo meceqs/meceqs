@@ -1,7 +1,6 @@
 using System;
 using Meceqs.Pipeline;
 using Meceqs.Sending;
-using Meceqs.TypedHandling;
 using NSubstitute;
 
 namespace Meceqs.Tests
@@ -21,24 +20,13 @@ namespace Meceqs.Tests
             return (Envelope<TMessage>)EnvelopeFactory().Create(message, id ?? Guid.NewGuid());
         }
 
-        public static MessageContext<TMessage> MessageContext<TMessage>(Type resultType = null, IServiceProvider requestServices = null)
+        public static MessageContext MessageContext<TMessage>(Type resultType = null, IServiceProvider requestServices = null)
             where TMessage : class, new()
         {
-            var envelope = TestObjects.Envelope<TMessage>();
+            var envelope = Envelope<TMessage>();
             requestServices = requestServices ?? Substitute.For<IServiceProvider>();
 
-            var messageContext = new MessageContext<TMessage>(envelope);
-            messageContext.Initialize("pipeline", requestServices, resultType ?? typeof(void));
-
-            return messageContext;
-        }
-
-        public static HandleContext<TMessage> HandleContext<TMessage>(Type resultType, MessageContext<TMessage> messageContext = null)
-            where TMessage : class, new()
-        {
-            messageContext = messageContext ?? MessageContext<TMessage>(resultType);
-
-            return new HandleContext<TMessage>(messageContext);
+            return new MessageContext(envelope, "pipeline", requestServices, resultType ?? typeof(void));
         }
     }
 }

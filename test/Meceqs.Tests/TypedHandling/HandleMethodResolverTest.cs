@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Meceqs.TypedHandling;
@@ -144,14 +143,13 @@ namespace Meceqs.Tests.Middleware.TypedHandling
 
         private void AssertMethod(MethodInfo method, Type messageType, Type resultType)
         {
-            var handleContextType = typeof(HandleContext<>).MakeGenericType(messageType);
-
             var resultTaskType = resultType != typeof(void)
                 ? typeof(Task<>).MakeGenericType(resultType)
                 : typeof(Task);
 
             method.ShouldNotBeNull();
-            method.GetParameters().First().ParameterType.ShouldBe(handleContextType);
+            method.GetParameters()[0].ParameterType.ShouldBe(messageType);
+            method.GetParameters()[1].ParameterType.ShouldBe(typeof(HandleContext));
             method.ReturnType.ShouldBe(resultTaskType);
         }
     }

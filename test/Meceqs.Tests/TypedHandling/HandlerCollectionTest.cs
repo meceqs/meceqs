@@ -10,7 +10,7 @@ namespace Meceqs.Tests.TypedHandling
     {
         public class HandlerOne : IHandles<SimpleMessage, int>
         {
-            public Task<int> HandleAsync(HandleContext<SimpleMessage> context)
+            public Task<int> HandleAsync(SimpleMessage msg, HandleContext context)
             {
                 return Task.FromResult(0);
             }
@@ -18,7 +18,7 @@ namespace Meceqs.Tests.TypedHandling
 
         public class HandlerTwo : IHandles<SimpleMessage, int>
         {
-            public Task<int> HandleAsync(HandleContext<SimpleMessage> context)
+            public Task<int> HandleAsync(SimpleMessage msg, HandleContext context)
             {
                 return Task.FromResult(0);
             }

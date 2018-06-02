@@ -9,7 +9,6 @@ namespace Meceqs.Pipeline
     public abstract class MessageContextBuilder<TBuilder> : IMessageContextBuilder<TBuilder>
         where TBuilder : IMessageContextBuilder<TBuilder>
     {
-        private readonly IMessageContextFactory _messageContextFactory;
         private readonly IPipelineProvider _pipelineProvider;
 
         protected Envelope Envelope { get; }
@@ -38,7 +37,6 @@ namespace Meceqs.Pipeline
             Guard.NotNullOrWhiteSpace(defaultPipelineName, nameof(defaultPipelineName));
             Guard.NotNull(serviceProvider, nameof(serviceProvider));
 
-            _messageContextFactory = serviceProvider.GetRequiredService<IMessageContextFactory>();
             _pipelineProvider = serviceProvider.GetRequiredService<IPipelineProvider>();
 
             RequestServices = serviceProvider;
@@ -94,9 +92,7 @@ namespace Meceqs.Pipeline
         {
             Guard.NotNull(envelope, nameof(envelope));
 
-            var context = _messageContextFactory.CreateMessageContext(envelope);
-
-            context.Initialize(PipelineName, RequestServices, resultType ?? typeof(void));
+            var context = new MessageContext(envelope, PipelineName, RequestServices, resultType ?? typeof(void));
 
             context.Cancellation = Cancellation;
             context.User = User;

@@ -14,7 +14,7 @@ namespace Meceqs.TypedHandling
     /// </summary>
     public interface IHandles<TMessage> : IHandles where TMessage : class
     {
-        Task HandleAsync(HandleContext<TMessage> context);
+        Task HandleAsync(TMessage message, HandleContext context);
     }
 
     /// <summary>
@@ -22,6 +22,6 @@ namespace Meceqs.TypedHandling
     /// </summary>
     public interface IHandles<TMessage, TResult> : IHandles where TMessage : class
     {
-        Task<TResult> HandleAsync(HandleContext<TMessage> context);
+        Task<TResult> HandleAsync(TMessage message, HandleContext context);
     }
 }

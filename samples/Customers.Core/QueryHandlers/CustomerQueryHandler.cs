@@ -24,7 +24,7 @@ namespace Customers.Core.QueryHandlers
             _customerRepository = customerRepository;
         }
 
-        public Task<FindCustomersResult> HandleAsync(HandleContext<FindCustomersQuery> context)
+        public Task<FindCustomersResult> HandleAsync(FindCustomersQuery qry, HandleContext context)
         {
             _logger.LogInformation("FindCustomers - MessageType:{MessageType} MessageId:{MessageId}",
                 context.Message.GetType(), context.Envelope.MessageId);
@@ -41,12 +41,12 @@ namespace Customers.Core.QueryHandlers
             return Task.FromResult(result);
         }
 
-        public Task<CustomerDto> HandleAsync(HandleContext<GetCustomerQuery> context)
+        public Task<CustomerDto> HandleAsync(GetCustomerQuery qry, HandleContext context)
         {
             _logger.LogInformation("GetCustomer - MessageType:{MessageType} MessageId:{MessageId}",
                 context.Message.GetType(), context.Envelope.MessageId);
 
-            var customer = _customerRepository.GetById(context.Message.CustomerId);
+            var customer = _customerRepository.GetById(qry.CustomerId);
 
             return Task.FromResult(ToDto(customer));
         }

@@ -69,7 +69,7 @@ namespace Meceqs.AspNetCore.Receiving
             foreach (var metadata in _options.MessageTypes)
             {
                 var path = messagePathConvention.GetPathForMessage(metadata.MessageType);
-                path = "/" + path.TrimStart('/');
+                path = AspNetCoreReceiverUtils.CombineRoutePrefixAndMessagePath(_options.RoutePrefix, path);
 
                 lookup.Add(path, metadata);
             }

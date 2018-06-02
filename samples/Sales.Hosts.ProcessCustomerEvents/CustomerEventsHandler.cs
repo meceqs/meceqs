@@ -15,10 +15,8 @@ namespace Sales.Hosts.ProcessCustomerEvents
             _logger = loggerFactory.CreateLogger<CustomerEventsHandler>();
         }
 
-        public Task HandleAsync(HandleContext<CustomerCreatedEvent> context)
+        public Task HandleAsync(CustomerCreatedEvent msg, HandleContext context)
         {
-            var msg = context.Message;
-
             _logger.LogInformation("Customer created: {CustomerId} - {FirstName} {LastName}",
                 msg.CustomerId, msg.FirstName, msg.LastName);
 

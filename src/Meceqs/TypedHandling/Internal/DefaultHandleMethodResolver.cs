@@ -34,7 +34,7 @@ namespace Meceqs.TypedHandling.Internal
                     where mi.ReturnType == (result == typeof(void) ? typeof(Task) : typeof(Task<>).MakeGenericType(result))
                     let parameter = mi.GetParameters().FirstOrDefault()
                     where parameter != null
-                    where parameter.ParameterType == typeof(HandleContext<>).MakeGenericType(message)
+                    where parameter.ParameterType == message
                     select mi;
 
                 return query.FirstOrDefault();

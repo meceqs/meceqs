@@ -5,7 +5,6 @@ using Meceqs.AspNetCore.Configuration;
 using Meceqs.AspNetCore.Hosting;
 using Meceqs.AspNetCore.Receiving;
 using Meceqs.Configuration;
-using Meceqs.Hosting;
 using Meceqs.Pipeline;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;

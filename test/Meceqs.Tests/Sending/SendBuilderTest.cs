@@ -19,7 +19,6 @@ namespace Meceqs.Tests.Sending
             var serviceProvider = Substitute.For<IServiceProvider>();
 
             serviceProvider.GetService(typeof(IEnvelopeFactory)).Returns(new DefaultEnvelopeFactory());
-            serviceProvider.GetService(typeof(IMessageContextFactory)).Returns(new DefaultMessageContextFactory());
 
             serviceProvider.GetService(typeof(IEnvelopeCorrelator)).Returns(correlator ?? Substitute.For<IEnvelopeCorrelator>());
 

@@ -17,7 +17,7 @@ namespace Meceqs.Transport
 
         private Action<TTransportReceiverOptions> _receiverOptions;
 
-        private string _pipelineName = MeceqsDefaults.ReceivePipelineName;
+        private string _pipelineName;
         private Action<IPipelineBuilder> _pipeline;
 
         /// <summary>
@@ -41,6 +41,18 @@ namespace Meceqs.Transport
         public IEnumerable<Assembly> GetDeserializationAssemblies() => _deserializationAssemblies;
         public Action<TTransportReceiverOptions> GetReceiverOptions() => _receiverOptions;
         public string GetPipelineName() => _pipelineName;
+
+        protected TransportReceiverBuilder()
+        {
+            // TODO @cweiss Enable once we have a way to pass the pipeline name to underlying services (e.g. Middleware)
+            //string friendlyReceiverName = GetType().Name;
+            //if (friendlyReceiverName.EndsWith("Builder"))
+            //{
+            //    friendlyReceiverName.Substring(0, friendlyReceiverName.Length - "Builder".Length);
+            //}
+            //_pipelineName = friendlyReceiverName;
+            _pipelineName = MeceqsDefaults.ReceivePipelineName;
+        }
 
         public Action<IPipelineBuilder> GetPipeline()
         {
@@ -80,6 +92,15 @@ namespace Meceqs.Transport
                 _deserializationAssemblies.Add(messageType.GetTypeInfo().Assembly);
             }
 
+            return Instance;
+        }
+
+        public TTransportReceiverBuilder ConfigureOptions(Action<TTransportReceiverOptions> options)
+        {
+            if (options != null)
+            {
+                _receiverOptions += options;
+            }
             return Instance;
         }
 

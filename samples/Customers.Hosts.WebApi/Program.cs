@@ -1,4 +1,3 @@
-using System.IO;
 using Customers.Core.Repositories;
 using Customers.Core.CommandHandlers;
 using Customers.Hosts.WebApi.Infrastructure;
@@ -8,11 +7,15 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using SampleConfig;
 using Meceqs.AzureEventHubs.Sending;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace Customers.Hosts.WebApi
 {
     public class Program
     {
+        private const string ApiVersion = "v1";
+        private const string ApiName = "Customers API";
+
         public static void Main(string[] args)
         {
             CreateWebHostBuilder(args).Build().Run();
@@ -26,6 +29,21 @@ namespace Customers.Hosts.WebApi
                 {
                     // Customers.Core
                     services.AddSingleton<ICustomerRepository, InMemoryCustomerRepository>();
+
+                    // MVC (Only required if you need your own controllers/pages)
+                    services.AddMvc();
+
+                    services.AddSwaggerGen(options =>
+                    {
+                        // This registers all handlers that have been added to the AspNetCoreReceiver
+                        options.AddMeceqs();
+
+                        options.SwaggerDoc(ApiVersion, new Info
+                        {
+                            Title = ApiName,
+                            Version = ApiVersion
+                        });
+                    });
                 })
                 .ConfigureMeceqs(meceqs =>
                 {
@@ -39,14 +57,13 @@ namespace Customers.Hosts.WebApi
 
                     meceqs
 
-                        // The Web API will process incoming requests.
+                        // The Web API will process incoming requests
                         .AddAspNetCoreReceiver(receiver =>
                         {
-                            // Throwing an exception is the default behavior.
-                            // We could also skip unknown message types but this doesn't make much sense
-                            // for a Web API.
-                            receiver.ThrowOnUnknownMessage();
+                            // Add a "/v1/" prefix to all message routes
+                            receiver.UseRoutePrefix("/" + ApiVersion);
 
+                            // Process messages with `IHandles<...>`-implementations.
                             receiver.UseTypedHandling(options =>
                             {
                                 // In this example, the context only handles messages from this Web API
@@ -89,7 +106,21 @@ namespace Customers.Hosts.WebApi
                 .Configure(app =>
                 {
                     app.UseDeveloperExceptionPage();
-                    app.UseAspNetCoreReceiverWithSwagger();
+
+                    app.UseMeceqs();
+
+                    // MVC (Only required if you need your own controllers/pages)
+                    app.UseMvc();
+
+                    // Swagger
+                    app.UseSwagger(options =>
+                    {
+                        options.RouteTemplate = "/swagger/{documentName}/swagger.json";
+                    });
+                    app.UseSwaggerUI(options =>
+                    {
+                        options.SwaggerEndpoint($"{ApiVersion}/swagger.json", $"{ApiName} - {ApiVersion}");
+                    });
                 });
         }
     }

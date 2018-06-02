@@ -16,14 +16,14 @@ namespace Meceqs.TypedHandling.Internal
     public class DefaultHandlerInvoker : IHandlerInvoker
     {
         // CacheKey: MessageType/ResultType
-        private readonly ConcurrentDictionary<Tuple<Type, Type>, Func<IHandles, HandleContext, Task>> _cachedHandleDelegates;
+        private readonly ConcurrentDictionary<Tuple<Type, Type>, Func<IHandles, object, HandleContext, Task>> _cachedHandleDelegates;
 
         // CacheKey: ResultType
         private readonly ConcurrentDictionary<Type, Func<Task, object>> _cachedTaskResultGetterDelegates;
 
         public DefaultHandlerInvoker()
         {
-            _cachedHandleDelegates = new ConcurrentDictionary<Tuple<Type, Type>, Func<IHandles, HandleContext, Task>>();
+            _cachedHandleDelegates = new ConcurrentDictionary<Tuple<Type, Type>, Func<IHandles, object, HandleContext, Task>>();
             _cachedTaskResultGetterDelegates = new ConcurrentDictionary<Type, Func<Task, object>>();
         }
 
@@ -34,11 +34,11 @@ namespace Meceqs.TypedHandling.Internal
             Type messageType = context.Message.GetType();
             Type resultType = context.MessageContext.ExpectedResultType;
 
-            Func<IHandles, HandleContext, Task> handleDelegate = GetOrAddHandleDelegate(messageType, resultType);
+            Func<IHandles, object, HandleContext, Task> handleDelegate = GetOrAddHandleDelegate(messageType, resultType);
 
             // Invoke Method
             // (this throws an InvalidCastOperationException, if the handler does not have the correct types)
-            Task resultTask = handleDelegate(context.Handler, context);
+            Task resultTask = handleDelegate(context.Handler, context.Message, context);
 
             await resultTask;
 
@@ -50,11 +50,11 @@ namespace Meceqs.TypedHandling.Internal
             }
         }
 
-        private Func<IHandles, HandleContext, Task> GetOrAddHandleDelegate(Type messageType, Type resultType)
+        private Func<IHandles, object, HandleContext, Task> GetOrAddHandleDelegate(Type messageType, Type resultType)
         {
             var cacheKey = Tuple.Create(messageType, resultType);
 
-            Func<IHandles, HandleContext, Task> handleDelegate = _cachedHandleDelegates.GetOrAdd(cacheKey, x =>
+            Func<IHandles, object, HandleContext, Task> handleDelegate = _cachedHandleDelegates.GetOrAdd(cacheKey, x =>
             {
                 // resolve correct type based on whether there should be a result.
                 Type typedHandlerType = x.Item2 != typeof(void)
@@ -65,26 +65,25 @@ namespace Meceqs.TypedHandling.Internal
                 // otherwise the method has unresolved generic types.
                 MethodInfo typedHandleMethod = typedHandlerType.GetTypeInfo().GetDeclaredMethod("HandleAsync");
 
-                // resolve generic types on parameters
-                Type typedHandleContextType = typeof(HandleContext<>).MakeGenericType(x.Item1);
-
                 // Create expression
 
                 // Declaration of the object on which the method should be called
                 var instance = Expression.Parameter(typeof(IHandles), "instance");
 
                 // Declaration of the parameters that should be passed to the call
+                var messageArg = Expression.Parameter(typeof(object), "message");
                 var contextArg = Expression.Parameter(typeof(HandleContext), "handleContext");
 
                 // // Declaration of the actual method call
                 var methodCall = Expression.Call(
                     Expression.Convert(instance, typedHandlerType),
                     typedHandleMethod,
-                    Expression.Convert(contextArg, typedHandleContextType));
+                    Expression.Convert(messageArg, messageType),
+                    contextArg);
 
                 // Compiles declaration into actual delegate
-                var typedDelegate = Expression.Lambda<Func<IHandles, HandleContext, Task>>(
-                    Expression.Convert(methodCall, typeof(Task)), instance, contextArg
+                var typedDelegate = Expression.Lambda<Func<IHandles, object, HandleContext, Task>>(
+                    Expression.Convert(methodCall, typeof(Task)), instance, messageArg, contextArg
                 ).Compile();
 
                 return typedDelegate;

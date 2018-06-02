@@ -13,7 +13,7 @@ namespace Meceqs.Tests.Middleware.TypedHandling
             _result = result ?? 0;
         }
 
-        public Task<int> HandleAsync(HandleContext<SimpleMessage> context)
+        public Task<int> HandleAsync(SimpleMessage msg, HandleContext context)
         {
             return Task.FromResult(_result);
         }
@@ -28,7 +28,7 @@ namespace Meceqs.Tests.Middleware.TypedHandling
             _result = result;
         }
 
-        public Task<SimpleResult> HandleAsync(HandleContext<SimpleMessage> context)
+        public Task<SimpleResult> HandleAsync(SimpleMessage msg, HandleContext context)
         {
             return Task.FromResult(_result);
         }
@@ -43,7 +43,7 @@ namespace Meceqs.Tests.Middleware.TypedHandling
             _callback = callback;
         }
 
-        public Task HandleAsync(HandleContext<SimpleMessage> context)
+        public Task HandleAsync(SimpleMessage msg, HandleContext context)
         {
             _callback?.Invoke();
 
@@ -63,19 +63,19 @@ namespace Meceqs.Tests.Middleware.TypedHandling
             _callback = callback;
         }
 
-        public Task HandleAsync(HandleContext<SimpleMessage> context)
+        public Task HandleAsync(SimpleMessage msg, HandleContext context)
         {
             _callback?.Invoke("SimpleMessage/NoResult");
             return Task.CompletedTask;
         }
 
-        public Task<SimpleResult> HandleAsync(HandleContext<SimpleCommand> context)
+        public Task<SimpleResult> HandleAsync(SimpleCommand msg, HandleContext context)
         {
             _callback?.Invoke("SimpleCommand/SimpleResult");
             return Task.FromResult(new SimpleResult { Text = "result" });
         }
 
-        public Task<int> HandleAsync(HandleContext<SimpleEvent> context)
+        public Task<int> HandleAsync(SimpleEvent msg, HandleContext context)
         {
             _callback?.Invoke("SimpleEvent/int");
             return Task.FromResult(1);

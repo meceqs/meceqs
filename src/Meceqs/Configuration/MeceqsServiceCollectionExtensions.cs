@@ -53,7 +53,6 @@ namespace Microsoft.Extensions.DependencyInjection
 
         private static void AddPipeline(IServiceCollection services)
         {
-            services.TryAddSingleton<IMessageContextFactory, DefaultMessageContextFactory>();
             services.TryAddSingleton<IPipelineProvider, DefaultPipelineProvider>();
 
             // Every pipeline that should be built must get its own builder.
@@ -85,7 +84,6 @@ namespace Microsoft.Extensions.DependencyInjection
 
         public static void AddTypedHandling(IServiceCollection services)
         {
-            services.TryAddSingleton<IHandleContextFactory, DefaultHandleContextFactory>();
             services.TryAddSingleton<IHandleMethodResolver, DefaultHandleMethodResolver>();
             services.TryAddSingleton<IHandlerInvoker, DefaultHandlerInvoker>();
         }

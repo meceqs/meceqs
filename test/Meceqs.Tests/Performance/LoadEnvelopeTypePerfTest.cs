@@ -7,7 +7,7 @@ using Xunit;
 namespace Meceqs.Tests.Performance
 {
     [SuppressMessage("xUnit", "xUnit1000", Justification = "Make class public to actually run it.")]
-    internal class LoadEnvelopeTypePerfTest
+    public class LoadEnvelopeTypePerfTest
     {
         private void RunTimed(string message, int loopCount, Action action)
         {

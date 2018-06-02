@@ -8,7 +8,7 @@ using Xunit;
 namespace Meceqs.Tests.Performance
 {
     [SuppressMessage("xUnit", "xUnit1000", Justification = "Make class public to actually run it.")]
-    internal class TypedMethodOnExistingObjectPerfTest
+    public class TypedMethodOnExistingObjectPerfTest
     {
         public class BrokeredMessage
         {

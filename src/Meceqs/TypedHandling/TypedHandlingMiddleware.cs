@@ -13,7 +13,6 @@ namespace Meceqs.TypedHandling
     public class TypedHandlingMiddleware
     {
         private readonly TypedHandlingOptions _options;
-        private readonly IHandleContextFactory _handleContextFactory;
         private readonly IHandleMethodResolver _handleMethodResolver;
         private readonly ILogger _logger;
 
@@ -23,7 +22,6 @@ namespace Meceqs.TypedHandling
         public TypedHandlingMiddleware(
             MiddlewareDelegate next,
             TypedHandlingOptions options,
-            IHandleContextFactory handleContextFactory,
             IHandleMethodResolver handleMethodResolver,
             IHandlerInvoker handlerInvoker,
             ILoggerFactory loggerFactory)
@@ -31,13 +29,11 @@ namespace Meceqs.TypedHandling
             // "next" is not stored because this is a terminating middleware.
 
             Guard.NotNull(options, nameof(options));
-            Guard.NotNull(handleContextFactory, nameof(handleContextFactory));
             Guard.NotNull(handleMethodResolver, nameof(handleMethodResolver));
             Guard.NotNull(handlerInvoker, nameof(handlerInvoker));
             Guard.NotNull(loggerFactory, nameof(loggerFactory));
 
             _options = options;
-            _handleContextFactory = handleContextFactory;
             _handleMethodResolver = handleMethodResolver;
             _logger = loggerFactory.CreateLogger<TypedHandlingMiddleware>();
 
@@ -114,9 +110,7 @@ namespace Meceqs.TypedHandling
                     $"did not find a Handle-method for '{handlerType}.{messageType}/{resultType}'");
             }
 
-            HandleContext handleContext = _handleContextFactory.CreateHandleContext(messageContext);
-
-            handleContext.Initialize(handler, handleMethod);
+            HandleContext handleContext = new HandleContext(messageContext, handler, handleMethod);
 
             return handleContext;
         }

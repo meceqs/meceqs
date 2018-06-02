@@ -15,10 +15,8 @@ namespace Sales.Hosts.ProcessOrders
             _logger = loggerFactory.CreateLogger<PlaceOrderCommandHandler>();
         }
 
-        public Task HandleAsync(HandleContext<PlaceOrderCommand> context)
+        public Task HandleAsync(PlaceOrderCommand cmd, HandleContext context)
         {
-            var cmd = context.Message;
-
             _logger.LogInformation(
                 "Received order from customer {CustomerId} with {ItemCount} items and a total of {TotalAmount}",
                 cmd.CustomerId,

@@ -1,5 +1,4 @@
 using System;
-using System.ComponentModel;
 using System.Reflection;
 using System.Security.Claims;
 using System.Threading;
@@ -9,46 +8,12 @@ using Meceqs.Sending;
 namespace Meceqs.TypedHandling
 {
     /// <summary>
-    /// Contains the typed envelope and metadata about the current execution.
-    /// Use <see cref="HandleContext.MessageContext"/> to access the
-    /// <see cref="MessageContext"/> of the current execution.
-    /// </summary>
-    public class HandleContext<TMessage> : HandleContext where TMessage : class
-    {
-        /// <summary>
-        /// Gets the message context of the current execution.
-        /// </summary>
-        public new MessageContext<TMessage> MessageContext => (MessageContext<TMessage>)base.MessageContext;
-
-        /// <summary>
-        /// Gets the typed envelope for which the pipeline is executed.
-        /// This is a shortcut for accessing the property on <see cref="MessageContext"/>.
-        /// </summary>
-        public new Envelope<TMessage> Envelope => MessageContext.Envelope;
-
-        /// <summary>
-        /// Gets the typed message for which the pipeline is executed.
-        /// This is a shortcut for accessing the property on <see cref="MessageContext"/>.
-        /// </summary>
-        public new TMessage Message => MessageContext.Message;
-
-        public HandleContext(MessageContext<TMessage> messageContext)
-            : base(messageContext)
-        {
-        }
-    }
-
-    /// <summary>
     /// Contains the envelope and metadata about the current execution.
-    /// Use <see cref="HandleContext.MessageContext"/> to access the
-    /// <see cref="MessageContext"/> of the current execution.
+    /// Use <see cref="MessageContext"/> to access the
+    /// <see cref="Pipeline.MessageContext"/> of the current execution.
     /// </summary>
-    public abstract class HandleContext
+    public class HandleContext
     {
-        private bool _initialized;
-        private IHandles _handler;
-        private MethodInfo _handleMethod;
-
         /// <summary>
         /// Gets the message context of the current execution.
         /// </summary>
@@ -57,14 +22,7 @@ namespace Meceqs.TypedHandling
         /// <summary>
         /// Gets the handler which processes the envelope/message.
         /// </summary>
-        public IHandles Handler
-        {
-            get
-            {
-                EnsureInitialized();
-                return _handler;
-            }
-        }
+        public IHandles Handler { get; }
 
         /// <summary>
         /// Gets the type of the handler which processes the envelope/message.
@@ -76,14 +34,7 @@ namespace Meceqs.TypedHandling
         /// Gets the "HandleAsync" method which processes the envelope/message.
         /// This can be used to read custom attributes of that method - e.g. by an interceptor.
         /// </summary>
-        public MethodInfo HandleMethod
-        {
-            get
-            {
-                EnsureInitialized();
-                return _handleMethod;
-            }
-        }
+        public MethodInfo HandleMethod { get; }
 
         #region MessageContext Shortcuts
 
@@ -142,33 +93,15 @@ namespace Meceqs.TypedHandling
         /// </summary>
         public IMessageSender MessageSender => (IMessageSender)MessageContext.RequestServices.GetService(typeof(IMessageSender));
 
-        protected HandleContext(MessageContext messageContext)
+        public HandleContext(MessageContext messageContext, IHandles handler, MethodInfo handleMethod)
         {
             Guard.NotNull(messageContext, nameof(messageContext));
-
-            MessageContext = messageContext;
-        }
-
-        /// <summary>
-        /// Brings the context into a valid state before the first interceptor/handler is invoked.
-        /// </summary>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public void Initialize(IHandles handler, MethodInfo handleMethod)
-        {
             Guard.NotNull(handler, nameof(handler));
             Guard.NotNull(handleMethod, nameof(handleMethod));
 
-            _handler = handler;
-            _handleMethod = handleMethod;
-            _initialized = true;
-        }
-
-        private void EnsureInitialized()
-        {
-            if (!_initialized)
-            {
-                throw new InvalidOperationException($"'{nameof(Initialize)}' has not been called.");
-            }
+            MessageContext = messageContext;
+            Handler = handler;
+            HandleMethod = handleMethod;
         }
     }
 }

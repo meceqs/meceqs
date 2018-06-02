@@ -1,40 +1,14 @@
 using System;
-using System.ComponentModel;
 using System.Security.Claims;
 using System.Threading;
 
 namespace Meceqs.Pipeline
 {
     /// <summary>
-    /// Contains the strongly typed envelope and metadata about the current execution.
-    /// </summary>
-    public class MessageContext<TMessage> : MessageContext where TMessage : class
-    {
-        /// <summary>
-        /// Gets the envelope for which the pipeline is executed.
-        /// </summary>
-        public new Envelope<TMessage> Envelope => (Envelope<TMessage>)base.Envelope;
-
-        /// <summary>
-        /// Gets the message for which the pipeline is executed. This is a shortcut for <see cref="Envelope.Message"/>.
-        /// </summary>
-        public new TMessage Message => (TMessage)base.Message;
-
-        public MessageContext(Envelope<TMessage> envelope)
-            : base(envelope)
-        {
-        }
-    }
-
-    /// <summary>
     /// Contains the envelope and metadata about the current execution.
     /// </summary>
-    public abstract class MessageContext
+    public class MessageContext
     {
-        private bool _initialized;
-        private string _pipelineName;
-        private IServiceProvider _requestServices;
-        private Type _expectedResultType;
         private MessageContextItems _messageContextItems;
 
         /// <summary>
@@ -55,38 +29,17 @@ namespace Meceqs.Pipeline
         /// <summary>
         /// Gets the name of the pipeline on which the current middleware is executed.
         /// </summary>
-        public string PipelineName
-        {
-            get
-            {
-                EnsureInitialized();
-                return _pipelineName;
-            }
-        }
+        public string PipelineName { get; }
 
         /// <summary>
         /// Gets the service provider for the current execution.
         /// </summary>
-        public IServiceProvider RequestServices
-        {
-            get
-            {
-                EnsureInitialized();
-                return _requestServices;
-            }
-        }
+        public IServiceProvider RequestServices { get; }
 
         /// <summary>
         /// Gets the type of the result expected by the caller.
         /// </summary>
-        public Type ExpectedResultType
-        {
-            get
-            {
-                EnsureInitialized();
-                return _expectedResultType;
-            }
-        }
+        public Type ExpectedResultType { get; }
 
         /// <summary>
         /// Gets or sets the result of the current execution. This object must match the type of <see cref="ExpectedResultType"/>
@@ -115,35 +68,17 @@ namespace Meceqs.Pipeline
         /// </summary>
         public ClaimsPrincipal User { get; set; }
 
-        protected MessageContext(Envelope envelope)
+        public MessageContext(Envelope envelope, string pipelineName, IServiceProvider requestServices, Type expectedResultType)
         {
             Guard.NotNull(envelope, nameof(envelope));
-
-            Envelope = envelope;
-        }
-
-        /// <summary>
-        /// Brings the context into a valid state before the pipeline is invoked.
-        /// </summary>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public void Initialize(string pipelineName, IServiceProvider requestServices, Type expectedResultType)
-        {
             Guard.NotNullOrWhiteSpace(pipelineName, nameof(pipelineName));
             Guard.NotNull(requestServices, nameof(requestServices));
             Guard.NotNull(expectedResultType, nameof(expectedResultType));
 
-            _pipelineName = pipelineName;
-            _requestServices = requestServices;
-            _expectedResultType = expectedResultType;
-            _initialized = true;
-        }
-
-        private void EnsureInitialized()
-        {
-            if (!_initialized)
-            {
-                throw new InvalidOperationException($"'{nameof(Initialize)}' has not been called.");
-            }
+            Envelope = envelope;
+            PipelineName = pipelineName;
+            RequestServices = requestServices;
+            ExpectedResultType = expectedResultType;
         }
     }
 }

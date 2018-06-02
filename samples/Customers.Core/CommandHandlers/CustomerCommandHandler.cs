@@ -28,13 +28,11 @@ namespace Customers.Core.CommandHandlers
         }
 
         [CustomLogic /* this attribute can be read by an IHandleInterceptor */]
-        public async Task<CreateCustomerResult> HandleAsync(HandleContext<CreateCustomerCommand> context)
+        public async Task<CreateCustomerResult> HandleAsync(CreateCustomerCommand cmd, HandleContext context)
         {
             _logger.LogInformation("MessageType:{MessageType} MessageId:{MessageId}", context.Message.GetType(), context.Envelope.MessageId);
 
             _logger.LogInformation("Envelope:{Envelope}", JsonConvert.SerializeObject(context.Envelope));
-
-            var cmd = context.Message;
 
             var customer = new Customer(cmd.FirstName, cmd.LastName);
 
@@ -45,11 +43,9 @@ namespace Customers.Core.CommandHandlers
             return new CreateCustomerResult { CustomerId = customer.Id };
         }
 
-        public async Task HandleAsync(HandleContext<ChangeNameCommand> context)
+        public async Task HandleAsync(ChangeNameCommand cmd, HandleContext context)
         {
             _logger.LogInformation("Envelope:{Envelope}", JsonConvert.SerializeObject(context.Envelope));
-
-            var cmd = context.Message;
 
             var customer = _customerRepository.GetById(cmd.CustomerId);
             if (customer == null)

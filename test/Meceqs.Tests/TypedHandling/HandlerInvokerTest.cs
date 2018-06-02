@@ -18,14 +18,12 @@ namespace Meceqs.Tests.Middleware.TypedHandling
         private HandleContext GetHandleContext<TMessage>(Type resultType, IHandles handler)
             where TMessage : class, new()
         {
-            var context = TestObjects.HandleContext<SimpleMessage>(resultType);
+            var messageContext = TestObjects.MessageContext<SimpleMessage>(resultType);
 
             var handleMethodResolver = new DefaultHandleMethodResolver();
             MethodInfo handleMethod = handleMethodResolver.GetHandleMethod(handler.GetType(), typeof(TMessage), resultType);
 
-            context.Initialize(handler, handleMethod);
-
-            return context;
+            return new HandleContext(messageContext, handler, handleMethod);
         }
 
         [Fact]
