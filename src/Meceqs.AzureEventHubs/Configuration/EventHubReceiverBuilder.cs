@@ -1,5 +1,6 @@
 using Meceqs.AzureEventHubs.Receiving;
 using Meceqs.Transport;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Meceqs.AzureEventHubs.Configuration
 {

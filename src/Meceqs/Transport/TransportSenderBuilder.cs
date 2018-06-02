@@ -1,67 +1,46 @@
 using System;
-using Meceqs.Configuration;
 using Meceqs.Pipeline;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Meceqs.Transport
 {
     public abstract class TransportSenderBuilder<TTransportSenderBuilder, TTransportSenderOptions>
-        : ITransportSenderBuilder<TTransportSenderBuilder>
-        where TTransportSenderBuilder : ITransportSenderBuilder<TTransportSenderBuilder>
+        : ITransportSenderBuilder<TTransportSenderBuilder, TTransportSenderOptions>
+        where TTransportSenderBuilder : ITransportSenderBuilder<TTransportSenderBuilder, TTransportSenderOptions>
         where TTransportSenderOptions : TransportSenderOptions
     {
-        private string _pipelineName = MeceqsDefaults.SendPipelineName;
-        private Action<PipelineOptions> _pipeline;
+        public string PipelineName { get; }
 
-        /// <summary>
-        /// Allows derived classes to modify the user-defined pipeline by adding additional
-        /// middleware components at the beginning.
-        /// </summary>
-        protected Action<PipelineOptions> PipelineStartHook { get; set; }
+        public IServiceCollection Services { get; }
 
-        /// <summary>
-        /// Allows derived classes to modify the user-defined pipeline by adding additional
-        /// middleware components at the end.
-        /// </summary>
-        protected Action<PipelineOptions> PipelineEndHook { get; set; }
-
-        protected Action<TTransportSenderOptions> SenderOptions { get; set; }
-
-        /// <summary>
-        /// This property is only necessary to support the builder pattern with
-        /// the generic arguments from this type.
-        /// </summary>
+        /// <inheritdoc/>
         public abstract TTransportSenderBuilder Instance { get; }
 
-        public Action<TTransportSenderOptions> GetSenderOptions() => SenderOptions;
-        public string GetPipelineName() => _pipelineName;
-
-        public Action<PipelineOptions> GetPipeline()
+        protected TransportSenderBuilder(IServiceCollection services, string pipelineName)
         {
-            var pipeline = PipelineStartHook + _pipeline + PipelineEndHook;
-
-            if (pipeline == null)
-            {
-                throw new MeceqsException(
-                    $"No pipeline was configured. Configure a custom pipeline " +
-                    $"by calling '{nameof(ConfigurePipeline)}'.");
-            }
-
-            return pipeline;
-        }
-
-        public TTransportSenderBuilder SetPipelineName(string pipelineName)
-        {
+            Guard.NotNull(services, nameof(services));
             Guard.NotNullOrWhiteSpace(pipelineName, nameof(pipelineName));
 
-            _pipelineName = pipelineName;
+            Services = services;
+            PipelineName = pipelineName;
+        }
+
+        public TTransportSenderBuilder Configure(Action<TTransportSenderOptions> options)
+        {
+            if (options != null)
+            {
+                Services.Configure(PipelineName, options);
+            }
+
             return Instance;
         }
 
         public TTransportSenderBuilder ConfigurePipeline(Action<PipelineOptions> pipeline)
         {
-            Guard.NotNull(pipeline, nameof(pipeline));
-
-            _pipeline = pipeline;
+            if (pipeline != null)
+            {
+                Services.Configure(PipelineName, pipeline);
+            }
             return Instance;
         }
     }

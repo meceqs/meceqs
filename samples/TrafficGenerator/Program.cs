@@ -55,18 +55,16 @@ namespace TrafficGenerator
                         builder
                             .AddHttpSender(sender =>
                             {
-                                sender.AddEndpoint("Customers", options =>
-                                {
-                                    options.BaseAddress = SampleConfiguration.CustomersWebApiUrl + "v1/";
+                                sender.SetBaseAddress(SampleConfiguration.CustomersWebApiUrl + "v1/");
 
-                                    // Write your own extension method if you have a base class for alle messages
-                                    options.AddMessagesFromAssembly<CreateCustomerCommand>(t => t.Name.EndsWith("Command") || t.Name.EndsWith("Query"));
-                                });
+                                // Write your own extension method if you have a base class for alle messages
+                                sender.AddMessagesFromAssembly<CreateCustomerCommand>(t => t.Name.EndsWith("Command") || t.Name.EndsWith("Query"));
                             })
-                            .AddServiceBusSender(sender =>
+                            .AddServiceBusSender("ServiceBus", sender =>
                             {
-                                sender.SetPipelineName("ServiceBus");
+
                             })
+
                             // send messages to a local file instead of the actual Service Bus.
                             .AddFileFakeServiceBusSender(SampleConfiguration.FileFakeServiceBusDirectory);
                     });

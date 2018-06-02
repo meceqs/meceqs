@@ -1,6 +1,6 @@
 using Meceqs.Transport;
 
-namespace Meceqs.AzureServiceBus.Configuration
+namespace Microsoft.Extensions.DependencyInjection
 {
     public interface IServiceBusReceiverBuilder : ITransportReceiverBuilder<IServiceBusReceiverBuilder>
     {

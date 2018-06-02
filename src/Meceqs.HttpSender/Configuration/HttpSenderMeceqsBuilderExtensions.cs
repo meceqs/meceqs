@@ -22,33 +22,41 @@ namespace Microsoft.Extensions.DependencyInjection
 
         public static IMeceqsBuilder AddHttpSender(this IMeceqsBuilder builder, Action<IHttpSenderBuilder> sender)
         {
-            return AddHttpSender(builder, null, sender);
+            return AddHttpSender(builder, null, null, sender);
         }
 
         public static IMeceqsBuilder AddHttpSender(
             this IMeceqsBuilder builder,
+            string pipelineName,
+            Action<IHttpSenderBuilder> sender)
+        {
+            return AddHttpSender(builder, pipelineName, null, sender);
+        }
+
+        public static IMeceqsBuilder AddHttpSender(
+            this IMeceqsBuilder builder,
+            string pipelineName,
             IConfiguration configuration,
-            Action<IHttpSenderBuilder> sender = null)
+            Action<IHttpSenderBuilder> sender)
         {
             Guard.NotNull(builder, nameof(builder));
 
+            pipelineName = pipelineName ?? MeceqsDefaults.SendPipelineName;
+
+            builder.AddHttpSenderServices();
+
+            // Code based options
+            var senderBuilder = new HttpSenderBuilder(builder.Services, pipelineName);
+            sender?.Invoke(senderBuilder);
+
+            // Add the HttpSenderMiddleware as the last middleware
+            senderBuilder.ConfigurePipeline(pipeline => pipeline.RunHttpSender());
+
+            // Configuration based options
             if (configuration != null)
             {
                 builder.Services.Configure<HttpSenderOptions>(configuration);
             }
-
-            var senderBuilder = new HttpSenderBuilder();
-            sender?.Invoke(senderBuilder);
-
-            builder.AddHttpSenderServices();
-
-            var senderOptions = senderBuilder.GetSenderOptions();
-            if (senderOptions != null)
-            {
-                builder.Services.Configure(senderOptions);
-            }
-
-            builder.ConfigurePipeline(senderBuilder.GetPipelineName(), senderBuilder.GetPipeline());
 
             return builder;
         }

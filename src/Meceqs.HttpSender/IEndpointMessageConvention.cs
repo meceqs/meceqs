@@ -7,6 +7,6 @@ namespace Meceqs.HttpSender
     /// </summary>
     public interface IEndpointMessageConvention
     {
-        EndpointMessage GetEndpointMessage(Type messageType);
+        string GetRelativePath(Type messageType);
     }
 }

@@ -53,7 +53,7 @@ namespace Microsoft.Extensions.DependencyInjection
         }
 
         /// <summary>
-        /// Adds an Azure Service Bus sender pipeline.
+        /// Adds an Azure Service Bus sender to the default "Send" pipeline.
         /// </summary>
         public static IMeceqsBuilder AddServiceBusSender(this IMeceqsBuilder builder, Action<IServiceBusSenderBuilder> sender)
         {
@@ -61,33 +61,41 @@ namespace Microsoft.Extensions.DependencyInjection
         }
 
         /// <summary>
-        /// Adds an Azure Service Bus sender pipeline.
+        /// Adds an Azure Service Bus sender to the given pipeline.
+        /// </summary>
+        public static IMeceqsBuilder AddServiceBusSender(this IMeceqsBuilder builder, string pipelineName, Action<IServiceBusSenderBuilder> sender)
+        {
+            return AddServiceBusSender(builder, pipelineName, null, sender);
+        }
+
+        /// <summary>
+        /// Adds an Azure Service Bus sender to the given pipeline.
         /// </summary>
         public static IMeceqsBuilder AddServiceBusSender(
             this IMeceqsBuilder builder,
+            string pipelineName,
             IConfiguration configuration,
             Action<IServiceBusSenderBuilder> sender)
         {
             Guard.NotNull(builder, nameof(builder));
             Guard.NotNull(sender, nameof(sender));
 
+            pipelineName = pipelineName ?? MeceqsDefaults.SendPipelineName;
+
+            builder.AddServiceBusServices();
+
+            // Code based options
+            var senderBuilder = new ServiceBusSenderBuilder(builder.Services, pipelineName);
+            sender?.Invoke(senderBuilder);
+
+            // Add the ServiceBusSenderMiddleware as the last middleware
+            senderBuilder.ConfigurePipeline(pipeline => pipeline.RunServiceBusSender());
+
+            // Configuration based options
             if (configuration != null)
             {
                 builder.Services.Configure<ServiceBusSenderOptions>(configuration);
             }
-
-            var senderBuilder = new ServiceBusSenderBuilder();
-            sender?.Invoke(senderBuilder);
-
-            builder.AddServiceBusServices();
-
-            var senderOptions = senderBuilder.GetSenderOptions();
-            if (senderOptions != null)
-            {
-                builder.Services.Configure(senderOptions);
-            }
-
-            builder.ConfigurePipeline(senderBuilder.GetPipelineName(), senderBuilder.GetPipeline());
 
             return builder;
         }

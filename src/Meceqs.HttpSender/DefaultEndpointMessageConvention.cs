@@ -17,20 +17,7 @@ namespace Meceqs.HttpSender
             "Query"
         };
 
-        public EndpointMessage GetEndpointMessage(Type messageType)
-        {
-            Guard.NotNull(messageType, nameof(messageType));
-
-            var endpointMessage = new EndpointMessage
-            {
-                MessageType = messageType,
-                RelativePath = GetRelativePathForMessage(messageType)
-            };
-
-            return endpointMessage;
-        }
-
-        private string GetRelativePathForMessage(Type messageType)
+        public string GetRelativePath(Type messageType)
         {
             Guard.NotNull(messageType, nameof(messageType));
 

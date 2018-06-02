@@ -1,64 +1,59 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Meceqs.Pipeline;
 using Meceqs.Serialization;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
 namespace Meceqs.HttpSender
 {
     public class HttpSenderMiddleware
     {
-        private readonly HttpSenderOptions _options;
-        private readonly IServiceProvider _serviceProvider;
-        private readonly IHttpClientProvider _httpClientProvider;
+        private readonly IOptionsMonitor<HttpSenderOptions> _optionsMonitor;
+        private readonly IHttpClientFactory _httpClientFactory;
         private readonly IHttpRequestMessageConverter _httpRequestMessageConverter;
         private readonly ISerializationProvider _serializationProvider;
 
-        private readonly Dictionary<Type, Tuple<string, EndpointMessage>> _messageMapping;
-
         public HttpSenderMiddleware(
             MiddlewareDelegate next,
-            IOptions<HttpSenderOptions> options,
-            IServiceProvider serviceProvider,
-            IHttpClientProvider httpClientProvider,
+            IOptionsMonitor<HttpSenderOptions> optionsMonitor,
+            IHttpClientFactory httpClientFactory,
             IHttpRequestMessageConverter httpRequestMessageConverter,
             ISerializationProvider serializationProvider)
         {
-            Guard.NotNull(options?.Value, nameof(options));
-            Guard.NotNull(serviceProvider, nameof(serviceProvider));
-            Guard.NotNull(httpClientProvider, nameof(httpClientProvider));
+            Guard.NotNull(optionsMonitor, nameof(optionsMonitor));
+            Guard.NotNull(httpClientFactory, nameof(httpClientFactory));
             Guard.NotNull(httpRequestMessageConverter, nameof(httpRequestMessageConverter));
             Guard.NotNull(serializationProvider, nameof(serializationProvider));
 
             // "next" is not stored because this is a terminal middleware.
-            _options = options.Value;
-            _serviceProvider = serviceProvider;
-            _httpClientProvider = httpClientProvider;
+            _optionsMonitor = optionsMonitor;
+            _httpClientFactory = httpClientFactory;
             _httpRequestMessageConverter = httpRequestMessageConverter;
             _serializationProvider = serializationProvider;
-
-            _messageMapping = BuildMessageMapping();
-
-            CreateHttpClients();
         }
 
         public async Task Invoke(MessageContext context)
         {
             Guard.NotNull(context, nameof(context));
 
-            Tuple<string, EndpointMessage> mapping;
-            if (!_messageMapping.TryGetValue(context.MessageType, out mapping))
+            string pipelineName = context.PipelineName;
+
+            var options = _optionsMonitor.Get(pipelineName);
+            var httpClient = _httpClientFactory.CreateClient("Meceqs.HttpSender." + pipelineName);
+
+            if (!options.Messages.TryGetValue(context.MessageType, out string relativePath))
             {
                 throw new InvalidOperationException($"No endpoint found for message type '{context.MessageType}'");
             }
 
-            var httpClient = _httpClientProvider.GetHttpClient(mapping.Item1);
+            if (string.IsNullOrEmpty(relativePath))
+            {
+                relativePath = options.MessageConvention.GetRelativePath(context.MessageType);
+            }
 
-            var request = _httpRequestMessageConverter.ConvertToRequestMessage(context.Envelope, mapping.Item2.RelativePath);
+            var request = _httpRequestMessageConverter.ConvertToRequestMessage(context.Envelope, relativePath);
 
             var response = await httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead, context.Cancellation);
 
@@ -74,58 +69,6 @@ namespace Meceqs.HttpSender
 
                 context.Result = serializer.Deserialize(context.ExpectedResultType, await response.Content.ReadAsStreamAsync());
             }
-        }
-
-        private Dictionary<Type, Tuple<string, EndpointMessage>> BuildMessageMapping()
-        {
-            var mapping = new Dictionary<Type, Tuple<string, EndpointMessage>>();
-
-            foreach (var endpoint in _options.Endpoints)
-            {
-                foreach (var message in endpoint.Value.Messages)
-                {
-                    mapping.Add(message.MessageType, Tuple.Create(endpoint.Key, message));
-                }
-            }
-
-            return mapping;
-        }
-
-        private void CreateHttpClients()
-        {
-            foreach (var endpoint in _options.Endpoints)
-            {
-                var endpointName = endpoint.Key;
-                var endpointOptions = endpoint.Value;
-
-                var client = CreateHttpClient(endpointOptions.DelegatingHandlers);
-
-                // trailing slash is really important:
-                // http://stackoverflow.com/questions/23438416/why-is-httpclient-baseaddress-not-working
-                client.BaseAddress = new Uri(endpointOptions.BaseAddress.TrimEnd('/') + "/");
-
-                _httpClientProvider.AddHttpClient(endpointName, client);
-            }
-        }
-
-        private HttpClient CreateHttpClient(IList<Type> delegatingHandlers)
-        {
-            // HttpClientHandler is the most-inner handler.
-            HttpMessageHandler handler = new HttpClientHandler();
-
-            // Create a chain of all configured handlers (must be created in reverse order)
-
-            foreach (var handlerType in delegatingHandlers.Reverse())
-            {
-                // This allows dependency injection on handlers.
-                var delegatingHandler = (DelegatingHandler)ActivatorUtilities.CreateInstance(_serviceProvider, handlerType);
-
-                delegatingHandler.InnerHandler = handler;
-
-                handler = delegatingHandler;
-            }
-
-            return new HttpClient(handler);
         }
     }
 }

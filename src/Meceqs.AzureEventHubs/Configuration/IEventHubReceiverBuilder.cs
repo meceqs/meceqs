@@ -1,6 +1,6 @@
 using Meceqs.Transport;
 
-namespace Meceqs.AzureEventHubs.Configuration
+namespace Microsoft.Extensions.DependencyInjection
 {
     public interface IEventHubReceiverBuilder : ITransportReceiverBuilder<IEventHubReceiverBuilder>
     {

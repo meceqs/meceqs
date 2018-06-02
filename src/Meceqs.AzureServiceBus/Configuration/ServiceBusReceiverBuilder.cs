@@ -1,4 +1,5 @@
 using Meceqs.Transport;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Meceqs.AzureServiceBus.Configuration
 {

@@ -1,4 +1,3 @@
-using System;
 using Meceqs.Transport;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -8,18 +7,12 @@ namespace Meceqs.HttpSender.Configuration
     {
         public override IHttpSenderBuilder Instance => this;
 
-        public HttpSenderBuilder()
-        {
-            PipelineEndHook = pipeline => pipeline.RunHttpSender();
-        }
+        public IHttpClientBuilder HttpClient { get; }
 
-        public IHttpSenderBuilder AddEndpoint(string endpointName, Action<EndpointOptions> options)
+        public HttpSenderBuilder(IServiceCollection services, string pipelineName)
+            : base(services, pipelineName)
         {
-            Guard.NotNullOrWhiteSpace(endpointName, nameof(endpointName));
-            Guard.NotNull(options, nameof(options));
-
-            SenderOptions += o => o.AddEndpoint(endpointName, options);
-            return this;
+            HttpClient = services.AddHttpClient("Meceqs.HttpSender." + pipelineName);
         }
     }
 }

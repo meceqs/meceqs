@@ -33,10 +33,10 @@ namespace Microsoft.Extensions.DependencyInjection
             Guard.NotNull(builder, nameof(builder));
             Guard.NotNull(receiver, nameof(receiver));
 
+            builder.AddEventHubServices();
+
             var receiverBuilder = new EventHubReceiverBuilder();
             receiver?.Invoke(receiverBuilder);
-
-            builder.AddEventHubServices();
 
             foreach (var assembly in receiverBuilder.GetDeserializationAssemblies())
             {
@@ -55,7 +55,7 @@ namespace Microsoft.Extensions.DependencyInjection
         }
 
         /// <summary>
-        /// Adds an Azure Event Hubs sender pipeline.
+        /// Adds an Azure Event Hubs sender to the default "Send" pipeline.
         /// </summary>
         public static IMeceqsBuilder AddEventHubSender(this IMeceqsBuilder builder, Action<IEventHubSenderBuilder> sender)
         {
@@ -63,33 +63,41 @@ namespace Microsoft.Extensions.DependencyInjection
         }
 
         /// <summary>
-        /// Adds an Azure Event Hubs sender pipeline.
+        /// Adds an Azure Event Hubs sender to the given pipeline.
+        /// </summary>
+        public static IMeceqsBuilder AddEventHubSender(this IMeceqsBuilder builder, string pipelineName, Action<IEventHubSenderBuilder> sender)
+        {
+            return AddEventHubSender(builder, pipelineName, null, sender);
+        }
+
+        /// <summary>
+        /// Adds an Azure Event Hubs sender to the given pipeline.
         /// </summary>
         public static IMeceqsBuilder AddEventHubSender(
             this IMeceqsBuilder builder,
+            string pipelineName,
             IConfiguration configuration,
             Action<IEventHubSenderBuilder> sender)
         {
             Guard.NotNull(builder, nameof(builder));
             Guard.NotNull(sender, nameof(sender));
 
+            pipelineName = pipelineName ?? MeceqsDefaults.SendPipelineName;
+
+            builder.AddEventHubServices();
+
+            // Code based options
+            var senderBuilder = new EventHubSenderBuilder(builder.Services, pipelineName);
+            sender?.Invoke(senderBuilder);
+
+            // Add the sender as the last middleware
+            senderBuilder.ConfigurePipeline(pipeline => pipeline.RunEventHubSender());
+
+            // Configuration based options
             if (configuration != null)
             {
                 builder.Services.Configure<EventHubSenderOptions>(configuration);
             }
-
-            var senderBuilder = new EventHubSenderBuilder();
-            sender?.Invoke(senderBuilder);
-
-            builder.AddEventHubServices();
-
-            var senderOptions = senderBuilder.GetSenderOptions();
-            if (senderOptions != null)
-            {
-                builder.Services.Configure(senderOptions);
-            }
-
-            builder.ConfigurePipeline(senderBuilder.GetPipelineName(), senderBuilder.GetPipeline());
 
             return builder;
         }

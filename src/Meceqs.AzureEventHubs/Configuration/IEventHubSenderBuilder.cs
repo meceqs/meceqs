@@ -1,8 +1,9 @@
+using Meceqs.AzureEventHubs.Sending;
 using Meceqs.Transport;
 
-namespace Meceqs.AzureEventHubs.Configuration
+namespace Microsoft.Extensions.DependencyInjection
 {
-    public interface IEventHubSenderBuilder : ITransportSenderBuilder<IEventHubSenderBuilder>
+    public interface IEventHubSenderBuilder : ITransportSenderBuilder<IEventHubSenderBuilder, EventHubSenderOptions>
     {
     }
 }

@@ -1,10 +1,10 @@
-using System;
+using Meceqs.HttpSender;
 using Meceqs.Transport;
 
-namespace Meceqs.HttpSender.Configuration
+namespace Microsoft.Extensions.DependencyInjection
 {
-    public interface IHttpSenderBuilder : ITransportSenderBuilder<IHttpSenderBuilder>
+    public interface IHttpSenderBuilder : ITransportSenderBuilder<IHttpSenderBuilder, HttpSenderOptions>
     {
-        IHttpSenderBuilder AddEndpoint(string endpointName, Action<EndpointOptions> options);
+        IHttpClientBuilder HttpClient { get; }
     }
 }

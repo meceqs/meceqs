@@ -8,9 +8,9 @@ namespace Meceqs.AzureServiceBus.Configuration
     {
         public override IServiceBusSenderBuilder Instance => this;
 
-        public ServiceBusSenderBuilder()
+        public ServiceBusSenderBuilder(IServiceCollection services, string pipelineName)
+            : base(services, pipelineName)
         {
-            PipelineEndHook = pipeline => pipeline.RunServiceBusSender();
         }
     }
 }

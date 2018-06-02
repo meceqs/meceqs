@@ -6,25 +6,15 @@ namespace Meceqs.HttpSender
 {
     public class HttpSenderOptions : TransportSenderOptions
     {
-        public Dictionary<string, EndpointOptions> Endpoints { get; set; } = new Dictionary<string, EndpointOptions>();
+        /// <summary>
+        /// Configures the mapping between message types and endpoint URIs for messages that
+        /// are added via one of the <see cref="AddMessage"/> methods.
+        /// </summary>
+        public IEndpointMessageConvention MessageConvention { get; set; } = new DefaultEndpointMessageConvention();
 
-        public void AddEndpoint(string endpoint, Action<EndpointOptions> options)
-        {
-            Guard.NotNullOrWhiteSpace(endpoint, nameof(endpoint));
-            Guard.NotNull(options, nameof(options));
-
-            EndpointOptions existingEndpoint;
-            if (Endpoints.TryGetValue(endpoint, out existingEndpoint))
-            {
-                options(existingEndpoint);
-            }
-            else
-            {
-                var endpointOptions = new EndpointOptions();
-                options(endpointOptions);
-
-                Endpoints.Add(endpoint, endpointOptions);
-            }
-        }
+        /// <summary>
+        /// A dictionary containing message type to endpoint URI mappings that are supported with this sender.
+        /// </summary>
+        public Dictionary<Type, string> Messages { get; private set; } = new Dictionary<Type, string>();
     }
 }

@@ -8,9 +8,9 @@ namespace Meceqs.AzureEventHubs.Configuration
     {
         public override IEventHubSenderBuilder Instance => this;
 
-        public EventHubSenderBuilder()
+        public EventHubSenderBuilder(IServiceCollection services, string pipelineName)
+            : base(services, pipelineName)
         {
-            PipelineEndHook = pipeline => pipeline.RunEventHubSender();
         }
     }
 }
