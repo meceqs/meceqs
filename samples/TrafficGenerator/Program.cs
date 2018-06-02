@@ -30,7 +30,7 @@ namespace TrafficGenerator
                     {
                         sender.AddEndpoint("Customers", options =>
                         {
-                            options.BaseAddress = SampleConfiguration.CustomersWebApiUrl;
+                            options.BaseAddress = SampleConfiguration.CustomersWebApiUrl + "v1/";
 
                             // Write your own extension method if you have a base class for alle messages
                             options.AddMessagesFromAssembly<CreateCustomerCommand>(t => t.Name.EndsWith("Command") || t.Name.EndsWith("Query"));
