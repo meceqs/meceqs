@@ -48,7 +48,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 builder.Services.Configure(senderOptions);
             }
 
-            builder.AddPipeline(senderBuilder.GetPipelineName(), senderBuilder.GetPipeline());
+            builder.ConfigurePipeline(senderBuilder.GetPipelineName(), senderBuilder.GetPipeline());
 
             return builder;
         }

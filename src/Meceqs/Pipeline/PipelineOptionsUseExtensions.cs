@@ -4,14 +4,14 @@ using Meceqs.Pipeline;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
-    public static class PipelineBuilderUseExtensions
+    public static class PipelineOptionsUseExtensions
     {
         /// <summary>
         /// Adds an in-line middleware to the pipeline.
         /// </summary>
-        public static IPipelineBuilder Use(this IPipelineBuilder builder, Func<MessageContext, Func<Task>, Task> middleware)
+        public static PipelineOptions Use(this PipelineOptions builder, Func<MessageContext, Func<Task>, Task> middleware)
         {
-            return builder.Use(next =>
+            return builder.Use((next, _) =>
             {
                 return context =>
                 {

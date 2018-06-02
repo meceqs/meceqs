@@ -1,4 +1,3 @@
-using System;
 using Meceqs.Pipeline;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
@@ -9,21 +8,28 @@ namespace Meceqs.Tests.Pipeline
     public class PipelineConfigurationTest
     {
         [Fact]
-        public void Adding_the_same_pipelineName_throws()
+        public void Configuring_the_same_pipelineName_succeeds()
         {
-            var services = new ServiceCollection()
-                .AddOptions();
+            var serviceProvider = new ServiceCollection()
+                .AddLogging()
+                .AddOptions()
+                .AddMeceqs(builder =>
+                {
+                    builder
+                        .ConfigurePipeline("pipeline", pipeline =>
+                        {
+                            pipeline.Use((ctx, next) => { return next(); });
+                        })
+                        .ConfigurePipeline("pipeline", pipeline =>
+                        {
+                            pipeline.Use((ctx, next) => { return next(); });
+                        });
+                })
+                .BuildServiceProvider();
 
-            services.AddMeceqs(builder =>
-            {
-                builder
-                    .AddPipeline("pipeline", pipeline => { })
-                    .AddPipeline("pipeline", pipeline => { });
-            });
+            var pipelineProvider = serviceProvider.GetRequiredService<IPipelineProvider>();
 
-            var serviceProvider = services.BuildServiceProvider();
-
-            Should.Throw<ArgumentException>(() => serviceProvider.GetRequiredService<IPipelineProvider>());
+            pipelineProvider.GetPipeline("pipeline").ShouldNotBeNull();
         }
     }
 }

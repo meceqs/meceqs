@@ -1,7 +1,6 @@
 using System;
 using Meceqs;
 using Meceqs.Configuration;
-using Meceqs.Hosting;
 using Meceqs.Pipeline;
 using Meceqs.Receiving;
 using Meceqs.Sending;
@@ -21,7 +20,6 @@ namespace Microsoft.Extensions.DependencyInjection
             Guard.NotNull(services, nameof(services));
 
             // Core Services
-            AddHosting(services);
             AddPipeline(services);
             AddReceiving(services);
             AddSending(services);
@@ -46,17 +44,9 @@ namespace Microsoft.Extensions.DependencyInjection
             return services;
         }
 
-        private static void AddHosting(IServiceCollection services)
-        {
-            services.TryAddSingleton<MeceqsInitializer>();
-        }
-
         private static void AddPipeline(IServiceCollection services)
         {
             services.TryAddSingleton<IPipelineProvider, DefaultPipelineProvider>();
-
-            // Every pipeline that should be built must get its own builder.
-            services.TryAddTransient<IPipelineBuilder, DefaultPipelineBuilder>();
         }
 
         private static void AddReceiving(IServiceCollection services)

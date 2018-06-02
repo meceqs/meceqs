@@ -2,11 +2,9 @@ using System;
 using Meceqs;
 using Meceqs.AspNetCore;
 using Meceqs.AspNetCore.Configuration;
-using Meceqs.AspNetCore.Hosting;
 using Meceqs.AspNetCore.Receiving;
 using Meceqs.Configuration;
 using Meceqs.Pipeline;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -21,9 +19,6 @@ namespace Microsoft.Extensions.DependencyInjection
             // Enricher
             builder.Services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             builder.Services.TryAddSingleton<IMessageContextEnricher, AspNetCoreEnricher>();
-
-            // Hosting
-            builder.Services.AddSingleton<IStartupFilter, MeceqsStartupFilter>(); // TODO @cweiss what if .AddAspNetCore() is called twice?
 
             // TODO should some be singleton?
             builder.Services.TryAddSingleton<IMessagePathConvention, DefaultMessagePathConvention>();
@@ -60,7 +55,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 builder.Services.Configure(receiverOptions);
             }
 
-            builder.AddPipeline(receiverBuilder.GetPipelineName(), receiverBuilder.GetPipeline());
+            builder.ConfigurePipeline(receiverBuilder.GetPipelineName(), receiverBuilder.GetPipeline());
 
             return builder;
         }

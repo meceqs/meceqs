@@ -7,8 +7,8 @@ namespace Meceqs.Pipeline
 {
     /// <summary>
     /// Contains common logic for building a <see cref="MessageContext"/>.
-    /// This type is typically not used directly - use <see cref="Meceqs.Receiving.IReceiveBuilder"/>
-    /// or <see cref="Meceqs.Sending.ISendBuilder"/> instead.
+    /// This type is typically not used directly - use <see cref="Receiving.IReceiveBuilder"/>
+    /// or <see cref="Sending.ISendBuilder"/> instead.
     /// </summary>
     public interface IMessageContextBuilder<TBuilder>
         where TBuilder : IMessageContextBuilder<TBuilder>
@@ -37,8 +37,8 @@ namespace Meceqs.Pipeline
 
         /// <summary>
         /// Uses the given service provider for <see cref="MessageContext.RequestServices"/>
-        /// instead of the default (which is the same provider either <see cref="Meceqs.Receiving.IMessageReceiver"/>
-        /// or <see cref="Meceqs.Sending.IMessageSender"/> was resolved from).
+        /// instead of the default (which is the same provider either <see cref="Receiving.IMessageReceiver"/>
+        /// or <see cref="Sending.IMessageSender"/> was resolved from).
         /// </summary>
         TBuilder SetRequestServices(IServiceProvider requestServices);
 
@@ -49,8 +49,8 @@ namespace Meceqs.Pipeline
 
         /// <summary>
         /// Uses a pipeline with the given name instead of the default pipeline
-        /// (which would be "Receive" for <see cref="Meceqs.Receiving.IMessageReceiver"/>
-        /// or "Send" for <see cref="Meceqs.Sending.IMessageSender"/>).
+        /// (which would be "Receive" for <see cref="Receiving.IMessageReceiver"/>
+        /// or "Send" for <see cref="Sending.IMessageSender"/>).
         /// </summary>
         TBuilder UsePipeline(string pipelineName);
     }

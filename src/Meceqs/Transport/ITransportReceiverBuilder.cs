@@ -23,7 +23,7 @@ namespace Meceqs.Transport
 
         TTransportReceiver SetPipelineName(string pipelineName);
 
-        TTransportReceiver ConfigurePipeline(Action<IPipelineBuilder> pipeline);
+        TTransportReceiver ConfigurePipeline(Action<PipelineOptions> pipeline);
 
         TTransportReceiver UseTypedHandling(Action<TypedHandlingOptions> options);
 

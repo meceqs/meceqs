@@ -36,7 +36,7 @@ namespace Meceqs.Pipeline
 
         /// <summary>
         /// Gets the item with the given key and casts it to the given result type.
-        /// Returns null ff the key does not exist.
+        /// Returns null if the key does not exist.
         /// </summary>
         public T Get<T>(object key)
         {

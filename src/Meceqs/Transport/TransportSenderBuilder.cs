@@ -10,19 +10,19 @@ namespace Meceqs.Transport
         where TTransportSenderOptions : TransportSenderOptions
     {
         private string _pipelineName = MeceqsDefaults.SendPipelineName;
-        private Action<IPipelineBuilder> _pipeline;
+        private Action<PipelineOptions> _pipeline;
 
         /// <summary>
         /// Allows derived classes to modify the user-defined pipeline by adding additional
         /// middleware components at the beginning.
         /// </summary>
-        protected Action<IPipelineBuilder> PipelineStartHook { get; set; }
+        protected Action<PipelineOptions> PipelineStartHook { get; set; }
 
         /// <summary>
         /// Allows derived classes to modify the user-defined pipeline by adding additional
         /// middleware components at the end.
         /// </summary>
-        protected Action<IPipelineBuilder> PipelineEndHook { get; set; }
+        protected Action<PipelineOptions> PipelineEndHook { get; set; }
 
         protected Action<TTransportSenderOptions> SenderOptions { get; set; }
 
@@ -35,7 +35,7 @@ namespace Meceqs.Transport
         public Action<TTransportSenderOptions> GetSenderOptions() => SenderOptions;
         public string GetPipelineName() => _pipelineName;
 
-        public Action<IPipelineBuilder> GetPipeline()
+        public Action<PipelineOptions> GetPipeline()
         {
             var pipeline = PipelineStartHook + _pipeline + PipelineEndHook;
 
@@ -57,7 +57,7 @@ namespace Meceqs.Transport
             return Instance;
         }
 
-        public TTransportSenderBuilder ConfigurePipeline(Action<IPipelineBuilder> pipeline)
+        public TTransportSenderBuilder ConfigurePipeline(Action<PipelineOptions> pipeline)
         {
             Guard.NotNull(pipeline, nameof(pipeline));
 

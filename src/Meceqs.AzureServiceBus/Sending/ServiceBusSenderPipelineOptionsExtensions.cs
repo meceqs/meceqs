@@ -4,9 +4,9 @@ using Meceqs.Pipeline;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
-    public static class ServiceBusSenderPipelineBuilderExtensions
+    public static class ServiceBusSenderPipelineOptionsExtensions
     {
-        public static void RunServiceBusSender(this IPipelineBuilder pipeline)
+        public static void RunServiceBusSender(this PipelineOptions pipeline)
         {
             Guard.NotNull(pipeline, nameof(pipeline));
 

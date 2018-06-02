@@ -1,57 +1,68 @@
 using System;
-using System.Collections.Generic;
-using Microsoft.Extensions.DependencyInjection;
+using System.Collections.Concurrent;
+using System.Threading;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace Meceqs.Pipeline
 {
     public class DefaultPipelineProvider : IPipelineProvider
     {
-        private readonly IDictionary<string, IPipeline> _pipelines = new Dictionary<string, IPipeline>();
+        private readonly IOptionsMonitor<PipelineOptions> _optionsMonitor;
+        private readonly IServiceProvider _serviceProvider;
+        private readonly ILoggerFactory _loggerFactory;
+        private readonly IMessageContextEnricher _messageContextEnricher;
+
+        private readonly ConcurrentDictionary<string, Lazy<IPipeline>> _pipelines;
+        private readonly Func<string, Lazy<IPipeline>> _pipelineFactory;
 
         public DefaultPipelineProvider(
-            IOptions<PipelineOptions> options,
-            IServiceProvider serviceProvider)
+            IOptionsMonitor<PipelineOptions> optionsMonitor,
+            IServiceProvider serviceProvider,
+            ILoggerFactory loggerFactory,
+            IMessageContextEnricher messageContextEnricher = null)
         {
-            Guard.NotNull(options, nameof(options));
-            Guard.NotNull(serviceProvider, nameof(serviceProvider));
+            Guard.NotNull(optionsMonitor, nameof(optionsMonitor));
+            Guard.NotNull(loggerFactory, nameof(loggerFactory));
 
-            BuildPipelines(serviceProvider, options.Value);
-        }
+            _optionsMonitor = optionsMonitor;
+            _serviceProvider = serviceProvider;
+            _loggerFactory = loggerFactory;
+            _messageContextEnricher = messageContextEnricher;
 
-        public void BuildPipelines()
-        {
-            // No-op because pipelines are already built in the constructor.
-            // If we would do it later, it would have to be thread-safe
-            // and use e.g. Lazy<> or custom locking.
-        }
-
-        private void BuildPipelines(IServiceProvider serviceProvider, PipelineOptions options)
-        {
-            foreach (var kvp in options.Pipelines)
+            // case-sensitive because named options is.
+            _pipelines = new ConcurrentDictionary<string, Lazy<IPipeline>>(StringComparer.Ordinal);
+            _pipelineFactory = (name) =>
             {
-                string pipelineName = kvp.Key;
-                Action<IPipelineBuilder> setupAction = kvp.Value;
-
-                var builder = serviceProvider.GetRequiredService<IPipelineBuilder>();
-
-                setupAction(builder);
-
-                _pipelines.Add(pipelineName, builder.Build(pipelineName));
-            }
+                return new Lazy<IPipeline>(() =>
+                {
+                    return CreatePipeline(name);
+                }, LazyThreadSafetyMode.ExecutionAndPublication);
+            };
         }
 
         public IPipeline GetPipeline(string pipelineName)
         {
             Guard.NotNullOrWhiteSpace(pipelineName, nameof(pipelineName));
 
-            IPipeline pipeline;
-            if (!_pipelines.TryGetValue(pipelineName, out pipeline))
-            {
-                throw new ArgumentException($"Pipeline with the name '{pipelineName}' does not exist");
-            }
+            IPipeline pipeline = _pipelines.GetOrAdd(pipelineName, _pipelineFactory).Value;
 
             return pipeline;
+        }
+
+        private IPipeline CreatePipeline(string pipelineName)
+        {
+            var options = _optionsMonitor.Get(pipelineName);
+
+            MiddlewareDelegate pipelineDelegate = options.BuildPipelineDelegate(_serviceProvider);
+
+            // TODO Is it safe to throw in a Lazy-initializer?
+            if (pipelineDelegate == null)
+            {
+                throw new ArgumentException($"A pipeline with the name '{pipelineName}' has not been configured.");
+            }
+
+            return new DefaultPipeline(pipelineDelegate, pipelineName, _loggerFactory, _messageContextEnricher);
         }
     }
 }

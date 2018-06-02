@@ -10,6 +10,6 @@ namespace Meceqs.Transport
 
         TTransportSender SetPipelineName(string pipelineName);
 
-        TTransportSender ConfigurePipeline(Action<IPipelineBuilder> pipeline);
+        TTransportSender ConfigurePipeline(Action<PipelineOptions> pipeline);
     }
 }

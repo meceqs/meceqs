@@ -10,7 +10,7 @@ using Xunit;
 
 namespace Meceqs.Tests.Pipeline
 {
-    public class PipelineBuilderUseMiddlewareScopingTest
+    public class PipelineUseMiddlewareScopingTest
     {
         private class MiddlewareWithServices
         {
@@ -79,16 +79,15 @@ namespace Meceqs.Tests.Pipeline
             public void Dispose() => _callCounter.DisposeCalled++;
         }
 
-        private IPipeline GetPipeline(IServiceProvider serviceProvider)
+        private MiddlewareDelegate GetPipeline(IServiceProvider serviceProvider)
         {
-            var loggerFactory = Substitute.For<ILoggerFactory>();
-            var builder = new DefaultPipelineBuilder(serviceProvider, loggerFactory, null);
+            var options = new PipelineOptions();
 
             // two middleware components to make sure we can test scoped services.
-            builder.UseMiddleware<MiddlewareWithServices>(false /* isTerminating */);
-            builder.UseMiddleware<MiddlewareWithServices>(true /* isTerminating */);
+            options.UseMiddleware<MiddlewareWithServices>(false /* isTerminating */);
+            options.UseMiddleware<MiddlewareWithServices>(true /* isTerminating */);
 
-            return builder.Build("pipeline");
+            return options.BuildPipelineDelegate(serviceProvider);
         }
 
         [Fact]
@@ -107,7 +106,7 @@ namespace Meceqs.Tests.Pipeline
             for (int i = 0; i < 5; i++)
             {
                 var context = TestObjects.MessageContext<SimpleMessage>(requestServices: serviceProvider);
-                await pipeline.InvokeAsync(context);
+                await pipeline(context);
             }
 
             // app shutdown
@@ -135,7 +134,7 @@ namespace Meceqs.Tests.Pipeline
             for (int i = 0; i < 5; i++)
             {
                 var context = TestObjects.MessageContext<SimpleMessage>(requestServices: serviceProvider);
-                await pipeline.InvokeAsync(context);
+                await pipeline(context);
             }
 
             // app shutdown
@@ -167,7 +166,7 @@ namespace Meceqs.Tests.Pipeline
                 {
                     var context = TestObjects.MessageContext<SimpleMessage>(requestServices: scope.ServiceProvider);
 
-                    await pipeline.InvokeAsync(context);
+                    await pipeline(context);
                 }
             }
 

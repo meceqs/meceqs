@@ -17,6 +17,9 @@ namespace Meceqs.Sending
             _envelopeFactory = serviceProvider.GetRequiredService<IEnvelopeFactory>();
         }
 
+        /// <summary>
+        /// Uses the builder pattern for sending an envelope to a pipeline.
+        /// </summary>
         public ISendBuilder ForEnvelope(Envelope envelope)
         {
             Guard.NotNull(envelope, nameof(envelope));
@@ -35,6 +38,9 @@ namespace Meceqs.Sending
             return new SendBuilder(envelope, _serviceProvider);
         }
 
+        /// <summary>
+        /// Uses the builder pattern for sending a message to a pipeline.
+        /// </summary>
         public ISendBuilder ForMessage(object message, Guid? messageId = null)
         {
             Guard.NotNull(message, nameof(message));

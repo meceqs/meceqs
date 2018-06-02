@@ -10,16 +10,16 @@ namespace Microsoft.Extensions.DependencyInjection
     /// <summary>
     /// Extension methods for adding a typed middleware.
     /// </summary>
-    public static class PipelineBuilderUseMiddlewareExtensions
+    public static class PipelineOptionsUseMiddlewareExtensions
     {
         private const string InvokeMethodName = "Invoke";
 
-        private static readonly MethodInfo GetServiceInfo = typeof(PipelineBuilderUseMiddlewareExtensions).GetMethod(nameof(GetService), BindingFlags.NonPublic | BindingFlags.Static);
+        private static readonly MethodInfo GetServiceInfo = typeof(PipelineOptionsUseMiddlewareExtensions).GetMethod(nameof(GetService), BindingFlags.NonPublic | BindingFlags.Static);
 
         /// <summary>
         /// Adds a middleware class to the pipeline.
         /// </summary>
-        public static IPipelineBuilder UseMiddleware<TMiddleware>(this IPipelineBuilder builder, params object[] args)
+        public static PipelineOptions UseMiddleware<TMiddleware>(this PipelineOptions builder, params object[] args)
         {
             return builder.UseMiddleware(typeof(TMiddleware), args);
         }
@@ -27,9 +27,9 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <summary>
         /// Adds a middleware class to the pipeline.
         /// </summary>
-        public static IPipelineBuilder UseMiddleware(this IPipelineBuilder builder, Type middleware, params object[] args)
+        public static PipelineOptions UseMiddleware(this PipelineOptions builder, Type middleware, params object[] args)
         {
-            return builder.Use(next =>
+            return builder.Use((next, applicationServices) =>
             {
                 var methods = middleware.GetMethods(BindingFlags.Instance | BindingFlags.Public);
                 var invokeMethods = methods.Where(m => string.Equals(m.Name, InvokeMethodName, StringComparison.Ordinal)).ToArray();
@@ -58,7 +58,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 var ctorArgs = new object[args.Length + 1];
                 ctorArgs[0] = next;
                 Array.Copy(args, 0, ctorArgs, 1, args.Length);
-                var instance = ActivatorUtilities.CreateInstance(builder.ApplicationServices, middleware, ctorArgs);
+                var instance = ActivatorUtilities.CreateInstance(applicationServices, middleware, ctorArgs);
                 if (parameters.Length == 1)
                 {
                     return (MiddlewareDelegate)methodinfo.CreateDelegate(typeof(MiddlewareDelegate), instance);

@@ -49,7 +49,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 builder.Services.Configure(receiverOptions);
             }
 
-            builder.AddPipeline(receiverBuilder.GetPipelineName(), receiverBuilder.GetPipeline());
+            builder.ConfigurePipeline(receiverBuilder.GetPipelineName(), receiverBuilder.GetPipeline());
 
             return builder;
         }
@@ -89,7 +89,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 builder.Services.Configure(senderOptions);
             }
 
-            builder.AddPipeline(senderBuilder.GetPipelineName(), senderBuilder.GetPipeline());
+            builder.ConfigurePipeline(senderBuilder.GetPipelineName(), senderBuilder.GetPipeline());
 
             return builder;
         }

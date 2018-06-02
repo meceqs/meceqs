@@ -18,19 +18,19 @@ namespace Meceqs.Transport
         private Action<TTransportReceiverOptions> _receiverOptions;
 
         private string _pipelineName;
-        private Action<IPipelineBuilder> _pipeline;
+        private Action<PipelineOptions> _pipeline;
 
         /// <summary>
         /// Allows derived classes to modify the user-defined pipeline by adding additional
         /// middleware components at the beginning.
         /// </summary>
-        protected Action<IPipelineBuilder> PipelineStartHook { get; set; }
+        protected Action<PipelineOptions> PipelineStartHook { get; set; }
 
         /// <summary>
         /// Allows derived classes to modify the user-defined pipeline by adding additional
         /// middleware components at the end.
         /// </summary>
-        protected Action<IPipelineBuilder> PipelineEndHook { get; set; }
+        protected Action<PipelineOptions> PipelineEndHook { get; set; }
 
         /// <summary>
         /// This property is only necessary to support the builder pattern with
@@ -54,7 +54,7 @@ namespace Meceqs.Transport
             _pipelineName = MeceqsDefaults.ReceivePipelineName;
         }
 
-        public Action<IPipelineBuilder> GetPipeline()
+        public Action<PipelineOptions> GetPipeline()
         {
             var pipeline = PipelineStartHook + _pipeline + PipelineEndHook;
 
@@ -128,7 +128,7 @@ namespace Meceqs.Transport
             return Instance;
         }
 
-        public TTransportReceiverBuilder ConfigurePipeline(Action<IPipelineBuilder> pipeline)
+        public TTransportReceiverBuilder ConfigurePipeline(Action<PipelineOptions> pipeline)
         {
             Guard.NotNull(pipeline, nameof(pipeline));
 
