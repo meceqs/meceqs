@@ -7,7 +7,7 @@ The envelopes are sent to __pipelines__ which consist of pluggable __middleware 
 It's easy to write your own __middleware__ that either enriches/modifies your envelopes or sends them to any target you like
 (e.g. a HTTP endpoint, a message broker, a database, ...).
 
-Meceqs targets [.NET Standard 1.3](https://docs.microsoft.com/en-us/dotnet/articles/standard/library) so it can be used
+Meceqs targets [.NET Standard 2.0](https://docs.microsoft.com/en-us/dotnet/articles/standard/library) so it can be used
 on .NET Core, .NET Framework, Mono, Xamarin and the Universal Windows Platform.
 
 Meceqs ships with the following integrations:
@@ -17,19 +17,18 @@ Meceqs ships with the following integrations:
 * ASP.NET Core
   * Write your own MVC controllers to leverage the features of ASP.NET Core (serializer, routes, validation, ...)
   * Or use our convention-based endpoint for your messages to offer Web APIs without having to write your own MVC controllers.
-  * Meceqs attaches itself to the ASP.NET Core request and adds useful metadata to every message that is sent or received. (e.g. RequestPath, ...)
+  * Meceqs attaches itself to the ASP.NET Core request to propagate HttpContext properties like `RequestServices` and `User`.
 * HTTP Sender (System.Net.Http.HttpClient)
   * Send messages via HTTP - works best with our convention-based ASP.NET Core API.
 * Azure Service Bus
   * Send messages to Azure Service Bus
   * Receive messages from Azure Service Bus
   * Use a file-based mock which makes local development very easy.
-  * *NOTE: There's no official .NET standard compatible Azure Service Bus library yet so this integration only works on the full .NET framework*
 * Azure Event Hubs
   * Send messages to Azure Event Hubs
   * Receive messages from Azure Event Hubs
   * Use a a file-based mock which makes local development very easy.
-* JSON serialization
+* JSON serialization (enabled by default)
 
 ## A first look
 
@@ -113,19 +112,7 @@ This envelope will be sent to the Web API. The `correlationId` is equal to the `
   "messageType": "Customers.Contracts.Commands.CreateCustomerCommand",
   "correlationId": "49f32326-a4a3-4242-9d8f-396c35db2f67",
   "createdOnUtc": "2016-09-17T19:48:28.5447192Z",
-  "headers": {},
-  "history": [
-    {
-      "pipeline": "Send",
-      "host": "FRONTEND01",
-      "endpoint": "FrontendWebApp",
-      "createdOnUtc": "2016-09-17T19:48:28.5729711Z",
-      "properties": {
-        "requestId": "0HKUV6E665U19",
-        "requestPath": "/SignUp"
-      }
-    }
-  ]
+  "headers": {}
 }
 ```
 
@@ -138,7 +125,7 @@ The business layer code decides to forward the message to *Azure Service Bus* be
 // `IHandles` from "Meceqs.TypedHandling" allows you to handle messages in a strongly typed way.
 public class CreateCustomerForwarder : IHandles<CreateCustomerCommand, CreateCustomerResult>
 {
-    public async Task<CreateCustomerResult> HandleAsync(HandleContext<CreateCustomerCommand> context)
+    public async Task<CreateCustomerResult> HandleAsync(CreateCustomerCommand msg, HandleContext context)
     {
         // The "HandleContext" gives you access to the envelope and to additional data
         // like the current user, cancellation tokens, ...
@@ -164,7 +151,6 @@ public class CreateCustomerForwarder : IHandles<CreateCustomerCommand, CreateCus
 public void ConfigureServices(IServiceCollection services)
 {
     services.AddMeceqs()
-        .AddJsonSerialization()
 
         // Configures the behavior of the ASP.NET Core receiver.
         .AddAspNetCoreReceiver(receiver =>
@@ -186,13 +172,12 @@ public void ConfigureServices(IServiceCollection services)
 public void Configure(IApplicationBuilder app)
 {
     // This adds the receiver to the ASP.NET Core pipeline.
-    app.UseAspNetCoreReceiver();
+    app.UseMeceqs();
 }
 ```
 
 #### Envelopes
 Azure Service Bus will receive this envelope. It has the same MessageId because the message is just forwarded.
-There's one history entry for every pipeline that processed the message.
 ```json
 {
   "message": {
@@ -203,39 +188,7 @@ There's one history entry for every pipeline that processed the message.
   "messageType": "Customers.Contracts.Commands.CreateCustomerCommand",
   "correlationId": "49f32326-a4a3-4242-9d8f-396c35db2f67",
   "createdOnUtc": "2016-09-17T19:48:28.5447192Z",
-  "headers": {},
-  "history": [
-    {
-      "pipeline": "Send",
-      "host": "FRONTEND01",
-      "endpoint": "FrontendWebApp",
-      "createdOnUtc": "2016-09-17T19:48:28.5729711Z",
-      "properties": {
-        "requestId": "0HKUV6E665U19",
-        "requestPath": "/SignUp"
-      }
-    },
-    {
-      "pipeline": "Receive",
-      "host": "BACKEND01",
-      "endpoint": "Customers.Hosts.WebApi",
-      "createdOnUtc": "2016-09-17T19:48:28.6304382Z",
-      "properties": {
-        "requestId": "0HKUV6JTPD1B1",
-        "requestPath": "/CreateCustomer"
-      }
-    },
-    {
-      "pipeline": "SendServiceBus",
-      "host": "BACKEND01",
-      "endpoint": "Customers.Hosts.WebApi",
-      "createdOnUtc": "2016-09-17T19:48:28.6321242Z",
-      "properties": {
-        "requestId": "0HKUV6JTPD1B1",
-        "requestPath": "/CreateCustomer"
-      }
-    }
-  ]
+  "headers": {}
 }
 ```
 
@@ -261,10 +214,9 @@ public class CreateCustomerProcessor : IHandles<CreateCustomerCommand>
         _customerRepository = customerRepository;
     }
 
-    public async Task HandleAsync(HandleContext<CreateCustomerCommand> context)
+    public async Task HandleAsync(CreateCustomerCommand cmd, HandleContext context)
     {
         var customerId = context.Envelope.MessageId;
-        var cmd = context.Message;
 
         var customer = new Customer(customerId, cmd.FirstName, cmd.LastName);
 
@@ -290,8 +242,6 @@ public class CreateCustomerProcessor : IHandles<CreateCustomerCommand>
 #### Configuration
 ```csharp
 services.AddMeceqs()
-    .AddJsonSerialization()
-
     .AddServiceBusReceiver(receiver =>
     {
         receiver.UseTypedHandling(options =>
@@ -299,7 +249,6 @@ services.AddMeceqs()
             options.Handlers.Add<CreateCustomerProcessor>();
         });
     })
-
     .AddEventHubSender(Configuration["EventHub"], sender =>
     {
         sender.SetPipelineName(MyPipelines.SendEventHub);
@@ -307,7 +256,7 @@ services.AddMeceqs()
 ```
 
 #### Envelopes
-The event is a new message and will not contain the previous history entries. However, it will have the same `correlationId`.
+The event is a new message that again will have the same `correlationId`.
 ```json
 {
   "message": {
@@ -319,15 +268,6 @@ The event is a new message and will not contain the previous history entries. Ho
   "messageType": "Customers.Contracts.Events.CustomerCreatedEvent",
   "correlationId": "49f32326-a4a3-4242-9d8f-396c35db2f67",
   "createdOnUtc": "2016-09-17T19:48:28.93049202Z",
-  "headers": {},
-  "history": [
-    {
-      "pipeline": "SendEventHub",
-      "host": "BACKEND02",
-      "endpoint": "Customers.Hosts.Worker",
-      "createdOnUtc": "2016-09-17T19:48:28.9305021Z",
-      "properties": {}
-    }
-  ]
+  "headers": {}
 }
 ```

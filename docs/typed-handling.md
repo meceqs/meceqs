@@ -27,13 +27,13 @@ using Meceqs.TypedHandling;
 // Implement this interface if your handler does not return a result.
 public interface IHandles<TMessage>
 {
-    Task HandleAsync(HandleContext<TMessage> message);
+    Task HandleAsync(TMessage message, HandleContext context);
 }
 
 // Implement this interface if your handler returns a result.
 public interface IHandles<TMessage, TResult>
 {
-    Task<TResult> HandleAsync(HandleContext<TMessage> message);
+    Task<TResult> HandleAsync(TMessage message, HandleContext context);
 }
 ```
 
@@ -52,10 +52,8 @@ public class CustomerCommandHandler :
     }
 
     [CustomLogic /* this attribute can be read by an IHandleInterceptor */]
-    public async Task<CreateCustomerResult> HandleAsync(HandleContext<CreateCustomerCommand> context)
+    public async Task<CreateCustomerResult> HandleAsync(CreateCustomerCommand cmd, HandleContext context)
     {
-        var cmd = context.Message;
-
         var customer = new Customer(cmd.FirstName, cmd.LastName);
 
         _customerRepository.Add(customer);
@@ -63,10 +61,8 @@ public class CustomerCommandHandler :
         return new CreateCustomerResult { CustomerId = customer.Id };
     }
 
-    public async Task HandleAsync(HandleContext<ChangeNameCommand> context)
+    public async Task HandleAsync(ChangeNameCommand cmd, HandleContext context)
     {
-        var cmd = context.Message;
-
         var customer = _customerRepository.GetById(cmd.CustomerId);
 
         if (customer == null)
@@ -98,26 +94,19 @@ public class SampleHandleInterceptor : IHandleInterceptor
 
     public Task OnHandleExecutionAsync(HandleContext context, HandleExecutionDelegate next)
     {
-        OnHandleExecuting(context);
-
-        return next(context);
-    }
-
-    private void OnHandleExecuting(HandleContext context)
-    {
         var customAttribute = context.HandleMethod.GetCustomAttribute(typeof(CustomLogicAttribute));
-
         if (customAttribute != null)
         {
             _logger.LogInformation("Custom attribute found on method");
         }
 
         customAttribute = context.HandlerType.GetCustomAttribute(typeof(CustomLogicAttribute));
-
         if (customAttribute != null)
         {
             _logger.LogInformation("Custom attribute found on class");
         }
+
+        return next(context);
     }
 }
 ```
@@ -128,7 +117,7 @@ You can add the typed handling middleware to any pipeline by calling the followi
 
 ```csharp
 services.AddMeceqs()
-    .AddPipeline("my-pipeline", pipeline =>
+    .ConfigurePipeline("my-pipeline", pipeline =>
     {
         //pipeline.UseYourCustomMiddleware();
 

@@ -100,10 +100,7 @@ Envelopes contain metadata about the message. This json serialized object shows 
   // Key:value pairs that are not properties in your message but should be stored with it anyway.
   "headers": {
     "createdBy": "admin"
-  },
-
-  // A list of all components that processed this envelope.
-  "history": [ ]
+  }
 }
 ```
 
@@ -133,7 +130,7 @@ The following code will retrieve a `IPipeline` with the name `Send` and invoke i
 
 ```csharp
 // The pipeline provider is a singleton instance in your DI container.
-IPipelineProvider pipelineProvider;
+IPipelineProvider pipelineProvider = serviceProvider.GetRequiredService<IPipelineProvider>();
 
 // A pipeline is identfied by name.
 IPipeline pipeline = pipelineProvider.GetPipeline("Send");
