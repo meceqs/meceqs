@@ -1,107 +1,76 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.IO;
 using Customers.Contracts.Commands;
 using Meceqs.AzureServiceBus.Sending;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using SampleConfig;
 
 namespace TrafficGenerator
 {
-    /// <summary>
-    /// This class configures the DI framework and launches the <see cref="Worker"/>.
-    /// </summary>
     public class Program
     {
-        private static void ConfigureServices(IServiceCollection services)
-        {
-            services.AddLogging();
-            services.AddOptions();
-
-            services.Configure<ServiceBusSenderOptions>(x => {
-                x.ConnectionString = $"Endpoint=sb://dummy.example.com;EntityPath={SampleConfiguration.PlaceOrderQueue}";
-            });
-
-            services.AddMeceqs(builder =>
-            {
-                builder
-
-                    .AddHttpSender(sender =>
-                    {
-                        sender.AddEndpoint("Customers", options =>
-                        {
-                            options.BaseAddress = SampleConfiguration.CustomersWebApiUrl + "v1/";
-
-                            // Write your own extension method if you have a base class for alle messages
-                            options.AddMessagesFromAssembly<CreateCustomerCommand>(t => t.Name.EndsWith("Command") || t.Name.EndsWith("Query"));
-                        });
-                    })
-
-                    .AddServiceBusSender(sender =>
-                    {
-                        sender.SetPipelineName("ServiceBus");
-                    })
-
-                    // send messages to a local file instead of the actual Service Bus.
-                    .AddFileFakeServiceBusSender(SampleConfiguration.FileFakeServiceBusDirectory);
-            });
-        }
-
         public static void Main(string[] args)
         {
-            Console.WriteLine("TrafficGenerator!");
-            Console.WriteLine("==================================");
-            Console.WriteLine();
-            Console.WriteLine("Press [ENTER] to close application");
-            Console.WriteLine();
+            CreateHostBuilder(args).Build().Run();
+        }
 
-            // Logging
+        public static IHostBuilder CreateHostBuilder(string[] args)
+        {
+            // Based on https://github.com/aspnet/MetaPackages/blob/dev/src/Microsoft.AspNetCore/WebHost.cs
+            return new HostBuilder()
+                .UseContentRoot(Directory.GetCurrentDirectory())
+                .ConfigureAppConfiguration((hostingContext, config) =>
+                {
+                    var env = hostingContext.HostingEnvironment;
 
-            var loggerFactory = new LoggerFactory();
-            loggerFactory.AddConsole(LogLevel.Debug);
+                    config.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                          .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: true);
 
-            var logger = loggerFactory.CreateLogger<Program>();
+                    config.AddEnvironmentVariables();
 
-            // From now on, we can actually do something with startup exceptions
+                    if (args != null)
+                    {
+                        config.AddCommandLine(args);
+                    }
+                })
+                .ConfigureLogging((hostingContext, logging) =>
+                {
+                    logging.AddConfiguration(hostingContext.Configuration.GetSection("Logging"));
+                    logging.AddConsole();
+                    logging.AddDebug();
+                })
+                .ConfigureServices((hostingContext, services) =>
+                {
+                    services.AddOptions();
+                    services.AddHostedService<TrafficGeneratorService>();
 
-            IServiceProvider applicationServices = null;
-            try
-            {
-                logger.LogInformation("Logging initialized");
+                    services.Configure<ServiceBusSenderOptions>(x => {
+                        x.ConnectionString = $"Endpoint=sb://dummy.example.com;EntityPath={SampleConfiguration.PlaceOrderQueue}";
+                    });
 
-                // Dependency Injection
+                    services.AddMeceqs(builder =>
+                    {
+                        builder
+                            .AddHttpSender(sender =>
+                            {
+                                sender.AddEndpoint("Customers", options =>
+                                {
+                                    options.BaseAddress = SampleConfiguration.CustomersWebApiUrl + "v1/";
 
-                var services = new ServiceCollection();
-                services.AddSingleton<ILoggerFactory>(loggerFactory);
-
-                ConfigureServices(services);
-
-                applicationServices = services.BuildServiceProvider();
-
-                // Start Worker on new Thread
-
-                var worker = (Worker)ActivatorUtilities.CreateInstance(applicationServices, typeof(Worker));
-                Task.Factory.StartNew(worker.Run);
-
-                // Wait for cancellation
-
-                Console.ReadLine();
-            }
-            catch (Exception ex)
-            {
-                logger?.LogError(0, ex, "Unhandled exception");
-            }
-            finally
-            {
-                // Close application
-
-                logger.LogInformation("Closing application");
-                (applicationServices as IDisposable)?.Dispose();
-                loggerFactory?.Dispose();
-
-                // Empty line just for nicer output in console.
-                Console.WriteLine();
-            }
+                                    // Write your own extension method if you have a base class for alle messages
+                                    options.AddMessagesFromAssembly<CreateCustomerCommand>(t => t.Name.EndsWith("Command") || t.Name.EndsWith("Query"));
+                                });
+                            })
+                            .AddServiceBusSender(sender =>
+                            {
+                                sender.SetPipelineName("ServiceBus");
+                            })
+                            // send messages to a local file instead of the actual Service Bus.
+                            .AddFileFakeServiceBusSender(SampleConfiguration.FileFakeServiceBusDirectory);
+                    });
+                });
         }
     }
 }

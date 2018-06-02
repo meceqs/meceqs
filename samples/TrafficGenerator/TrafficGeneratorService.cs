@@ -5,11 +5,12 @@ using Customers.Contracts.Commands;
 using Customers.Contracts.Queries;
 using Meceqs.Sending;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace TrafficGenerator
 {
-    public class Worker
+    public class TrafficGeneratorService : IHostedService
     {
         private static readonly Random _random = new Random();
 
@@ -21,13 +22,13 @@ namespace TrafficGenerator
         private Timer _countCustomersTimer;
         private Timer _placeOrderTimer;
 
-        public Worker(IServiceProvider applicationServices, ILoggerFactory loggerFactory)
+        public TrafficGeneratorService(IServiceProvider applicationServices, ILoggerFactory loggerFactory)
         {
             _applicationServices = applicationServices;
-            _logger = loggerFactory.CreateLogger<Worker>();
+            _logger = loggerFactory.CreateLogger<TrafficGeneratorService>();
         }
 
-        public void Run()
+        public Task StartAsync(CancellationToken cancellationToken)
         {
             _logger.LogInformation("Starting timers");
 
@@ -39,9 +40,9 @@ namespace TrafficGenerator
             if (createCustomerEnabled)
             {
                 _createCustomerTimer = new Timer(_ =>
-               {
-                   InvokeTimerMethod("CreateCustomer", CreateCustomer, _createCustomerTimer, 5 * 1000);
-               }, null, _random.Next(1000) /* first start */, Timeout.Infinite);
+                {
+                    InvokeTimerMethod("CreateCustomer", CreateCustomer, _createCustomerTimer, 5 * 1000);
+                }, null, _random.Next(1000) /* first start */, Timeout.Infinite);
             }
 
             if (changeNameEnabled)
@@ -67,6 +68,17 @@ namespace TrafficGenerator
                     InvokeTimerMethod("PlaceOrder", PlaceOrder, _placeOrderTimer, 4 * 1000);
                 }, null, _random.Next(2000, 4000) /* first start */, Timeout.Infinite);
             }
+
+            return Task.CompletedTask;
+        }
+
+        public Task StopAsync(CancellationToken cancellationToken)
+        {
+            _createCustomerTimer?.Dispose();
+            _changeNameTimer?.Dispose();
+            _countCustomersTimer?.Dispose();
+            _placeOrderTimer?.Dispose();
+            return Task.CompletedTask;
         }
 
         private async Task CreateCustomer(IServiceProvider requestServices)
