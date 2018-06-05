@@ -9,31 +9,34 @@ using Microsoft.Extensions.Options;
 
 namespace Meceqs.AspNetCore.Receiving
 {
+    /// <summary>
+    /// This is an ASP.NET Core middleware that "receives" incoming HTTP requests.
+    /// </summary>
     public class ReceiveTransportMiddleware
     {
         private readonly RequestDelegate _next;
-        private readonly ReceiveTransportOptions _options;
-        private readonly IOptionsMonitor<AspNetCoreReceiverOptions> _receiverOptions;
+        private readonly ReceiveTransportOptions _transportOptions;
+        private readonly IOptionsMonitor<AspNetCoreReceiverOptions> _receiverOptionsMonitor;
         private readonly ILogger _logger;
 
         private readonly Dictionary<string, Tuple<string, MessageMetadata>> _pathLookup;
 
         public ReceiveTransportMiddleware(
             RequestDelegate next,
-            IOptions<ReceiveTransportOptions> options,
-            IOptionsMonitor<AspNetCoreReceiverOptions> receiverOptions,
+            IOptions<ReceiveTransportOptions> transportOptions,
+            IOptionsMonitor<AspNetCoreReceiverOptions> receiverOptionsMonitor,
             IMessagePathConvention messagePathConvention,
             ILoggerFactory loggerFactory)
         {
             Guard.NotNull(next, nameof(next));
-            Guard.NotNull(options?.Value, nameof(options));
-            Guard.NotNull(receiverOptions, nameof(receiverOptions));
+            Guard.NotNull(transportOptions?.Value, nameof(transportOptions));
+            Guard.NotNull(receiverOptionsMonitor, nameof(receiverOptionsMonitor));
             Guard.NotNull(messagePathConvention, nameof(messagePathConvention));
             Guard.NotNull(loggerFactory, nameof(loggerFactory));
 
             _next = next;
-            _options = options.Value;
-            _receiverOptions = receiverOptions;
+            _transportOptions = transportOptions.Value;
+            _receiverOptionsMonitor = receiverOptionsMonitor;
             _logger = loggerFactory.CreateLogger<ReceiveTransportMiddleware>();
 
             _pathLookup = BuildPathLookup(messagePathConvention);
@@ -66,14 +69,14 @@ namespace Meceqs.AspNetCore.Receiving
         {
             var lookup = new Dictionary<string, Tuple<string, MessageMetadata>>(StringComparer.OrdinalIgnoreCase);
 
-            if (_options.Receivers.Count == 0)
+            if (_transportOptions.Receivers.Count == 0)
             {
                 throw new MeceqsException("No receivers have been configured for the ASP.NET Core transport.");
             }
 
-            foreach (string receiverName in _options.Receivers)
+            foreach (string receiverName in _transportOptions.Receivers)
             {
-                var receiverOptions = _receiverOptions.Get(receiverName);
+                var receiverOptions = _receiverOptionsMonitor.Get(receiverName);
 
                 if (receiverOptions.MessageTypes.Count == 0)
                 {

@@ -10,19 +10,24 @@ namespace Meceqs.AzureServiceBus.Sending
     {
         // TODO MessageSender lifecycle - should it be transient?
 
-        private readonly IServiceBusMessageSender _sender;
+        private readonly IOptionsMonitor<ServiceBusSenderOptions> _optionsMonitor;
+        private readonly IServiceBusMessageSenderFactory _senderFactory;
+
+        private readonly object _lock = new object();
+        private IServiceBusMessageSender _sender;
 
         public ServiceBusSenderMiddleware(
             MiddlewareDelegate next,
-            IOptions<ServiceBusSenderOptions> options,
+            IOptionsMonitor<ServiceBusSenderOptions> optionsMonitor,
             IServiceBusMessageSenderFactory senderFactory)
         {
             // "next" is not stored because this is a terminating middleware.
 
-            Guard.NotNull(options?.Value, nameof(options));
+            Guard.NotNull(optionsMonitor, nameof(optionsMonitor));
             Guard.NotNull(senderFactory, nameof(senderFactory));
 
-            _sender = senderFactory.CreateMessageSender(options.Value.ConnectionString);
+            _optionsMonitor = optionsMonitor;
+            _senderFactory = senderFactory;
         }
 
         public Task Invoke(MessageContext context, IServiceBusMessageConverter serviceBusMessageConverter)
@@ -32,12 +37,30 @@ namespace Meceqs.AzureServiceBus.Sending
 
             var serviceBusMessage = serviceBusMessageConverter.ConvertToServiceBusMessage(context.Envelope);
 
+            var sender = GetOrCreateSender(context.PipelineName);
+
             return _sender.SendAsync(serviceBusMessage);
         }
 
         public void Dispose()
         {
             _sender?.Close();
+        }
+
+        private IServiceBusMessageSender GetOrCreateSender(string pipelineName)
+        {
+            if (_sender != null)
+                return _sender;
+
+            lock (_lock)
+            {
+                if (_sender != null)
+                    return _sender;
+
+                var options = _optionsMonitor.Get(pipelineName);
+                _sender = _senderFactory.CreateMessageSender(options.ConnectionString);
+                return _sender;
+            }
         }
     }
 }
