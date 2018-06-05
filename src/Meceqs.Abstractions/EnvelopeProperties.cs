@@ -15,8 +15,7 @@ namespace Meceqs
         {
             Guard.NotNullOrWhiteSpace(key, nameof(key));
 
-            object value;
-            if (TryGetValue(key, out value))
+            if (TryGetValue(key, out var value))
             {
                 return ValueConverter.Instance.ConvertValue<T>(value);
             }
@@ -28,8 +27,7 @@ namespace Meceqs
         {
             Guard.NotNullOrWhiteSpace(key, nameof(key));
 
-            object value;
-            if (TryGetValue(key, out value))
+            if (TryGetValue(key, out var value))
             {
                 return ValueConverter.Instance.ConvertValue<T>(value);
             }

@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using SampleConfig;
-using Meceqs.AzureEventHubs.Sending;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace Customers.Hosts.WebApi
@@ -53,15 +52,20 @@ namespace Customers.Hosts.WebApi
                     // tell Meceqs to resolve it from there.
                     meceqs.Services.AddSingleton<SingletonHandleInterceptor>();
 
-                    meceqs.Services.Configure<EventHubSenderOptions>(x => x.EventHubConnectionString = "Endpoint=sb://dummy;EntityPath=customers");
-
                     meceqs
-
                         // The Web API will process incoming requests
                         .AddAspNetCoreReceiver(receiver =>
                         {
                             // Add a "/v1/" prefix to all message routes
-                            receiver.UseRoutePrefix("/" + ApiVersion);
+                            receiver.SetRoutePrefix("/" + ApiVersion);
+
+                            // This adds a custom middleware to the pipeline.
+                            // They are executed in this order before the Typed Handling middleware is executed.
+                            receiver.ConfigurePipeline(pipeline =>
+                            {
+                                // add user id to message if not present
+                                pipeline.UseAuditing();
+                            });
 
                             // Process messages with `IHandles<...>`-implementations.
                             receiver.UseTypedHandling(options =>
@@ -81,14 +85,6 @@ namespace Customers.Hosts.WebApi
                                 // this interceptor will use the lifecycle from the DI framework.
                                 options.Interceptors.AddService<SingletonHandleInterceptor>();
                             });
-
-                            // This adds a custom middleware to the pipeline.
-                            // They are executed in this order before the Typed Handling middleware is executed.
-                            receiver.ConfigurePipeline(pipeline =>
-                            {
-                                // add user id to message if not present
-                                pipeline.UseAuditing();
-                            });
                         })
 
                         // This Web API will also send messages to an Azure Event Hub.
@@ -98,10 +94,10 @@ namespace Customers.Hosts.WebApi
                             {
                                 pipeline.UseAuditing(); // add user id to message if not present
                             });
-                        })
 
-                        // Fake for the EventHubSender which will send events to a local file.
-                        .AddFileFakeEventHubSender(SampleConfiguration.FileFakeEventHubDirectory);
+                            // For this sample, we will send messages to a local file instead of a real Event Hub.
+                            sender.UseFileFake(SampleConfiguration.FileFakeEventHubDirectory, "customers");
+                        });
                 })
                 .Configure(app =>
                 {

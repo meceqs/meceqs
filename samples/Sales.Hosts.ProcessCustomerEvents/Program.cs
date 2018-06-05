@@ -51,22 +51,27 @@ namespace Sales.Hosts.ProcessCustomerEvents
                             {
                                 receiver
                                     .SkipUnknownMessages()
+
+                                    // This adds a custom middleware to the pipeline.
+                                    // They are executed in this order before the Typed Handling middleware is executed.
+                                    .ConfigurePipeline(x =>
+                                    {
+                                        x.UseAuditing();
+                                    })
+
+                                    // Process messages with `IHandles<...>`-implementations.
                                     .UseTypedHandling(options =>
                                     {
                                         options.Handlers.Add<CustomerEventsHandler>();
                                     })
-                                    // RunTypedHandling will be added at the end automatically!
-                                    .ConfigurePipeline(x =>
+
+                                    // For this sample, we will read events from a local file instead of a real Event Hub.
+                                    .UseFileFake(options =>
                                     {
-                                        x.UseAuditing();
+                                        options.Directory = SampleConfiguration.FileFakeEventHubDirectory;
+                                        options.ClearEventHubOnStart = true;
+                                        options.EventHubName = "customers";
                                     });
-                            })
-                            // Fake for the EventHubReceiver which will read events from a local file.
-                            .AddFileFakeEventHubProcessor(options =>
-                            {
-                                options.Directory = SampleConfiguration.FileFakeEventHubDirectory;
-                                options.ClearEventHubOnStart = true;
-                                options.EventHubName = "customers";
                             });
                     });
                 });

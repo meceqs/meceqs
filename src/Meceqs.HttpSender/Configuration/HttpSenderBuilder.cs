@@ -9,10 +9,12 @@ namespace Meceqs.HttpSender.Configuration
 
         public IHttpClientBuilder HttpClient { get; }
 
-        public HttpSenderBuilder(IServiceCollection services, string pipelineName)
-            : base(services, pipelineName)
+        public HttpSenderBuilder(IMeceqsBuilder meceqsBuilder, string pipelineName)
+            : base(meceqsBuilder, pipelineName)
         {
-            HttpClient = services.AddHttpClient("Meceqs.HttpSender." + pipelineName);
+            HttpClient = meceqsBuilder.Services.AddHttpClient("Meceqs.HttpSender." + PipelineName);
+
+            ConfigurePipeline(pipeline => pipeline.EndsWith(x => x.RunHttpSender()));
         }
     }
 }

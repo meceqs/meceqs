@@ -62,11 +62,9 @@ namespace TrafficGenerator
                             })
                             .AddServiceBusSender("ServiceBus", sender =>
                             {
-
-                            })
-
-                            // send messages to a local file instead of the actual Service Bus.
-                            .AddFileFakeServiceBusSender(SampleConfiguration.FileFakeServiceBusDirectory);
+                                // For this sample, we will send messages to a local file instead of a real Service Hub.
+                                sender.UseFileFake(SampleConfiguration.FileFakeServiceBusDirectory, SampleConfiguration.PlaceOrderQueue);
+                            });
                     });
                 });
         }

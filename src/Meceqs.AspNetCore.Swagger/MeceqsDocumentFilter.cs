@@ -1,5 +1,4 @@
-﻿using Meceqs.AspNetCore.Configuration;
-using Meceqs.AspNetCore.Receiving;
+﻿using Meceqs.AspNetCore.Receiving;
 using Meceqs.Transport;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -13,31 +12,39 @@ namespace Meceqs.AspNetCore.Swagger
 
     public class MeceqsDocumentFilter : IDocumentFilter
     {
-        private readonly AspNetCoreReceiverOptions _options;
+        private readonly ReceiveTransportOptions _transportOptions;
+        private readonly IOptionsMonitor<AspNetCoreReceiverOptions> _receiverOptions;
         private readonly IMessagePathConvention _messagePathConvention;
         private readonly MeceqsSwaggerOptions _meceqsOptions;
 
         public MeceqsDocumentFilter(
-            IOptions<AspNetCoreReceiverOptions> options,
+            IOptions<ReceiveTransportOptions> transportOptions,
+            IOptionsMonitor<AspNetCoreReceiverOptions> receiverOptions,
             IMessagePathConvention messagePathConvention,
             MeceqsSwaggerOptions meceqsOptions)
         {
-            _options = options?.Value;
+            _transportOptions = transportOptions?.Value;
+            _receiverOptions = receiverOptions;
             _messagePathConvention = messagePathConvention;
             _meceqsOptions = meceqsOptions;
         }
 
         public void Apply(SwaggerDocument swaggerDoc, DocumentFilterContext context)
         {
-            foreach (var messageType in _options.MessageTypes)
+            foreach (string receiverName in _transportOptions.Receivers)
             {
-                AddMessageType(messageType, swaggerDoc, context.SchemaRegistry);
+                AspNetCoreReceiverOptions receiverOptions = _receiverOptions.Get(receiverName);
+
+                foreach (var messageType in receiverOptions.MessageTypes)
+                {
+                    AddMessageType(messageType, swaggerDoc, context.SchemaRegistry, receiverOptions);
+                }
             }
 
             swaggerDoc.Definitions = context.SchemaRegistry.Definitions;
         }
 
-        private void AddMessageType(MessageMetadata messageType, SwaggerDocument document, ISchemaRegistry schemaRegistry)
+        private void AddMessageType(MessageMetadata messageType, SwaggerDocument document, ISchemaRegistry schemaRegistry, AspNetCoreReceiverOptions receiverOptions)
         {
             if (document.Paths == null)
             {
@@ -87,7 +94,7 @@ namespace Meceqs.AspNetCore.Swagger
             }
 
             string path = _messagePathConvention.GetPathForMessage(messageType.MessageType);
-            path = AspNetCoreReceiverUtils.CombineRoutePrefixAndMessagePath(_options.RoutePrefix, path);
+            path = AspNetCoreReceiverUtils.CombineRoutePrefixAndMessagePath(receiverOptions.RoutePrefix, path);
 
             document.Paths.Add(path, new PathItem
             {

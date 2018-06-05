@@ -2,7 +2,6 @@ using System.Threading;
 using Meceqs.Pipeline;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Primitives;
 
 namespace Meceqs.AspNetCore
 {
@@ -72,8 +71,7 @@ namespace Meceqs.AspNetCore
 
             if (!messageContext.Envelope.Headers.ContainsKey(_options.RemoteUserAgentHeaderName))
             {
-                StringValues userAgent;
-                if (httpContext.Request.Headers.TryGetValue("User-Agent", out userAgent))
+                if (httpContext.Request.Headers.TryGetValue("User-Agent", out var userAgent))
                 {
                     messageContext.Envelope.Headers.Add(_options.RemoteUserAgentHeaderName, userAgent.ToString());
                 }

@@ -1,4 +1,5 @@
 using Meceqs.AzureEventHubs.Sending;
+using Meceqs.Configuration;
 using Meceqs.Transport;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -8,9 +9,17 @@ namespace Meceqs.AzureEventHubs.Configuration
     {
         public override IEventHubSenderBuilder Instance => this;
 
-        public EventHubSenderBuilder(IServiceCollection services, string pipelineName)
-            : base(services, pipelineName)
+        public EventHubSenderBuilder(IMeceqsBuilder meceqsBuilder, string pipelineName)
+            : base(meceqsBuilder, pipelineName)
         {
+            ConfigurePipeline(pipeline => pipeline.EndsWith(x => x.RunEventHubSender()));
+        }
+
+        public IEventHubSenderBuilder SetConnectionString(string connectionString)
+        {
+            Guard.NotNullOrWhiteSpace(connectionString, nameof(connectionString));
+
+            return Configure(x => x.EventHubConnectionString = connectionString);
         }
     }
 }

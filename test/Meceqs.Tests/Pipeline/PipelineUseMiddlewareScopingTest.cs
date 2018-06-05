@@ -87,7 +87,7 @@ namespace Meceqs.Tests.Pipeline
             options.UseMiddleware<MiddlewareWithServices>(false /* isTerminating */);
             options.UseMiddleware<MiddlewareWithServices>(true /* isTerminating */);
 
-            return options.BuildPipelineDelegate(serviceProvider);
+            return options.BuildPipeline(serviceProvider);
         }
 
         [Fact]

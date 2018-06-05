@@ -1,5 +1,7 @@
+using Meceqs.AspNetCore.Receiving;
 using Meceqs.Transport;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Meceqs.AspNetCore.Configuration
 {
@@ -8,9 +10,14 @@ namespace Meceqs.AspNetCore.Configuration
     {
         public override IAspNetCoreReceiverBuilder Instance => this;
 
-        public IAspNetCoreReceiverBuilder UseRoutePrefix(PathString path)
+        public AspNetCoreReceiverBuilder(IMeceqsBuilder meceqsBuilder, string pipelineName)
+            : base(meceqsBuilder, pipelineName)
         {
-            ConfigureOptions(x => x.RoutePrefix = path);
+        }
+
+        public IAspNetCoreReceiverBuilder SetRoutePrefix(PathString path)
+        {
+            Configure(x => x.RoutePrefix = path);
             return this;
         }
 }

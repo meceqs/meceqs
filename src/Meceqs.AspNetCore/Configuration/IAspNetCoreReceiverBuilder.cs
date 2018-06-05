@@ -1,10 +1,11 @@
+using Meceqs.AspNetCore.Receiving;
 using Meceqs.Transport;
 using Microsoft.AspNetCore.Http;
 
-namespace Meceqs.AspNetCore.Configuration
+namespace Microsoft.Extensions.DependencyInjection
 {
-    public interface IAspNetCoreReceiverBuilder : ITransportReceiverBuilder<IAspNetCoreReceiverBuilder>
+    public interface IAspNetCoreReceiverBuilder : ITransportReceiverBuilder<IAspNetCoreReceiverBuilder, AspNetCoreReceiverOptions>
     {
-        IAspNetCoreReceiverBuilder UseRoutePrefix(PathString path);
+        IAspNetCoreReceiverBuilder SetRoutePrefix(PathString path);
     }
 }

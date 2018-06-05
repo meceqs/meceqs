@@ -25,13 +25,14 @@ namespace Meceqs.AspNetCore.Receiving
             _httpResponseWriter = httpResponseWriter;
         }
 
-        public async Task ReceiveAsync(HttpContext httpContext, MessageMetadata metadata)
+        public async Task ReceiveAsync(HttpContext httpContext, string receiverName, MessageMetadata metadata)
         {
             // TODO error handling etc.
 
             var envelope = _httpRequestReader.ConvertToEnvelope(httpContext, metadata.MessageType);
 
             object result = await _messageReceiver.ForEnvelope(envelope)
+                .UsePipeline(receiverName)
                 .SetCancellationToken(httpContext.RequestAborted)
                 .ReceiveAsync(metadata.ResultType);
 

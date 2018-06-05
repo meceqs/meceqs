@@ -49,16 +49,17 @@ namespace Sales.Hosts.ProcessOrders
                         builder
                             .AddServiceBusReceiver(receiver =>
                             {
+                                // Will read messages from local file system.
+                                receiver.UseFileFake(options =>
+                                {
+                                    options.Directory = SampleConfiguration.FileFakeServiceBusDirectory;
+                                    options.EntityPath = SampleConfiguration.PlaceOrderQueue;
+                                });
+
                                 receiver.UseTypedHandling(options =>
                                 {
                                     options.Handlers.AddFromAssembly<Program>();
                                 });
-                            })
-                            // Fake for the ServiceBusReceiver which will read messages from local file system.
-                            .AddFileFakeServiceBusProcessor(options =>
-                            {
-                                options.Directory = SampleConfiguration.FileFakeServiceBusDirectory;
-                                options.EntityPath = SampleConfiguration.PlaceOrderQueue;
                             });
                     });
                 });

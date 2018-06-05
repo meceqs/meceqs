@@ -1,17 +1,20 @@
 using System;
 using Meceqs;
-using Meceqs.Configuration;
 using Meceqs.AzureEventHubs.FileFake;
 using Meceqs.AzureEventHubs.Internal;
 using Microsoft.Extensions.Logging;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
-    public static class FileFakeEventHubMeceqsBuilderExtensions
+    public static class FileFakeEventHubBuilderExtensions
     {
-        public static IMeceqsBuilder AddFileFakeEventHubSender(this IMeceqsBuilder builder, string directory)
+        public static IEventHubSenderBuilder UseFileFake(this IEventHubSenderBuilder builder, string directory, string entityPath)
         {
             Guard.NotNull(builder, nameof(builder));
+            Guard.NotNullOrWhiteSpace(directory, nameof(directory));
+            Guard.NotNullOrWhiteSpace(entityPath, nameof(entityPath));
+
+            builder.SetConnectionString("Endpoint=sb://dummy;EntityPath=" + entityPath);
 
             builder.Services.AddSingleton<IEventHubClientFactory>(serviceProvider =>
             {
@@ -23,7 +26,7 @@ namespace Microsoft.Extensions.DependencyInjection
             return builder;
         }
 
-        public static IMeceqsBuilder AddFileFakeEventHubProcessor(this IMeceqsBuilder builder, Action<FileFakeEventHubProcessorOptions> options)
+        public static IEventHubReceiverBuilder UseFileFake(this IEventHubReceiverBuilder builder, Action<FileFakeEventHubProcessorOptions> options)
         {
             Guard.NotNull(builder, nameof(builder));
 

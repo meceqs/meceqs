@@ -5,5 +5,6 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public interface IEventHubSenderBuilder : ITransportSenderBuilder<IEventHubSenderBuilder, EventHubSenderOptions>
     {
+        IEventHubSenderBuilder SetConnectionString(string connectionString);
     }
 }

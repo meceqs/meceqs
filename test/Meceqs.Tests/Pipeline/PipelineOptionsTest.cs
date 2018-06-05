@@ -16,7 +16,7 @@ namespace Meceqs.Tests.Pipeline
             var optionsInstance = new PipelineOptions();
             options?.Invoke(optionsInstance);
 
-            return optionsInstance.BuildPipelineDelegate(serviceProvider);
+            return optionsInstance.BuildPipeline(serviceProvider);
         }
 
         [Fact]

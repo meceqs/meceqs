@@ -11,9 +11,20 @@ namespace Meceqs.Pipeline
     {
         private readonly IList<Func<MiddlewareDelegate, IServiceProvider, MiddlewareDelegate>> _middlewareEntries;
 
+        private Action<PipelineOptions> _onBuildPipeline;
+
         public PipelineOptions()
         {
             _middlewareEntries = new List<Func<MiddlewareDelegate, IServiceProvider, MiddlewareDelegate>>();
+        }
+
+        /// <summary>
+        /// Allows modifying the pipeline before it is built. This can be used to set the last middleware.
+        /// </summary>
+        public PipelineOptions EndsWith(Action<PipelineOptions> onBuildPipeline)
+        {
+            _onBuildPipeline = onBuildPipeline;
+            return this;
         }
 
         /// <summary>
@@ -28,18 +39,17 @@ namespace Meceqs.Pipeline
         /// <summary>
         /// Creates an executable pipeline with all configured middleware components.
         /// </summary>
-        public MiddlewareDelegate BuildPipelineDelegate(IServiceProvider applicationServices)
+        public MiddlewareDelegate BuildPipeline(IServiceProvider applicationServices)
         {
+            _onBuildPipeline?.Invoke(this);
+
             if (_middlewareEntries.Count == 0)
             {
                 return null;
             }
 
-            MiddlewareDelegate pipeline = context =>
-            {
-                // This middleware will be executed last!
-                throw new InvalidOperationException("The message has not been handled by a terminating middleware");
-            };
+            // This middleware will always be the last one!
+            MiddlewareDelegate pipeline = context => throw new InvalidOperationException("The message has not been handled by a terminating middleware");
 
             foreach (var middleware in _middlewareEntries.Reverse())
             {

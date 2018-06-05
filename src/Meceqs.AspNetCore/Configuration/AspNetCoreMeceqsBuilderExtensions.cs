@@ -5,7 +5,6 @@ using Meceqs.AspNetCore.Configuration;
 using Meceqs.AspNetCore.Receiving;
 using Meceqs.Configuration;
 using Meceqs.Pipeline;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Microsoft.Extensions.DependencyInjection
@@ -16,8 +15,9 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             Guard.NotNull(builder, nameof(builder));
 
+            builder.Services.AddHttpContextAccessor();
+
             // Enricher
-            builder.Services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             builder.Services.TryAddSingleton<IMessageContextEnricher, AspNetCoreEnricher>();
 
             // TODO should some be singleton?
@@ -31,31 +31,34 @@ namespace Microsoft.Extensions.DependencyInjection
         }
 
         /// <summary>
-        /// Adds an ASP.NET Core receiver pipeline.
+        /// Adds an ASP.NET Core receiver that sends messages to the default <see cref="MeceqsDefaults.ReceivePipelineName"/> pipeline.
         /// </summary>
         public static IMeceqsBuilder AddAspNetCoreReceiver(
             this IMeceqsBuilder builder,
-            Action<IAspNetCoreReceiverBuilder> options)
+            Action<IAspNetCoreReceiverBuilder> receiver)
+        {
+            return AddAspNetCoreReceiver(builder, null, receiver);
+        }
+
+        /// <summary>
+        /// Adds an ASP.NET Core receiver that sends messages to the named pipeline.
+        /// </summary>
+        public static IMeceqsBuilder AddAspNetCoreReceiver(
+            this IMeceqsBuilder builder,
+            string pipelineName,
+            Action<IAspNetCoreReceiverBuilder> receiver)
         {
             Guard.NotNull(builder, nameof(builder));
-
-            var receiverBuilder = new AspNetCoreReceiverBuilder();
-            options?.Invoke(receiverBuilder);
+            Guard.NotNull(receiver, nameof(receiver));
 
             builder.AddAspNetCore();
 
-            foreach (var assembly in receiverBuilder.GetDeserializationAssemblies())
-            {
-                builder.AddDeserializationAssembly(assembly);
-            }
+            var receiverBuilder = new AspNetCoreReceiverBuilder(builder, pipelineName);
 
-            var receiverOptions = receiverBuilder.GetReceiverOptions();
-            if (receiverOptions != null)
-            {
-                builder.Services.Configure(receiverOptions);
-            }
+            receiver?.Invoke(receiverBuilder);
 
-            builder.ConfigurePipeline(receiverBuilder.GetPipelineName(), receiverBuilder.GetPipeline());
+            // Register the receiver with the transport
+            builder.Services.Configure<ReceiveTransportOptions>(o => o.AddReceiver(receiverBuilder.PipelineName));
 
             return builder;
         }

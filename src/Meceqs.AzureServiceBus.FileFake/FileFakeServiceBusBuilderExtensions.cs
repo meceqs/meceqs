@@ -1,17 +1,20 @@
 using System;
 using Meceqs;
-using Meceqs.Configuration;
 using Meceqs.AzureServiceBus.FileFake;
 using Meceqs.AzureServiceBus.Internal;
 using Microsoft.Extensions.Logging;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
-    public static class FileFakeServiceBusMeceqsBuilderExtensions
+    public static class FileFakeServiceBusBuilderExtensions
     {
-        public static IMeceqsBuilder AddFileFakeServiceBusSender(this IMeceqsBuilder builder, string directory)
+        public static IServiceBusSenderBuilder UseFileFake(this IServiceBusSenderBuilder builder, string directory, string entityPath)
         {
             Guard.NotNull(builder, nameof(builder));
+            Guard.NotNullOrWhiteSpace(directory, nameof(directory));
+            Guard.NotNullOrWhiteSpace(entityPath, nameof(entityPath));
+
+            builder.SetConnectionString($"Endpoint=sb://dummy.example.com;EntityPath={entityPath}");
 
             builder.Services.AddSingleton<IServiceBusMessageSenderFactory>(serviceProvider =>
             {
@@ -23,7 +26,7 @@ namespace Microsoft.Extensions.DependencyInjection
             return builder;
         }
 
-        public static IMeceqsBuilder AddFileFakeServiceBusProcessor(this IMeceqsBuilder builder, Action<FileFakeServiceBusProcessorOptions> options)
+        public static IServiceBusReceiverBuilder UseFileFake(this IServiceBusReceiverBuilder builder, Action<FileFakeServiceBusProcessorOptions> options)
         {
             Guard.NotNull(builder, nameof(builder));
 

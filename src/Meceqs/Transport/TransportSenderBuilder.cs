@@ -1,4 +1,5 @@
 using System;
+using Meceqs.Configuration;
 using Meceqs.Pipeline;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -11,18 +12,19 @@ namespace Meceqs.Transport
     {
         public string PipelineName { get; }
 
-        public IServiceCollection Services { get; }
+        public IMeceqsBuilder MeceqsBuilder { get; }
+
+        public IServiceCollection Services => MeceqsBuilder.Services;
 
         /// <inheritdoc/>
         public abstract TTransportSenderBuilder Instance { get; }
 
-        protected TransportSenderBuilder(IServiceCollection services, string pipelineName)
+        protected TransportSenderBuilder(IMeceqsBuilder meceqsBuilder, string pipelineName)
         {
-            Guard.NotNull(services, nameof(services));
-            Guard.NotNullOrWhiteSpace(pipelineName, nameof(pipelineName));
+            Guard.NotNull(meceqsBuilder, nameof(meceqsBuilder));
 
-            Services = services;
-            PipelineName = pipelineName;
+            MeceqsBuilder = meceqsBuilder;
+            PipelineName = pipelineName ?? MeceqsDefaults.SendPipelineName;
         }
 
         public TTransportSenderBuilder Configure(Action<TTransportSenderOptions> options)
@@ -31,7 +33,6 @@ namespace Meceqs.Transport
             {
                 Services.Configure(PipelineName, options);
             }
-
             return Instance;
         }
 

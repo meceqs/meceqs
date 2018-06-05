@@ -1,6 +1,4 @@
-using Microsoft.Extensions.DependencyInjection;
-
-namespace Meceqs.Configuration
+namespace Microsoft.Extensions.DependencyInjection
 {
     /// <summary>
     /// Used to configure the behavior of Meceqs.

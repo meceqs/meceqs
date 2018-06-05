@@ -7,10 +7,11 @@ namespace Meceqs.AspNetCore.Receiving
     {
         private static readonly List<string> _suffixesToRemove = new List<string>
         {
-            "Message",
             "Command",
             "Event",
-            "Query"
+            "Message",
+            "Query",
+            "Request"
         };
 
         public string GetPathForMessage(Type messageType)

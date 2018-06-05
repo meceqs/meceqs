@@ -12,42 +12,35 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class ServiceBusMeceqsBuilderExtensions
     {
-        private static IMeceqsBuilder AddServiceBusServices(this IMeceqsBuilder builder)
+        private static void AddServiceBusServices(this IMeceqsBuilder builder)
         {
             Guard.NotNull(builder, nameof(builder));
 
             builder.Services.TryAddSingleton<IServiceBusMessageConverter, DefaultServiceBusMessageConverter>();
             builder.Services.TryAddSingleton<IServiceBusMessageSenderFactory, DefaultServiceBusMessageSenderFactory>();
             builder.Services.TryAddSingleton<IServiceBusReceiver, DefaultServiceBusReceiver>();
-
-            return builder;
         }
 
         /// <summary>
-        /// Adds an Azure Service Bus receiver pipeline.
+        /// Adds an Azure Service Bus receiver that sends messages to the default <see cref="MeceqsDefaults.ReceivePipelineName"/> pipeline.
         /// </summary>
         public static IMeceqsBuilder AddServiceBusReceiver(this IMeceqsBuilder builder, Action<IServiceBusReceiverBuilder> receiver)
+        {
+            return AddServiceBusReceiver(builder, null, receiver);
+        }
+
+        /// <summary>
+        /// Adds an Azure Service Bus receiver that sends messages to the named pipeline.
+        /// </summary>
+        public static IMeceqsBuilder AddServiceBusReceiver(this IMeceqsBuilder builder, string pipelineName, Action<IServiceBusReceiverBuilder> receiver)
         {
             Guard.NotNull(builder, nameof(builder));
             Guard.NotNull(receiver, nameof(receiver));
 
-            var receiverBuilder = new ServiceBusReceiverBuilder();
-            receiver?.Invoke(receiverBuilder);
-
             builder.AddServiceBusServices();
 
-            foreach (var assembly in receiverBuilder.GetDeserializationAssemblies())
-            {
-                builder.AddDeserializationAssembly(assembly);
-            }
-
-            var receiverOptions = receiverBuilder.GetReceiverOptions();
-            if (receiverOptions != null)
-            {
-                builder.Services.Configure(receiverOptions);
-            }
-
-            builder.ConfigurePipeline(receiverBuilder.GetPipelineName(), receiverBuilder.GetPipeline());
+            var receiverBuilder = new ServiceBusReceiverBuilder(builder, pipelineName);
+            receiver?.Invoke(receiverBuilder);
 
             return builder;
         }
@@ -80,21 +73,16 @@ namespace Microsoft.Extensions.DependencyInjection
             Guard.NotNull(builder, nameof(builder));
             Guard.NotNull(sender, nameof(sender));
 
-            pipelineName = pipelineName ?? MeceqsDefaults.SendPipelineName;
-
             builder.AddServiceBusServices();
 
             // Code based options
-            var senderBuilder = new ServiceBusSenderBuilder(builder.Services, pipelineName);
+            var senderBuilder = new ServiceBusSenderBuilder(builder, pipelineName);
             sender?.Invoke(senderBuilder);
-
-            // Add the ServiceBusSenderMiddleware as the last middleware
-            senderBuilder.ConfigurePipeline(pipeline => pipeline.RunServiceBusSender());
 
             // Configuration based options
             if (configuration != null)
             {
-                builder.Services.Configure<ServiceBusSenderOptions>(configuration);
+                builder.Services.Configure<ServiceBusSenderOptions>(senderBuilder.PipelineName, configuration);
             }
 
             return builder;

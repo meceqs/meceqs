@@ -6,6 +6,6 @@ namespace Meceqs.AspNetCore.Receiving
 {
     public interface IAspNetCoreReceiver
     {
-        Task ReceiveAsync(HttpContext httpContext, MessageMetadata metadata);
+        Task ReceiveAsync(HttpContext httpContext, string receiverName, MessageMetadata metadata);
     }
 }

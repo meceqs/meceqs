@@ -5,5 +5,6 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public interface IServiceBusSenderBuilder : ITransportSenderBuilder<IServiceBusSenderBuilder, ServiceBusSenderOptions>
     {
+        IServiceBusSenderBuilder SetConnectionString(string connectionString);
     }
 }

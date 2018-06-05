@@ -54,7 +54,7 @@ namespace Meceqs.Pipeline
         {
             var options = _optionsMonitor.Get(pipelineName);
 
-            MiddlewareDelegate pipelineDelegate = options.BuildPipelineDelegate(_serviceProvider);
+            MiddlewareDelegate pipelineDelegate = options.BuildPipeline(_serviceProvider);
 
             // TODO Is it safe to throw in a Lazy-initializer?
             if (pipelineDelegate == null)

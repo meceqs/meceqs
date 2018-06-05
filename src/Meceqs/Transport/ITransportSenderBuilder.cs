@@ -15,6 +15,11 @@ namespace Meceqs.Transport
         string PipelineName { get; }
 
         /// <summary>
+        /// Gets the Meceqs builder.
+        /// </summary>
+        IMeceqsBuilder MeceqsBuilder { get; }
+
+        /// <summary>
         /// Gets the application service collection.
         /// </summary>
         IServiceCollection Services { get; }
