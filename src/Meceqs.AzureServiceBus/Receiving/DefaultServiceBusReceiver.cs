@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Meceqs.AzureServiceBus.Configuration;
 using Meceqs.AzureServiceBus.Internal;
+using Meceqs.Configuration;
 using Meceqs.Receiving;
 using Microsoft.Azure.ServiceBus;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,15 +19,17 @@ namespace Meceqs.AzureServiceBus.Receiving
         private readonly IServiceScopeFactory _serviceScopeFactory;
 
         public DefaultServiceBusReceiver(
-            IOptions<ServiceBusReceiverOptions> options,
+            IOptionsMonitor<ServiceBusReceiverOptions> optionsMonitor,
             ILoggerFactory loggerFactory,
             IServiceScopeFactory serviceScopeFactory)
         {
-            Guard.NotNull(options?.Value, nameof(options));
+            Guard.NotNull(optionsMonitor, nameof(optionsMonitor));
             Guard.NotNull(loggerFactory, nameof(loggerFactory));
             Guard.NotNull(serviceScopeFactory, nameof(serviceScopeFactory));
 
-            _options = options.Value;
+            // TODO !!! EventHubReceiver doesn't work with named options yet.
+            _options = optionsMonitor.Get(MeceqsDefaults.ReceivePipelineName);
+
             _logger = loggerFactory.CreateLogger<DefaultServiceBusReceiver>();
             _serviceScopeFactory = serviceScopeFactory;
         }
