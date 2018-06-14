@@ -1,6 +1,5 @@
 using System;
 using Meceqs;
-using Meceqs.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Microsoft.AspNetCore.Hosting

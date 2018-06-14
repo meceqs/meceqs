@@ -1,7 +1,7 @@
 using Meceqs.Transport;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Meceqs.HttpSender.Configuration
+namespace Meceqs.HttpSender.DependencyInjection
 {
     public class HttpSenderBuilder : TransportSenderBuilder<IHttpSenderBuilder, HttpSenderOptions>, IHttpSenderBuilder
     {

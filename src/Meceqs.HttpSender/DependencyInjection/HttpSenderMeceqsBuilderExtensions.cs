@@ -1,7 +1,7 @@
 using System;
 using Meceqs;
 using Meceqs.HttpSender;
-using Meceqs.HttpSender.Configuration;
+using Meceqs.HttpSender.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 

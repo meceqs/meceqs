@@ -3,7 +3,7 @@ using Meceqs.Transport;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Meceqs.AspNetCore.Configuration
+namespace Meceqs.AspNetCore.DependencyInjection
 {
     public class AspNetCoreReceiverBuilder : TransportReceiverBuilder<IAspNetCoreReceiverBuilder, AspNetCoreReceiverOptions>,
         IAspNetCoreReceiverBuilder

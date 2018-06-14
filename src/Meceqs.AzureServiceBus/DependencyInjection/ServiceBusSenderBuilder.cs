@@ -1,9 +1,8 @@
 using Meceqs.AzureServiceBus.Sending;
-using Meceqs.Configuration;
 using Meceqs.Transport;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Meceqs.AzureServiceBus.Configuration
+namespace Meceqs.AzureServiceBus.DependencyInjection
 {
     public class ServiceBusSenderBuilder : TransportSenderBuilder<IServiceBusSenderBuilder, ServiceBusSenderOptions>, IServiceBusSenderBuilder
     {

@@ -1,4 +1,4 @@
-using Meceqs.AzureServiceBus.Configuration;
+using Meceqs.AzureServiceBus.Receiving;
 using Meceqs.Transport;
 
 namespace Microsoft.Extensions.DependencyInjection

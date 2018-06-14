@@ -1,4 +1,4 @@
-namespace Meceqs.Configuration
+namespace Meceqs
 {
     /// <summary>
     /// Global defaults. These values can only be changed through code.

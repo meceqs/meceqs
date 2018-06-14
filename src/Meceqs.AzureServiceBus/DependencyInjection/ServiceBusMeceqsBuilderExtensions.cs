@@ -1,10 +1,9 @@
 using System;
 using Meceqs;
-using Meceqs.AzureServiceBus.Configuration;
+using Meceqs.AzureServiceBus.DependencyInjection;
 using Meceqs.AzureServiceBus.Internal;
 using Meceqs.AzureServiceBus.Receiving;
 using Meceqs.AzureServiceBus.Sending;
-using Meceqs.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 

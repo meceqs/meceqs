@@ -1,9 +1,8 @@
 using System;
 using Meceqs;
 using Meceqs.AspNetCore;
-using Meceqs.AspNetCore.Configuration;
+using Meceqs.AspNetCore.DependencyInjection;
 using Meceqs.AspNetCore.Receiving;
-using Meceqs.Configuration;
 using Meceqs.Pipeline;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 

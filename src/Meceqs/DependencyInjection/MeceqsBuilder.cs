@@ -1,6 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Meceqs.Configuration
+namespace Meceqs.DependencyInjection
 {
     public class MeceqsBuilder : IMeceqsBuilder
     {

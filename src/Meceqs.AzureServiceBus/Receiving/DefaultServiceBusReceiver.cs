@@ -1,9 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Meceqs.AzureServiceBus.Configuration;
 using Meceqs.AzureServiceBus.Internal;
-using Meceqs.Configuration;
 using Meceqs.Receiving;
 using Microsoft.Azure.ServiceBus;
 using Microsoft.Extensions.DependencyInjection;

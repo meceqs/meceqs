@@ -1,5 +1,4 @@
 using System;
-using Meceqs.Configuration;
 using Meceqs.Pipeline;
 using Microsoft.Extensions.DependencyInjection;
 

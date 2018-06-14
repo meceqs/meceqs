@@ -1,6 +1,6 @@
 using Meceqs.Transport;
 
-namespace Meceqs.AzureServiceBus.Configuration
+namespace Meceqs.AzureServiceBus.Receiving
 {
     public class ServiceBusReceiverOptions : TransportReceiverOptions
     {

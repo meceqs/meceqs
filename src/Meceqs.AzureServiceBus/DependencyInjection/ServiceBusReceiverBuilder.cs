@@ -1,8 +1,8 @@
-using Meceqs.Configuration;
+using Meceqs.AzureServiceBus.Receiving;
 using Meceqs.Transport;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Meceqs.AzureServiceBus.Configuration
+namespace Meceqs.AzureServiceBus.DependencyInjection
 {
     public class ServiceBusReceiverBuilder : TransportReceiverBuilder<IServiceBusReceiverBuilder, ServiceBusReceiverOptions>,
         IServiceBusReceiverBuilder

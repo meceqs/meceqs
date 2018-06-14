@@ -1,9 +1,8 @@
 using Meceqs.AzureEventHubs.Receiving;
-using Meceqs.Configuration;
 using Meceqs.Transport;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Meceqs.AzureEventHubs.Configuration
+namespace Meceqs.AzureEventHubs.DependencyInjection
 {
     public class EventHubReceiverBuilder : TransportReceiverBuilder<IEventHubReceiverBuilder, EventHubReceiverOptions>,
         IEventHubReceiverBuilder

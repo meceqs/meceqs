@@ -1,6 +1,5 @@
 using System;
 using System.Threading.Tasks;
-using Meceqs.Configuration;
 using Meceqs.Pipeline;
 using Microsoft.Extensions.DependencyInjection;
 
