@@ -49,7 +49,15 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         public static IMeceqsBuilder AddEventHubSender(this IMeceqsBuilder builder, Action<IEventHubSenderBuilder> sender)
         {
-            return AddEventHubSender(builder, null, sender);
+            return AddEventHubSender(builder, null, null, sender);
+        }
+
+        /// <summary>
+        /// Adds an Azure Event Hubs sender to the default "Send" pipeline.
+        /// </summary>
+        public static IMeceqsBuilder AddEventHubSender(this IMeceqsBuilder builder, IConfiguration configuration, Action<IEventHubSenderBuilder> sender = null)
+        {
+            return AddEventHubSender(builder, null, configuration, sender);
         }
 
         /// <summary>
@@ -67,7 +75,7 @@ namespace Microsoft.Extensions.DependencyInjection
             this IMeceqsBuilder builder,
             string pipelineName,
             IConfiguration configuration,
-            Action<IEventHubSenderBuilder> sender)
+            Action<IEventHubSenderBuilder> sender = null)
         {
             Guard.NotNull(builder, nameof(builder));
             Guard.NotNull(sender, nameof(sender));
