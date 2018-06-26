@@ -1,6 +1,6 @@
+using System;
 using Meceqs.Pipeline;
 using Microsoft.Extensions.DependencyInjection;
-using Shouldly;
 using Xunit;
 
 namespace Meceqs.Tests.Pipeline
@@ -8,7 +8,7 @@ namespace Meceqs.Tests.Pipeline
     public class PipelineConfigurationTest
     {
         [Fact]
-        public void Configuring_the_same_pipelineName_succeeds()
+        public void Adding_the_same_pipelineName_fails()
         {
             var serviceProvider = new ServiceCollection()
                 .AddLogging()
@@ -27,9 +27,7 @@ namespace Meceqs.Tests.Pipeline
                 })
                 .BuildServiceProvider();
 
-            var pipelineProvider = serviceProvider.GetRequiredService<IPipelineProvider>();
-
-            pipelineProvider.GetPipeline("pipeline").ShouldNotBeNull();
+            Assert.Throws<InvalidOperationException>(() => serviceProvider.GetRequiredService<IPipelineProvider>());
         }
     }
 }
