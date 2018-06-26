@@ -9,6 +9,8 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class MeceqsBuilderExtensions
     {
+        // TODO @cweiss name it AddPipeline again and throw if it already exists?!
+
         /// <summary>
         /// Configures the default "Receive" pipeline. This pipeline will be used when <see cref="Meceqs.Receiving.IMessageReceiver"/>
         /// is used without specifying a named pipeline.
