@@ -10,7 +10,7 @@
                 "${workspaceFolder}/Meceqs.sln"
             ],
             "problemMatcher": "$msCompile"
-        }
+        },
         {
             "label": "build",
             "command": "dotnet",
