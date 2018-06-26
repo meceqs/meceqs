@@ -21,10 +21,12 @@ namespace Microsoft.Extensions.DependencyInjection
             return AddHttpSender(builder, null, null, sender);
         }
 
-        public static IMeceqsBuilder AddHttpSender(
-            this IMeceqsBuilder builder,
-            string pipelineName,
-            Action<IHttpSenderBuilder> sender)
+        public static IMeceqsBuilder AddHttpSender(this IMeceqsBuilder builder, IConfiguration configuration, Action<IHttpSenderBuilder> sender = null)
+        {
+            return AddHttpSender(builder, null, configuration, sender);
+        }
+
+        public static IMeceqsBuilder AddHttpSender(this IMeceqsBuilder builder, string pipelineName, Action<IHttpSenderBuilder> sender)
         {
             return AddHttpSender(builder, pipelineName, null, sender);
         }
@@ -33,7 +35,7 @@ namespace Microsoft.Extensions.DependencyInjection
             this IMeceqsBuilder builder,
             string pipelineName,
             IConfiguration configuration,
-            Action<IHttpSenderBuilder> sender)
+            Action<IHttpSenderBuilder> sender = null)
         {
             Guard.NotNull(builder, nameof(builder));
 
