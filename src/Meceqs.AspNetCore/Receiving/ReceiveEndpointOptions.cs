@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Meceqs.AspNetCore.Receiving
 {
-    public class ReceiveTransportOptions
+    public class ReceiveEndpointOptions
     {
         private readonly List<string> _receivers = new List<string>();
 

@@ -9,47 +9,59 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class MeceqsBuilderExtensions
     {
-        // TODO @cweiss name it AddPipeline again and throw if it already exists?!
-
         /// <summary>
-        /// Configures the default "Receive" pipeline. This pipeline will be used when <see cref="Meceqs.Receiving.IMessageReceiver"/>
+        /// Adds the default "Receive" pipeline. This pipeline will be used when <see cref="Meceqs.Receiving.IMessageReceiver"/>
         /// is used without specifying a named pipeline.
         /// </summary>
-        public static IMeceqsBuilder ConfigureReceivePipeline(this IMeceqsBuilder builder, Action<PipelineOptions> pipeline)
+        public static IMeceqsBuilder AddReceivePipeline(this IMeceqsBuilder builder, Action<PipelineBuilder> pipeline)
         {
             Guard.NotNull(builder, nameof(builder));
             Guard.NotNull(pipeline, nameof(pipeline));
 
-            builder.ConfigurePipeline(MeceqsDefaults.ReceivePipelineName, pipeline);
+            builder.AddPipeline(MeceqsDefaults.ReceivePipelineName, pipeline);
 
             return builder;
         }
 
         /// <summary>
-        /// Configures the default "Send" pipeline. This pipeline will be used when <see cref="Meceqs.Sending.IMessageSender"/>
+        /// Adds the default "Send" pipeline. This pipeline will be used when <see cref="Meceqs.Sending.IMessageSender"/>
         /// is used without specifying a named pipeline.
         /// </summary>
-        public static IMeceqsBuilder ConfigureSendPipeline(this IMeceqsBuilder builder, Action<PipelineOptions> pipeline)
+        public static IMeceqsBuilder AddSendPipeline(this IMeceqsBuilder builder, Action<PipelineBuilder> pipeline)
         {
             Guard.NotNull(builder, nameof(builder));
             Guard.NotNull(pipeline, nameof(pipeline));
 
-            builder.ConfigurePipeline(MeceqsDefaults.SendPipelineName, pipeline);
+            builder.AddPipeline(MeceqsDefaults.SendPipelineName, pipeline);
 
             return builder;
         }
 
         /// <summary>
-        /// Configures a named pipeline. This pipeline can be used by <see cref="Meceqs.Receiving.IMessageReceiver"/>
+        /// Adds a named pipeline. This pipeline can be used by <see cref="Meceqs.Receiving.IMessageReceiver"/>
         /// and <see cref="Meceqs.Sending.IMessageSender"/>.
         /// </summary>
-        public static IMeceqsBuilder ConfigurePipeline(this IMeceqsBuilder builder, string pipelineName, Action<PipelineOptions> pipeline)
+        public static IMeceqsBuilder AddPipeline(this IMeceqsBuilder builder, string pipelineName, Action<PipelineBuilder> pipeline)
         {
             Guard.NotNull(builder, nameof(builder));
             Guard.NotNullOrWhiteSpace(pipelineName, nameof(pipelineName));
             Guard.NotNull(pipeline, nameof(pipeline));
 
-            builder.Services.Configure(pipelineName, pipeline);
+            builder.Services.Configure<PipelineProviderOptions>(o => o.AddPipeline(pipelineName, pipeline));
+
+            return builder;
+        }
+
+        /// <summary>
+        /// Adds a named pipeline. This pipeline can be used by <see cref="Meceqs.Receiving.IMessageReceiver"/>
+        /// and <see cref="Meceqs.Sending.IMessageSender"/>.
+        /// </summary>
+        public static IMeceqsBuilder AddPipeline(this IMeceqsBuilder builder, PipelineBuilder pipeline)
+        {
+            Guard.NotNull(builder, nameof(builder));
+            Guard.NotNull(pipeline, nameof(pipeline));
+
+            builder.Services.Configure<PipelineProviderOptions>(o => o.AddPipeline(pipeline));
 
             return builder;
         }

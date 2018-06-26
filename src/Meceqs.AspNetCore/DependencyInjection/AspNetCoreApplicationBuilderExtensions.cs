@@ -12,7 +12,7 @@ namespace Microsoft.AspNetCore.Builder
         {
             Guard.NotNull(builder, nameof(builder));
 
-            builder.UseMiddleware<ReceiveTransportMiddleware>();
+            builder.UseMiddleware<ReceiveEndpointMiddleware>();
 
             return builder;
         }

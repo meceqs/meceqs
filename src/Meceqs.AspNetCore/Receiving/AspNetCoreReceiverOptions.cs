@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace Meceqs.AspNetCore.Receiving
 {
-    public class AspNetCoreReceiverOptions : TransportReceiverOptions
+    public class AspNetCoreReceiverOptions : ReceiveTransportOptions
     {
         public PathString RoutePrefix { get; set; }
 

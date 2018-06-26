@@ -81,7 +81,7 @@ namespace Meceqs.Tests.Pipeline
 
         private MiddlewareDelegate GetPipeline(IServiceProvider serviceProvider)
         {
-            var options = new PipelineOptions();
+            var options = new PipelineBuilder("foo");
 
             // two middleware components to make sure we can test scoped services.
             options.UseMiddleware<MiddlewareWithServices>(false /* isTerminating */);

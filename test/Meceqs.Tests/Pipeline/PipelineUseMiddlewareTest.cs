@@ -43,11 +43,11 @@ namespace Meceqs.Tests.Pipeline
             }
         }
 
-        private MiddlewareDelegate GetPipeline(Action<PipelineOptions> options = null)
+        private MiddlewareDelegate GetPipeline(Action<PipelineBuilder> options = null)
         {
             var serviceProvider = new ServiceCollection().BuildServiceProvider();
 
-            var optionsInstance = new PipelineOptions();
+            var optionsInstance = new PipelineBuilder("foo");
             options?.Invoke(optionsInstance);
 
             return optionsInstance.BuildPipeline(serviceProvider);

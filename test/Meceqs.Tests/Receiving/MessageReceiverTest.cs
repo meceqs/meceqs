@@ -18,7 +18,7 @@ namespace Meceqs.Tests.Receiving
 
             services.AddMeceqs(builder =>
             {
-                builder.ConfigureReceivePipeline(pipeline => pipeline.RunCallback(callback));
+                builder.AddReceivePipeline(pipeline => pipeline.RunCallback(callback));
             });
 
             var serviceProvider = services.BuildServiceProvider();

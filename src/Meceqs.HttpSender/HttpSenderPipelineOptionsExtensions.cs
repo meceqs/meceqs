@@ -6,7 +6,7 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class HttpSenderPipelineOptionsExtensions
     {
-        public static PipelineOptions RunHttpSender(this PipelineOptions pipeline)
+        public static PipelineBuilder RunHttpSender(this PipelineBuilder pipeline)
         {
             Guard.NotNull(pipeline, nameof(pipeline));
 

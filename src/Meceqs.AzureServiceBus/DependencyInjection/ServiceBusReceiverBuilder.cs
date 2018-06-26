@@ -1,13 +1,11 @@
 using Meceqs.AzureServiceBus.Receiving;
 using Meceqs.Transport;
-using Microsoft.Extensions.DependencyInjection;
 
-namespace Meceqs.AzureServiceBus.DependencyInjection
+namespace Microsoft.Extensions.DependencyInjection
 {
-    public class ServiceBusReceiverBuilder : TransportReceiverBuilder<IServiceBusReceiverBuilder, ServiceBusReceiverOptions>,
-        IServiceBusReceiverBuilder
+    public class ServiceBusReceiverBuilder : ReceiveTransportBuilder<ServiceBusReceiverBuilder, ServiceBusReceiverOptions>
     {
-        public override IServiceBusReceiverBuilder Instance => this;
+        protected override ServiceBusReceiverBuilder Instance => this;
 
         public ServiceBusReceiverBuilder(IMeceqsBuilder meceqsBuilder, string pipelineName)
             : base(meceqsBuilder, pipelineName)

@@ -7,21 +7,29 @@ namespace Meceqs.Pipeline
     /// <summary>
     /// Used for configuring the middleware components of a pipeline.
     /// </summary>
-    public class PipelineOptions
+    public class PipelineBuilder
     {
         private readonly IList<Func<MiddlewareDelegate, IServiceProvider, MiddlewareDelegate>> _middlewareEntries;
 
-        private Action<PipelineOptions> _onBuildPipeline;
+        private Action<PipelineBuilder> _onBuildPipeline;
 
-        public PipelineOptions()
+        /// <summary>
+        /// The name of the pipeline being built.
+        /// </summary>
+        public string Name { get; }
+
+        public PipelineBuilder(string pipelineName)
         {
+            Guard.NotNullOrWhiteSpace(pipelineName, nameof(pipelineName));
+
+            Name = pipelineName;
             _middlewareEntries = new List<Func<MiddlewareDelegate, IServiceProvider, MiddlewareDelegate>>();
         }
 
         /// <summary>
         /// Allows modifying the pipeline before it is built. This can be used to set the last middleware.
         /// </summary>
-        public PipelineOptions EndsWith(Action<PipelineOptions> onBuildPipeline)
+        public PipelineBuilder EndsWith(Action<PipelineBuilder> onBuildPipeline)
         {
             _onBuildPipeline = onBuildPipeline;
             return this;
@@ -30,7 +38,7 @@ namespace Meceqs.Pipeline
         /// <summary>
         /// Adds the given middleware delegate to the pipeline.
         /// </summary>
-        public PipelineOptions Use(Func<MiddlewareDelegate, IServiceProvider, MiddlewareDelegate> middleware)
+        public PipelineBuilder Use(Func<MiddlewareDelegate, IServiceProvider, MiddlewareDelegate> middleware)
         {
             _middlewareEntries.Add(middleware);
             return this;
@@ -42,11 +50,6 @@ namespace Meceqs.Pipeline
         public MiddlewareDelegate BuildPipeline(IServiceProvider applicationServices)
         {
             _onBuildPipeline?.Invoke(this);
-
-            if (_middlewareEntries.Count == 0)
-            {
-                return null;
-            }
 
             // This middleware will always be the last one!
             MiddlewareDelegate pipeline = context => throw new InvalidOperationException("The message has not been handled by a terminating middleware");

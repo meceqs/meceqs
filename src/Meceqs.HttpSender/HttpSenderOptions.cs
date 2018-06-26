@@ -4,7 +4,7 @@ using Meceqs.Transport;
 
 namespace Meceqs.HttpSender
 {
-    public class HttpSenderOptions : TransportSenderOptions
+    public class HttpSenderOptions : SendTransportOptions
     {
         /// <summary>
         /// Configures the mapping between message types and endpoint URIs for messages that

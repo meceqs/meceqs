@@ -12,18 +12,18 @@ namespace Meceqs.AspNetCore.Receiving
     /// <summary>
     /// This is an ASP.NET Core middleware that "receives" incoming HTTP requests.
     /// </summary>
-    public class ReceiveTransportMiddleware
+    public class ReceiveEndpointMiddleware
     {
         private readonly RequestDelegate _next;
-        private readonly ReceiveTransportOptions _transportOptions;
+        private readonly ReceiveEndpointOptions _transportOptions;
         private readonly IOptionsMonitor<AspNetCoreReceiverOptions> _receiverOptionsMonitor;
         private readonly ILogger _logger;
 
         private readonly Dictionary<string, Tuple<string, MessageMetadata>> _pathLookup;
 
-        public ReceiveTransportMiddleware(
+        public ReceiveEndpointMiddleware(
             RequestDelegate next,
-            IOptions<ReceiveTransportOptions> transportOptions,
+            IOptions<ReceiveEndpointOptions> transportOptions,
             IOptionsMonitor<AspNetCoreReceiverOptions> receiverOptionsMonitor,
             IMessagePathConvention messagePathConvention,
             ILoggerFactory loggerFactory)
@@ -37,7 +37,7 @@ namespace Meceqs.AspNetCore.Receiving
             _next = next;
             _transportOptions = transportOptions.Value;
             _receiverOptionsMonitor = receiverOptionsMonitor;
-            _logger = loggerFactory.CreateLogger<ReceiveTransportMiddleware>();
+            _logger = loggerFactory.CreateLogger<ReceiveEndpointMiddleware>();
 
             _pathLookup = BuildPathLookup(messagePathConvention);
         }

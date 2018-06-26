@@ -1,24 +1,21 @@
 using Meceqs.AspNetCore.Receiving;
 using Meceqs.Transport;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
 
-namespace Meceqs.AspNetCore.DependencyInjection
+namespace Microsoft.Extensions.DependencyInjection
 {
-    public class AspNetCoreReceiverBuilder : TransportReceiverBuilder<IAspNetCoreReceiverBuilder, AspNetCoreReceiverOptions>,
-        IAspNetCoreReceiverBuilder
+    public class AspNetCoreReceiverBuilder : ReceiveTransportBuilder<AspNetCoreReceiverBuilder, AspNetCoreReceiverOptions>
     {
-        public override IAspNetCoreReceiverBuilder Instance => this;
+        protected override AspNetCoreReceiverBuilder Instance => this;
 
         public AspNetCoreReceiverBuilder(IMeceqsBuilder meceqsBuilder, string pipelineName)
             : base(meceqsBuilder, pipelineName)
         {
         }
 
-        public IAspNetCoreReceiverBuilder SetRoutePrefix(PathString path)
+        public AspNetCoreReceiverBuilder SetRoutePrefix(PathString path)
         {
-            Configure(x => x.RoutePrefix = path);
-            return this;
+            return Configure(x => x.RoutePrefix = path);
         }
 }
 }

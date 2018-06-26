@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Meceqs.DependencyInjection
@@ -6,11 +7,16 @@ namespace Meceqs.DependencyInjection
     {
         public IServiceCollection Services { get; }
 
-        public MeceqsBuilder(IServiceCollection services)
+        public IConfiguration Configuration { get; }
+
+        internal MeceqsBuilder(IServiceCollection services, IConfiguration configuration)
         {
             Guard.NotNull(services, nameof(services));
 
             Services = services;
+
+            // Ensures people don't have to deal with a nullable configuration.
+            Configuration = configuration ?? new ConfigurationBuilder().Build();
         }
     }
 }

@@ -1,20 +1,20 @@
+using Meceqs;
 using Meceqs.AzureEventHubs.Sending;
 using Meceqs.Transport;
-using Microsoft.Extensions.DependencyInjection;
 
-namespace Meceqs.AzureEventHubs.DependencyInjection
+namespace Microsoft.Extensions.DependencyInjection
 {
-    public class EventHubSenderBuilder : TransportSenderBuilder<IEventHubSenderBuilder, EventHubSenderOptions>, IEventHubSenderBuilder
+    public class EventHubSenderBuilder : SendTransportBuilder<EventHubSenderBuilder, EventHubSenderOptions>
     {
-        public override IEventHubSenderBuilder Instance => this;
+        protected override EventHubSenderBuilder Instance => this;
 
         public EventHubSenderBuilder(IMeceqsBuilder meceqsBuilder, string pipelineName)
             : base(meceqsBuilder, pipelineName)
         {
-            ConfigurePipeline(pipeline => pipeline.EndsWith(x => x.RunEventHubSender()));
+            Pipeline.EndsWith(x => x.RunEventHubSender());
         }
 
-        public IEventHubSenderBuilder SetConnectionString(string connectionString)
+        public EventHubSenderBuilder SetConnectionString(string connectionString)
         {
             Guard.NotNullOrWhiteSpace(connectionString, nameof(connectionString));
 

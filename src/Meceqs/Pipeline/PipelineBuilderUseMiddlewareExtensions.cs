@@ -10,16 +10,16 @@ namespace Microsoft.Extensions.DependencyInjection
     /// <summary>
     /// Extension methods for adding a typed middleware.
     /// </summary>
-    public static class PipelineOptionsUseMiddlewareExtensions
+    public static class PipelineBuilderUseMiddlewareExtensions
     {
         private const string InvokeMethodName = "Invoke";
 
-        private static readonly MethodInfo GetServiceInfo = typeof(PipelineOptionsUseMiddlewareExtensions).GetMethod(nameof(GetService), BindingFlags.NonPublic | BindingFlags.Static);
+        private static readonly MethodInfo GetServiceInfo = typeof(PipelineBuilderUseMiddlewareExtensions).GetMethod(nameof(GetService), BindingFlags.NonPublic | BindingFlags.Static);
 
         /// <summary>
         /// Adds a middleware class to the pipeline.
         /// </summary>
-        public static PipelineOptions UseMiddleware<TMiddleware>(this PipelineOptions builder, params object[] args)
+        public static PipelineBuilder UseMiddleware<TMiddleware>(this PipelineBuilder builder, params object[] args)
         {
             return builder.UseMiddleware(typeof(TMiddleware), args);
         }
@@ -27,7 +27,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <summary>
         /// Adds a middleware class to the pipeline.
         /// </summary>
-        public static PipelineOptions UseMiddleware(this PipelineOptions builder, Type middleware, params object[] args)
+        public static PipelineBuilder UseMiddleware(this PipelineBuilder builder, Type middleware, params object[] args)
         {
             return builder.Use((next, applicationServices) =>
             {

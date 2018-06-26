@@ -8,7 +8,7 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class FileFakeEventHubBuilderExtensions
     {
-        public static IEventHubSenderBuilder UseFileFake(this IEventHubSenderBuilder builder, string directory, string entityPath)
+        public static EventHubSenderBuilder UseFileFake(this EventHubSenderBuilder builder, string directory, string entityPath)
         {
             Guard.NotNull(builder, nameof(builder));
             Guard.NotNullOrWhiteSpace(directory, nameof(directory));
@@ -26,7 +26,7 @@ namespace Microsoft.Extensions.DependencyInjection
             return builder;
         }
 
-        public static IEventHubReceiverBuilder UseFileFake(this IEventHubReceiverBuilder builder, Action<FileFakeEventHubProcessorOptions> options)
+        public static EventHubReceiverBuilder UseFileFake(this EventHubReceiverBuilder builder, Action<FileFakeEventHubProcessorOptions> options)
         {
             Guard.NotNull(builder, nameof(builder));
 

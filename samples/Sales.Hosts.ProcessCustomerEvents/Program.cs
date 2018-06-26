@@ -49,29 +49,25 @@ namespace Sales.Hosts.ProcessCustomerEvents
                         builder
                             .AddEventHubReceiver(receiver =>
                             {
-                                receiver
-                                    .SkipUnknownMessages()
+                                receiver.SkipUnknownMessages();
 
-                                    // This adds a custom middleware to the pipeline.
-                                    // They are executed in this order before the Typed Handling middleware is executed.
-                                    .ConfigurePipeline(x =>
-                                    {
-                                        x.UseAuditing();
-                                    })
+                                // This adds a custom middleware to the pipeline.
+                                // They are executed in order of registration before the Typed Handling middleware is executed.
+                                receiver.Pipeline.UseAuditing();
 
-                                    // Process messages with `IHandles<...>`-implementations.
-                                    .UseTypedHandling(options =>
-                                    {
-                                        options.Handlers.Add<CustomerEventsHandler>();
-                                    })
+                                // Process messages with `IHandles<...>`-implementations.
+                                receiver.UseTypedHandling(options =>
+                                {
+                                    options.Handlers.Add<CustomerEventsHandler>();
+                                });
 
-                                    // For this sample, we will read events from a local file instead of a real Event Hub.
-                                    .UseFileFake(options =>
-                                    {
-                                        options.Directory = SampleConfiguration.FileFakeEventHubDirectory;
-                                        options.ClearEventHubOnStart = true;
-                                        options.EventHubName = "customers";
-                                    });
+                                // For this sample, we will read events from a local file instead of a real Event Hub.
+                                receiver.UseFileFake(options =>
+                                {
+                                    options.Directory = SampleConfiguration.FileFakeEventHubDirectory;
+                                    options.ClearEventHubOnStart = true;
+                                    options.EventHubName = "customers";
+                                });
                             });
                     });
                 });

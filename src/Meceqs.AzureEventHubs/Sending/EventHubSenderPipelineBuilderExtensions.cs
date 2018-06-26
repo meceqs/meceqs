@@ -4,9 +4,9 @@ using Meceqs.Pipeline;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
-    public static class EventHubSenderPipelineOptionsExtensions
+    public static class EventHubSenderPipelineBuilderExtensions
     {
-        public static void RunEventHubSender(this PipelineOptions pipeline)
+        public static void RunEventHubSender(this PipelineBuilder pipeline)
         {
             Guard.NotNull(pipeline, nameof(pipeline));
 

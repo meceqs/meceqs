@@ -1,6 +1,5 @@
 using Customers.Core.Repositories;
 using Customers.Core.CommandHandlers;
-using Customers.Hosts.WebApi.Infrastructure;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Builder;
@@ -60,12 +59,8 @@ namespace Customers.Hosts.WebApi
                             receiver.SetRoutePrefix("/" + ApiVersion);
 
                             // This adds a custom middleware to the pipeline.
-                            // They are executed in this order before the Typed Handling middleware is executed.
-                            receiver.ConfigurePipeline(pipeline =>
-                            {
-                                // add user id to message if not present
-                                pipeline.UseAuditing();
-                            });
+                            // They are executed in this order before the TypedHandling middleware is executed.
+                            receiver.Pipeline.UseAuditing();// add user id to message if not present
 
                             // Process messages with `IHandles<...>`-implementations.
                             receiver.UseTypedHandling(options =>
@@ -90,10 +85,7 @@ namespace Customers.Hosts.WebApi
                         // This Web API will also send messages to an Azure Event Hub.
                         .AddEventHubSender(sender =>
                         {
-                            sender.ConfigurePipeline(pipeline =>
-                            {
-                                pipeline.UseAuditing(); // add user id to message if not present
-                            });
+                            sender.Pipeline.UseAuditing(); // add user id to message if not present
 
                             // For this sample, we will send messages to a local file instead of a real Event Hub.
                             sender.UseFileFake(SampleConfiguration.FileFakeEventHubDirectory, "customers");

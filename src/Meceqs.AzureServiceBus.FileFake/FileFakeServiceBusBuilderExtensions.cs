@@ -8,7 +8,7 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class FileFakeServiceBusBuilderExtensions
     {
-        public static IServiceBusSenderBuilder UseFileFake(this IServiceBusSenderBuilder builder, string directory, string entityPath)
+        public static ServiceBusSenderBuilder UseFileFake(this ServiceBusSenderBuilder builder, string directory, string entityPath)
         {
             Guard.NotNull(builder, nameof(builder));
             Guard.NotNullOrWhiteSpace(directory, nameof(directory));
@@ -26,7 +26,7 @@ namespace Microsoft.Extensions.DependencyInjection
             return builder;
         }
 
-        public static IServiceBusReceiverBuilder UseFileFake(this IServiceBusReceiverBuilder builder, Action<FileFakeServiceBusProcessorOptions> options)
+        public static ServiceBusReceiverBuilder UseFileFake(this ServiceBusReceiverBuilder builder, Action<FileFakeServiceBusProcessorOptions> options)
         {
             Guard.NotNull(builder, nameof(builder));
 

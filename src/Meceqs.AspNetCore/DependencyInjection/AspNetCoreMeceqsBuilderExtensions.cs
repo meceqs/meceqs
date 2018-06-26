@@ -1,7 +1,6 @@
 using System;
 using Meceqs;
 using Meceqs.AspNetCore;
-using Meceqs.AspNetCore.DependencyInjection;
 using Meceqs.AspNetCore.Receiving;
 using Meceqs.Pipeline;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -32,9 +31,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <summary>
         /// Adds an ASP.NET Core receiver that sends messages to the default <see cref="MeceqsDefaults.ReceivePipelineName"/> pipeline.
         /// </summary>
-        public static IMeceqsBuilder AddAspNetCoreReceiver(
-            this IMeceqsBuilder builder,
-            Action<IAspNetCoreReceiverBuilder> receiver)
+        public static IMeceqsBuilder AddAspNetCoreReceiver(this IMeceqsBuilder builder, Action<AspNetCoreReceiverBuilder> receiver)
         {
             return AddAspNetCoreReceiver(builder, null, receiver);
         }
@@ -42,10 +39,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <summary>
         /// Adds an ASP.NET Core receiver that sends messages to the named pipeline.
         /// </summary>
-        public static IMeceqsBuilder AddAspNetCoreReceiver(
-            this IMeceqsBuilder builder,
-            string pipelineName,
-            Action<IAspNetCoreReceiverBuilder> receiver)
+        public static IMeceqsBuilder AddAspNetCoreReceiver(this IMeceqsBuilder builder, string pipelineName, Action<AspNetCoreReceiverBuilder> receiver)
         {
             Guard.NotNull(builder, nameof(builder));
             Guard.NotNull(receiver, nameof(receiver));
@@ -53,18 +47,15 @@ namespace Microsoft.Extensions.DependencyInjection
             builder.AddAspNetCore();
 
             var receiverBuilder = new AspNetCoreReceiverBuilder(builder, pipelineName);
-
             receiver?.Invoke(receiverBuilder);
 
             // Register the receiver with the transport
-            builder.Services.Configure<ReceiveTransportOptions>(o => o.AddReceiver(receiverBuilder.PipelineName));
+            builder.Services.Configure<ReceiveEndpointOptions>(o => o.AddReceiver(receiverBuilder.PipelineName));
 
             return builder;
         }
 
-        public static IMeceqsBuilder ConfigureAspNetCoreEnricher(
-            this IMeceqsBuilder builder,
-            Action<AspNetCoreEnricherOptions> options)
+        public static IMeceqsBuilder ConfigureAspNetCoreEnricher(this IMeceqsBuilder builder, Action<AspNetCoreEnricherOptions> options)
         {
             Guard.NotNull(builder, nameof(builder));
 

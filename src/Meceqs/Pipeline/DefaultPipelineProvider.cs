@@ -1,14 +1,14 @@
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Concurrent;
 using System.Threading;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace Meceqs.Pipeline
 {
     public class DefaultPipelineProvider : IPipelineProvider
     {
-        private readonly IOptionsMonitor<PipelineOptions> _optionsMonitor;
+        private readonly PipelineProviderOptions _providerOptions;
         private readonly IServiceProvider _serviceProvider;
         private readonly ILoggerFactory _loggerFactory;
         private readonly IMessageContextEnricher _messageContextEnricher;
@@ -17,15 +17,15 @@ namespace Meceqs.Pipeline
         private readonly Func<string, Lazy<IPipeline>> _pipelineFactory;
 
         public DefaultPipelineProvider(
-            IOptionsMonitor<PipelineOptions> optionsMonitor,
+            IOptions<PipelineProviderOptions> providerOptions,
             IServiceProvider serviceProvider,
             ILoggerFactory loggerFactory,
             IMessageContextEnricher messageContextEnricher = null)
         {
-            Guard.NotNull(optionsMonitor, nameof(optionsMonitor));
+            Guard.NotNull(providerOptions, nameof(providerOptions));
             Guard.NotNull(loggerFactory, nameof(loggerFactory));
 
-            _optionsMonitor = optionsMonitor;
+            _providerOptions = providerOptions.Value;
             _serviceProvider = serviceProvider;
             _loggerFactory = loggerFactory;
             _messageContextEnricher = messageContextEnricher;
@@ -52,15 +52,12 @@ namespace Meceqs.Pipeline
 
         private IPipeline CreatePipeline(string pipelineName)
         {
-            var options = _optionsMonitor.Get(pipelineName);
-
-            MiddlewareDelegate pipelineDelegate = options.BuildPipeline(_serviceProvider);
-
-            // TODO Is it safe to throw in a Lazy-initializer?
-            if (pipelineDelegate == null)
+            if (!_providerOptions.Pipelines.TryGetValue(pipelineName, out PipelineBuilder builder))
             {
                 throw new ArgumentException($"A pipeline with the name '{pipelineName}' has not been configured.");
             }
+
+            MiddlewareDelegate pipelineDelegate = builder.BuildPipeline(_serviceProvider);
 
             return new DefaultPipeline(pipelineDelegate, pipelineName, _loggerFactory, _messageContextEnricher);
         }

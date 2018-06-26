@@ -7,25 +7,24 @@ using Xunit;
 
 namespace Meceqs.Tests.Pipeline
 {
-    public class PipelineOptionsTest
+    public class PipelineBuilderTest
     {
-        private MiddlewareDelegate GetPipeline(Action<PipelineOptions> options = null)
+        private MiddlewareDelegate GetPipeline(Action<PipelineBuilder> options = null)
         {
             var serviceProvider = new ServiceCollection().BuildServiceProvider();
 
-            var optionsInstance = new PipelineOptions();
+            var optionsInstance = new PipelineBuilder("foo");
             options?.Invoke(optionsInstance);
 
             return optionsInstance.BuildPipeline(serviceProvider);
         }
 
         [Fact]
-        public void Pipeline_is_null_if_no_middleware_registered()
+        public void Pipeline_is_not_null_if_no_middleware_registered()
         {
-            var context = TestObjects.MessageContext<SimpleMessage>();
             var pipeline = GetPipeline();
 
-            Assert.Null(pipeline);
+            Assert.NotNull(pipeline);
         }
 
         [Fact]

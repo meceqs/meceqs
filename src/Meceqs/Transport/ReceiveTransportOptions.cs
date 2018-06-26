@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Meceqs.Transport
 {
-    public abstract class TransportReceiverOptions
+    public abstract class ReceiveTransportOptions
     {
         public List<MessageMetadata> MessageTypes { get; } = new List<MessageMetadata>();
 

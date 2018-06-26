@@ -16,11 +16,11 @@ namespace Meceqs.Tests.Pipeline
                 .AddMeceqs(builder =>
                 {
                     builder
-                        .ConfigurePipeline("pipeline", pipeline =>
+                        .AddPipeline("pipeline", pipeline =>
                         {
                             pipeline.Use((ctx, next) => { return next(); });
                         })
-                        .ConfigurePipeline("pipeline", pipeline =>
+                        .AddPipeline("pipeline", pipeline =>
                         {
                             pipeline.Use((ctx, next) => { return next(); });
                         });

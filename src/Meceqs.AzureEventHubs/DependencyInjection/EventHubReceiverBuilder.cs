@@ -1,13 +1,11 @@
 using Meceqs.AzureEventHubs.Receiving;
 using Meceqs.Transport;
-using Microsoft.Extensions.DependencyInjection;
 
-namespace Meceqs.AzureEventHubs.DependencyInjection
+namespace Microsoft.Extensions.DependencyInjection
 {
-    public class EventHubReceiverBuilder : TransportReceiverBuilder<IEventHubReceiverBuilder, EventHubReceiverOptions>,
-        IEventHubReceiverBuilder
+    public class EventHubReceiverBuilder : ReceiveTransportBuilder<EventHubReceiverBuilder, EventHubReceiverOptions>
     {
-        public override IEventHubReceiverBuilder Instance => this;
+        protected override EventHubReceiverBuilder Instance => this;
 
         public EventHubReceiverBuilder(IMeceqsBuilder meceqsBuilder, string pipelineName)
             : base(meceqsBuilder, pipelineName)

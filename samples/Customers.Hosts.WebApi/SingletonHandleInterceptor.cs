@@ -2,7 +2,7 @@ using System.Threading.Tasks;
 using Meceqs.TypedHandling;
 using Microsoft.Extensions.Logging;
 
-namespace Customers.Hosts.WebApi.Infrastructure
+namespace Customers.Hosts.WebApi
 {
     public class SingletonHandleInterceptor : IHandleInterceptor
     {

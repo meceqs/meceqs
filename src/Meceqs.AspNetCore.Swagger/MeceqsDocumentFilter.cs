@@ -12,13 +12,13 @@ namespace Meceqs.AspNetCore.Swagger
 
     public class MeceqsDocumentFilter : IDocumentFilter
     {
-        private readonly ReceiveTransportOptions _transportOptions;
+        private readonly Receiving.ReceiveEndpointOptions _transportOptions;
         private readonly IOptionsMonitor<AspNetCoreReceiverOptions> _receiverOptions;
         private readonly IMessagePathConvention _messagePathConvention;
         private readonly MeceqsSwaggerOptions _meceqsOptions;
 
         public MeceqsDocumentFilter(
-            IOptions<ReceiveTransportOptions> transportOptions,
+            IOptions<Receiving.ReceiveEndpointOptions> transportOptions,
             IOptionsMonitor<AspNetCoreReceiverOptions> receiverOptions,
             IMessagePathConvention messagePathConvention,
             MeceqsSwaggerOptions meceqsOptions)

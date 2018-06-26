@@ -1,11 +1,8 @@
-using System;
 using Meceqs;
-using Meceqs.AzureEventHubs.DependencyInjection;
 using Meceqs.AzureEventHubs.Internal;
 using Meceqs.AzureEventHubs.Receiving;
-using Meceqs.AzureEventHubs.Sending;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using System;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -23,7 +20,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <summary>
         /// Adds an Azure Event Hubs receiver that sends messages to the default <see cref="MeceqsDefaults.ReceivePipelineName"/> pipeline.
         /// </summary>
-        public static IMeceqsBuilder AddEventHubReceiver(this IMeceqsBuilder builder, Action<IEventHubReceiverBuilder> receiver)
+        public static IMeceqsBuilder AddEventHubReceiver(this IMeceqsBuilder builder, Action<EventHubReceiverBuilder> receiver)
         {
             return AddEventHubReceiver(builder, null, receiver);
         }
@@ -31,7 +28,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <summary>
         /// Adds an Azure Event Hubs receiver that sends messages to the named pipeline.
         /// </summary>
-        public static IMeceqsBuilder AddEventHubReceiver(this IMeceqsBuilder builder, string pipelineName, Action<IEventHubReceiverBuilder> receiver)
+        public static IMeceqsBuilder AddEventHubReceiver(this IMeceqsBuilder builder, string pipelineName, Action<EventHubReceiverBuilder> receiver)
         {
             Guard.NotNull(builder, nameof(builder));
             Guard.NotNull(receiver, nameof(receiver));
@@ -45,53 +42,24 @@ namespace Microsoft.Extensions.DependencyInjection
         }
 
         /// <summary>
-        /// Adds an Azure Event Hubs sender to the default "Send" pipeline.
+        /// Adds the default "Send" pipeline with an Azure Event Hubs endpoint.
         /// </summary>
-        public static IMeceqsBuilder AddEventHubSender(this IMeceqsBuilder builder, Action<IEventHubSenderBuilder> sender)
+        public static IMeceqsBuilder AddEventHubSender(this IMeceqsBuilder builder, Action<EventHubSenderBuilder> sender = null)
         {
-            return AddEventHubSender(builder, null, null, sender);
+            return AddEventHubSender(builder, null, sender);
         }
 
         /// <summary>
-        /// Adds an Azure Event Hubs sender to the default "Send" pipeline.
+        /// Adds the named pipeline with an Azure Event Hubs endpoint.
         /// </summary>
-        public static IMeceqsBuilder AddEventHubSender(this IMeceqsBuilder builder, IConfiguration configuration, Action<IEventHubSenderBuilder> sender = null)
-        {
-            return AddEventHubSender(builder, null, configuration, sender);
-        }
-
-        /// <summary>
-        /// Adds an Azure Event Hubs sender to the given pipeline.
-        /// </summary>
-        public static IMeceqsBuilder AddEventHubSender(this IMeceqsBuilder builder, string pipelineName, Action<IEventHubSenderBuilder> sender)
-        {
-            return AddEventHubSender(builder, pipelineName, null, sender);
-        }
-
-        /// <summary>
-        /// Adds an Azure Event Hubs sender to the given pipeline.
-        /// </summary>
-        public static IMeceqsBuilder AddEventHubSender(
-            this IMeceqsBuilder builder,
-            string pipelineName,
-            IConfiguration configuration,
-            Action<IEventHubSenderBuilder> sender = null)
+        public static IMeceqsBuilder AddEventHubSender(this IMeceqsBuilder builder, string pipelineName, Action<EventHubSenderBuilder> sender = null)
         {
             Guard.NotNull(builder, nameof(builder));
-            Guard.NotNull(sender, nameof(sender));
 
             builder.AddEventHubServices();
 
             var senderBuilder = new EventHubSenderBuilder(builder, pipelineName);
-
-            // Code based options
             sender?.Invoke(senderBuilder);
-
-            // Configuration based options
-            if (configuration != null)
-            {
-                builder.Services.Configure<EventHubSenderOptions>(senderBuilder.PipelineName, configuration);
-            }
 
             return builder;
         }
