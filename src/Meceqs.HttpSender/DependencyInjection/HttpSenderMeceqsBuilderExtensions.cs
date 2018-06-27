@@ -28,6 +28,8 @@ namespace Microsoft.Extensions.DependencyInjection
             var senderBuilder = new HttpSenderBuilder(builder, pipelineName);
             sender?.Invoke(senderBuilder);
 
+            senderBuilder.Build();
+
             return builder;
         }
     }
