@@ -3,7 +3,7 @@ using Meceqs.Transport;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
-    public class ServiceBusReceiverBuilder : ReceiveTransportBuilder<ServiceBusReceiverBuilder, ServiceBusReceiverOptions>
+    public class ServiceBusReceiverBuilder : ReceiveTransportBuilder<ServiceBusReceiverBuilder, ServiceBusReceiveEndpointOptions>
     {
         protected override ServiceBusReceiverBuilder Instance => this;
 

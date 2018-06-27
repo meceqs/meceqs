@@ -52,12 +52,15 @@ namespace Meceqs.Pipeline
 
         private IPipeline CreatePipeline(string pipelineName)
         {
-            if (!_providerOptions.Pipelines.TryGetValue(pipelineName, out PipelineBuilder builder))
+            if (!_providerOptions.Pipelines.TryGetValue(pipelineName, out Action<IPipelineBuilder> builderAction))
             {
                 throw new ArgumentException($"A pipeline with the name '{pipelineName}' has not been configured.");
             }
 
-            MiddlewareDelegate pipelineDelegate = builder.BuildPipeline(_serviceProvider);
+            var pipelineBuilder = new PipelineBuilder(_serviceProvider);
+            builderAction(pipelineBuilder);
+
+            MiddlewareDelegate pipelineDelegate = pipelineBuilder.Build();
 
             return new DefaultPipeline(pipelineDelegate, pipelineName, _loggerFactory, _messageContextEnricher);
         }

@@ -6,7 +6,7 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class ServiceBusSenderPipelineBuilderExtensions
     {
-        public static void RunServiceBusSender(this PipelineBuilder pipeline)
+        public static void RunServiceBusSender(this IPipelineBuilder pipeline)
         {
             Guard.NotNull(pipeline, nameof(pipeline));
 

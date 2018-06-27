@@ -11,7 +11,7 @@ namespace Microsoft.Extensions.DependencyInjection
         public EventHubSenderBuilder(IMeceqsBuilder meceqsBuilder, string pipelineName)
             : base(meceqsBuilder, pipelineName)
         {
-            Pipeline.EndsWith(x => x.RunEventHubSender());
+            ConfigurePipeline(pipeline => pipeline.EndsWith(x => x.RunEventHubSender()));
         }
 
         public EventHubSenderBuilder SetConnectionString(string connectionString)

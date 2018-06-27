@@ -5,9 +5,9 @@ using Meceqs.Pipeline;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
-    public static class AuditingPipelineOptionsExtensions
+    public static class AuditingPipelineBuilderExtensions
     {
-        public static PipelineBuilder UseAuditing(this PipelineBuilder pipeline, Action<AuditingOptions> setupAction = null)
+        public static IPipelineBuilder UseAuditing(this IPipelineBuilder pipeline, Action<AuditingOptions> setupAction = null)
         {
             Guard.NotNull(pipeline, nameof(pipeline));
 

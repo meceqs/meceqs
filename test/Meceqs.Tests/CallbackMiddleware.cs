@@ -32,7 +32,7 @@ namespace Meceqs.Tests
 
     public static class CallbackMiddlewarePipelineBuilderExtensions
     {
-        public static void RunCallback(this PipelineBuilder pipeline, Action<MessageContext> callback)
+        public static void RunCallback(this IPipelineBuilder pipeline, Action<MessageContext> callback)
         {
             Guard.NotNull(pipeline, nameof(pipeline));
 

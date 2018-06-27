@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using Meceqs.Pipeline;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -6,6 +8,8 @@ namespace Meceqs.Transport
 {
     public abstract class TransportPipelineBuilder
     {
+        private readonly List<Action<IPipelineBuilder>> _configurePipelineBuilderDelegates = new List<Action<IPipelineBuilder>>();
+
         /// <summary>
         /// Gets the Meceqs builder.
         /// </summary>
@@ -22,14 +26,9 @@ namespace Meceqs.Transport
         public IConfigurationSection PipelineConfiguration { get; }
 
         /// <summary>
-        /// Allows adding custom middelware components to the pipeline.
-        /// </summary>
-        public PipelineBuilder Pipeline { get; }
-
-        /// <summary>
         /// Gets the name of the pipeline configured by this builder.
         /// </summary>
-        public string PipelineName => Pipeline.Name;
+        public string PipelineName { get; }
 
         protected TransportPipelineBuilder(IMeceqsBuilder meceqsBuilder, string pipelineName)
         {
@@ -37,10 +36,27 @@ namespace Meceqs.Transport
             Guard.NotNullOrWhiteSpace(pipelineName, nameof(pipelineName));
 
             MeceqsBuilder = meceqsBuilder;
-            Pipeline = new PipelineBuilder(pipelineName);
+            PipelineName = pipelineName;
             PipelineConfiguration = meceqsBuilder.Configuration.GetSection(PipelineName);
+        }
 
-            MeceqsBuilder.AddPipeline(Pipeline);
+        protected void ConfigurePipelineInternal(Action<IPipelineBuilder> pipeline)
+        {
+            if (pipeline != null)
+            {
+                _configurePipelineBuilderDelegates.Add(pipeline);
+            }
+        }
+
+        public virtual void Build()
+        {
+            Action<IPipelineBuilder> pipelineBuilder = null;
+            foreach (var configure in _configurePipelineBuilderDelegates)
+            {
+                pipelineBuilder += configure;
+            }
+
+            MeceqsBuilder.AddPipeline(PipelineName, pipelineBuilder);
         }
     }
 }

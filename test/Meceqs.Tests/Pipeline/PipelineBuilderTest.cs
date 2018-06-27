@@ -9,14 +9,14 @@ namespace Meceqs.Tests.Pipeline
 {
     public class PipelineBuilderTest
     {
-        private MiddlewareDelegate GetPipeline(Action<PipelineBuilder> options = null)
+        private MiddlewareDelegate GetPipeline(Action<IPipelineBuilder> pipeline = null)
         {
             var serviceProvider = new ServiceCollection().BuildServiceProvider();
 
-            var optionsInstance = new PipelineBuilder("foo");
-            options?.Invoke(optionsInstance);
+            var pipelineBuilder = new PipelineBuilder(serviceProvider);
+            pipeline?.Invoke(pipelineBuilder);
 
-            return optionsInstance.BuildPipeline(serviceProvider);
+            return pipelineBuilder.Build();
         }
 
         [Fact]

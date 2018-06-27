@@ -18,7 +18,7 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             HttpClient = meceqsBuilder.Services.AddHttpClient("Meceqs.HttpSender." + PipelineName);
 
-            Pipeline.EndsWith(x => x.RunHttpSender());
+            ConfigurePipeline(pipeline => pipeline.EndsWith(x => x.RunHttpSender()));
         }
 
         /// <summary>

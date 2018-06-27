@@ -49,6 +49,8 @@ namespace Microsoft.Extensions.DependencyInjection
             var receiverBuilder = new AspNetCoreReceiverBuilder(builder, pipelineName);
             receiver?.Invoke(receiverBuilder);
 
+            receiverBuilder.Build();
+
             // Register the receiver with the transport
             builder.Services.Configure<ReceiveEndpointOptions>(o => o.AddReceiver(receiverBuilder.PipelineName));
 

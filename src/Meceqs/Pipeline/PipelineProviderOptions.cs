@@ -5,31 +5,21 @@ namespace Meceqs.Pipeline
 {
     public class PipelineProviderOptions
     {
-        private readonly Dictionary<string, PipelineBuilder> _pipelines = new Dictionary<string, PipelineBuilder>();
+        private readonly Dictionary<string, Action<IPipelineBuilder>> _pipelines = new Dictionary<string, Action<IPipelineBuilder>>();
 
-        public IReadOnlyDictionary<string, PipelineBuilder> Pipelines => _pipelines;
+        public IReadOnlyDictionary<string, Action<IPipelineBuilder>> Pipelines => _pipelines;
 
-        public void AddPipeline(string name, Action<PipelineBuilder> builder)
+        public void AddPipeline(string name, Action<IPipelineBuilder> builder)
         {
             Guard.NotNullOrWhiteSpace(name, nameof(name));
             Guard.NotNull(builder, nameof(builder));
 
-            var builderInstance = new PipelineBuilder(name);
-            builder(builderInstance);
-
-            AddPipeline(builderInstance);
-        }
-
-        public void AddPipeline(PipelineBuilder builder)
-        {
-            Guard.NotNull(builder, nameof(builder));
-
-            if (_pipelines.ContainsKey(builder.Name))
+            if (_pipelines.ContainsKey(name))
             {
-                throw new InvalidOperationException("Pipeline already exists: " + builder.Name);
+                throw new InvalidOperationException("Pipeline already exists: " + name);
             }
 
-            _pipelines.Add(builder.Name, builder);
+            _pipelines.Add(name, builder);
         }
     }
 }

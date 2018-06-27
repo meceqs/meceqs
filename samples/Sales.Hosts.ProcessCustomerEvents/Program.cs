@@ -53,7 +53,10 @@ namespace Sales.Hosts.ProcessCustomerEvents
 
                                 // This adds a custom middleware to the pipeline.
                                 // They are executed in order of registration before the Typed Handling middleware is executed.
-                                receiver.Pipeline.UseAuditing();
+                                receiver.ConfigurePipeline(pipeline =>
+                                {
+                                    pipeline.UseAuditing();
+                                });
 
                                 // Process messages with `IHandles<...>`-implementations.
                                 receiver.UseTypedHandling(options =>

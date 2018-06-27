@@ -31,9 +31,9 @@ namespace Meceqs.Transport
             return Instance;
         }
 
-        public TSendTransportBuilder ConfigurePipeline(Action<PipelineBuilder> pipeline)
+        public TSendTransportBuilder ConfigurePipeline(Action<IPipelineBuilder> pipeline)
         {
-            pipeline?.Invoke(Pipeline);
+            ConfigurePipelineInternal(pipeline);
             return Instance;
         }
     }

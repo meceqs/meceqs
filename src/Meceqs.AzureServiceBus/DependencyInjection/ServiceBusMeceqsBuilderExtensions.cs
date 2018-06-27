@@ -38,6 +38,8 @@ namespace Microsoft.Extensions.DependencyInjection
             var receiverBuilder = new ServiceBusReceiverBuilder(builder, pipelineName);
             receiver?.Invoke(receiverBuilder);
 
+            receiverBuilder.Build();
+
             return builder;
         }
 
@@ -60,6 +62,8 @@ namespace Microsoft.Extensions.DependencyInjection
 
             var senderBuilder = new ServiceBusSenderBuilder(builder, pipelineName);
             sender?.Invoke(senderBuilder);
+
+            senderBuilder.Build();
 
             return builder;
         }

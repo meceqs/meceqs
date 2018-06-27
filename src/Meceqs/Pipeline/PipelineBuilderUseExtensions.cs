@@ -9,9 +9,9 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <summary>
         /// Adds an in-line middleware to the pipeline.
         /// </summary>
-        public static PipelineBuilder Use(this PipelineBuilder builder, Func<MessageContext, Func<Task>, Task> middleware)
+        public static IPipelineBuilder Use(this IPipelineBuilder builder, Func<MessageContext, Func<Task>, Task> middleware)
         {
-            return builder.Use((next, _) =>
+            return builder.Use(next =>
             {
                 return context =>
                 {

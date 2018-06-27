@@ -11,7 +11,7 @@ namespace Microsoft.Extensions.DependencyInjection
         public ServiceBusSenderBuilder(IMeceqsBuilder meceqsBuilder, string pipelineName)
             : base(meceqsBuilder, pipelineName)
         {
-            Pipeline.EndsWith(x => x.RunServiceBusSender());
+            ConfigurePipeline(pipeline => pipeline.EndsWith(x => x.RunServiceBusSender()));
         }
 
         public ServiceBusSenderBuilder SetConnectionString(string connectionString)

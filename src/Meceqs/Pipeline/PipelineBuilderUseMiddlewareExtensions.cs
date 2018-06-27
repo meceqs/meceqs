@@ -19,7 +19,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <summary>
         /// Adds a middleware class to the pipeline.
         /// </summary>
-        public static PipelineBuilder UseMiddleware<TMiddleware>(this PipelineBuilder builder, params object[] args)
+        public static IPipelineBuilder UseMiddleware<TMiddleware>(this IPipelineBuilder builder, params object[] args)
         {
             return builder.UseMiddleware(typeof(TMiddleware), args);
         }
@@ -27,9 +27,10 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <summary>
         /// Adds a middleware class to the pipeline.
         /// </summary>
-        public static PipelineBuilder UseMiddleware(this PipelineBuilder builder, Type middleware, params object[] args)
+        public static IPipelineBuilder UseMiddleware(this IPipelineBuilder builder, Type middleware, params object[] args)
         {
-            return builder.Use((next, applicationServices) =>
+            var applicationServices = builder.ApplicationServices;
+            return builder.Use(next =>
             {
                 var methods = middleware.GetMethods(BindingFlags.Instance | BindingFlags.Public);
                 var invokeMethods = methods.Where(m => string.Equals(m.Name, InvokeMethodName, StringComparison.Ordinal)).ToArray();

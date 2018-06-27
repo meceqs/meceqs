@@ -34,9 +34,9 @@ namespace Meceqs.Transport
             return Instance;
         }
 
-        public TReceiveTransportBuilder ConfigurePipeline(Action<PipelineBuilder> pipeline)
+        public TReceiveTransportBuilder ConfigurePipeline(Action<IPipelineBuilder> pipeline)
         {
-            pipeline?.Invoke(Pipeline);
+            ConfigurePipelineInternal(pipeline);
             return Instance;
         }
 
@@ -103,7 +103,7 @@ namespace Meceqs.Transport
             }
 
             // Add the middleware to the end of the pipeline.
-            Pipeline.EndsWith(x => x.RunTypedHandling(options));
+            ConfigurePipeline(pipeline => pipeline.EndsWith(x => x.RunTypedHandling(options)));
 
             return Instance;
         }

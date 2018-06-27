@@ -60,7 +60,10 @@ namespace Customers.Hosts.WebApi
 
                             // This adds a custom middleware to the pipeline.
                             // They are executed in this order before the TypedHandling middleware is executed.
-                            receiver.Pipeline.UseAuditing();// add user id to message if not present
+                            receiver.ConfigurePipeline(pipeline =>
+                            {
+                                pipeline.UseAuditing();// add user id to message if not present
+                            });
 
                             // Process messages with `IHandles<...>`-implementations.
                             receiver.UseTypedHandling(options =>
@@ -85,7 +88,10 @@ namespace Customers.Hosts.WebApi
                         // This Web API will also send messages to an Azure Event Hub.
                         .AddEventHubSender(sender =>
                         {
-                            sender.Pipeline.UseAuditing(); // add user id to message if not present
+                            sender.ConfigurePipeline(pipeline =>
+                            {
+                                pipeline.UseAuditing(); // add user id to message if not present
+                            });
 
                             // For this sample, we will send messages to a local file instead of a real Event Hub.
                             sender.UseFileFake(SampleConfiguration.FileFakeEventHubDirectory, "customers");
