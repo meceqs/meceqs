@@ -7,10 +7,10 @@ namespace Meceqs.AspNetCore.Receiving
     {
         public PathString RoutePrefix { get; set; }
 
+        public bool RequiresAuthentication { get; set; } = true;
+
         public AspNetCoreReceiverOptions()
         {
-            // Default options
-
             // We give other ASP.NET Core middleware a chance to process it or to return a 404.
             UnknownMessageBehavior = UnknownMessageBehavior.Skip;
         }

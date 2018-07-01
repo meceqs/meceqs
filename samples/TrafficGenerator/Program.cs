@@ -57,6 +57,9 @@ namespace TrafficGenerator
                             {
                                 sender.SetBaseAddress(SampleConfiguration.CustomersWebApiUrl + "v1/");
 
+                                // Adds an "Authorization" header for each request.
+                                sender.HttpClient.AddHttpMessageHandler<AuthorizationDelegatingHandler>();
+
                                 // Write your own extension method if you have a base class for alle messages
                                 sender.AddMessagesFromAssembly<CreateCustomerCommand>(t => t.Name.EndsWith("Command") || t.Name.EndsWith("Query"));
                             })

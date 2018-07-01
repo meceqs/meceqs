@@ -6,6 +6,9 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using SampleConfig;
 using Swashbuckle.AspNetCore.Swagger;
+using idunno.Authentication.Basic;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace Customers.Hosts.WebApi
 {
@@ -27,6 +30,33 @@ namespace Customers.Hosts.WebApi
                 {
                     // Customers.Core
                     services.AddSingleton<ICustomerRepository, InMemoryCustomerRepository>();
+
+                    // Incoming requests must be authenticated.
+                    // Uses basic auth FOR DEMO PURPOSES!!! (https://github.com/blowdart/idunno.Authentication)
+                    // Use e.g. AddJwtBearer() with OAuth tokens instead!
+                    services.AddAuthentication(BasicAuthenticationDefaults.AuthenticationScheme)
+                        .AddBasic(options =>
+                        {
+                            options.Realm = "meceqs-sample";
+                            options.AllowInsecureProtocol = true; // For demo purposes only, of course!
+                            options.Events = new BasicAuthenticationEvents
+                            {
+                                OnValidateCredentials = context =>
+                                {
+                                    if (context.Username == "username" && context.Password == "password")
+                                    {
+                                        context.Principal = new ClaimsPrincipal(
+                                            new ClaimsIdentity(new [] {
+                                                new Claim(ClaimTypes.NameIdentifier, context.Username),
+                                            },
+                                            BasicAuthenticationDefaults.AuthenticationScheme));
+
+                                        context.Success();
+                                    }
+                                    return Task.CompletedTask;
+                                }
+                            };
+                        });
 
                     // MVC (Only required if you need your own controllers/pages)
                     services.AddMvc();
@@ -100,6 +130,8 @@ namespace Customers.Hosts.WebApi
                 .Configure(app =>
                 {
                     app.UseDeveloperExceptionPage();
+
+                    app.UseAuthentication();
 
                     app.UseMeceqs();
 

@@ -2,24 +2,29 @@ using System.Threading.Tasks;
 using Meceqs.Receiving;
 using Meceqs.Transport;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
 
 namespace Meceqs.AspNetCore.Receiving
 {
     public class DefaultAspNetCoreReceiver : IAspNetCoreReceiver
     {
+        private readonly IOptionsMonitor<AspNetCoreReceiverOptions> _optionsMonitor;
         private readonly IHttpRequestReader _httpRequestReader;
         private readonly IMessageReceiver _messageReceiver;
         private readonly IHttpResponseWriter _httpResponseWriter;
 
         public DefaultAspNetCoreReceiver(
+            IOptionsMonitor<AspNetCoreReceiverOptions> optionsMonitor,
             IHttpRequestReader httpRequestReader,
             IMessageReceiver messageReceiver,
             IHttpResponseWriter httpResponseWriter)
         {
+            Guard.NotNull(optionsMonitor, nameof(optionsMonitor));
             Guard.NotNull(httpRequestReader, nameof(httpRequestReader));
             Guard.NotNull(messageReceiver, nameof(messageReceiver));
             Guard.NotNull(httpResponseWriter, nameof(httpResponseWriter));
 
+            _optionsMonitor = optionsMonitor;
             _httpRequestReader = httpRequestReader;
             _messageReceiver = messageReceiver;
             _httpResponseWriter = httpResponseWriter;
@@ -29,14 +34,24 @@ namespace Meceqs.AspNetCore.Receiving
         {
             // TODO error handling etc.
 
-            var envelope = _httpRequestReader.ConvertToEnvelope(httpContext, metadata.MessageType);
+            var options = _optionsMonitor.Get(receiverName);
 
-            object result = await _messageReceiver.ForEnvelope(envelope)
-                .UsePipeline(receiverName)
-                .SetCancellationToken(httpContext.RequestAborted)
-                .ReceiveAsync(metadata.ResultType);
+            if (options.RequiresAuthentication && httpContext.User?.Identity?.IsAuthenticated != true)
+            {
+                httpContext.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            }
+            else
+            {
+                var envelope = _httpRequestReader.ConvertToEnvelope(httpContext, metadata.MessageType);
 
-            _httpResponseWriter.WriteResult(result, httpContext);
+                object result = await _messageReceiver.ForEnvelope(envelope)
+                    .UsePipeline(receiverName)
+                    .SetCancellationToken(httpContext.RequestAborted)
+                    .SetUser(httpContext.User)
+                    .ReceiveAsync(metadata.ResultType);
+
+                _httpResponseWriter.WriteResult(result, httpContext);
+            }
         }
     }
 }
