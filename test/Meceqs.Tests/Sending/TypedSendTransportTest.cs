@@ -35,7 +35,7 @@
 //             var sendContext = GetSendContext<SimpleMessage>();
 
 //             // Act
-//             string result = await transport.SendAsync<string>(sendContext);
+//             string response = await transport.SendAsync<string>(sendContext);
 
 //             // Assert
 //             await handler.Received(1).SendAsync(sendContext);

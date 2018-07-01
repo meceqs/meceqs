@@ -65,16 +65,16 @@ namespace Meceqs.Tests.Pipeline
         }
 
         [Fact]
-        public async Task Invoke_calls_middleware_with_ExpectedResultType()
+        public async Task Invoke_calls_middleware_with_ExpectedResponseType()
         {
             var called = 0;
             MiddlewareDelegate middleware = (ctx) => {
                 called++;
-                ctx.ExpectedResultType.ShouldBe(typeof(string));
+                ctx.ExpectedResponseType.ShouldBe(typeof(string));
                 return Task.CompletedTask;
             };
             var pipeline = GetPipeline(middleware);
-            var context = TestObjects.MessageContext<SimpleMessage>(resultType: typeof(string));
+            var context = TestObjects.MessageContext<SimpleMessage>(responseType: typeof(string));
 
             await pipeline.InvokeAsync(context);
 
@@ -82,20 +82,20 @@ namespace Meceqs.Tests.Pipeline
         }
 
         [Fact]
-        public async Task Invoke_with_expectedResultType_returns_result()
+        public async Task Invoke_with_expectedResponseType_returns_response()
         {
             MiddlewareDelegate middleware = (ctx) => {
-                ctx.Result = "result";
+                ctx.Response = "response";
                 return Task.CompletedTask;
             };
             var pipeline = GetPipeline(middleware);
-            var context = TestObjects.MessageContext<SimpleMessage>(resultType: typeof(string));
+            var context = TestObjects.MessageContext<SimpleMessage>(responseType: typeof(string));
 
             await pipeline.InvokeAsync(context);
 
-            string result = (string)context.Result;
+            string response = (string)context.Response;
 
-            result.ShouldBe("result");
+            response.ShouldBe("response");
         }
     }
 }

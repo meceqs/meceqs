@@ -17,26 +17,26 @@ namespace Meceqs.Test.Performance
     {
         private class SimpleMessageStringHandler : IHandles<SimpleMessage, string>
         {
-            private readonly string _result;
+            private readonly string _response;
 
-            public SimpleMessageStringHandler(string result)
+            public SimpleMessageStringHandler(string response)
             {
-                _result = result;
+                _response = response;
             }
 
             public Task<string> HandleAsync(SimpleMessage msg, HandleContext context)
             {
-                return Task.FromResult(_result);
+                return Task.FromResult(_response);
             }
         }
 
-        private MessageContext GetMessageContext<TMessage, TResult>()
+        private MessageContext GetMessageContext<TMessage, TResponse>()
             where TMessage : class, new()
         {
             var envelope = TestObjects.Envelope<TMessage>();
             var serviceProvider = new ServiceCollection().BuildServiceProvider();
 
-            return new MessageContext(envelope, "pipeline", serviceProvider, typeof(TResult));
+            return new MessageContext(envelope, "pipeline", serviceProvider, typeof(TResponse));
         }
 
         private async Task RunTimed(string message, int loopCount, Func<Task> action)
@@ -73,15 +73,15 @@ namespace Meceqs.Test.Performance
             const int loopCount = 100000;
 
             Type messageType = typeof(SimpleMessage);
-            Type resultType = typeof(string);
+            Type responseType = typeof(string);
 
             var messageContext = GetMessageContext<SimpleMessage, string>();
-            var handler = new SimpleMessageStringHandler("result");
+            var handler = new SimpleMessageStringHandler("response");
 
             // resolve types (necessary for all tests)
 
             // resolve generic types
-            Type typedHandlerType = typeof(IHandles<,>).MakeGenericType(messageType, resultType);
+            Type typedHandlerType = typeof(IHandles<,>).MakeGenericType(messageType, responseType);
 
             // the MethodInfo must be created from a type which has resolved generic types,
             // otherwise the method has unresolved generic types.
@@ -95,8 +95,8 @@ namespace Meceqs.Test.Performance
 
             await RunTimed("HandleAsync: MethodInfo.Invoke", loopCount, async () =>
             {
-                Task resultTask = (Task) typedHandleMethod.Invoke(handler, new [] { handleContext.Message, handleContext });
-                await resultTask;
+                Task responseTask = (Task) typedHandleMethod.Invoke(handler, new [] { handleContext.Message, handleContext });
+                await responseTask;
             });
 
             // Compiled Expression
@@ -126,8 +126,8 @@ namespace Meceqs.Test.Performance
 
             await RunTimed("HandleAsync: Expression.Compile", loopCount, async () =>
             {
-                Task resultTask = typedDelegate(handler, handleContext.Message, handleContext);
-                await resultTask;
+                Task responseTask = typedDelegate(handler, handleContext.Message, handleContext);
+                await responseTask;
             });
         }
 
@@ -138,8 +138,8 @@ namespace Meceqs.Test.Performance
 
             Task task = Task.FromResult("test");
 
-            Type taskResultType = typeof(Task<>).MakeGenericType(typeof(string));
-            PropertyInfo resultPropertyInfo = taskResultType.GetProperty("Result");
+            Type taskResponseType = typeof(Task<>).MakeGenericType(typeof(string));
+            PropertyInfo resultPropertyInfo = taskResponseType.GetProperty("Result");
 
             // PropertyInfo.GetValue
 
@@ -152,7 +152,7 @@ namespace Meceqs.Test.Performance
 
             var instance = Expression.Parameter(typeof(object), "instance");
             var getMethod = resultPropertyInfo.GetGetMethod();
-            var methodCall = Expression.Call(Expression.Convert(instance, taskResultType), getMethod);
+            var methodCall = Expression.Call(Expression.Convert(instance, taskResponseType), getMethod);
             var typedDelegate = Expression.Lambda<Func<object, object>>(methodCall, instance).Compile();
 
             RunTimed("Task.Result: Expression.Compile", loopCount, () =>

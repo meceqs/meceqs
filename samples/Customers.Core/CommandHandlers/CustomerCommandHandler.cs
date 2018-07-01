@@ -12,7 +12,7 @@ using Newtonsoft.Json;
 namespace Customers.Core.CommandHandlers
 {
     public class CustomerCommandHandler :
-        IHandles<CreateCustomerCommand, CreateCustomerResult>,
+        IHandles<CreateCustomerCommand, CreateCustomerResponse>,
         IHandles<ChangeNameCommand>
     {
         private readonly ILogger _logger;
@@ -28,7 +28,7 @@ namespace Customers.Core.CommandHandlers
         }
 
         [CustomLogic /* this attribute can be read by an IHandleInterceptor */]
-        public async Task<CreateCustomerResult> HandleAsync(CreateCustomerCommand cmd, HandleContext context)
+        public async Task<CreateCustomerResponse> HandleAsync(CreateCustomerCommand cmd, HandleContext context)
         {
             _logger.LogInformation("MessageType:{MessageType} MessageId:{MessageId}", context.Message.GetType(), context.Envelope.MessageId);
 
@@ -40,7 +40,7 @@ namespace Customers.Core.CommandHandlers
 
             await SaveAndClearEvents(customer, context.Envelope);
 
-            return new CreateCustomerResult { CustomerId = customer.Id };
+            return new CreateCustomerResponse { CustomerId = customer.Id };
         }
 
         public async Task HandleAsync(ChangeNameCommand cmd, HandleContext context)

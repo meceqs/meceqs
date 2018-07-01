@@ -15,10 +15,10 @@ namespace Meceqs.TypedHandling.Internal
     /// <remarks>See "Meceqs.Tests/Performance/TypedHandling_HandlerInvokerTest" for performance tests</remarks>
     public class DefaultHandlerInvoker : IHandlerInvoker
     {
-        // CacheKey: MessageType/ResultType
+        // CacheKey: MessageType/ResponseType
         private readonly ConcurrentDictionary<Tuple<Type, Type>, Func<IHandles, object, HandleContext, Task>> _cachedHandleDelegates;
 
-        // CacheKey: ResultType
+        // CacheKey: ResponseType
         private readonly ConcurrentDictionary<Type, Func<Task, object>> _cachedTaskResultGetterDelegates;
 
         public DefaultHandlerInvoker()
@@ -32,31 +32,31 @@ namespace Meceqs.TypedHandling.Internal
             Guard.NotNull(context, nameof(context));
 
             Type messageType = context.Message.GetType();
-            Type resultType = context.MessageContext.ExpectedResultType;
+            Type responseType = context.MessageContext.ExpectedResponseType;
 
-            Func<IHandles, object, HandleContext, Task> handleDelegate = GetOrAddHandleDelegate(messageType, resultType);
+            Func<IHandles, object, HandleContext, Task> handleDelegate = GetOrAddHandleDelegate(messageType, responseType);
 
             // Invoke Method
             // (this throws an InvalidCastOperationException, if the handler does not have the correct types)
-            Task resultTask = handleDelegate(context.Handler, context.Message, context);
+            Task responseTask = handleDelegate(context.Handler, context.Message, context);
 
-            await resultTask;
+            await responseTask;
 
-            if (resultType != typeof(void))
+            if (responseType != typeof(void))
             {
-                Func<Task, object> getResultDelegate = GetOrAddResultGetterDelegate(resultType);
+                Func<Task, object> getTaskResultDelegate = GetOrAddTaskResultGetterDelegate(responseType);
 
-                context.MessageContext.Result = getResultDelegate(resultTask);
+                context.MessageContext.Response = getTaskResultDelegate(responseTask);
             }
         }
 
-        private Func<IHandles, object, HandleContext, Task> GetOrAddHandleDelegate(Type messageType, Type resultType)
+        private Func<IHandles, object, HandleContext, Task> GetOrAddHandleDelegate(Type messageType, Type responseType)
         {
-            var cacheKey = Tuple.Create(messageType, resultType);
+            var cacheKey = Tuple.Create(messageType, responseType);
 
             Func<IHandles, object, HandleContext, Task> handleDelegate = _cachedHandleDelegates.GetOrAdd(cacheKey, x =>
             {
-                // resolve correct type based on whether there should be a result.
+                // resolve correct type based on whether there should be a response.
                 Type typedHandlerType = x.Item2 != typeof(void)
                     ? typeof(IHandles<,>).MakeGenericType(x.Item1, x.Item2)
                     : typeof(IHandles<>).MakeGenericType(x.Item1);
@@ -92,7 +92,7 @@ namespace Meceqs.TypedHandling.Internal
             return handleDelegate;
         }
 
-        private Func<Task, object> GetOrAddResultGetterDelegate(Type resultType)
+        private Func<Task, object> GetOrAddTaskResultGetterDelegate(Type resultType)
         {
             Func<Task, object> getResultDelegate = _cachedTaskResultGetterDelegates.GetOrAdd(resultType, x =>
             {

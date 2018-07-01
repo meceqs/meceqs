@@ -18,14 +18,14 @@ namespace Meceqs.Receiving
             return InvokePipelineAsync();
         }
 
-        public Task<TResult> ReceiveAsync<TResult>()
+        public Task<TResponse> ReceiveAsync<TResponse>()
         {
-            return InvokePipelineAsync<TResult>();
+            return InvokePipelineAsync<TResponse>();
         }
 
-        public Task<object> ReceiveAsync(Type resultType)
+        public Task<object> ReceiveAsync(Type responseType)
         {
-            return InvokePipelineAsync(resultType);
+            return InvokePipelineAsync(responseType);
         }
     }
 }

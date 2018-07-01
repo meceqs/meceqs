@@ -15,9 +15,9 @@ namespace Meceqs.AspNetCore.Receiving
             _serializationProvider = serializationProvider;
         }
 
-        public void WriteResult(object result, HttpContext httpContext)
+        public void WriteResponse(object response, HttpContext httpContext)
         {
-            if (result == null)
+            if (response == null)
                 return;
 
             IEnumerable<string> supportedContentTypes = GetSupportedContentTypes(httpContext);
@@ -26,7 +26,7 @@ namespace Meceqs.AspNetCore.Receiving
 
             httpContext.Response.ContentType = serializer.ContentType;
 
-            serializer.SerializeToStream(result, httpContext.Response.Body);
+            serializer.SerializeToStream(response, httpContext.Response.Body);
         }
 
         private IEnumerable<string> GetSupportedContentTypes(HttpContext httpContext)

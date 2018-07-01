@@ -16,15 +16,15 @@ namespace Meceqs.Receiving
         Task ReceiveAsync();
 
         /// <summary>
-        /// Sends the envelope to the pipeline and expects a result object of the given type.
+        /// Sends the envelope to the pipeline and expects a response object of the given type.
         /// If no pipeline name was configured, the default "Receive" pipeline will be used.
         /// </summary>
-        Task<TResult> ReceiveAsync<TResult>();
+        Task<TResponse> ReceiveAsync<TResponse>();
 
         /// <summary>
-        /// Sends the envelope to the pipeline and expects a result object of the given type.
+        /// Sends the envelope to the pipeline and expects a response object of the given type.
         /// If no pipeline name was configured, the default "Receive" pipeline will be used.
         /// </summary>
-        Task<object> ReceiveAsync(Type resultType);
+        Task<object> ReceiveAsync(Type responseType);
     }
 }

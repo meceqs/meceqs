@@ -58,7 +58,7 @@ namespace Meceqs.HttpSender
 
             response.EnsureSuccessStatusCode();
 
-            if (context.ExpectedResultType != typeof(void))
+            if (context.ExpectedResponseType != typeof(void))
             {
                 string contentType = response.Content.Headers.ContentType.ToString();
                 if (!_serializationProvider.TryGetSerializer(contentType, out ISerializer serializer))
@@ -66,7 +66,7 @@ namespace Meceqs.HttpSender
                     throw new NotSupportedException($"ContentType '{contentType}' is not supported.");
                 }
 
-                context.Result = serializer.Deserialize(context.ExpectedResultType, await response.Content.ReadAsStreamAsync());
+                context.Response = serializer.Deserialize(context.ExpectedResponseType, await response.Content.ReadAsStreamAsync());
             }
         }
     }

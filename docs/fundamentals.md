@@ -16,9 +16,9 @@ The following concepts build the foundation of Meceqs:
 * __MessageContext:__
     A context object that is passed from middleware to middleware. It holds the envelope and additional data like cancellation tokens,
     the current user etc. This is similar to the `HttpContext` type from ASP.NET Core.
-* __Result objects:__
-    For synchronous request/response messaging, the pipeline can be invoked with an expected result type
-    and any *middleware* can set the `MessageContext.Result` property to return the result object to the caller.
+* __Response objects:__
+    For synchronous request/response messaging, the pipeline can be invoked with an expected response type
+    and any *middleware* can set the `MessageContext.Response` property to return the response object to the caller.
     This is similar to the `HttpContext.Response` feature in ASP.NET Core.
 
 ## Messages
@@ -50,8 +50,8 @@ public class GetCustomerQuery
     public Guid CustomerId { get; set; }
 }
 
-// Result objects can be of any type.
-public class GetCustomerResult
+// Response objects can be of any type.
+public class GetCustomerResponse
 {
     public Guid CustomerId { get; set; }
     public string FullName { get; set; }
@@ -167,7 +167,7 @@ Typically, a pipeline is used for one of two scenarios:
     Whenever your application *receives an existing envelope* from somewhere, you want to *receive* it.
     This typically happens when your application is a Web API, a worker process for incoming messages from a broker, etc.
     In this case, the last middleware in the pipeline usually does one of the following things:
-    * Execute business logic for an incoming command/query/event (and maybe return a result)
+    * Execute business logic for an incoming command/query/event (and maybe return a response)
     * Create additional messages (by using the same mechanism as in the previously mentioned **Sending messages**)
     * Store/forward the envelope
     * ...
@@ -192,15 +192,15 @@ CreateCustomerCommand cmd = new CreateCustomerCommand { FirstName = "John", Last
 await _messageSender.SendAsync(cmd);
 ```
 
-If the target returns a result for the command, the web application would use this code
-(assuming the target returns a `CreateCustomerResult` object with a `CustomerId` property):
+If the target returns a response for the command, the web application would use this code
+(assuming the target returns a `CreateCustomerResponse` object with a `CustomerId` property):
 
 ```csharp
 CreateCustomerCommand cmd = new CreateCustomerCommand { FirstName = "John", LastName = "Snow" };
 
-CreateCustomerResult result = await _messageSender.SendAsync<CreateCustomerResult>(cmd);
+CreateCustomerResponse response = await _messageSender.SendAsync<CreateCustomerResponse>(cmd);
 
-Debug.WriteLine("CustomerId: " + result.CustomerId);
+Debug.WriteLine("CustomerId: " + response.CustomerId);
 ```
 
 If you need to set headers on the envelope or some medata on the message context,
@@ -232,19 +232,19 @@ await _messageReceiver.ForEnvelope(existingEnvelope)
     .ReceiveAsync();
 ```
 
-In typical asynchronous scenarios (like processing messages from a queue, ...) a message receiver does not return a result.
+In typical asynchronous scenarios (like processing messages from a queue, ...) a message receiver does not return a response.
 However, if the message receiver is part of a synchronous conversation (like a HTTP call) it's very common
-that the receiver has to return a result to the caller - especially in case of query requests.
-For this reason, `IMessageReceiver` also offers a `ReceiveAsync<TResult>()` method.
+that the receiver has to return a response to the caller - especially in case of query requests.
+For this reason, `IMessageReceiver` also offers a `ReceiveAsync<TResponse>()` method.
 
 Following up in our example, the ASP.NET Core backend API would implement a MVC controller with the following code
-to process the `CreateCustomerCommand` and to immediately return a `CreateCustomerResult`:
+to process the `CreateCustomerCommand` and to immediately return a `CreateCustomerResponse`:
 
 ```csharp
 [HttpPost]
-public Task<CreateCustomerResult> CreateCustomer([FromBody] Envelope<CreateCustomerCommand> envelope)
+public Task<CreateCustomerResponse> CreateCustomer([FromBody] Envelope<CreateCustomerCommand> envelope)
 {
-    return _messageReceiver.ReceiveAsync<CreateCustomerResult>(envelope);
+    return _messageReceiver.ReceiveAsync<CreateCustomerResponse>(envelope);
 }
 ```
 

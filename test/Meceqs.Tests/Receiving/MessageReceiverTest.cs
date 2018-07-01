@@ -38,7 +38,7 @@ namespace Meceqs.Tests.Receiving
             return AssertMessageContext(envelope, null, assertions);
         }
 
-        private async Task AssertMessageContext(Envelope envelope, Type resultType, Action<MessageContext> assertions)
+        private async Task AssertMessageContext(Envelope envelope, Type responseType, Action<MessageContext> assertions)
         {
             // Assert callback
             var called = false;
@@ -52,7 +52,7 @@ namespace Meceqs.Tests.Receiving
             var receiver = GetMessageReceiver(callback);
 
             // Act
-            await (resultType == null ? receiver.ReceiveAsync(envelope) : receiver.ReceiveAsync(envelope, resultType));
+            await (responseType == null ? receiver.ReceiveAsync(envelope) : receiver.ReceiveAsync(envelope, responseType));
 
             called.ShouldBeTrue();
         }
@@ -152,28 +152,28 @@ namespace Meceqs.Tests.Receiving
         }
 
         [Fact]
-        public async Task ResultType_is_passed_to_MessageContext()
+        public async Task ResponseType_is_passed_to_MessageContext()
         {
             var envelope = TestObjects.Envelope<SimpleMessage>();
-            var resultType = typeof(string);
+            var responseType = typeof(string);
 
-            await AssertMessageContext(envelope, resultType, (ctx) =>
+            await AssertMessageContext(envelope, responseType, (ctx) =>
             {
-                ctx.ExpectedResultType.ShouldBe(resultType);
+                ctx.ExpectedResponseType.ShouldBe(responseType);
             });
         }
 
         [Fact]
-        public async Task Result_from_middleware_is_returned()
+        public async Task Response_from_middleware_is_returned()
         {
             var envelope = TestObjects.Envelope<SimpleMessage>();
 
-            var callback = new Action<MessageContext>((ctx) => ctx.Result = "result");
+            var callback = new Action<MessageContext>((ctx) => ctx.Response = "response");
             var receiver = GetMessageReceiver(callback);
 
-            string result = await receiver.ReceiveAsync<string>(envelope);
+            string response = await receiver.ReceiveAsync<string>(envelope);
 
-            result.ShouldBe("result");
+            response.ShouldBe("response");
         }
     }
 }

@@ -4,6 +4,6 @@ namespace Meceqs.AspNetCore.Receiving
 {
     public interface IHttpResponseWriter
     {
-        void WriteResult(object result, HttpContext httpContext);
+        void WriteResponse(object response, HttpContext httpContext);
     }
 }

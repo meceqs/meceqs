@@ -6,39 +6,39 @@ namespace Meceqs.Tests.Middleware.TypedHandling
 {
     public class SimpleMessageIntHandler : IHandles<SimpleMessage, int>
     {
-        private readonly int _result;
+        private readonly int _response;
 
-        public SimpleMessageIntHandler(int? result = null)
+        public SimpleMessageIntHandler(int? response = null)
         {
-            _result = result ?? 0;
+            _response = response ?? 0;
         }
 
         public Task<int> HandleAsync(SimpleMessage msg, HandleContext context)
         {
-            return Task.FromResult(_result);
+            return Task.FromResult(_response);
         }
     }
 
-    public class SimpleMessageSimpleResultHandler : IHandles<SimpleMessage, SimpleResult>
+    public class SimpleMessageSimpleResponseHandler : IHandles<SimpleMessage, SimpleResponse>
     {
-        private readonly SimpleResult _result;
+        private readonly SimpleResponse _response;
 
-        public SimpleMessageSimpleResultHandler(SimpleResult result = null)
+        public SimpleMessageSimpleResponseHandler(SimpleResponse response = null)
         {
-            _result = result;
+            _response = response;
         }
 
-        public Task<SimpleResult> HandleAsync(SimpleMessage msg, HandleContext context)
+        public Task<SimpleResponse> HandleAsync(SimpleMessage msg, HandleContext context)
         {
-            return Task.FromResult(_result);
+            return Task.FromResult(_response);
         }
     }
 
-    public class SimpleMessageNoResultHandler : IHandles<SimpleMessage>
+    public class SimpleMessageNoResponseHandler : IHandles<SimpleMessage>
     {
         private readonly Action _callback;
 
-        public SimpleMessageNoResultHandler(Action callback = null)
+        public SimpleMessageNoResponseHandler(Action callback = null)
         {
             _callback = callback;
         }
@@ -53,7 +53,7 @@ namespace Meceqs.Tests.Middleware.TypedHandling
 
     public class MultipleMessagesHandler :
         IHandles<SimpleMessage>,
-        IHandles<SimpleCommand, SimpleResult>,
+        IHandles<SimpleCommand, SimpleResponse>,
         IHandles<SimpleEvent, int>
     {
         private readonly Action<string> _callback;
@@ -65,14 +65,14 @@ namespace Meceqs.Tests.Middleware.TypedHandling
 
         public Task HandleAsync(SimpleMessage msg, HandleContext context)
         {
-            _callback?.Invoke("SimpleMessage/NoResult");
+            _callback?.Invoke("SimpleMessage/NoResponse");
             return Task.CompletedTask;
         }
 
-        public Task<SimpleResult> HandleAsync(SimpleCommand msg, HandleContext context)
+        public Task<SimpleResponse> HandleAsync(SimpleCommand msg, HandleContext context)
         {
-            _callback?.Invoke("SimpleCommand/SimpleResult");
-            return Task.FromResult(new SimpleResult { Text = "result" });
+            _callback?.Invoke("SimpleCommand/SimpleResponse");
+            return Task.FromResult(new SimpleResponse { Text = "response" });
         }
 
         public Task<int> HandleAsync(SimpleEvent msg, HandleContext context)

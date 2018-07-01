@@ -20,29 +20,29 @@ namespace Meceqs.Tests.Middleware.TypedHandling
         {
             // Arrange
             var resolver = GetResolver();
-            var handlerType = typeof(SimpleMessageNoResultHandler);
+            var handlerType = typeof(SimpleMessageNoResponseHandler);
             var messageType = typeof(SimpleMessage);
-            Type resultType = typeof(void);
+            Type responseType = typeof(void);
 
             // Act & Assert
-            Should.Throw<ArgumentNullException>(() => resolver.GetHandleMethod(null, messageType, resultType));
-            Should.Throw<ArgumentNullException>(() => resolver.GetHandleMethod(handlerType, null, resultType));
+            Should.Throw<ArgumentNullException>(() => resolver.GetHandleMethod(null, messageType, responseType));
+            Should.Throw<ArgumentNullException>(() => resolver.GetHandleMethod(handlerType, null, responseType));
         }
 
         [Fact]
-        public void Succeeds_for_SimpleMessage_no_result()
+        public void Succeeds_for_SimpleMessage_no_response()
         {
             // Arrange
             var resolver = GetResolver();
-            var handlerType = typeof(SimpleMessageNoResultHandler);
+            var handlerType = typeof(SimpleMessageNoResponseHandler);
             var messageType = typeof(SimpleMessage);
-            Type resultType = typeof(void);
+            Type responseType = typeof(void);
 
             // Act
-            var method = resolver.GetHandleMethod(handlerType, messageType, resultType);
+            var method = resolver.GetHandleMethod(handlerType, messageType, responseType);
 
             // Assert
-            AssertMethod(method, messageType, resultType);
+            AssertMethod(method, messageType, responseType);
         }
 
         [Fact]
@@ -52,45 +52,45 @@ namespace Meceqs.Tests.Middleware.TypedHandling
             var resolver = GetResolver();
             var handlerType = typeof(SimpleMessageIntHandler);
             var messageType = typeof(SimpleMessage);
-            Type resultType = typeof(int);
+            Type responseType = typeof(int);
 
             // Act
-            var method = resolver.GetHandleMethod(handlerType, messageType, resultType);
+            var method = resolver.GetHandleMethod(handlerType, messageType, responseType);
 
             // Assert
-            AssertMethod(method, messageType, resultType);
+            AssertMethod(method, messageType, responseType);
         }
 
         [Fact]
-        public void Selects_SimpleMessageNoResult_if_handler_has_multiple_handlers()
+        public void Selects_SimpleMessageNoResponse_if_handler_has_multiple_handlers()
         {
             // Arrange
             var resolver = GetResolver();
             var handlerType = typeof(MultipleMessagesHandler);
             var messageType = typeof(SimpleMessage);
-            Type resultType = typeof(void);
+            Type responseType = typeof(void);
 
             // Act
-            var method = resolver.GetHandleMethod(handlerType, messageType, resultType);
+            var method = resolver.GetHandleMethod(handlerType, messageType, responseType);
 
             // Assert
-            AssertMethod(method, messageType, resultType);
+            AssertMethod(method, messageType, responseType);
         }
 
         [Fact]
-        public void Selects_SimpleCommandSimpleResult_if_handler_has_multiple_handlers()
+        public void Selects_SimpleCommandSimpleResponse_if_handler_has_multiple_handlers()
         {
             // Arrange
             var resolver = GetResolver();
             var handlerType = typeof(MultipleMessagesHandler);
             var messageType = typeof(SimpleCommand);
-            Type resultType = typeof(SimpleResult);
+            Type responseType = typeof(SimpleResponse);
 
             // Act
-            var method = resolver.GetHandleMethod(handlerType, messageType, resultType);
+            var method = resolver.GetHandleMethod(handlerType, messageType, responseType);
 
             // Assert
-            AssertMethod(method, messageType, resultType);
+            AssertMethod(method, messageType, responseType);
         }
 
         [Fact]
@@ -100,57 +100,57 @@ namespace Meceqs.Tests.Middleware.TypedHandling
             var resolver = GetResolver();
             var handlerType = typeof(MultipleMessagesHandler);
             var messageType = typeof(SimpleEvent);
-            Type resultType = typeof(int);
+            Type responseType = typeof(int);
 
             // Act
-            var method = resolver.GetHandleMethod(handlerType, messageType, resultType);
+            var method = resolver.GetHandleMethod(handlerType, messageType, responseType);
 
             // Assert
-            AssertMethod(method, messageType, resultType);
+            AssertMethod(method, messageType, responseType);
         }
 
         [Fact]
-        public void Returns_null_if_handler_has_same_message_but_different_result()
+        public void Returns_null_if_handler_has_same_message_but_different_response()
         {
             // Arrange
             var resolver = GetResolver();
             var handlerType = typeof(SimpleMessageIntHandler);
             var messageType = typeof(SimpleMessage);
-            Type resultType = typeof(string);
+            Type responseType = typeof(string);
 
             // Act
-            var method = resolver.GetHandleMethod(handlerType, messageType, resultType);
+            var method = resolver.GetHandleMethod(handlerType, messageType, responseType);
 
             // Assert
             method.ShouldBeNull();
         }
 
         [Fact]
-        public void Returns_null_if_handler_has_same_message_but_no_result()
+        public void Returns_null_if_handler_has_same_message_but_no_response()
         {
             // Arrange
             var resolver = GetResolver();
-            var handlerType = typeof(SimpleMessageNoResultHandler);
+            var handlerType = typeof(SimpleMessageNoResponseHandler);
             var messageType = typeof(SimpleMessage);
-            Type resultType = typeof(int);
+            Type responseType = typeof(int);
 
             // Act
-            var method = resolver.GetHandleMethod(handlerType, messageType, resultType);
+            var method = resolver.GetHandleMethod(handlerType, messageType, responseType);
 
             // Assert
             method.ShouldBeNull();
         }
 
-        private void AssertMethod(MethodInfo method, Type messageType, Type resultType)
+        private void AssertMethod(MethodInfo method, Type messageType, Type responseType)
         {
-            var resultTaskType = resultType != typeof(void)
-                ? typeof(Task<>).MakeGenericType(resultType)
+            var responseTaskType = responseType != typeof(void)
+                ? typeof(Task<>).MakeGenericType(responseType)
                 : typeof(Task);
 
             method.ShouldNotBeNull();
             method.GetParameters()[0].ParameterType.ShouldBe(messageType);
             method.GetParameters()[1].ParameterType.ShouldBe(typeof(HandleContext));
-            method.ReturnType.ShouldBe(resultTaskType);
+            method.ReturnType.ShouldBe(responseTaskType);
         }
     }
 }

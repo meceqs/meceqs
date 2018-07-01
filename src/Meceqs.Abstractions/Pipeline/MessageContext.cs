@@ -37,15 +37,15 @@ namespace Meceqs.Pipeline
         public IServiceProvider RequestServices { get; }
 
         /// <summary>
-        /// Gets the type of the result expected by the caller.
+        /// Gets the type of the response expected by the caller.
         /// </summary>
-        public Type ExpectedResultType { get; }
+        public Type ExpectedResponseType { get; }
 
         /// <summary>
-        /// Gets or sets the result of the current execution. This object must match the type of <see cref="ExpectedResultType"/>
+        /// Gets or sets the response of the current execution. This object must match the type of <see cref="ExpectedResponseType"/>
         /// or the caller will receive an invalid cast exception.
         /// </summary>
-        public object Result { get; set; }
+        public object Response { get; set; }
 
         /// <summary>
         /// Gets or sets the cancellation token for the current execution.
@@ -68,17 +68,17 @@ namespace Meceqs.Pipeline
         /// </summary>
         public ClaimsPrincipal User { get; set; }
 
-        public MessageContext(Envelope envelope, string pipelineName, IServiceProvider requestServices, Type expectedResultType)
+        public MessageContext(Envelope envelope, string pipelineName, IServiceProvider requestServices, Type expectedResponseType)
         {
             Guard.NotNull(envelope, nameof(envelope));
             Guard.NotNullOrWhiteSpace(pipelineName, nameof(pipelineName));
             Guard.NotNull(requestServices, nameof(requestServices));
-            Guard.NotNull(expectedResultType, nameof(expectedResultType));
+            Guard.NotNull(expectedResponseType, nameof(expectedResponseType));
 
             Envelope = envelope;
             PipelineName = pipelineName;
             RequestServices = requestServices;
-            ExpectedResultType = expectedResultType;
+            ExpectedResponseType = expectedResponseType;
         }
     }
 }

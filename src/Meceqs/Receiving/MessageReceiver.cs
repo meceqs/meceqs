@@ -42,23 +42,23 @@ namespace Meceqs.Receiving
         }
 
         /// <summary>
-        /// Sends the envelope to the default "Receive" pipeline and expects a result object of the given type.
+        /// Sends the envelope to the default "Receive" pipeline and expects a response object of the given type.
         /// If you want to use a different pipeline or change some other behavior,
         /// use the builder pattern with <see cref="ForEnvelope"/>.
         /// </summary>
-        public Task<TResult> ReceiveAsync<TResult>(Envelope envelope)
+        public Task<TResponse> ReceiveAsync<TResponse>(Envelope envelope)
         {
-            return ForEnvelope(envelope).ReceiveAsync<TResult>();
+            return ForEnvelope(envelope).ReceiveAsync<TResponse>();
         }
 
         /// <summary>
-        /// Sends the envelope to the default "Receive" pipeline and expects a result object of the given type.
+        /// Sends the envelope to the default "Receive" pipeline and expects a response object of the given type.
         /// If you want to use a different pipeline or change some other behavior,
         /// use the builder pattern with <see cref="ForEnvelope"/>.
         /// </summary>
-        public Task<object> ReceiveAsync(Envelope envelope, Type resultType)
+        public Task<object> ReceiveAsync(Envelope envelope, Type responseType)
         {
-            return ForEnvelope(envelope).ReceiveAsync(resultType);
+            return ForEnvelope(envelope).ReceiveAsync(responseType);
         }
     }
 }

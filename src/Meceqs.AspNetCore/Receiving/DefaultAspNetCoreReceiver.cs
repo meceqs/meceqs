@@ -44,13 +44,13 @@ namespace Meceqs.AspNetCore.Receiving
             {
                 var envelope = _httpRequestReader.ConvertToEnvelope(httpContext, metadata.MessageType);
 
-                object result = await _messageReceiver.ForEnvelope(envelope)
+                object response = await _messageReceiver.ForEnvelope(envelope)
                     .UsePipeline(receiverName)
                     .SetCancellationToken(httpContext.RequestAborted)
                     .SetUser(httpContext.User)
-                    .ReceiveAsync(metadata.ResultType);
+                    .ReceiveAsync(metadata.ResponseType);
 
-                _httpResponseWriter.WriteResult(result, httpContext);
+                _httpResponseWriter.WriteResponse(response, httpContext);
             }
         }
     }

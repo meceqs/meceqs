@@ -78,11 +78,11 @@ namespace Meceqs.Pipeline
             return Instance;
         }
 
-        protected virtual MessageContext CreateMessageContext(Envelope envelope, Type resultType)
+        protected virtual MessageContext CreateMessageContext(Envelope envelope, Type responseType)
         {
             Guard.NotNull(envelope, nameof(envelope));
 
-            var context = new MessageContext(envelope, PipelineName, RequestServices, resultType ?? typeof(void));
+            var context = new MessageContext(envelope, PipelineName, RequestServices, responseType ?? typeof(void));
 
             context.Cancellation = Cancellation;
             context.User = User;
@@ -100,33 +100,33 @@ namespace Meceqs.Pipeline
             var pipelineProvider = RequestServices.GetRequiredService<IPipelineProvider>();
             var pipeline = pipelineProvider.GetPipeline(PipelineName);
 
-            var messageContext = CreateMessageContext(Envelope, resultType: typeof(void));
+            var messageContext = CreateMessageContext(Envelope, responseType: typeof(void));
 
             await pipeline.InvokeAsync(messageContext);
         }
 
-        protected async Task<TResult> InvokePipelineAsync<TResult>()
+        protected async Task<TResponse> InvokePipelineAsync<TResponse>()
         {
             var pipelineProvider = RequestServices.GetRequiredService<IPipelineProvider>();
             var pipeline = pipelineProvider.GetPipeline(PipelineName);
 
-            var messageContext = CreateMessageContext(Envelope, typeof(TResult));
+            var messageContext = CreateMessageContext(Envelope, typeof(TResponse));
 
             await pipeline.InvokeAsync(messageContext);
 
-            return (TResult)messageContext.Result;
+            return (TResponse)messageContext.Response;
         }
 
-        protected async Task<object> InvokePipelineAsync(Type resultType)
+        protected async Task<object> InvokePipelineAsync(Type responseType)
         {
             var pipelineProvider = RequestServices.GetRequiredService<IPipelineProvider>();
             var pipeline = pipelineProvider.GetPipeline(PipelineName);
 
-            var messageContext = CreateMessageContext(Envelope, resultType);
+            var messageContext = CreateMessageContext(Envelope, responseType);
 
             await pipeline.InvokeAsync(messageContext);
 
-            return messageContext.Result;
+            return messageContext.Response;
         }
     }
 }

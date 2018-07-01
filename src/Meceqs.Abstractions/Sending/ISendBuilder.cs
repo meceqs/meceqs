@@ -23,15 +23,15 @@ namespace Meceqs.Sending
         Task SendAsync();
 
         /// <summary>
-        /// Sends the envelope/message to the pipeline and expects a result object of the given type.
+        /// Sends the envelope/message to the pipeline and expects a response object of the given type.
         /// If no pipeline name was configured, the default "Send" pipeline will be used.
         /// </summary>
-        Task<TResult> SendAsync<TResult>();
+        Task<TResponse> SendAsync<TResponse>();
 
         /// <summary>
-        /// Sends the envelope/message to the pipeline and expects a result object of the given type.
+        /// Sends the envelope/message to the pipeline and expects a response object of the given type.
         /// If no pipeline name was configured, the default "Send" pipeline will be used.
         /// </summary>
-        Task<object> SendAsync(Type resultType);
+        Task<object> SendAsync(Type responseType);
     }
 }

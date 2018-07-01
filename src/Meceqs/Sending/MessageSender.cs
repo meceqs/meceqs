@@ -60,13 +60,13 @@ namespace Meceqs.Sending
         }
 
         /// <summary>
-        /// Sends the message to the default "Send" pipeline and expects a result object of the given type.
+        /// Sends the message to the default "Send" pipeline and expects a response object of the given type.
         /// If you want to use a different pipeline or change some other behavior,
         /// use the builder pattern with <see cref="ForMessage"/>.
         /// </summary>
-        public Task<TResult> SendAsync<TResult>(object message, Guid? messageId = null)
+        public Task<TResponse> SendAsync<TResponse>(object message, Guid? messageId = null)
         {
-            return ForMessage(message, messageId).SendAsync<TResult>();
+            return ForMessage(message, messageId).SendAsync<TResponse>();
         }
     }
 }

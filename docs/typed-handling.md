@@ -5,8 +5,8 @@ that is similar to Jimmy Bogard's [MediatR](https://github.com/jbogard/MediatR) 
 His library has been a great inspiration for us and we would like to thank him and his contributors for creating it!
 
 Our typed handling middleware has the following features:
-* `IHandles<TMessage>` interface for handlers that don't return results.
-* `IHandles<TMessage, TResult>` interface for handlers that return results.
+* `IHandles<TMessage>` interface for handlers that don't return responses.
+* `IHandles<TMessage, TResponse>` interface for handlers that return responses.
 * `HandleContext` object that contains metadata (envelope, message context, handler reflection data).
 * `IHandleInterceptor` interface for creating interceptors that can read attributes from the handler method/class.
 * Handlers and interceptors can be configured separately for every pipeline.
@@ -24,16 +24,16 @@ Your handler has to implement one of these interfaces:
 ```csharp
 using Meceqs.TypedHandling;
 
-// Implement this interface if your handler does not return a result.
+// Implement this interface if your handler does not return a response.
 public interface IHandles<TMessage>
 {
     Task HandleAsync(TMessage message, HandleContext context);
 }
 
-// Implement this interface if your handler returns a result.
-public interface IHandles<TMessage, TResult>
+// Implement this interface if your handler returns a response.
+public interface IHandles<TMessage, TResponse>
 {
-    Task<TResult> HandleAsync(TMessage message, HandleContext context);
+    Task<TResponse> HandleAsync(TMessage message, HandleContext context);
 }
 ```
 
@@ -41,7 +41,7 @@ An example for a handler that handles two messages can be seen here:
 
 ```csharp
 public class CustomerCommandHandler :
-    IHandles<CreateCustomerCommand, CreateCustomerResult>,
+    IHandles<CreateCustomerCommand, CreateCustomerResponse>,
     IHandles<ChangeNameCommand>
 {
     private readonly ICustomerRepository _customerRepository;
@@ -52,13 +52,13 @@ public class CustomerCommandHandler :
     }
 
     [CustomLogic /* this attribute can be read by an IHandleInterceptor */]
-    public async Task<CreateCustomerResult> HandleAsync(CreateCustomerCommand cmd, HandleContext context)
+    public async Task<CreateCustomerResponse> HandleAsync(CreateCustomerCommand cmd, HandleContext context)
     {
         var customer = new Customer(cmd.FirstName, cmd.LastName);
 
         _customerRepository.Add(customer);
 
-        return new CreateCustomerResult { CustomerId = customer.Id };
+        return new CreateCustomerResponse { CustomerId = customer.Id };
     }
 
     public async Task HandleAsync(ChangeNameCommand cmd, HandleContext context)

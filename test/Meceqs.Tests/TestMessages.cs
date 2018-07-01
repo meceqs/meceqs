@@ -13,7 +13,7 @@ namespace Meceqs.Tests
     {
     }
 
-    public class SimpleResult
+    public class SimpleResponse
     {
         public string Text { get; set; }
     }

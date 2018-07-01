@@ -15,13 +15,13 @@ namespace Meceqs.Tests.Middleware.TypedHandling
             return new DefaultHandlerInvoker();
         }
 
-        private HandleContext GetHandleContext<TMessage>(Type resultType, IHandles handler)
+        private HandleContext GetHandleContext<TMessage>(Type responseType, IHandles handler)
             where TMessage : class, new()
         {
-            var messageContext = TestObjects.MessageContext<SimpleMessage>(resultType);
+            var messageContext = TestObjects.MessageContext<SimpleMessage>(responseType);
 
             var handleMethodResolver = new DefaultHandleMethodResolver();
-            MethodInfo handleMethod = handleMethodResolver.GetHandleMethod(handler.GetType(), typeof(TMessage), resultType);
+            MethodInfo handleMethod = handleMethodResolver.GetHandleMethod(handler.GetType(), typeof(TMessage), responseType);
 
             return new HandleContext(messageContext, handler, handleMethod);
         }
@@ -48,16 +48,16 @@ namespace Meceqs.Tests.Middleware.TypedHandling
             await invoker.InvokeHandleAsync(context);
 
             // Assert
-            context.MessageContext.Result.ShouldBe(1);
+            context.MessageContext.Response.ShouldBe(1);
         }
 
         [Fact]
-        public async Task Succeeds_for_SimpleMessage_without_result()
+        public async Task Succeeds_for_SimpleMessage_without_response()
         {
             // Arrange
             var invoker = GetInvoker();
             bool handlerCalled = false;
-            var handler = new SimpleMessageNoResultHandler(() => handlerCalled = true);
+            var handler = new SimpleMessageNoResponseHandler(() => handlerCalled = true);
             var context = GetHandleContext<SimpleMessage>(typeof(void), handler);
 
             // Act
@@ -65,23 +65,23 @@ namespace Meceqs.Tests.Middleware.TypedHandling
 
             // Assert
             handlerCalled.ShouldBeTrue();
-            context.MessageContext.Result.ShouldBeNull();
+            context.MessageContext.Response.ShouldBeNull();
         }
 
         [Fact]
-        public async Task Succeeds_for_SimpleMessage_and_SimpleResult()
+        public async Task Succeeds_for_SimpleMessage_and_SimpleResponse()
         {
             // Arrange
             var invoker = GetInvoker();
-            var expectedResult = new SimpleResult();
-            var handler = new SimpleMessageSimpleResultHandler(expectedResult);
-            var context = GetHandleContext<SimpleMessage>(typeof(SimpleResult), handler);
+            var expectedResponse = new SimpleResponse();
+            var handler = new SimpleMessageSimpleResponseHandler(expectedResponse);
+            var context = GetHandleContext<SimpleMessage>(typeof(SimpleResponse), handler);
 
             // Act
             await invoker.InvokeHandleAsync(context);
 
             // Assert
-            context.MessageContext.Result.ShouldBe(expectedResult);
+            context.MessageContext.Response.ShouldBe(expectedResponse);
         }
     }
 }

@@ -5,15 +5,15 @@ namespace Meceqs.Transport
     public class MessageMetadata
     {
         public Type MessageType { get; }
-        public Type ResultType { get; }
+        public Type ResponseType { get; }
 
-        public MessageMetadata(Type messageType, Type resultType)
+        public MessageMetadata(Type messageType, Type responseType)
         {
             Guard.NotNull(messageType, nameof(messageType));
-            // resultType may be null!
+            // responseType may be null!
 
             MessageType = messageType;
-            ResultType = resultType;
+            ResponseType = responseType;
         }
     }
 }

@@ -36,13 +36,13 @@ namespace Meceqs.Tests.Sending
         public async Task Calls_Pipeline()
         {
             // Arrange
-            var resultEvent = new SimpleEvent();
+            var evt = new SimpleEvent();
 
             var pipeline = Substitute.For<IPipeline>();
             var sender = GetSender(pipeline: pipeline);
 
             // Act
-            string result = await sender.ForMessage(resultEvent)
+            string response = await sender.ForMessage(evt)
                 .SendAsync<string>();
 
             // Assert
@@ -58,8 +58,8 @@ namespace Meceqs.Tests.Sending
             var sourceCmd = TestObjects.Envelope<SimpleCommand>();
             sourceCmd.CorrelationId = correlationId;
 
-            var resultEvent = new SimpleEvent();
-            var resultEventId = Guid.NewGuid();
+            var evt = new SimpleEvent();
+            var eventId = Guid.NewGuid();
 
             var cancellationSource = new CancellationTokenSource();
 
@@ -71,8 +71,8 @@ namespace Meceqs.Tests.Sending
                     called++;
 
                     var ctx = x.Arg<MessageContext>();
-                    Assert.Equal(resultEventId, ctx.Envelope.MessageId);
-                    Assert.Equal(resultEvent, ctx.Envelope.Message);
+                    Assert.Equal(eventId, ctx.Envelope.MessageId);
+                    Assert.Equal(evt, ctx.Envelope.Message);
                     Assert.Equal(cancellationSource.Token, ctx.Cancellation);
                     Assert.Equal("Value", ctx.Envelope.Headers["Key"]);
                     Assert.Equal("SendValue", ctx.Items.Get<string>("SendKey"));
@@ -85,7 +85,7 @@ namespace Meceqs.Tests.Sending
 
             // Act
 
-            string result = await sender.ForMessage(resultEvent, resultEventId)
+            string response = await sender.ForMessage(evt, eventId)
                 .CorrelateWith(sourceCmd)
                 .SetCancellationToken(cancellationSource.Token)
                 .SetHeader("Key", "Value")

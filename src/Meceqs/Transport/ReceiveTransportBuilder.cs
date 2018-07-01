@@ -45,16 +45,16 @@ namespace Meceqs.Transport
             return AddMessageType(typeof(TMessage));
         }
 
-        public TReceiveTransportBuilder AddMessageType<TMessage, TResult>()
+        public TReceiveTransportBuilder AddMessageType<TMessage, TResponse>()
         {
-            return AddMessageType(typeof(TMessage), typeof(TResult));
+            return AddMessageType(typeof(TMessage), typeof(TResponse));
         }
 
-        public TReceiveTransportBuilder AddMessageType(Type messageType, Type resultType = null)
+        public TReceiveTransportBuilder AddMessageType(Type messageType, Type responseType = null)
         {
             Guard.NotNull(messageType, nameof(messageType));
 
-            Configure(x => x.AddMessageType(messageType, resultType));
+            Configure(x => x.AddMessageType(messageType, responseType));
 
             // To be able to work with the message in the receiver,
             // we must also be able to deserialize it.
@@ -98,7 +98,7 @@ namespace Meceqs.Transport
             {
                 foreach (var implementedHandle in handler.ImplementedHandles)
                 {
-                    AddMessageType(implementedHandle.MessageType, implementedHandle.ResultType);
+                    AddMessageType(implementedHandle.MessageType, implementedHandle.ResponseType);
                 }
             }
 

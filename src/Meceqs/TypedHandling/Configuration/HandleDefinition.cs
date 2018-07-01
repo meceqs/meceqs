@@ -6,15 +6,15 @@ namespace Meceqs.TypedHandling.Configuration
     {
         public Type MessageType { get; }
 
-        public Type ResultType { get; }
+        public Type ResponseType { get; }
 
-        public HandleDefinition(Type messageType, Type resultType)
+        public HandleDefinition(Type messageType, Type responseType)
         {
             Guard.NotNull(messageType, nameof(messageType));
-            Guard.NotNull(resultType, nameof(resultType));
+            Guard.NotNull(responseType, nameof(responseType));
 
             MessageType = messageType;
-            ResultType = resultType;
+            ResponseType = responseType;
         }
     }
 }

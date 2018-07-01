@@ -62,7 +62,7 @@ namespace Meceqs.TypedHandling
 
         private IHandles CreateHandler(MessageContext messageContext)
         {
-            var key = new HandleDefinition(messageContext.MessageType, messageContext.ExpectedResultType);
+            var key = new HandleDefinition(messageContext.MessageType, messageContext.ExpectedResponseType);
 
             IHandlerMetadata handlerMetadata;
             if (_handlerMapping.TryGetValue(key, out handlerMetadata))
@@ -79,8 +79,8 @@ namespace Meceqs.TypedHandling
             {
                 case UnknownMessageBehavior.ThrowException:
                     throw new UnknownMessageException(
-                        $"There was no handler configured for message/result types " +
-                        $"'{messageContext.MessageType}/{messageContext.ExpectedResultType}");
+                        $"There was no handler configured for message/response types " +
+                        $"'{messageContext.MessageType}/{messageContext.ExpectedResponseType}");
 
                 case UnknownMessageBehavior.Skip:
                     _logger.SkippingMessage(messageContext);
@@ -98,16 +98,16 @@ namespace Meceqs.TypedHandling
         {
             var handlerType = handler.GetType();
             var messageType = messageContext.MessageType;
-            var resultType = messageContext.ExpectedResultType;
+            var responseType = messageContext.ExpectedResponseType;
 
             // This allows interceptors to e.g. look for custom attributes on the class or method.
-            var handleMethod = _handleMethodResolver.GetHandleMethod(handlerType, messageType, resultType);
+            var handleMethod = _handleMethodResolver.GetHandleMethod(handlerType, messageType, responseType);
 
             if (handleMethod == null)
             {
                 throw new InvalidOperationException(
                     $"'{nameof(_handleMethodResolver.GetHandleMethod)}' " +
-                    $"did not find a Handle-method for '{handlerType}.{messageType}/{resultType}'");
+                    $"did not find a Handle-method for '{handlerType}.{messageType}/{responseType}'");
             }
 
             HandleContext handleContext = new HandleContext(messageContext, handler, handleMethod);
@@ -147,7 +147,7 @@ namespace Meceqs.TypedHandling
         }
 
         /// <summary>
-        /// Returns a dictionary which returns a <see cref="IHandlerMetadata"/> for a given a message type and result type.
+        /// Returns a dictionary which returns a <see cref="IHandlerMetadata"/> for a given a message type and response type.
         /// </summary>
         private static Dictionary<HandleDefinition, IHandlerMetadata> CreateHandlerMapping(HandlerCollection handlers)
         {

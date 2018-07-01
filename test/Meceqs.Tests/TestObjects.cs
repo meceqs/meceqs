@@ -20,13 +20,13 @@ namespace Meceqs.Tests
             return (Envelope<TMessage>)EnvelopeFactory().Create(message, id ?? Guid.NewGuid());
         }
 
-        public static MessageContext MessageContext<TMessage>(Type resultType = null, IServiceProvider requestServices = null)
+        public static MessageContext MessageContext<TMessage>(Type responseType = null, IServiceProvider requestServices = null)
             where TMessage : class, new()
         {
             var envelope = Envelope<TMessage>();
             requestServices = requestServices ?? Substitute.For<IServiceProvider>();
 
-            return new MessageContext(envelope, "pipeline", requestServices, resultType ?? typeof(void));
+            return new MessageContext(envelope, "pipeline", requestServices, responseType ?? typeof(void));
         }
     }
 }

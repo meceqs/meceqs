@@ -28,14 +28,14 @@ namespace Meceqs.Sending
             return InvokePipelineAsync();
         }
 
-        public Task<TResult> SendAsync<TResult>()
+        public Task<TResponse> SendAsync<TResponse>()
         {
-            return InvokePipelineAsync<TResult>();
+            return InvokePipelineAsync<TResponse>();
         }
 
-        public Task<object> SendAsync(Type resultType)
+        public Task<object> SendAsync(Type responseType)
         {
-            return InvokePipelineAsync(resultType);
+            return InvokePipelineAsync(responseType);
         }
     }
 }

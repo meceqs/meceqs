@@ -38,7 +38,7 @@ namespace Meceqs.Tests.Performance
             const int loopCount = 100000;
 
             BrokeredMessage message = new BrokeredMessage();
-            var resultType = typeof(string);
+            var responseType = typeof(string);
 
             MethodInfo getBodyMethod = typeof(BrokeredMessage).GetMethod(nameof(BrokeredMessage.GetBody));
 
@@ -55,11 +55,11 @@ namespace Meceqs.Tests.Performance
 
             RunTimed("MethodInfo.Invoke", loopCount, () =>
             {
-                var method = methodCache.GetOrAdd(resultType, x => {
+                var method = methodCache.GetOrAdd(responseType, x => {
                     MethodInfo typedHandleMethod = getBodyMethod.MakeGenericMethod(x);
                     return typedHandleMethod;
                 });
-                
+
                 string s = (string)method.Invoke(message, new object[] { });
             });
 
@@ -69,7 +69,7 @@ namespace Meceqs.Tests.Performance
 
             RunTimed("MethodInfo Delegate", loopCount, () =>
             {
-                var del = delegateCache.GetOrAdd(resultType, x =>
+                var del = delegateCache.GetOrAdd(responseType, x =>
                 {
                     MethodInfo typedHandleMethod = getBodyMethod.MakeGenericMethod(x);
                     Func<BrokeredMessage, object> compiledDel = (Func<BrokeredMessage, object>) typedHandleMethod.CreateDelegate(typeof(Func<BrokeredMessage, object>), null);

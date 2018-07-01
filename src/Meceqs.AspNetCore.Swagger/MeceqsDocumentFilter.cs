@@ -76,7 +76,7 @@ namespace Meceqs.AspNetCore.Swagger
             operation.Responses.Add("200", new Response
             {
                 Description = "OK",
-                Schema = messageType.ResultType != typeof(void) ? schemaRegistry.GetOrRegister(messageType.ResultType) : null
+                Schema = messageType.ResponseType != typeof(void) ? schemaRegistry.GetOrRegister(messageType.ResponseType) : null
             });
 
             if (!string.IsNullOrEmpty(_meceqsOptions.SecurityDefinition))

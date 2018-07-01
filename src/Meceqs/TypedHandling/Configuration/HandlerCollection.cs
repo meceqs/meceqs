@@ -66,7 +66,7 @@ namespace Meceqs.TypedHandling.Configuration
                     throw new InvalidOperationException(
                         $"The handler '{handlerMetadata.HandlerType}' can not be added because it contains the following " +
                         $"'{nameof(IHandles)}' implementations which have already been added by the handler '{existing.HandlerType}': " +
-                        string.Join(";", duplicates.Select(x => $"{x.MessageType}/{x.ResultType}"))
+                        string.Join(";", duplicates.Select(x => $"{x.MessageType}/{x.ResponseType}"))
                     );
                 }
             }
@@ -195,9 +195,9 @@ namespace Meceqs.TypedHandling.Configuration
                     {
                         throw new NotSupportedException(
                             $"Interface '{implementedInterface}' does not have any generic types. " +
-                            $"This method tries to read the message type and the result type from the {nameof(IHandles)} " +
+                            $"This method tries to read the message type and the response type from the {nameof(IHandles)} " +
                             $"implementations. There are two different {nameof(IHandles)} interfaces. " +
-                            "One that accepts only a message type and one that accepts a message type and a result type." +
+                            "One that accepts only a message type and one that accepts a message type and a response type." +
                             "Seems like the given interface is neither of those!");
                     }
 
@@ -205,16 +205,16 @@ namespace Meceqs.TypedHandling.Configuration
                     {
                         throw new NotSupportedException(
                             $"Interface '{implementedInterface}' has more than 2 generic types (it has {typeArguments})." +
-                            $"This method tries to read the message type and the result type from the {nameof(IHandles)} " +
+                            $"This method tries to read the message type and the response type from the {nameof(IHandles)} " +
                             $"implementations. There are two different {nameof(IHandles)} interfaces. " +
-                            "One that accepts only a message type and one that accepts a message type and a result type." +
+                            "One that accepts only a message type and one that accepts a message type and a response type." +
                             "Seems like the given interface is neither of those!");
                     }
 
                     Type messageType = implementedInterface.GenericTypeArguments[0];
-                    Type resultType = implementedInterface.GenericTypeArguments.Length > 1 ? implementedInterface.GenericTypeArguments[1] : typeof(void);
+                    Type responseType = implementedInterface.GenericTypeArguments.Length > 1 ? implementedInterface.GenericTypeArguments[1] : typeof(void);
 
-                    yield return new HandleDefinition(messageType, resultType);
+                    yield return new HandleDefinition(messageType, responseType);
                 }
 
                 type = type.GetTypeInfo().BaseType;

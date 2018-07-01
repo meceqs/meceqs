@@ -11,7 +11,7 @@ namespace Customers.Core.QueryHandlers
 {
     [CustomLogic /* this attribute can be read by an IHandleInterceptor */]
     public class CustomerQueryHandler :
-        IHandles<FindCustomersQuery, FindCustomersResult>,
+        IHandles<FindCustomersQuery, FindCustomersResponse>,
         IHandles<GetCustomerQuery, CustomerDto>
     {
         private readonly ILogger _logger;
@@ -24,7 +24,7 @@ namespace Customers.Core.QueryHandlers
             _customerRepository = customerRepository;
         }
 
-        public Task<FindCustomersResult> HandleAsync(FindCustomersQuery qry, HandleContext context)
+        public Task<FindCustomersResponse> HandleAsync(FindCustomersQuery qry, HandleContext context)
         {
             _logger.LogInformation("FindCustomers - MessageType:{MessageType} MessageId:{MessageId}",
                 context.Message.GetType(), context.Envelope.MessageId);
@@ -33,12 +33,12 @@ namespace Customers.Core.QueryHandlers
 
             var customers = _customerRepository.GetAll();
 
-            var result = new FindCustomersResult
+            var response = new FindCustomersResponse
             {
                 Customers = customers.Select(x => ToDto(x)).ToList()
             };
 
-            return Task.FromResult(result);
+            return Task.FromResult(response);
         }
 
         public Task<CustomerDto> HandleAsync(GetCustomerQuery qry, HandleContext context)

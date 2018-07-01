@@ -9,9 +9,9 @@ namespace Meceqs.Transport
 
         public UnknownMessageBehavior UnknownMessageBehavior { get; set; } = UnknownMessageBehavior.ThrowException;
 
-        public void AddMessageType(Type messageType, Type resultType = null)
+        public void AddMessageType(Type messageType, Type responseType = null)
         {
-            MessageTypes.Add(new MessageMetadata(messageType, resultType));
+            MessageTypes.Add(new MessageMetadata(messageType, responseType));
         }
     }
 }

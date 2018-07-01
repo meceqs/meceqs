@@ -55,9 +55,9 @@ public class CreateCustomerCommand
 var cmd = new CreateCustomerCommand { FirstName = "John", LastName = "Snow" };
 
 // IMessageSender is the main interface for sending new messages to a pipeline.
-var result = await _messageSender.SendAsync<CreateCustomerResult>(cmd);
+var response = await _messageSender.SendAsync<CreateCustomerResponse>(cmd);
 
-Debug.WriteLine("CustomerId: " + result.CustomerId);
+Debug.WriteLine("CustomerId: " + response.CustomerId);
 ```
 
 #### Configuration
@@ -123,9 +123,9 @@ The business layer code decides to forward the message to *Azure Service Bus* be
 #### Usage
 ```csharp
 // `IHandles` from "Meceqs.TypedHandling" allows you to handle messages in a strongly typed way.
-public class CreateCustomerForwarder : IHandles<CreateCustomerCommand, CreateCustomerResult>
+public class CreateCustomerForwarder : IHandles<CreateCustomerCommand, CreateCustomerResponse>
 {
-    public async Task<CreateCustomerResult> HandleAsync(CreateCustomerCommand msg, HandleContext context)
+    public async Task<CreateCustomerResponse> HandleAsync(CreateCustomerCommand msg, HandleContext context)
     {
         // The "HandleContext" gives you access to the envelope and to additional data
         // like the current user, cancellation tokens, ...
@@ -141,7 +141,7 @@ public class CreateCustomerForwarder : IHandles<CreateCustomerCommand, CreateCus
             .UsePipeline(MyPipelines.SendServiceBus)
             .SendAsync();
 
-        return new CreateCustomerResult { CustomerId = customerId };
+        return new CreateCustomerResponse { CustomerId = customerId };
     }
 }
 ```
