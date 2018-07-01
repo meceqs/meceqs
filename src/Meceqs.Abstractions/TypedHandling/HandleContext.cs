@@ -14,6 +14,8 @@ namespace Meceqs.TypedHandling
     /// </summary>
     public class HandleContext
     {
+        private IMessageSender _messageSender;
+
         /// <summary>
         /// Gets the message context of the current execution.
         /// </summary>
@@ -91,7 +93,17 @@ namespace Meceqs.TypedHandling
         /// <summary>
         /// Gets a <see cref="IMessageSender"/>, resolved from <see cref="MessageContext.RequestServices"/>.
         /// </summary>
-        public IMessageSender MessageSender => (IMessageSender)MessageContext.RequestServices.GetService(typeof(IMessageSender));
+        public IMessageSender MessageSender
+        {
+            get
+            {
+                if (_messageSender == null)
+                {
+                    _messageSender = (IMessageSender)MessageContext.RequestServices.GetService(typeof(IMessageSender));
+                }
+                return _messageSender;
+            }
+        }
 
         public HandleContext(MessageContext messageContext, IHandles handler, MethodInfo handleMethod)
         {
