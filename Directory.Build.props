@@ -4,14 +4,9 @@
     <Authors>C3 Loyalty Services</Authors>
     <Copyright>Copyright (c) C3 Loyalty Services</Copyright>
 
+    <LangVersion>latest</LangVersion>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <DebugType>portable</DebugType>
-  </PropertyGroup>
-
-  <!-- Create XML documentation for libraries -->
-  <PropertyGroup Condition="'$(OutputType)'=='library' and '$(Configuration)'=='Release'">
-    <NoWarn>$(NoWarn);CS1591</NoWarn>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
 
 </Project>

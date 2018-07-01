@@ -23,7 +23,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
         /// <summary>
         /// Add the given message type to this sender. The relative endpoint path will be resolved
-        /// by using the configured <see cref="MessageConvention"/>.
+        /// by using the configured <see cref="IEndpointMessageConvention"/>.
         /// </summary>
         public HttpSenderBuilder AddMessage<TMessage>()
         {
@@ -32,7 +32,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
         /// <summary>
         /// Add the given message type to this sender. The relative endpoint path will be resolved
-        /// by using the configured <see cref="MessageConvention"/>.
+        /// by using the configured <see cref="IEndpointMessageConvention"/>.
         /// </summary>
         public HttpSenderBuilder AddMessage(Type messageType)
         {

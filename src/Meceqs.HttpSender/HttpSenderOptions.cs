@@ -7,8 +7,7 @@ namespace Meceqs.HttpSender
     public class HttpSenderOptions : SendTransportOptions
     {
         /// <summary>
-        /// Configures the mapping between message types and endpoint URIs for messages that
-        /// are added via one of the <see cref="AddMessage"/> methods.
+        /// Configures the mapping between message types and endpoint URIs.
         /// </summary>
         public IEndpointMessageConvention MessageConvention { get; set; } = new DefaultEndpointMessageConvention();
 
