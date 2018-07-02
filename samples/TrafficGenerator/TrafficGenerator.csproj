@@ -9,7 +9,6 @@
     <ProjectReference Include="..\Sales.Contracts\Sales.Contracts.csproj" />
     <ProjectReference Include="..\..\src\Meceqs\Meceqs.csproj" />
     <ProjectReference Include="..\..\src\Meceqs.AzureServiceBus\Meceqs.AzureServiceBus.csproj" />
-    <ProjectReference Include="..\..\src\Meceqs.AzureServiceBus.FileFake\Meceqs.AzureServiceBus.FileFake.csproj" />
     <ProjectReference Include="..\..\src\Meceqs.HttpSender\Meceqs.HttpSender.csproj" />
   </ItemGroup>
   <ItemGroup>
