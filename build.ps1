@@ -59,11 +59,17 @@ Task "Build" $RunBuild {
 
 Task "Tests" $RunTests {
 
+    $testOutput = Join-Path $ArtifactsPath "Tests"
+    New-Item $testOutput -ItemType Directory -ErrorAction Ignore | Out-Null
+
     $testsFailed = $false
     Get-ChildItem -Filter *.csproj -Recurse | ForEach-Object {
 
         if (Select-Xml -Path $_.FullName -XPath "/Project/ItemGroup/PackageReference[@Include='Microsoft.NET.Test.Sdk']") {
-            dotnet test $_.FullName -c $BuildConfiguration --no-build
+            $library = Split-Path $_.DirectoryName -Leaf
+            $testResultOutput = Join-Path $testOutput "$library.trx"
+
+            dotnet test $_.FullName -c $BuildConfiguration --no-build --logger "trx;LogFileName=$testResultOutput"
             if ($LASTEXITCODE -ne 0) { $testsFailed = $true }
         }
     }
