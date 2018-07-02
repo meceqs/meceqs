@@ -1,6 +1,6 @@
 <Project>
+  <Import Project="version.props" />
   <PropertyGroup>
-    <VersionPrefix>0.5.0</VersionPrefix>
     <Authors>C3 Loyalty Services</Authors>
     <Copyright>Copyright (c) C3 Loyalty Services</Copyright>
 

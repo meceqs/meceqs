@@ -1,0 +1,9 @@
+<Project>
+  <PropertyGroup>
+    <VersionPrefix>0.5.0</VersionPrefix>
+
+    <!-- Take suffix from build server or use a local identifier -->
+    <VersionSuffix Condition="'$(VersionSuffix)'==''">$(BUILD_BUILDNUMBER)</VersionSuffix>
+    <VersionSuffix Condition="'$(VersionSuffix)'==''">loc$([System.DateTime]::UtcNow.ToString('yyyyMMddHHmm'))</VersionSuffix>
+  </PropertyGroup>
+</Project>
