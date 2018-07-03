@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -16,8 +17,16 @@ namespace Sales.Hosts.ProcessOrders
 
         public static IHostBuilder CreateHostBuilder(string[] args)
         {
+            // The generic HostBuilder does not have logic for automatically reading the environment.
+            string environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+            if (string.IsNullOrWhiteSpace(environment))
+            {
+                environment = "Production";
+            }
+
             // Based on https://github.com/aspnet/MetaPackages/blob/dev/src/Microsoft.AspNetCore/WebHost.cs
             return new HostBuilder()
+                .UseEnvironment(environment)
                 .UseContentRoot(Directory.GetCurrentDirectory())
                 .ConfigureAppConfiguration((hostingContext, config) =>
                 {
@@ -43,23 +52,25 @@ namespace Sales.Hosts.ProcessOrders
                 {
                     services.AddHostedService<ServiceBusProcessorService>();
 
-                    services.AddOptions();
                     services.AddMeceqs(builder =>
                     {
                         builder
                             .AddServiceBusReceiver(receiver =>
                             {
-                                // Will read messages from local file system.
-                                receiver.UseFileFake(options =>
-                                {
-                                    options.Directory = SampleConfiguration.FileFakeServiceBusDirectory;
-                                    options.EntityPath = SampleConfiguration.PlaceOrderQueue;
-                                });
-
                                 receiver.UseTypedHandling(options =>
                                 {
                                     options.Handlers.AddFromAssembly<Program>();
                                 });
+
+                                if (hostingContext.HostingEnvironment.IsDevelopment())
+                                {
+                                    // Will read messages from local file system.
+                                    receiver.UseFileFake(options =>
+                                    {
+                                        options.Directory = SampleConfiguration.FileFakeServiceBusDirectory;
+                                        options.EntityPath = SampleConfiguration.PlaceOrderQueue;
+                                    });
+                                }
                             });
                     });
                 });

@@ -1,6 +1,5 @@
-﻿using System.IO;
-using Customers.Contracts.Commands;
-using Meceqs.AzureServiceBus.Sending;
+﻿using System;
+using System.IO;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -18,8 +17,16 @@ namespace TrafficGenerator
 
         public static IHostBuilder CreateHostBuilder(string[] args)
         {
+            // The generic HostBuilder does not have logic for automatically reading the environment.
+            string environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+            if (string.IsNullOrWhiteSpace(environment))
+            {
+                environment = "Production";
+            }
+
             // Based on https://github.com/aspnet/MetaPackages/blob/dev/src/Microsoft.AspNetCore/WebHost.cs
             return new HostBuilder()
+                .UseEnvironment(environment)
                 .UseContentRoot(Directory.GetCurrentDirectory())
                 .ConfigureAppConfiguration((hostingContext, config) =>
                 {
@@ -43,30 +50,23 @@ namespace TrafficGenerator
                 })
                 .ConfigureServices((hostingContext, services) =>
                 {
-                    services.AddOptions();
                     services.AddHostedService<TrafficGeneratorService>();
 
-                    services.Configure<ServiceBusSenderOptions>(x => {
-                        x.ConnectionString = $"Endpoint=sb://dummy.example.com;EntityPath={SampleConfiguration.PlaceOrderQueue}";
-                    });
-
-                    services.AddMeceqs(builder =>
+                    services.AddMeceqs(hostingContext.Configuration.GetSection("Meceqs"), builder =>
                     {
                         builder
-                            .AddHttpSender(sender =>
+                            .AddHttpSender("HttpSenderCustomers", sender =>
                             {
-                                sender.SetBaseAddress(SampleConfiguration.CustomersWebApiUrl + "v1/");
-
                                 // Adds an "Authorization" header for each request.
-                                sender.HttpClient.AddHttpMessageHandler<AuthorizationDelegatingHandler>();
-
-                                // Write your own extension method if you have a base class for alle messages
-                                sender.AddMessagesFromAssembly<CreateCustomerCommand>(t => t.Name.EndsWith("Command") || t.Name.EndsWith("Query"));
+                                sender.HttpClient.AddHttpMessageHandler(() => new AuthorizationDelegatingHandler());
                             })
-                            .AddServiceBusSender("ServiceBus", sender =>
+                            .AddServiceBusSender("ServiceBusSender", sender =>
                             {
-                                // For this sample, we will send messages to a local file instead of a real Service Hub.
-                                sender.UseFileFake(SampleConfiguration.FileFakeServiceBusDirectory, SampleConfiguration.PlaceOrderQueue);
+                                if (hostingContext.HostingEnvironment.IsDevelopment())
+                                {
+                                    // For this sample, we will send messages to a local file instead of a real Service Hub.
+                                    sender.UseFileFake(SampleConfiguration.FileFakeServiceBusDirectory, SampleConfiguration.PlaceOrderQueue);
+                                }
                             });
                     });
                 });

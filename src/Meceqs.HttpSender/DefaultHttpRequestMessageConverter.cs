@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -16,14 +17,14 @@ namespace Meceqs.HttpSender
             _serializationProvider = serializationProvider;
         }
 
-        public HttpRequestMessage ConvertToRequestMessage(Envelope envelope, string relativePath)
+        public HttpRequestMessage ConvertToRequestMessage(Envelope envelope, Uri requestUri)
         {
             Guard.NotNull(envelope, nameof(envelope));
-            Guard.NotNullOrWhiteSpace(relativePath, nameof(relativePath));
+            Guard.NotNull(requestUri, nameof(requestUri));
 
             var serializer = _serializationProvider.GetDefaultSerializer();
 
-            var request = new HttpRequestMessage(HttpMethod.Post, relativePath);
+            var request = new HttpRequestMessage(HttpMethod.Post, requestUri);
 
             using (MemoryStream stream = new MemoryStream())
             {

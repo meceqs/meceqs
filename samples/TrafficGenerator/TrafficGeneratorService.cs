@@ -87,7 +87,9 @@ namespace TrafficGenerator
 
             var createCustomerCommand = CustomerFactory.GetRandomCreateCustomerCommand();
 
-            var response = await messageSender.SendAsync<CreateCustomerResponse>(createCustomerCommand);
+            var response = await messageSender.ForMessage(createCustomerCommand)
+                .UsePipeline("HttpSenderCustomers")
+                .SendAsync<CreateCustomerResponse>();
 
             _logger.LogInformation("Customer created with id {CustomerId}", response.CustomerId);
         }
@@ -99,6 +101,7 @@ namespace TrafficGenerator
             // Change name of a random customer.
 
             var response = await messageSender.ForMessage(new FindCustomersQuery())
+                .UsePipeline("HttpSenderCustomers")
                 .SendAsync<FindCustomersResponse>();
 
             var index = new Random().Next(response.Customers.Count);
@@ -106,7 +109,9 @@ namespace TrafficGenerator
 
             var changeNameCommand = CustomerFactory.SetRandomName(customerId);
 
-            await messageSender.SendAsync(changeNameCommand);
+            await messageSender.ForMessage(changeNameCommand)
+                .UsePipeline("HttpSenderCustomers")
+                .SendAsync();
 
             _logger.LogInformation("Customer {CustomerId} changed his/her name to {FirstName} {LastName}",
                 changeNameCommand.CustomerId,
@@ -118,7 +123,9 @@ namespace TrafficGenerator
         {
             var messageSender = requestServices.GetRequiredService<IMessageSender>();
 
-            var response = await messageSender.SendAsync<FindCustomersResponse>(new FindCustomersQuery());
+            var response = await messageSender.ForMessage(new FindCustomersQuery())
+                .UsePipeline("HttpSenderCustomers")
+                .SendAsync<FindCustomersResponse>();
 
             _logger.LogInformation("Customer-Count: {CustomerCount}", response.Customers.Count);
         }
@@ -128,7 +135,9 @@ namespace TrafficGenerator
             var messageSender = requestServices.GetRequiredService<IMessageSender>();
 
             // Place order for a random customer.
-            var response = await messageSender.SendAsync<FindCustomersResponse>(new FindCustomersQuery());
+            var response = await messageSender.ForMessage(new FindCustomersQuery())
+                .UsePipeline("HttpSenderCustomers")
+                .SendAsync<FindCustomersResponse>();
 
             var index = new Random().Next(response.Customers.Count);
             Guid customerId = response.Customers[index].CustomerId;
@@ -136,7 +145,7 @@ namespace TrafficGenerator
             var placeOrderCommand = OrderFactory.CreateOrder(customerId);
 
             await messageSender.ForMessage(placeOrderCommand)
-                .UsePipeline("ServiceBus")
+                .UsePipeline("ServiceBusSender")
                 .SendAsync();
         }
 

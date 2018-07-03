@@ -73,7 +73,7 @@ namespace Customers.Hosts.WebApi
                         });
                     });
                 })
-                .ConfigureMeceqs(meceqs =>
+                .ConfigureMeceqs((hostingContext, meceqs) =>
                 {
                     // Meceqs resolves interceptors transiently by default.
                     // To change this, you can add the interceptor with your own lifecycle
@@ -123,8 +123,11 @@ namespace Customers.Hosts.WebApi
                                 pipeline.UseAuditing(); // add user id to message if not present
                             });
 
-                            // For this sample, we will send messages to a local file instead of a real Event Hub.
-                            sender.UseFileFake(SampleConfiguration.FileFakeEventHubDirectory, "customers");
+                            if (hostingContext.HostingEnvironment.IsDevelopment())
+                            {
+                                // For this sample, we will send messages to a local file instead of a real Event Hub.
+                                sender.UseFileFake(SampleConfiguration.FileFakeEventHubDirectory, "customers");
+                            }
                         });
                 })
                 .Configure(app =>

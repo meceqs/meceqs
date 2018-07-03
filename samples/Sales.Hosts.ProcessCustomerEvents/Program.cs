@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -16,8 +17,16 @@ namespace Sales.Hosts.ProcessCustomerEvents
 
         public static IHostBuilder CreateHostBuilder(string[] args)
         {
+            // The generic HostBuilder does not have logic for automatically reading the environment.
+            string environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+            if (string.IsNullOrWhiteSpace(environment))
+            {
+                environment = "Production";
+            }
+
             // Based on https://github.com/aspnet/MetaPackages/blob/dev/src/Microsoft.AspNetCore/WebHost.cs
             return new HostBuilder()
+                .UseEnvironment(environment)
                 .UseContentRoot(Directory.GetCurrentDirectory())
                 .ConfigureAppConfiguration((hostingContext, config) =>
                 {
@@ -43,7 +52,6 @@ namespace Sales.Hosts.ProcessCustomerEvents
                 {
                     services.AddHostedService<EventProcessorService>();
 
-                    services.AddOptions();
                     services.AddMeceqs(builder =>
                     {
                         builder
@@ -64,13 +72,16 @@ namespace Sales.Hosts.ProcessCustomerEvents
                                     options.Handlers.Add<CustomerEventsHandler>();
                                 });
 
-                                // For this sample, we will read events from a local file instead of a real Event Hub.
-                                receiver.UseFileFake(options =>
+                                if (hostingContext.HostingEnvironment.IsDevelopment())
                                 {
-                                    options.Directory = SampleConfiguration.FileFakeEventHubDirectory;
-                                    options.ClearEventHubOnStart = true;
-                                    options.EventHubName = "customers";
-                                });
+                                    // For this sample, we will read events from a local file instead of a real Event Hub.
+                                    receiver.UseFileFake(options =>
+                                    {
+                                        options.Directory = SampleConfiguration.FileFakeEventHubDirectory;
+                                        options.ClearEventHubOnStart = true;
+                                        options.EventHubName = "customers";
+                                    });
+                                }
                             });
                     });
                 });

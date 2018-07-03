@@ -42,17 +42,9 @@ namespace Meceqs.HttpSender
             var options = _optionsMonitor.Get(pipelineName);
             var httpClient = _httpClientFactory.CreateClient("Meceqs.HttpSender." + pipelineName);
 
-            if (!options.Messages.TryGetValue(context.MessageType, out string relativePath))
-            {
-                throw new InvalidOperationException($"No endpoint found for message type '{context.MessageType}'");
-            }
+            Uri absoluteUri = GetAbsoluteRequestUri(options, context.MessageType);
 
-            if (string.IsNullOrEmpty(relativePath))
-            {
-                relativePath = options.MessageConvention.GetRelativePath(context.MessageType);
-            }
-
-            var request = _httpRequestMessageConverter.ConvertToRequestMessage(context.Envelope, relativePath);
+            var request = _httpRequestMessageConverter.ConvertToRequestMessage(context.Envelope, absoluteUri);
 
             var response = await httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead, context.Cancellation);
 
@@ -68,6 +60,17 @@ namespace Meceqs.HttpSender
 
                 context.Response = serializer.Deserialize(context.ExpectedResponseType, await response.Content.ReadAsStreamAsync());
             }
+        }
+
+        private static Uri GetAbsoluteRequestUri(HttpSenderOptions options, Type messageType)
+        {
+            Guard.NotNull(options.BaseAddress, nameof(options.BaseAddress));
+
+            string absoluteUri = options.BaseAddress.TrimEnd('/') + "/";
+            
+            absoluteUri += options.MessageConvention.GetRelativePath(messageType).TrimStart('/');
+
+            return new Uri(absoluteUri);
         }
     }
 }

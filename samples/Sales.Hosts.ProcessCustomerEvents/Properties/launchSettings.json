@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Sales.Hosts.ProcessCustomerEvents": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}

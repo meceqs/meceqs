@@ -11,7 +11,7 @@ namespace Meceqs.AspNetCore.Receiving
 
         public AspNetCoreReceiverOptions()
         {
-            // We give other ASP.NET Core middleware a chance to process it or to return a 404.
+            // We give other ASP.NET Core middleware components a chance to process it or to return a 404.
             UnknownMessageBehavior = UnknownMessageBehavior.Skip;
         }
     }

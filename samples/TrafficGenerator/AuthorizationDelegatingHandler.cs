@@ -16,7 +16,7 @@ namespace TrafficGenerator
 
             string authenticationValue = Convert.ToBase64String(Encoding.ASCII.GetBytes("username:password"));
 
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", authenticationValue);
+            request.Headers.Authorization = new AuthenticationHeaderValue("Basic", authenticationValue);
 
             return base.SendAsync(request, cancellationToken);
         }

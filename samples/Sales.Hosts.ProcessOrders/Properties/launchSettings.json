@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Sales.Hosts.ProcessOrders": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}
