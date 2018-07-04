@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Meceqs.Pipeline;
@@ -46,11 +47,20 @@ namespace Meceqs.HttpSender
 
             var request = _httpRequestMessageConverter.ConvertToRequestMessage(context.Envelope, absoluteUri);
 
-            var response = await httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead, context.Cancellation);
+            // Gives DelegatingHandlers a chance to access the Meceqs context
+            request.Properties["Meceqs-MessageContext"] = context;
+
+            var response = await httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, context.Cancellation);
 
             response.EnsureSuccessStatusCode();
 
-            if (context.ExpectedResponseType != typeof(void))
+            if (context.ExpectedResponseType == typeof(Stream))
+            {
+                // Special case for downloading files etc.
+                // TODO we should probably do this somehow differently
+                context.Response = await response.Content.ReadAsStreamAsync();
+            }
+            else if (context.ExpectedResponseType != typeof(void))
             {
                 string contentType = response.Content.Headers.ContentType.ToString();
                 if (!_serializationProvider.TryGetSerializer(contentType, out ISerializer serializer))
