@@ -60,21 +60,18 @@ namespace Meceqs.HttpSender
                 // TODO we should probably do this somehow differently
                 context.Response = await response.Content.ReadAsStreamAsync();
             }
-            else if (context.ExpectedResponseType != typeof(void) && response.Content.Headers.ContentLength > 0)
+            else if (context.ExpectedResponseType != typeof(void))
             {
                 string contentType = response.Content.Headers.ContentType?.ToString();
-
-                if (string.IsNullOrEmpty(contentType))
+                if (!string.IsNullOrEmpty(contentType))
                 {
-                    throw new InvalidOperationException("Content-Type header is missing");
-                }
+                    if (!_serializationProvider.TryGetSerializer(contentType, out ISerializer serializer))
+                    {
+                        throw new NotSupportedException($"ContentType '{contentType}' is not supported.");
+                    }
 
-                if (!_serializationProvider.TryGetSerializer(contentType, out ISerializer serializer))
-                {
-                    throw new NotSupportedException($"ContentType '{contentType}' is not supported.");
+                    context.Response = serializer.Deserialize(context.ExpectedResponseType, await response.Content.ReadAsStreamAsync());
                 }
-
-                context.Response = serializer.Deserialize(context.ExpectedResponseType, await response.Content.ReadAsStreamAsync());
             }
         }
 
