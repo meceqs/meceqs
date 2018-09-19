@@ -91,7 +91,7 @@ namespace Meceqs.Tests.Pipeline
                 options.UseMiddleware<CallbackMiddleware>(callback2);
                 options.UseMiddleware<TerminatingCallbackMiddleware>(callback3);
             });
-            
+
             await pipeline(context);
 
             called1.ShouldBe(1);

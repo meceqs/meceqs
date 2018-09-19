@@ -80,7 +80,7 @@ namespace Meceqs.HttpSender
             Guard.NotNull(options.BaseAddress, nameof(options.BaseAddress));
 
             string absoluteUri = options.BaseAddress.TrimEnd('/') + "/";
-            
+
             absoluteUri += options.MessageConvention.GetRelativePath(messageType).TrimStart('/');
 
             return new Uri(absoluteUri);

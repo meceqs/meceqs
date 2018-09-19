@@ -17,7 +17,7 @@ namespace Meceqs.Serialization.Json
         public JsonSerializer(JsonSerializerSettings settings = null)
         {
             _jsonSerializer = NewtonsoftJsonSerializer.Create(settings ?? JsonDefaults.DefaultSerializerSettings);
-            
+
         }
 
         public byte[] SerializeToByteArray(object obj)

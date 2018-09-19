@@ -7,7 +7,7 @@ namespace Customers.Core.Repositories
 {
     public class InMemoryCustomerRepository : ICustomerRepository
     {
-        private readonly List<Customer> _customers = new List<Customer>() 
+        private readonly List<Customer> _customers = new List<Customer>()
         {
             new Customer("Evan", "Manning"),
             new Customer("Jennifer", "Wallace"),
