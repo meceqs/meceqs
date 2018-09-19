@@ -1,10 +1,43 @@
 using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("Meceqs.Amqp")]
-[assembly: InternalsVisibleTo("Meceqs.AspNetCore")]
-[assembly: InternalsVisibleTo("Meceqs.AspNetCore.Swagger")]
-[assembly: InternalsVisibleTo("Meceqs.AzureEventHubs")]
-[assembly: InternalsVisibleTo("Meceqs.AzureServiceBus")]
-[assembly: InternalsVisibleTo("Meceqs.HttpSender")]
+[assembly: InternalsVisibleTo("Meceqs.AspNetCore, PublicKey=" +
+"00240000048000009400000006020000002400005253413100040000010001000537c23d6e2407" +
+"10852c4953821eda10fc3f1d6bbfe7e6d5d2e4ebd7235e570d0c7d351acc7b43c461ff18f2f7f9" +
+"00334ee9dc124539b433540eec23c457c977e4fd01a49179c071f1184718aafb8c920026f1a4f9" +
+"9c00c4ae25ad4ba5420bfcd5aa01f7552dcbd507e1f11eeeb87f2021be90d99a2ee0fbed5d219a" +
+"c4ab8ba1")]
 
-[assembly: InternalsVisibleTo("Meceqs.Tests")]
+[assembly: InternalsVisibleTo("Meceqs.AspNetCore.Swagger, PublicKey=" +
+"00240000048000009400000006020000002400005253413100040000010001000537c23d6e2407" +
+"10852c4953821eda10fc3f1d6bbfe7e6d5d2e4ebd7235e570d0c7d351acc7b43c461ff18f2f7f9" +
+"00334ee9dc124539b433540eec23c457c977e4fd01a49179c071f1184718aafb8c920026f1a4f9" +
+"9c00c4ae25ad4ba5420bfcd5aa01f7552dcbd507e1f11eeeb87f2021be90d99a2ee0fbed5d219a" +
+"c4ab8ba1")]
+
+[assembly: InternalsVisibleTo("Meceqs.AzureEventHubs, PublicKey=" +
+"00240000048000009400000006020000002400005253413100040000010001000537c23d6e2407" +
+"10852c4953821eda10fc3f1d6bbfe7e6d5d2e4ebd7235e570d0c7d351acc7b43c461ff18f2f7f9" +
+"00334ee9dc124539b433540eec23c457c977e4fd01a49179c071f1184718aafb8c920026f1a4f9" +
+"9c00c4ae25ad4ba5420bfcd5aa01f7552dcbd507e1f11eeeb87f2021be90d99a2ee0fbed5d219a" +
+"c4ab8ba1")]
+
+[assembly: InternalsVisibleTo("Meceqs.AzureServiceBus, PublicKey=" +
+"00240000048000009400000006020000002400005253413100040000010001000537c23d6e2407" +
+"10852c4953821eda10fc3f1d6bbfe7e6d5d2e4ebd7235e570d0c7d351acc7b43c461ff18f2f7f9" +
+"00334ee9dc124539b433540eec23c457c977e4fd01a49179c071f1184718aafb8c920026f1a4f9" +
+"9c00c4ae25ad4ba5420bfcd5aa01f7552dcbd507e1f11eeeb87f2021be90d99a2ee0fbed5d219a" +
+"c4ab8ba1")]
+
+[assembly: InternalsVisibleTo("Meceqs.HttpSender, PublicKey=" +
+"00240000048000009400000006020000002400005253413100040000010001000537c23d6e2407" +
+"10852c4953821eda10fc3f1d6bbfe7e6d5d2e4ebd7235e570d0c7d351acc7b43c461ff18f2f7f9" +
+"00334ee9dc124539b433540eec23c457c977e4fd01a49179c071f1184718aafb8c920026f1a4f9" +
+"9c00c4ae25ad4ba5420bfcd5aa01f7552dcbd507e1f11eeeb87f2021be90d99a2ee0fbed5d219a" +
+"c4ab8ba1")]
+
+[assembly: InternalsVisibleTo("Meceqs.Tests, PublicKey=" +
+"00240000048000009400000006020000002400005253413100040000010001000537c23d6e2407" +
+"10852c4953821eda10fc3f1d6bbfe7e6d5d2e4ebd7235e570d0c7d351acc7b43c461ff18f2f7f9" +
+"00334ee9dc124539b433540eec23c457c977e4fd01a49179c071f1184718aafb8c920026f1a4f9" +
+"9c00c4ae25ad4ba5420bfcd5aa01f7552dcbd507e1f11eeeb87f2021be90d99a2ee0fbed5d219a" +
+"c4ab8ba1")]
