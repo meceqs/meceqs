@@ -52,7 +52,7 @@ Task "Build" $RunBuild {
 
     dotnet msbuild "/t:Restore;Build;Pack" "/p:CI=true" `
         "/p:Configuration=$BuildConfiguration" `
-        "/p:PackageOutputPath=$(Join-Path $ArtifactsPath "NuGet")"
+        "/p:PackageOutputPath=$(Join-Path $ArtifactsPath "nuget")"
 
     if ($LASTEXITCODE -ne 0) { throw "Build failed." }
 }
