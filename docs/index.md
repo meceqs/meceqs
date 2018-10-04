@@ -69,33 +69,24 @@ This is the configuration for your [ASP.NET Core startup](https://docs.asp.net/e
 ```csharp
 public void ConfigureServices(IServiceCollection services)
 {
-    services.AddMeceqs()
-
-        // This will serialize envelopes using the JSON format.
-        .AddJsonSerialization()
-
-        // You can mix IConfiguration based configuration with static configuration.
-        .AddHttpSender(Configuration["HttpSender"], sender =>
+    services.AddMeceqs(Configuration, meceqs => meceqs
+        // HttpSender is a built-in transport - see Meceqs.HttpSender.
+        // If you don't specify a pipeline name, the default "Send" name will be used.
+        .AddHttpSender("CustomersPipeline", sender =>
         {
-            // You can have multiple endpoints to talk to different services.
-            sender.AddEndpoint("CustomersApi", options =>
-            {
-                // You can add regular "DelegatingHandler"s - e.g. to add an Authorization header to each request.
-                options.AddDelegatingHandler<OAuthDelegatingHandler>();
-
-                options.AddMessage<CreateCustomerCommand>();
-            });
-        });
+            // The built-in HttpSender uses Microsoft.Extensions.Http.
+            // See https://docs.microsoft.com/en-us/aspnet/core/fundamentals/http-requests
+            // for configuration options.
+            sender.HttpClient.AddHttpMessageHandler(() => new MyCustomDelegatingHandler());
+        }));
 }
 ```
 
 A json-based configuration file contains settings that change per environment:
 ```json
 {
-  "HttpSender": {
-    "CustomersApi": {
-      "BaseAddress": "http://api.example.com/customers/"
-    }
+  "CustomersPipeline": {
+    "BaseAddress": "http://api.example.com/customers/"
   }
 }
 ```
@@ -137,7 +128,8 @@ public class CreateCustomerForwarder : IHandles<CreateCustomerCommand, CreateCus
 
         // This time we use the builder pattern of IMessageSender to use a named pipeline.
         // This allows you to use multiple pipelines for different use cases.
-        await context.MessageSender.ForEnvelope(context.Envelope)
+        await context.MessageSender
+            .ForEnvelope(context.Envelope)
             .UsePipeline(MyPipelines.SendServiceBus)
             .SendAsync();
 
@@ -150,7 +142,7 @@ public class CreateCustomerForwarder : IHandles<CreateCustomerCommand, CreateCus
 ```csharp
 public void ConfigureServices(IServiceCollection services)
 {
-    services.AddMeceqs()
+    services.AddMeceqs(Configuration, meceqs => meceqs
 
         // Configures the behavior of the ASP.NET Core receiver.
         .AddAspNetCoreReceiver(receiver =>
@@ -162,11 +154,9 @@ public void ConfigureServices(IServiceCollection services)
             });
         })
 
-        // Add the sender and read the connection string from a configuration source (e.g. Azure Key Vault)
-        .AddServiceBusSender(Configuration["ServiceBus"], sender =>
-        {
-            sender.SetPipelineName(MyPipelines.SendServiceBus);
-        });
+        // Add the named Service Bus pipeline. The connection string will be read from the global configuration
+        // that has been passed to .AddMeceqs(IConfiguration).
+        .AddServiceBusSender(MyPipelines.SendServiceBus));
 }
 
 public void Configure(IApplicationBuilder app)
@@ -231,7 +221,8 @@ public class CreateCustomerProcessor : IHandles<CreateCustomerCommand>
 
         var customerCreatedEvent = new CustomerCreatedEvent(customerId, customer.FirstName, customer.LastName);
 
-        await context.MessageSender.ForMessage(customerCreatedEvent)
+        await context.MessageSender
+            .ForMessage(customerCreatedEvent)
             .FollowsFrom(context) // This will correlate the messages
             .UsePipeline(MyPipelines.SendEventHub)
             .SendAsync();
@@ -241,7 +232,7 @@ public class CreateCustomerProcessor : IHandles<CreateCustomerCommand>
 
 #### Configuration
 ```csharp
-services.AddMeceqs()
+services.AddMeceqs(Configuration, meceqs => meceqs
     .AddServiceBusReceiver(receiver =>
     {
         receiver.UseTypedHandling(options =>
@@ -249,10 +240,7 @@ services.AddMeceqs()
             options.Handlers.Add<CreateCustomerProcessor>();
         });
     })
-    .AddEventHubSender(Configuration["EventHub"], sender =>
-    {
-        sender.SetPipelineName(MyPipelines.SendEventHub);
-    });
+    .AddEventHubSender(MyPipelines.SendEventHub));
 ```
 
 #### Envelopes

@@ -117,7 +117,7 @@ You can add the typed handling middleware to any pipeline by calling the followi
 
 ```csharp
 services.AddMeceqs()
-    .ConfigurePipeline("my-pipeline", pipeline =>
+    .AddPipeline("my-pipeline", pipeline =>
     {
         //pipeline.UseYourCustomMiddleware();
 

@@ -112,7 +112,7 @@ To make sure this is possible and extensible, a `MessageContext` will be passed 
 This object contains your envelope and many additional properties.
 
 ```csharp
-MessageContext messageContext = new MessageContext<CreateCustomerCommand>(envelope);
+MessageContext messageContext = new MessageContext(envelope, ...);
 
 // These values will usually come from your framework (e.g. from HttpContext in ASP.NET Core).
 messageContext.Cancellation = _cancellationToken;
@@ -160,7 +160,7 @@ Typically, a pipeline is used for one of two scenarios:
     In this case, the last middleware in the pipeline might do one of the following things:
     * Create a synchronous HTTP call for commands/queries
     * Send commands/events to a message broker (e.g. Azure Service Bus, RabbitMQ)
-    * Save events in a database/event store (e.g. SQL, GetEventStore, Azure Event Hubs, Apache Kafka)
+    * Store events in a database/event store (e.g. SQL, GetEventStore, Azure Event Hubs, Apache Kafka)
     * Execute more business logic in case of a decoupled in-process architecture
     * ...
 * __Receiving messages:__
