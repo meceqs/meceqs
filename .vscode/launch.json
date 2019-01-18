@@ -10,7 +10,7 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/samples/Customers.Hosts.WebApi/bin/Debug/netcoreapp2.1/Customers.Hosts.WebApi.dll",
+            "program": "${workspaceFolder}/samples/Customers.Hosts.WebApi/bin/Debug/netcoreapp2.2/Customers.Hosts.WebApi.dll",
             "args": [],
             "cwd": "${workspaceFolder}/samples/Customers.Hosts.WebApi",
             "stopAtEntry": false,

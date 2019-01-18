@@ -4,7 +4,7 @@
     <Authors>Christian Weiss</Authors>
     <Copyright>Copyright (c) Christian Weiss</Copyright>
     <PackageProjectUrl>https://github.com/meceqs/meceqs</PackageProjectUrl>
-    <PackageLicenseUrl>https://raw.githubusercontent.com/meceqs/meceqs/master/LICENSE</PackageLicenseUrl>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageReleaseNotes Condition="'$(Version)' != ''">https://github.com/meceqs/meceqs/releases/tag/v$(Version)</PackageReleaseNotes>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>git://github.com/meceqs/meceqs</RepositoryUrl>
@@ -16,4 +16,7 @@
     <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)SignKey.snk</AssemblyOriginatorKeyFile>
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
   </PropertyGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)LICENSE" Pack="true" PackagePath=""/>
+  </ItemGroup>
 </Project>
