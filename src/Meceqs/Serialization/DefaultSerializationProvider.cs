@@ -28,15 +28,13 @@ namespace Meceqs.Serialization
 
         public ISerializer GetSerializer(IEnumerable<string> supportedContentTypes)
         {
-            ISerializer serializer = null;
-
             if (supportedContentTypes != null)
             {
                 bool hasItems = false;
                 foreach (var supportedContentType in supportedContentTypes)
                 {
                     hasItems = true;
-                    if (TryGetSerializer(supportedContentType, out serializer))
+                    if (TryGetSerializer(supportedContentType, out ISerializer serializer))
                     {
                         return serializer;
                     }
@@ -65,6 +63,20 @@ namespace Meceqs.Serialization
             }
 
             return false;
+        }
+
+        public object Deserialize(string contentType, Type objectType, Stream serializedObject)
+        {
+            Guard.NotNull(contentType, nameof(contentType));
+            Guard.NotNull(objectType, nameof(objectType));
+            Guard.NotNull(serializedObject, nameof(serializedObject));
+
+            if (!TryGetSerializer(contentType, out var serializer))
+            {
+                throw new NotSupportedException($"ContentType '{contentType}' is not supported.");
+            }
+
+            return serializer.Deserialize(objectType, serializedObject);
         }
 
         public Envelope DeserializeEnvelope(string contentType, byte[] serializedEnvelope, string messageType)

@@ -1,6 +1,6 @@
 using System;
 
-namespace Meceqs.Sending
+namespace Meceqs.Internal
 {
     public interface IEnvelopeFactory
     {

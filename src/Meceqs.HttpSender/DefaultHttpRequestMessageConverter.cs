@@ -3,6 +3,7 @@ using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using Meceqs.Serialization;
+using Meceqs.Transport;
 
 namespace Meceqs.HttpSender
 {
@@ -28,10 +29,22 @@ namespace Meceqs.HttpSender
 
             using (MemoryStream stream = new MemoryStream())
             {
-                serializer.SerializeToStream(envelope, stream);
+                serializer.SerializeToStream(envelope.Message, stream);
 
                 request.Content = new ByteArrayContent(stream.ToArray());
                 request.Content.Headers.ContentType = new MediaTypeHeaderValue(serializer.ContentType);
+                
+                request.Content.Headers.Add(TransportHeaderNames.MessageId, envelope.MessageId.ToString());
+
+                if (envelope.CorrelationId != envelope.MessageId)
+                {
+                    request.Content.Headers.Add(TransportHeaderNames.CorrelationId, envelope.CorrelationId.ToString());
+                }
+
+                foreach (var headerEntry in envelope.Headers)
+                {
+                    request.Content.Headers.Add(TransportHeaderNames.HeaderPrefix + headerEntry.Key, headerEntry.Value.ToString());
+                }
             }
 
             return request;

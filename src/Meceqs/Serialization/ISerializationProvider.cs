@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace Meceqs.Serialization
@@ -10,6 +11,8 @@ namespace Meceqs.Serialization
         bool TryGetSerializer(string contentType, out ISerializer serializer);
 
         ISerializer GetSerializer(IEnumerable<string> supportedContentTypes);
+
+        object Deserialize(string contentType, Type objectType, Stream serializedObject);
 
         Envelope DeserializeEnvelope(string contentType, byte[] serializedEnvelope, string messageType);
 

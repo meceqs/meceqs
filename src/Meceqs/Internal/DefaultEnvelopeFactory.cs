@@ -4,7 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace Meceqs.Sending
+namespace Meceqs.Internal
 {
     /// <summary>
     /// Creates a strongly-typed <see cref="Envelope{TMessage}"/> for the given message by using cached reflection.

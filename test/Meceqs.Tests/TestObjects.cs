@@ -1,4 +1,5 @@
 using System;
+using Meceqs.Internal;
 using Meceqs.Pipeline;
 using Meceqs.Sending;
 using NSubstitute;

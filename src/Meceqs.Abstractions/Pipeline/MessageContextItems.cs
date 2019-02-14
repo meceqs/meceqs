@@ -42,8 +42,7 @@ namespace Meceqs.Pipeline
         {
             if (key != null)
             {
-                object value;
-                if (TryGetValue(key, out value))
+                if (TryGetValue(key, out object value))
                 {
                     return (T)value;
                 }

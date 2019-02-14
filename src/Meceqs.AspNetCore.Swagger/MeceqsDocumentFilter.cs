@@ -6,26 +6,30 @@ using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Collections.Generic;
 using System.Linq;
+using Meceqs.Serialization;
 
 namespace Meceqs.AspNetCore.Swagger
 {
 
     public class MeceqsDocumentFilter : IDocumentFilter
     {
-        private readonly Receiving.ReceiveEndpointOptions _transportOptions;
+        private readonly ReceiveEndpointOptions _transportOptions;
         private readonly IOptionsMonitor<AspNetCoreReceiverOptions> _receiverOptions;
         private readonly IMessagePathConvention _messagePathConvention;
+        private readonly IEnumerable<ISerializer> _serializers;
         private readonly MeceqsSwaggerOptions _meceqsOptions;
 
         public MeceqsDocumentFilter(
-            IOptions<Receiving.ReceiveEndpointOptions> transportOptions,
+            IOptions<ReceiveEndpointOptions> transportOptions,
             IOptionsMonitor<AspNetCoreReceiverOptions> receiverOptions,
             IMessagePathConvention messagePathConvention,
+            IEnumerable<ISerializer> serializers,
             MeceqsSwaggerOptions meceqsOptions)
         {
             _transportOptions = transportOptions?.Value;
             _receiverOptions = receiverOptions;
             _messagePathConvention = messagePathConvention;
+            _serializers = serializers;
             _meceqsOptions = meceqsOptions;
         }
 
@@ -35,7 +39,7 @@ namespace Meceqs.AspNetCore.Swagger
             {
                 AspNetCoreReceiverOptions receiverOptions = _receiverOptions.Get(receiverName);
 
-                foreach (var messageType in receiverOptions.MessageTypes)
+                foreach (var messageType in receiverOptions.MessageTypes.OrderBy(x => x.MessageType.FullName))
                 {
                     AddMessageType(messageType, swaggerDoc, context.SchemaRegistry, receiverOptions);
                 }
@@ -57,19 +61,55 @@ namespace Meceqs.AspNetCore.Swagger
                 Responses = new Dictionary<string, Response>()
             };
 
-            // Body Parameters
+            // Content Types
 
-            var envelopeType = typeof(Envelope<>).MakeGenericType(messageType.MessageType);
-            var envelopeSchema = schemaRegistry.GetOrRegister(envelopeType);
-
-            var parameter = new BodyParameter
+            foreach (var serializer in _serializers)
             {
-                Name = "envelope",
-                Required = true,
-                Schema = envelopeSchema
-            };
+                if (serializer.CanSerializeType(messageType.MessageType))
+                {
+                    if (operation.Consumes == null)
+                    {
+                        operation.Consumes = new List<string>();
+                    }
 
-            operation.Parameters.Add(parameter);
+                    operation.Consumes.Add(serializer.ContentType);
+                }
+
+                if (messageType.ResponseType != typeof(void) && serializer.CanSerializeType(messageType.ResponseType))
+                {
+                    if (operation.Produces == null)
+                    {
+                        operation.Produces = new List<string>();
+                    }
+
+                    operation.Produces.Add(serializer.ContentType);
+                }
+            }
+
+            // Parameters
+
+            operation.Parameters.Add(new BodyParameter
+            {
+                Name = "message",
+                Required = true,
+                Schema = schemaRegistry.GetOrRegister(messageType.MessageType),
+            });
+
+            operation.Parameters.Add(new NonBodyParameter
+            {
+                Name = TransportHeaderNames.MessageId,
+                In = "header",
+                Type = "string",
+                Format = "uuid"
+            });
+
+            operation.Parameters.Add(new NonBodyParameter
+            {
+                Name = TransportHeaderNames.CorrelationId,
+                In = "header",
+                Type = "string",
+                Format = "uuid"
+            });
 
             // Response
 

@@ -8,16 +8,19 @@ namespace Meceqs.Serialization.Json
 {
     public class JsonSerializer : ISerializer
     {
-        private const string _contentType = "application/json";
-
         private readonly NewtonsoftJsonSerializer _jsonSerializer;
 
-        public string ContentType => _contentType;
+        public string ContentType { get; } = "application/json";
 
         public JsonSerializer(JsonSerializerSettings settings = null)
         {
             _jsonSerializer = NewtonsoftJsonSerializer.Create(settings ?? JsonDefaults.DefaultSerializerSettings);
 
+        }
+
+        public bool CanSerializeType(Type objectType)
+        {
+            return true;
         }
 
         public byte[] SerializeToByteArray(object obj)

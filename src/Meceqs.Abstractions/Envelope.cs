@@ -60,7 +60,7 @@ namespace Meceqs
         /// <summary>
         /// The creation date of the message.
         /// </summary>
-        public DateTime? CreatedOnUtc { get; set; } // TODO @cweiss Use DateTimeOffset?
+        public DateTimeOffset? CreatedOnUtc { get; set; }
 
         /// <summary>
         /// Contains additional, non-typed information about the message.
@@ -124,7 +124,7 @@ namespace Meceqs
 
             if (!CreatedOnUtc.HasValue)
             {
-                CreatedOnUtc = DateTime.UtcNow;
+                CreatedOnUtc = DateTimeOffset.UtcNow;
             }
         }
     }

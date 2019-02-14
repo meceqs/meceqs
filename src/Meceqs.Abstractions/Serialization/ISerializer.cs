@@ -10,6 +10,8 @@ namespace Meceqs.Serialization
     {
         string ContentType { get; }
 
+        bool CanSerializeType(Type objectType);
+
         byte[] SerializeToByteArray(object obj);
 
         void SerializeToStream(object obj, Stream stream);

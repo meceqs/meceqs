@@ -1,6 +1,7 @@
 using System;
 using Meceqs;
 using Meceqs.DependencyInjection;
+using Meceqs.Internal;
 using Meceqs.Pipeline;
 using Meceqs.Receiving;
 using Meceqs.Sending;
