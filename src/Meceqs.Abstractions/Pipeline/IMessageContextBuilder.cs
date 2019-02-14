@@ -1,4 +1,3 @@
-using System;
 using System.ComponentModel;
 using System.Security.Claims;
 using System.Threading;
@@ -34,13 +33,6 @@ namespace Meceqs.Pipeline
         /// Writes the given header:value pair to the <see cref="Envelope.Headers"/> dictionary.
         /// </summary>
         TBuilder SetHeader(string headerName, object value);
-
-        /// <summary>
-        /// Uses the given service provider for <see cref="MessageContext.RequestServices"/>
-        /// instead of the default (which is the same provider either <see cref="Receiving.IMessageReceiver"/>
-        /// or <see cref="Sending.IMessageSender"/> was resolved from).
-        /// </summary>
-        TBuilder SetRequestServices(IServiceProvider requestServices);
 
         /// <summary>
         /// Writes the given user to <see cref="MessageContext.User"/>.

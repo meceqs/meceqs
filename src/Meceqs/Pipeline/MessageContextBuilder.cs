@@ -9,13 +9,14 @@ namespace Meceqs.Pipeline
     public abstract class MessageContextBuilder<TBuilder> : IMessageContextBuilder<TBuilder>
         where TBuilder : IMessageContextBuilder<TBuilder>
     {
+        protected string DefaultPipelineName { get; }
         protected Envelope Envelope { get; }
+        protected IServiceProvider RequestServices { get; }
 
         protected CancellationToken Cancellation { get; private set; }
         protected MessageContextItems ContextItems { get; private set; }
-        protected string PipelineName { get; private set; }
-        protected IServiceProvider RequestServices { get; private set; }
         protected ClaimsPrincipal User { get; private set; }
+        protected string ForcedPipelineName { get; private set; }
 
         /// <summary>
         /// Returning "this" in methods is not possible because "TBuilder" is not a derived type from this.
@@ -28,7 +29,7 @@ namespace Meceqs.Pipeline
             Guard.NotNull(envelope, nameof(envelope));
             Guard.NotNull(serviceProvider, nameof(serviceProvider));
 
-            PipelineName = defaultPipelineName;
+            DefaultPipelineName = defaultPipelineName;
             Envelope = envelope;
             RequestServices = serviceProvider;
         }
@@ -50,14 +51,6 @@ namespace Meceqs.Pipeline
             return Instance;
         }
 
-        public TBuilder SetRequestServices(IServiceProvider requestServices)
-        {
-            Guard.NotNull(requestServices, nameof(requestServices));
-
-            RequestServices = requestServices;
-            return Instance;
-        }
-
         public TBuilder SetUser(ClaimsPrincipal user)
         {
             User = user;
@@ -68,7 +61,7 @@ namespace Meceqs.Pipeline
         {
             Guard.NotNullOrWhiteSpace(pipelineName, nameof(pipelineName));
 
-            PipelineName = pipelineName;
+            ForcedPipelineName = pipelineName;
             return Instance;
         }
 
@@ -78,11 +71,12 @@ namespace Meceqs.Pipeline
             return Instance;
         }
 
-        protected virtual MessageContext CreateMessageContext(Envelope envelope, Type responseType)
+        protected virtual MessageContext CreateMessageContext(string pipelineName, Envelope envelope, Type responseType)
         {
+            Guard.NotNullOrWhiteSpace(pipelineName, nameof(pipelineName));
             Guard.NotNull(envelope, nameof(envelope));
 
-            var context = new MessageContext(envelope, PipelineName, RequestServices, responseType ?? typeof(void));
+            var context = new MessageContext(envelope, pipelineName, RequestServices, responseType ?? typeof(void));
 
             context.Cancellation = Cancellation;
             context.User = User;
@@ -95,22 +89,26 @@ namespace Meceqs.Pipeline
             return context;
         }
 
-        protected async Task InvokePipelineAsync()
+        private IPipeline GetPipeline()
         {
             var pipelineProvider = RequestServices.GetRequiredService<IPipelineProvider>();
-            var pipeline = pipelineProvider.GetPipeline(PipelineName);
+            return pipelineProvider.GetPipeline(Envelope.Message.GetType(), ForcedPipelineName, DefaultPipelineName);
+        }
 
-            var messageContext = CreateMessageContext(Envelope, responseType: typeof(void));
+        protected async Task InvokePipelineAsync()
+        {
+            var pipeline = GetPipeline();
+
+            var messageContext = CreateMessageContext(pipeline.Name, Envelope, responseType: typeof(void));
 
             await pipeline.InvokeAsync(messageContext);
         }
 
         protected async Task<TResponse> InvokePipelineAsync<TResponse>()
         {
-            var pipelineProvider = RequestServices.GetRequiredService<IPipelineProvider>();
-            var pipeline = pipelineProvider.GetPipeline(PipelineName);
+            var pipeline = GetPipeline();
 
-            var messageContext = CreateMessageContext(Envelope, typeof(TResponse));
+            var messageContext = CreateMessageContext(pipeline.Name, Envelope, typeof(TResponse));
 
             await pipeline.InvokeAsync(messageContext);
 
@@ -119,10 +117,9 @@ namespace Meceqs.Pipeline
 
         protected async Task<object> InvokePipelineAsync(Type responseType)
         {
-            var pipelineProvider = RequestServices.GetRequiredService<IPipelineProvider>();
-            var pipeline = pipelineProvider.GetPipeline(PipelineName);
+            var pipeline = GetPipeline();
 
-            var messageContext = CreateMessageContext(Envelope, responseType);
+            var messageContext = CreateMessageContext(pipeline.Name, Envelope, responseType);
 
             await pipeline.InvokeAsync(messageContext);
 

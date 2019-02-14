@@ -54,6 +54,10 @@ namespace Meceqs.Transport
         {
             Guard.NotNull(messageType, nameof(messageType));
 
+            // Ensures that the message gets routed to this pipeline.
+            Services.Configure<PipelineProviderOptions>(x => x.AddMessageTypeMapping(messageType, PipelineName));
+
+            // Let's the transport itself know that it should handle this message type.
             Configure(x => x.AddMessageType(messageType, responseType));
 
             // To be able to work with the message in the receiver,

@@ -41,6 +41,24 @@ namespace Meceqs.Pipeline
             };
         }
 
+        public IPipeline GetPipeline(Type messageType, string forcedPipelineName, string fallbackPipelineName)
+        {
+            Guard.NotNull(messageType, nameof(messageType));
+            Guard.NotNull(fallbackPipelineName, nameof(fallbackPipelineName));
+
+            string pipelineName;
+            if (forcedPipelineName != null)
+            {
+                pipelineName = forcedPipelineName;
+            }
+            else if (!_providerOptions.Mappings.TryGetValue(messageType, out pipelineName))
+            {
+                pipelineName = fallbackPipelineName;
+            }
+
+            return GetPipeline(pipelineName);
+        }
+
         public IPipeline GetPipeline(string pipelineName)
         {
             Guard.NotNullOrWhiteSpace(pipelineName, nameof(pipelineName));

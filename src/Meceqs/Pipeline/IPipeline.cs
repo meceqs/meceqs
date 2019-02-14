@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 namespace Meceqs.Pipeline
 {
     /// <summary>
-    /// A pipeline represents a list of independant middleware components.
+    /// A pipeline represents a list of independent middleware components.
     /// </summary>
     public interface IPipeline
     {

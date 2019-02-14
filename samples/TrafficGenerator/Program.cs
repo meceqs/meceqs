@@ -1,9 +1,12 @@
 ﻿using System;
 using System.IO;
+using Customers.Contracts.Commands;
+using Customers.Contracts.Queries;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Sales.Contracts.Commands;
 using SampleConfig;
 
 namespace TrafficGenerator
@@ -57,11 +60,20 @@ namespace TrafficGenerator
                         builder
                             .AddHttpSender("HttpSenderCustomers", sender =>
                             {
+                                // Bind these messages to this pipeline
+                                sender.AddMessageType<ChangeNameCommand>();
+                                sender.AddMessageType<CreateCustomerCommand>();
+                                sender.AddMessageType<FindCustomersQuery>();
+                                sender.AddMessageType<GetCustomerQuery>();
+
                                 // Adds an "Authorization" header for each request.
                                 sender.HttpClient.AddHttpMessageHandler(() => new AuthorizationDelegatingHandler());
                             })
                             .AddServiceBusSender("ServiceBusSender", sender =>
                             {
+                                // Bind these messages to this pipeline
+                                sender.AddMessageType<PlaceOrderCommand>();
+
                                 if (hostingContext.HostingEnvironment.IsDevelopment())
                                 {
                                     // For this sample, we will send messages to a local file instead of a real Service Hub.
