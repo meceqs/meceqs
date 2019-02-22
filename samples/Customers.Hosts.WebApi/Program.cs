@@ -63,14 +63,16 @@ namespace Customers.Hosts.WebApi
 
                     services.AddSwaggerGen(options =>
                     {
-                        // This registers all handlers that have been added to the AspNetCoreReceiver
-                        options.AddMeceqs();
-
                         options.SwaggerDoc(ApiVersion, new Info
                         {
                             Title = ApiName,
                             Version = ApiVersion
                         });
+
+                        options.AddSecurityDefinition("basic", new BasicAuthScheme());
+
+                        // This registers all handlers that have been added to the AspNetCoreReceiver
+                        options.AddMeceqs(x => x.SecurityDefinition = "basic");
                     });
                 })
                 .ConfigureMeceqs((hostingContext, meceqs) =>
