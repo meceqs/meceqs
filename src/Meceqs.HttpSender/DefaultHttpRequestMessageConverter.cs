@@ -23,7 +23,7 @@ namespace Meceqs.HttpSender
             Guard.NotNull(envelope, nameof(envelope));
             Guard.NotNull(requestUri, nameof(requestUri));
 
-            var serializer = _serializationProvider.GetDefaultSerializer();
+            var serializer = _serializationProvider.GetSerializer(envelope.Message.GetType());
 
             var request = new HttpRequestMessage(HttpMethod.Post, requestUri);
 
@@ -44,6 +44,12 @@ namespace Meceqs.HttpSender
                 foreach (var headerEntry in envelope.Headers)
                 {
                     request.Content.Headers.Add(TransportHeaderNames.HeaderPrefix + headerEntry.Key, headerEntry.Value.ToString());
+                }
+
+                // We also need to let the receiver know what result types we can handle.
+                foreach (var acceptedContentType in _serializationProvider.SupportedContentTypes)
+                {
+                    request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(acceptedContentType));
                 }
             }
 

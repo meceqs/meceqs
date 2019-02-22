@@ -1,56 +1,71 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
+using Microsoft.Extensions.Options;
 
 namespace Meceqs.Serialization
 {
     public class DefaultSerializationProvider : ISerializationProvider
     {
-        private readonly List<ISerializer> _serializers;
-        private readonly IEnvelopeTypeLoader _envelopeTypeLoader;
+        private readonly IReadOnlyList<ISerializer> _serializers;
 
-        public DefaultSerializationProvider(IEnumerable<ISerializer> serializers, IEnvelopeTypeLoader envelopeTypeLoader)
-        {
-            _serializers = serializers.ToList();
-            _envelopeTypeLoader = envelopeTypeLoader;
-        }
+        public IReadOnlyList<string> SupportedContentTypes { get; }
 
-        public ISerializer GetDefaultSerializer()
+        public DefaultSerializationProvider(IOptions<SerializationOptions> options)
         {
-            if (_serializers.Count > 0)
+            Guard.NotNull(options?.Value, nameof(options));
+
+            _serializers = options.Value.Serializers;
+
+            if (_serializers.Count == 0)
             {
-                return _serializers[0];
+                throw new InvalidOperationException("No serializers have been configured.");
             }
 
-            throw new InvalidOperationException($"No services of type '{nameof(ISerializer)}' have been registered.");
+            SupportedContentTypes = GetSupportedContentTypes(_serializers);
+        }
+
+        public ISerializer GetSerializer(Type objectType)
+        {
+            Guard.NotNull(objectType, nameof(objectType));
+
+            foreach (var serializer in _serializers)
+            {
+                if (serializer.CanSerializeType(objectType))
+                    return serializer;
+            }
+
+            throw new InvalidOperationException($"No serializer found that can handle the type '{objectType.FullName}'.");
         }
 
         public ISerializer GetSerializer(IEnumerable<string> supportedContentTypes)
         {
-            if (supportedContentTypes != null)
-            {
-                bool hasItems = false;
-                foreach (var supportedContentType in supportedContentTypes)
-                {
-                    hasItems = true;
-                    if (TryGetSerializer(supportedContentType, out ISerializer serializer))
-                    {
-                        return serializer;
-                    }
-                }
+            Guard.NotNull(supportedContentTypes, nameof(supportedContentTypes));
 
-                if (hasItems)
+            bool hasItems = false;
+            foreach (var supportedContentType in supportedContentTypes)
+            {
+                hasItems = true;
+                if (TryGetSerializer(supportedContentType, out ISerializer serializer))
                 {
-                    throw new InvalidOperationException($"No serializer matching content types '{string.Join(",", supportedContentTypes)}'");
+                    return serializer;
                 }
             }
 
-            return GetDefaultSerializer();
+            if (hasItems)
+            {
+                throw new InvalidOperationException($"No serializer matching content types '{string.Join(",", supportedContentTypes)}'.");
+            }
+            else
+            {
+                throw new ArgumentException("The list may not be empty", nameof(supportedContentTypes));
+            }
         }
 
         public bool TryGetSerializer(string contentType, out ISerializer serializer)
         {
+            Guard.NotNull(contentType, nameof(contentType));
+
             serializer = null;
 
             foreach (var supportedSerializer in _serializers)
@@ -79,34 +94,19 @@ namespace Meceqs.Serialization
             return serializer.Deserialize(objectType, serializedObject);
         }
 
-        public Envelope DeserializeEnvelope(string contentType, byte[] serializedEnvelope, string messageType)
+        private static IReadOnlyList<string> GetSupportedContentTypes(IEnumerable<ISerializer> serializers)
         {
-            Guard.NotNull(contentType, nameof(contentType));
-            Guard.NotNull(messageType, nameof(messageType));
+            var contentTypes = new List<string>();
 
-            if (!TryGetSerializer(contentType, out var serializer))
+            foreach (var serializer in serializers)
             {
-                throw new NotSupportedException($"ContentType '{contentType}' is not supported.");
+                if (!contentTypes.Contains(serializer.ContentType))
+                {
+                    contentTypes.Add(serializer.ContentType);
+                }
             }
 
-            Type envelopeType = _envelopeTypeLoader.LoadEnvelopeType(messageType);
-
-            return (Envelope)serializer.Deserialize(envelopeType, serializedEnvelope);
-        }
-
-        public Envelope DeserializeEnvelope(string contentType, Stream serializedEnvelope, string messageType)
-        {
-            Guard.NotNull(contentType, nameof(contentType));
-            Guard.NotNull(messageType, nameof(messageType));
-
-            if (!TryGetSerializer(contentType, out var serializer))
-            {
-                throw new NotSupportedException($"ContentType '{contentType}' is not supported.");
-            }
-
-            Type envelopeType = _envelopeTypeLoader.LoadEnvelopeType(messageType);
-
-            return (Envelope)serializer.Deserialize(envelopeType, serializedEnvelope);
+            return contentTypes;
         }
     }
 }

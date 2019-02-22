@@ -1,6 +1,6 @@
 using System;
 
-namespace Meceqs.Serialization
+namespace Meceqs.Internal
 {
     public interface IEnvelopeTypeLoader
     {

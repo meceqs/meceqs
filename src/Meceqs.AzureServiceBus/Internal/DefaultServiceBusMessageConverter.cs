@@ -1,3 +1,6 @@
+using System;
+using System.IO;
+using Meceqs.Internal;
 using Meceqs.Serialization;
 using Meceqs.Transport;
 using Microsoft.Azure.ServiceBus;
@@ -7,19 +10,22 @@ namespace Meceqs.AzureServiceBus.Internal
     public class DefaultServiceBusMessageConverter : IServiceBusMessageConverter
     {
         private readonly ISerializationProvider _serializationProvider;
+        private readonly IEnvelopeTypeLoader _envelopeTypeLoader;
 
-        public DefaultServiceBusMessageConverter(ISerializationProvider serializationProvider)
+        public DefaultServiceBusMessageConverter(ISerializationProvider serializationProvider, IEnvelopeTypeLoader envelopeTypeLoader)
         {
             Guard.NotNull(serializationProvider, nameof(serializationProvider));
+            Guard.NotNull(envelopeTypeLoader, nameof(envelopeTypeLoader));
 
             _serializationProvider = serializationProvider;
+            _envelopeTypeLoader = envelopeTypeLoader;
         }
 
         public Message ConvertToServiceBusMessage(Envelope envelope)
         {
             Guard.NotNull(envelope, nameof(envelope));
 
-            ISerializer serializer = _serializationProvider.GetDefaultSerializer();
+            ISerializer serializer = _serializationProvider.GetSerializer(envelope.Message.GetType());
 
             byte[] serializedEnvelope = serializer.SerializeToByteArray(envelope);
 
@@ -48,9 +54,12 @@ namespace Meceqs.AzureServiceBus.Internal
             string contentType = serviceBusMessage.ContentType ?? (string)serviceBusMessage.UserProperties[TransportHeaderNames.ContentType];
             string messageType = (string)serviceBusMessage.UserProperties[TransportHeaderNames.MessageType];
 
-            byte[] serializedEnvelope = serviceBusMessage.Body;
+            Type envelopeType = _envelopeTypeLoader.LoadEnvelopeType(messageType);
 
-            return _serializationProvider.DeserializeEnvelope(contentType, serializedEnvelope, messageType);
+            using (var envelopeStream = new MemoryStream(serviceBusMessage.Body))
+            {
+                return (Envelope)_serializationProvider.Deserialize(contentType, envelopeType, envelopeStream);
+            }
         }
     }
 }

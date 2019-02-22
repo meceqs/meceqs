@@ -23,12 +23,7 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             Guard.NotNull(services, nameof(services));
 
-            // Core Services
-            AddPipeline(services);
-            AddReceiving(services);
-            AddSending(services);
-            AddSerialization(services);
-            AddTypedHandling(services);
+            AddDefaultServices(services);
 
             var meceqsBuilder = new MeceqsBuilder(services, configuration);
 
@@ -59,36 +54,26 @@ namespace Microsoft.Extensions.DependencyInjection
             return services;
         }
 
-        private static void AddPipeline(IServiceCollection services)
+        private static void AddDefaultServices(IServiceCollection services)
         {
-            services.TryAddSingleton<IPipelineProvider, DefaultPipelineProvider>();
-        }
-
-        private static void AddReceiving(IServiceCollection services)
-        {
-            // Resolving the receiver transiently makes sure it gets
-            // resolved from a scoped service provider in case there is one.
-            services.TryAddTransient<IMessageReceiver, MessageReceiver>();
-        }
-
-        private static void AddSending(IServiceCollection services)
-        {
+            // Internal
             services.TryAddSingleton<IEnvelopeFactory, DefaultEnvelopeFactory>();
-            services.TryAddSingleton<IEnvelopeCorrelator, DefaultEnvelopeCorrelator>();
-
-            // Resolving the sender transiently makes sure it gets
-            // resolved from a scoped service provider in case there is one.
-            services.TryAddTransient<IMessageSender, MessageSender>();
-        }
-
-        private static void AddSerialization(IServiceCollection services)
-        {
-            services.TryAddSingleton<ISerializationProvider, DefaultSerializationProvider>();
             services.TryAddSingleton<IEnvelopeTypeLoader, DefaultEnvelopeTypeLoader>();
-        }
 
-        public static void AddTypedHandling(IServiceCollection services)
-        {
+            // Pipeline
+            services.TryAddSingleton<IPipelineProvider, DefaultPipelineProvider>();
+
+            // Receiving
+            services.TryAddTransient<IMessageReceiver, MessageReceiver>();
+
+            // Sending
+            services.TryAddSingleton<IEnvelopeCorrelator, DefaultEnvelopeCorrelator>();
+            services.TryAddTransient<IMessageSender, MessageSender>();
+
+            // Serialization
+            services.TryAddSingleton<ISerializationProvider, DefaultSerializationProvider>();
+
+            // Typed Handling
             services.TryAddSingleton<IHandleMethodResolver, DefaultHandleMethodResolver>();
             services.TryAddSingleton<IHandlerInvoker, DefaultHandlerInvoker>();
         }

@@ -1,10 +1,10 @@
 using System;
 using System.Reflection;
-using Meceqs.Serialization;
+using Meceqs.Internal;
 using Microsoft.Extensions.Options;
 using Xunit;
 
-namespace Meceqs.Tests
+namespace Meceqs.Tests.Internal
 {
     public class EnvelopeTypeLoaderTest
     {

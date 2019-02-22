@@ -1,3 +1,6 @@
+using System;
+using System.IO;
+using Meceqs.Internal;
 using Meceqs.Serialization;
 using Meceqs.Transport;
 using Microsoft.Azure.EventHubs;
@@ -7,19 +10,22 @@ namespace Meceqs.AzureEventHubs.Internal
     public class DefaultEventDataConverter : IEventDataConverter
     {
         private readonly ISerializationProvider _serializationProvider;
+        private readonly IEnvelopeTypeLoader _envelopeTypeLoader;
 
-        public DefaultEventDataConverter(ISerializationProvider serializationProvider)
+        public DefaultEventDataConverter(ISerializationProvider serializationProvider, IEnvelopeTypeLoader envelopeTypeLoader)
         {
             Guard.NotNull(serializationProvider, nameof(serializationProvider));
+            Guard.NotNull(envelopeTypeLoader, nameof(envelopeTypeLoader));
 
             _serializationProvider = serializationProvider;
+            _envelopeTypeLoader = envelopeTypeLoader;
         }
 
         public EventData ConvertToEventData(Envelope envelope)
         {
             Guard.NotNull(envelope, nameof(envelope));
 
-            ISerializer serializer = _serializationProvider.GetDefaultSerializer();
+            ISerializer serializer = _serializationProvider.GetSerializer(envelope.Message.GetType());
 
             byte[] serializedEnvelope = serializer.SerializeToByteArray(envelope);
 
@@ -40,9 +46,12 @@ namespace Meceqs.AzureEventHubs.Internal
             string contentType = (string)eventData.Properties[TransportHeaderNames.ContentType];
             string messageType = (string)eventData.Properties[TransportHeaderNames.MessageType];
 
-            byte[] serializedEnvelope = eventData.Body.Array;
+            Type envelopeType = _envelopeTypeLoader.LoadEnvelopeType(messageType);
 
-            return _serializationProvider.DeserializeEnvelope(contentType, serializedEnvelope, messageType);
+            using (var envelopeStream = new MemoryStream(eventData.Body.Array))
+            {
+                return (Envelope)_serializationProvider.Deserialize(contentType, envelopeType, envelopeStream);
+            }
         }
     }
 }

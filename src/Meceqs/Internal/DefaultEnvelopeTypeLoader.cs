@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 using System.Linq;
 using Microsoft.Extensions.Options;
 
-namespace Meceqs.Serialization
+namespace Meceqs.Internal
 {
     public class DefaultEnvelopeTypeLoader : IEnvelopeTypeLoader
     {
