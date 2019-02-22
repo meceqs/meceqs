@@ -8,8 +8,7 @@ namespace Meceqs.Serialization
     public class DefaultSerializationProvider : ISerializationProvider
     {
         private readonly IReadOnlyList<ISerializer> _serializers;
-
-        public IReadOnlyList<string> SupportedContentTypes { get; }
+        private readonly IReadOnlyList<string> _supportedContentTypes;
 
         public DefaultSerializationProvider(IOptions<SerializationOptions> options)
         {
@@ -22,7 +21,7 @@ namespace Meceqs.Serialization
                 throw new InvalidOperationException("No serializers have been configured.");
             }
 
-            SupportedContentTypes = GetSupportedContentTypes(_serializers);
+            _supportedContentTypes = GetSupportedContentTypes(_serializers);
         }
 
         public ISerializer GetSerializer(Type objectType)
@@ -60,6 +59,25 @@ namespace Meceqs.Serialization
             {
                 throw new ArgumentException("The list may not be empty", nameof(supportedContentTypes));
             }
+        }
+
+        public IReadOnlyList<string> GetSupportedContentTypes(Type objectType = null)
+        {
+            if (objectType == null)
+            {
+                return _supportedContentTypes;
+            }
+
+            List<string> supportedContentTypes = new List<string>();
+            foreach (var serializer in _serializers)
+            {
+                if (!supportedContentTypes.Contains(serializer.ContentType) && serializer.CanSerializeType(objectType))
+                {
+                    supportedContentTypes.Add(serializer.ContentType);
+                }
+            }
+
+            return supportedContentTypes;
         }
 
         public bool TryGetSerializer(string contentType, out ISerializer serializer)

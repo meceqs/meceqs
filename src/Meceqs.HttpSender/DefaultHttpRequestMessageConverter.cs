@@ -47,7 +47,7 @@ namespace Meceqs.HttpSender
                 }
 
                 // We also need to let the receiver know what result types we can handle.
-                foreach (var acceptedContentType in _serializationProvider.SupportedContentTypes)
+                foreach (var acceptedContentType in _serializationProvider.GetSupportedContentTypes())
                 {
                     request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(acceptedContentType));
                 }

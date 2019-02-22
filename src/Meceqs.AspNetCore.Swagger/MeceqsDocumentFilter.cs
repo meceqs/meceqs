@@ -16,20 +16,20 @@ namespace Meceqs.AspNetCore.Swagger
         private readonly ReceiveEndpointOptions _transportOptions;
         private readonly IOptionsMonitor<AspNetCoreReceiverOptions> _receiverOptions;
         private readonly IMessagePathConvention _messagePathConvention;
-        private readonly IEnumerable<ISerializer> _serializers;
+        private readonly ISerializationProvider _serializationProvider;
         private readonly MeceqsSwaggerOptions _meceqsOptions;
 
         public MeceqsDocumentFilter(
             IOptions<ReceiveEndpointOptions> transportOptions,
             IOptionsMonitor<AspNetCoreReceiverOptions> receiverOptions,
             IMessagePathConvention messagePathConvention,
-            IEnumerable<ISerializer> serializers,
+            ISerializationProvider serializationProvider,
             MeceqsSwaggerOptions meceqsOptions)
         {
             _transportOptions = transportOptions?.Value;
             _receiverOptions = receiverOptions;
             _messagePathConvention = messagePathConvention;
-            _serializers = serializers;
+            _serializationProvider = serializationProvider;
             _meceqsOptions = meceqsOptions;
         }
 
@@ -63,27 +63,13 @@ namespace Meceqs.AspNetCore.Swagger
 
             // Content Types
 
-            foreach (var serializer in _serializers)
+            var consumeTypes = _serializationProvider.GetSupportedContentTypes(messageType.MessageType);
+            operation.Consumes = new List<string>(consumeTypes);
+
+            if (messageType.ResponseType != typeof(void))
             {
-                if (serializer.CanSerializeType(messageType.MessageType))
-                {
-                    if (operation.Consumes == null)
-                    {
-                        operation.Consumes = new List<string>();
-                    }
-
-                    operation.Consumes.Add(serializer.ContentType);
-                }
-
-                if (messageType.ResponseType != typeof(void) && serializer.CanSerializeType(messageType.ResponseType))
-                {
-                    if (operation.Produces == null)
-                    {
-                        operation.Produces = new List<string>();
-                    }
-
-                    operation.Produces.Add(serializer.ContentType);
-                }
+                var producesTypes = _serializationProvider.GetSupportedContentTypes(messageType.ResponseType);
+                operation.Produces = new List<string>(producesTypes);
             }
 
             // Parameters
