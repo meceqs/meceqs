@@ -25,9 +25,7 @@ namespace Meceqs.AzureEventHubs.FileFake
 
         public Task SendAsync(EventData data, string partitionKey)
         {
-            // TODO @cweiss partition algorithm?
-
-            string serializedEventData = FileFakeEventDataSerializer.Serialize(data);
+            string serializedEventData = FileFakeEventDataSerializer.Serialize(data, partitionKey);
 
             InvokeWithRetry(3, () =>
             {

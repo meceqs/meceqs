@@ -1,7 +1,5 @@
 using System;
 using System.IO;
-using System.Linq;
-using System.Reflection;
 using System.Text;
 using Meceqs.Transport;
 using Microsoft.Azure.EventHubs;
@@ -14,13 +12,8 @@ namespace Meceqs.AzureEventHubs.FileFake
     {
         // From https://github.com/Azure/azure-event-hubs-dotnet/blob/dev/src/Microsoft.Azure.EventHubs/Primitives/ClientConstants.cs
         private const string EnqueuedTimeUtcName = "x-opt-enqueued-time";
-        private const string SequenceNumberName = "x-opt-sequence-number";
-        private const string OffsetName = "x-opt-offset";
 
-        private static readonly PropertyInfo SystemPropertiesSetter = typeof(EventData).GetProperty("SystemProperties");
-        private static readonly ConstructorInfo SystemPropertiesCtor = typeof(EventData.SystemPropertiesCollection).GetTypeInfo().DeclaredConstructors.First();
-
-        public static string Serialize(EventData eventData)
+        public static string Serialize(EventData eventData, string partitionKey)
         {
             string serializedEnvelope = Encoding.UTF8.GetString(eventData.Body.Array);
 
@@ -36,6 +29,9 @@ namespace Meceqs.AzureEventHubs.FileFake
                     writer.WritePropertyName(kvp.Key);
                     writer.WriteValue(kvp.Value);
                 }
+
+                writer.WritePropertyName("PartitionKey");
+                writer.WriteValue(partitionKey);
 
                 writer.WritePropertyName(EnqueuedTimeUtcName);
                 writer.WriteValue(DateTime.UtcNow);
@@ -62,16 +58,11 @@ namespace Meceqs.AzureEventHubs.FileFake
                 eventData.Properties[header] = value;
             }
 
-            // System properties are internal - that's why we need reflection :(
-            // Header names: https://github.com/Azure/azure-event-hubs-dotnet/blob/dev/src/Microsoft.Azure.EventHubs/Primitives/ClientConstants.cs
-
-            var systemProperties = (EventData.SystemPropertiesCollection)SystemPropertiesCtor.Invoke(new object[] { });
-
-            systemProperties[EnqueuedTimeUtcName] = (DateTime)jsonEventData.GetValue(EnqueuedTimeUtcName).ToObject(typeof(DateTime));
-            systemProperties[SequenceNumberName] = sequenceNumber;
-            systemProperties[OffsetName] = sequenceNumber.ToString();
-
-            SystemPropertiesSetter.SetValue(eventData, systemProperties);
+            eventData.SystemProperties = new EventData.SystemPropertiesCollection(
+                sequenceNumber: sequenceNumber,
+                enqueuedTimeUtc: (DateTime)jsonEventData.GetValue(EnqueuedTimeUtcName).ToObject(typeof(DateTime)),
+                offset: sequenceNumber.ToString(),
+                partitionKey: jsonEventData.GetValue("PartitionKey").ToString());
 
             return eventData;
         }
