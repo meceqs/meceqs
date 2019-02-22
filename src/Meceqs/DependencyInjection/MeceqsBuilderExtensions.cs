@@ -54,9 +54,22 @@ namespace Microsoft.Extensions.DependencyInjection
         }
 
         /// <summary>
+        /// Adds the given serializer.
+        /// </summary>
+        public static IMeceqsBuilder AddSerializer(this IMeceqsBuilder builder, ISerializer serializer)
+        {
+            Guard.NotNull(builder, nameof(builder));
+            Guard.NotNull(serializer, nameof(serializer));
+
+            builder.Services.Configure<SerializationOptions>(options => options.Serializers.Add(serializer));
+
+            return builder;
+        }
+
+        /// <summary>
         /// Adds a Json serializer that uses Newtonsoft.Json.
         /// </summary>
-        public static IMeceqsBuilder AddJsonSerialization(this IMeceqsBuilder builder, JsonSerializerSettings settings = null)
+        public static IMeceqsBuilder AddJsonSerializer(this IMeceqsBuilder builder, JsonSerializerSettings settings = null)
         {
             Guard.NotNull(builder, nameof(builder));
 
