@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -65,10 +66,9 @@ namespace Meceqs.HttpSender
                 string contentType = response.Content.Headers.ContentType?.ToString();
                 if (!string.IsNullOrEmpty(contentType))
                 {
-                    if (!_serializationProvider.TryGetSerializer(contentType, out ISerializer serializer))
-                    {
-                        throw new NotSupportedException($"ContentType '{contentType}' is not supported.");
-                    }
+                    var contentTypeList = new List<string> { contentType };
+
+                    var serializer = _serializationProvider.GetSerializer(context.ExpectedResponseType, contentTypeList);
 
                     context.Response = serializer.Deserialize(context.ExpectedResponseType, await response.Content.ReadAsStreamAsync());
                 }

@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
+using System.Linq;
 using Microsoft.Extensions.Options;
 
 namespace Meceqs.Serialization
 {
     public class DefaultSerializationProvider : ISerializationProvider
     {
+        private static readonly IEnumerable<string> EmptyContentTypes = new List<string>().AsReadOnly();
+
         private readonly IReadOnlyList<ISerializer> _serializers;
         private readonly IReadOnlyList<string> _supportedContentTypes;
 
@@ -22,43 +24,6 @@ namespace Meceqs.Serialization
             }
 
             _supportedContentTypes = GetSupportedContentTypes(_serializers);
-        }
-
-        public ISerializer GetSerializer(Type objectType)
-        {
-            Guard.NotNull(objectType, nameof(objectType));
-
-            foreach (var serializer in _serializers)
-            {
-                if (serializer.CanSerializeType(objectType))
-                    return serializer;
-            }
-
-            throw new InvalidOperationException($"No serializer found that can handle the type '{objectType.FullName}'.");
-        }
-
-        public ISerializer GetSerializer(IEnumerable<string> supportedContentTypes)
-        {
-            Guard.NotNull(supportedContentTypes, nameof(supportedContentTypes));
-
-            bool hasItems = false;
-            foreach (var supportedContentType in supportedContentTypes)
-            {
-                hasItems = true;
-                if (TryGetSerializer(supportedContentType, out ISerializer serializer))
-                {
-                    return serializer;
-                }
-            }
-
-            if (hasItems)
-            {
-                throw new InvalidOperationException($"No serializer matching content types '{string.Join(",", supportedContentTypes)}'.");
-            }
-            else
-            {
-                throw new ArgumentException("The list may not be empty", nameof(supportedContentTypes));
-            }
         }
 
         public IReadOnlyList<string> GetSupportedContentTypes(Type objectType = null)
@@ -80,36 +45,69 @@ namespace Meceqs.Serialization
             return supportedContentTypes;
         }
 
-        public bool TryGetSerializer(string contentType, out ISerializer serializer)
+        public ISerializer GetSerializer(Type objectType)
         {
-            Guard.NotNull(contentType, nameof(contentType));
+            return GetSerializer(objectType, EmptyContentTypes);
+        }
 
-            serializer = null;
+        public ISerializer GetSerializer(Type objectType, string supportedContentType)
+        {
+            Guard.NotNullOrWhiteSpace(supportedContentType, nameof(supportedContentType));
 
-            foreach (var supportedSerializer in _serializers)
+            return GetSerializer(objectType, new List<string> { supportedContentType });
+        }
+
+        public ISerializer GetSerializer(Type objectType, IEnumerable<string> supportedContentTypes)
+        {
+            if (!TryGetSerializer(objectType, supportedContentTypes, out var serializer))
             {
-                if (supportedSerializer.ContentType == contentType)
+                throw new InvalidOperationException(
+                    $"No serializer matches object type '{objectType.FullName}' " +
+                    $"and content types '{string.Join(",", supportedContentTypes)}'.");
+            }
+
+            return serializer;
+        }
+
+        public bool TryGetSerializer(Type objectType, out ISerializer serializer)
+        {
+            return TryGetSerializer(objectType, EmptyContentTypes, out serializer);
+        }
+
+        public bool TryGetSerializer(Type objectType, string supportedContentType, out ISerializer serializer)
+        {
+            Guard.NotNullOrWhiteSpace(supportedContentType, nameof(supportedContentType));
+
+            return TryGetSerializer(objectType, new List<string> { supportedContentType }, out serializer);
+        }
+
+        public bool TryGetSerializer(Type objectType, IEnumerable<string> supportedContentTypes, out ISerializer serializer)
+        {
+            Guard.NotNull(objectType, nameof(objectType));
+            Guard.NotNull(supportedContentTypes, nameof(supportedContentTypes));
+
+            foreach (var existingSerializer in _serializers)
+            {
+                if (existingSerializer.CanSerializeType(objectType))
                 {
-                    serializer = supportedSerializer;
-                    return true;
+                    if (!supportedContentTypes.Any())
+                    {
+                        // The client doesn't have any preference regarding the content type
+                        // so we can return the "best" (= the first that matches)
+                        serializer = existingSerializer;
+                        return true;
+                    }
+
+                    if (supportedContentTypes.Any(x => string.Equals(x, existingSerializer.ContentType, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        serializer = existingSerializer;
+                        return true;
+                    }
                 }
             }
 
+            serializer = null;
             return false;
-        }
-
-        public object Deserialize(string contentType, Type objectType, Stream serializedObject)
-        {
-            Guard.NotNull(contentType, nameof(contentType));
-            Guard.NotNull(objectType, nameof(objectType));
-            Guard.NotNull(serializedObject, nameof(serializedObject));
-
-            if (!TryGetSerializer(contentType, out var serializer))
-            {
-                throw new NotSupportedException($"ContentType '{contentType}' is not supported.");
-            }
-
-            return serializer.Deserialize(objectType, serializedObject);
         }
 
         private static IReadOnlyList<string> GetSupportedContentTypes(IEnumerable<ISerializer> serializers)

@@ -22,7 +22,7 @@ namespace Meceqs.AspNetCore.Receiving
 
             IEnumerable<string> supportedContentTypes = GetSupportedContentTypes(httpContext);
 
-            ISerializer serializer = _serializationProvider.GetSerializer(supportedContentTypes);
+            ISerializer serializer = _serializationProvider.GetSerializer(response.GetType(), supportedContentTypes);
 
             httpContext.Response.ContentType = serializer.ContentType;
 

@@ -25,7 +25,7 @@ namespace Meceqs.AzureServiceBus.Internal
         {
             Guard.NotNull(envelope, nameof(envelope));
 
-            ISerializer serializer = _serializationProvider.GetSerializer(envelope.Message.GetType());
+            ISerializer serializer = _serializationProvider.GetSerializer(envelope.GetType());
 
             byte[] serializedEnvelope = serializer.SerializeToByteArray(envelope);
 
@@ -50,15 +50,15 @@ namespace Meceqs.AzureServiceBus.Internal
         {
             Guard.NotNull(serviceBusMessage, nameof(serviceBusMessage));
 
-            // TODO @cweiss validations?
             string contentType = serviceBusMessage.ContentType ?? (string)serviceBusMessage.UserProperties[TransportHeaderNames.ContentType];
             string messageType = (string)serviceBusMessage.UserProperties[TransportHeaderNames.MessageType];
 
             Type envelopeType = _envelopeTypeLoader.LoadEnvelopeType(messageType);
+            ISerializer serializer = _serializationProvider.GetSerializer(envelopeType, contentType);
 
             using (var envelopeStream = new MemoryStream(serviceBusMessage.Body))
             {
-                return (Envelope)_serializationProvider.Deserialize(contentType, envelopeType, envelopeStream);
+                return (Envelope)serializer.Deserialize(envelopeType, envelopeStream);
             }
         }
     }

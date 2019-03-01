@@ -25,7 +25,7 @@ namespace Meceqs.AzureEventHubs.Internal
         {
             Guard.NotNull(envelope, nameof(envelope));
 
-            ISerializer serializer = _serializationProvider.GetSerializer(envelope.Message.GetType());
+            ISerializer serializer = _serializationProvider.GetSerializer(envelope.GetType());
 
             byte[] serializedEnvelope = serializer.SerializeToByteArray(envelope);
 
@@ -47,10 +47,11 @@ namespace Meceqs.AzureEventHubs.Internal
             string messageType = (string)eventData.Properties[TransportHeaderNames.MessageType];
 
             Type envelopeType = _envelopeTypeLoader.LoadEnvelopeType(messageType);
+            ISerializer serializer = _serializationProvider.GetSerializer(envelopeType, contentType);
 
             using (var envelopeStream = new MemoryStream(eventData.Body.Array))
             {
-                return (Envelope)_serializationProvider.Deserialize(contentType, envelopeType, envelopeStream);
+                return (Envelope)serializer.Deserialize(envelopeType, envelopeStream);
             }
         }
     }

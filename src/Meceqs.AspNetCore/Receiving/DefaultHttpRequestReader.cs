@@ -31,7 +31,9 @@ namespace Meceqs.AspNetCore.Receiving
             var requestHeaders = httpContext.Request.GetTypedHeaders();
             string contentType = requestHeaders.ContentType.MediaType.ToString();
 
-            object message = _serializationProvider.Deserialize(contentType, messageType, httpContext.Request.Body);
+            var serializer = _serializationProvider.GetSerializer(messageType, contentType);
+
+            object message = serializer.Deserialize(messageType, httpContext.Request.Body);
 
             Guid messageId = GetGuidHeader(requestHeaders.Headers, TransportHeaderNames.MessageId) ?? Guid.NewGuid();
 

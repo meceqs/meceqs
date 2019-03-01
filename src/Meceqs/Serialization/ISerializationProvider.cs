@@ -1,19 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 
 namespace Meceqs.Serialization
 {
     public interface ISerializationProvider
     {
-        bool TryGetSerializer(string contentType, out ISerializer serializer);
+        IReadOnlyList<string> GetSupportedContentTypes(Type objectType = null);
 
         ISerializer GetSerializer(Type objectType);
 
-        ISerializer GetSerializer(IEnumerable<string> supportedContentTypes);
+        ISerializer GetSerializer(Type objectType, string supportedContentType);
 
-        IReadOnlyList<string> GetSupportedContentTypes(Type objectType = null);
+        ISerializer GetSerializer(Type objectType, IEnumerable<string> supportedContentTypes);
 
-        object Deserialize(string contentType, Type objectType, Stream serializedObject);
+        bool TryGetSerializer(Type objectType, out ISerializer serializer);
+
+        bool TryGetSerializer(Type objectType, string supportedContentType, out ISerializer serializer);
+
+        bool TryGetSerializer(Type objectType, IEnumerable<string> supportedContentTypes, out ISerializer serializer);
     }
 }
