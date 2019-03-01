@@ -1,4 +1,5 @@
-﻿using Meceqs.AspNetCore.Receiving;
+﻿using System;
+using Meceqs.AspNetCore.Receiving;
 using Meceqs.Transport;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -13,6 +14,8 @@ namespace Meceqs.AspNetCore.Swagger
 
     public class MeceqsDocumentFilter : IDocumentFilter
     {
+        private const string JsonContentType = "application/json";
+
         private readonly ReceiveEndpointOptions _transportOptions;
         private readonly IOptionsMonitor<AspNetCoreReceiverOptions> _receiverOptions;
         private readonly IMessagePathConvention _messagePathConvention;
@@ -63,13 +66,11 @@ namespace Meceqs.AspNetCore.Swagger
 
             // Content Types
 
-            var consumeTypes = _serializationProvider.GetSupportedContentTypes(messageType.MessageType);
-            operation.Consumes = new List<string>(consumeTypes);
+            operation.Consumes = GetOrderedContentTypes(messageType.MessageType);
 
             if (messageType.ResponseType != typeof(void))
             {
-                var producesTypes = _serializationProvider.GetSupportedContentTypes(messageType.ResponseType);
-                operation.Produces = new List<string>(producesTypes);
+                operation.Produces = GetOrderedContentTypes(messageType.ResponseType);
             }
 
             // Parameters
@@ -126,6 +127,20 @@ namespace Meceqs.AspNetCore.Swagger
             {
                 Post = operation
             });
+        }
+
+        private List<string> GetOrderedContentTypes(Type objectType)
+        {
+            var contentTypes = _serializationProvider.GetSupportedContentTypes(objectType).ToList();
+
+            // If JSON is supported, we place it at the beginning so that the Swagger UI automatically selects it.
+            // This makes using the UI much easier if you have other non-textual serializers.
+            if (contentTypes.Count > 1 && contentTypes.Remove(JsonContentType))
+            {
+                contentTypes.Insert(0, JsonContentType);
+            }
+
+            return contentTypes;
         }
     }
 }
