@@ -26,17 +26,23 @@ namespace Meceqs.AzureServiceBus.FileFake
             {
                 writer.WriteStartObject();
 
-                foreach (var kvp in message.UserProperties)
-                {
-                    writer.WritePropertyName(kvp.Key);
-                    writer.WriteValue(kvp.Value);
-                }
+                writer.WritePropertyName(nameof(message.ContentType));
+                writer.WriteValue(message.ContentType);
+
+                writer.WritePropertyName(nameof(message.Label));
+                writer.WriteValue(message.Label);
 
                 writer.WritePropertyName(nameof(message.MessageId));
                 writer.WriteValue(message.MessageId);
 
                 writer.WritePropertyName(nameof(message.CorrelationId));
                 writer.WriteValue(message.CorrelationId);
+
+                foreach (var kvp in message.UserProperties)
+                {
+                    writer.WritePropertyName(kvp.Key);
+                    writer.WriteValue(kvp.Value);
+                }
 
                 writer.WritePropertyName(nameof(message.SystemProperties.EnqueuedTimeUtc));
                 writer.WriteValue(DateTime.UtcNow);
@@ -57,16 +63,16 @@ namespace Meceqs.AzureServiceBus.FileFake
             string serializedEnvelope = jsonMessage.GetValue("Body").ToString();
             Message message = new Message(Encoding.UTF8.GetBytes(serializedEnvelope));
 
+            message.ContentType = jsonMessage.GetValue(nameof(message.ContentType)).ToString();
+            message.Label = jsonMessage.GetValue(nameof(message.Label)).ToString();
+            message.MessageId = jsonMessage.GetValue(nameof(message.MessageId)).ToString();
+            message.CorrelationId = jsonMessage.GetValue(nameof(message.CorrelationId)).ToString();
+
             foreach (var header in TransportHeaderNames.AsList())
             {
                 string value = jsonMessage.GetValue(header)?.ToString();
                 message.UserProperties[header] = value;
             }
-
-            message.ContentType = message.UserProperties[TransportHeaderNames.ContentType].ToString();
-            message.MessageId = message.UserProperties[TransportHeaderNames.MessageId].ToString();
-
-            message.CorrelationId = jsonMessage.GetValue(nameof(message.CorrelationId)).ToString();
 
             // System properties are internal - that's why we need reflection :(
 

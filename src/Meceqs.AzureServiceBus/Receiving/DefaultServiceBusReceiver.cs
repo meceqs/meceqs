@@ -1,8 +1,10 @@
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Meceqs.AzureServiceBus.Internal;
 using Meceqs.Receiving;
+using Meceqs.Transport;
 using Microsoft.Azure.ServiceBus;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -46,7 +48,7 @@ namespace Meceqs.AzureServiceBus.Receiving
 
                 try
                 {
-                    await ResolveServicesAndInvokeReceiver(message, cancellation);
+                    await CreateScopeAndInvokeMessageReceiver(message, cancellation);
                     success = true;
                 }
                 catch (Exception ex)
@@ -62,7 +64,7 @@ namespace Meceqs.AzureServiceBus.Receiving
             }
         }
 
-        private async Task ResolveServicesAndInvokeReceiver(Message message, CancellationToken cancellation)
+        private async Task CreateScopeAndInvokeMessageReceiver(Message message, CancellationToken cancellation)
         {
             // Handling a message from an underlying transport is similar to handling a HTTP-request.
             // We must make sure processing of one message doesn't have an effect on other messages.
@@ -73,12 +75,36 @@ namespace Meceqs.AzureServiceBus.Receiving
                 var serviceBusMessageConverter = scope.ServiceProvider.GetRequiredService<IServiceBusMessageConverter>();
                 var messageReceiver = scope.ServiceProvider.GetRequiredService<IMessageReceiver>();
 
+                string messageType = string.IsNullOrEmpty(message.Label)
+                    ? (string)message.UserProperties[TransportHeaderNames.MessageType]
+                    : message.Label;
+
+                // TODO this should be in one central location - see TypedHandling etc.
+                if (!IsKnownMessageType(messageType))
+                {
+                    if (_options.UnknownMessageBehavior == UnknownMessageBehavior.ThrowException)
+                    {
+                        // TODO separate exception type.
+                        throw new InvalidOperationException($"The message type '{messageType}' has not been configured for this receiver.");
+                    }
+                    else if (_options.UnknownMessageBehavior == UnknownMessageBehavior.Skip)
+                    {
+                        _logger.LogInformation("Skipping unknown message type {MessageType}", messageType);
+                        return;
+                    }
+                }
+
                 Envelope envelope = serviceBusMessageConverter.ConvertToEnvelope(message);
 
                 await messageReceiver.ForEnvelope(envelope)
                     .SetCancellationToken(cancellation)
                     .ReceiveAsync();
             }
+        }
+
+        private bool IsKnownMessageType(string messageType)
+        {
+            return _options.MessageTypes.Any(x => string.Equals(x.MessageType.FullName, messageType, StringComparison.OrdinalIgnoreCase));
         }
     }
 }

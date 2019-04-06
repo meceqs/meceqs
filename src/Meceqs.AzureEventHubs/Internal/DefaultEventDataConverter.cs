@@ -32,7 +32,6 @@ namespace Meceqs.AzureEventHubs.Internal
             EventData eventData = new EventData(serializedEnvelope);
 
             eventData.Properties[TransportHeaderNames.ContentType] = serializer.ContentType;
-
             eventData.Properties[TransportHeaderNames.MessageId] = envelope.MessageId;
             eventData.Properties[TransportHeaderNames.MessageType] = envelope.MessageType;
 

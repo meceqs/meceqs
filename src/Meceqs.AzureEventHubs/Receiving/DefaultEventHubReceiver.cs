@@ -75,11 +75,10 @@ namespace Meceqs.AzureEventHubs.Receiving
                 var eventDataConverter = scope.ServiceProvider.GetRequiredService<IEventDataConverter>();
                 var messageReceiver = scope.ServiceProvider.GetRequiredService<IMessageReceiver>();
 
+                // TODO this should be in one central location - see TypedHandling etc.
                 string messageType = (string)eventData.Properties[TransportHeaderNames.MessageType];
                 if (!IsKnownMessageType(messageType))
                 {
-                    // TODO this should be in one central location - see TypedHandling etc.
-
                     if (_options.UnknownMessageBehavior == UnknownMessageBehavior.ThrowException)
                     {
                         // TODO separate exception type.

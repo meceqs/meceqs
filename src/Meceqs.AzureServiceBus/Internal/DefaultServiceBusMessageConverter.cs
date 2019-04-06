@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using Meceqs.Internal;
 using Meceqs.Serialization;
-using Meceqs.Transport;
 using Microsoft.Azure.ServiceBus;
 
 namespace Meceqs.AzureServiceBus.Internal
@@ -31,16 +30,9 @@ namespace Meceqs.AzureServiceBus.Internal
 
             Message serviceBusMessage = new Message(serializedEnvelope);
 
-            // Some properties are written to the object and to the headers-dictionary
-            // to be consistent with other transports that only have header-dictionaries.
-
             serviceBusMessage.ContentType = serializer.ContentType;
-            serviceBusMessage.UserProperties[TransportHeaderNames.ContentType] = serializer.ContentType;
-
             serviceBusMessage.MessageId = envelope.MessageId.ToString();
-            serviceBusMessage.UserProperties[TransportHeaderNames.MessageId] = envelope.MessageId;
-            serviceBusMessage.UserProperties[TransportHeaderNames.MessageType] = envelope.MessageType;
-
+            serviceBusMessage.Label = envelope.MessageType;
             serviceBusMessage.CorrelationId = envelope.CorrelationId.ToString();
 
             return serviceBusMessage;
@@ -50,8 +42,8 @@ namespace Meceqs.AzureServiceBus.Internal
         {
             Guard.NotNull(serviceBusMessage, nameof(serviceBusMessage));
 
-            string contentType = serviceBusMessage.ContentType ?? (string)serviceBusMessage.UserProperties[TransportHeaderNames.ContentType];
-            string messageType = (string)serviceBusMessage.UserProperties[TransportHeaderNames.MessageType];
+            string contentType = serviceBusMessage.ContentType ?? throw new InvalidOperationException("ContentType not set.");
+            string messageType = serviceBusMessage.Label ?? throw new InvalidOperationException("Label not set.");
 
             Type envelopeType = _envelopeTypeLoader.LoadEnvelopeType(messageType);
             ISerializer serializer = _serializationProvider.GetSerializer(envelopeType, contentType);
