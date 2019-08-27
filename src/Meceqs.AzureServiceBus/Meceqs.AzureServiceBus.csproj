@@ -6,6 +6,6 @@
     <ProjectReference Include="..\Meceqs\Meceqs.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.Azure.ServiceBus" Version="3.3.0" />
+    <PackageReference Include="Microsoft.Azure.ServiceBus" Version="4.0.0" />
   </ItemGroup>
 </Project>
