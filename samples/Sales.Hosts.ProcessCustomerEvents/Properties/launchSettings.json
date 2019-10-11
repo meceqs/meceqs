@@ -3,7 +3,7 @@
     "Sales.Hosts.ProcessCustomerEvents": {
       "commandName": "Project",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "DOTNET_ENVIRONMENT": "Development"
       }
     }
   }

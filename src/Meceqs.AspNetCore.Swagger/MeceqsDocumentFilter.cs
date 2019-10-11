@@ -1,17 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Meceqs.AspNetCore.Receiving;
+using Meceqs.Serialization;
 using Meceqs.Transport;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Swashbuckle.AspNetCore.Swagger;
+using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using System.Collections.Generic;
-using System.Linq;
-using Meceqs.Serialization;
 
 namespace Meceqs.AspNetCore.Swagger
 {
-
     public class MeceqsDocumentFilter : IDocumentFilter
     {
         private const string JsonContentType = "application/json";
@@ -36,7 +35,7 @@ namespace Meceqs.AspNetCore.Swagger
             _meceqsOptions = meceqsOptions;
         }
 
-        public void Apply(SwaggerDocument swaggerDoc, DocumentFilterContext context)
+        public void Apply(OpenApiDocument swaggerDoc, DocumentFilterContext context)
         {
             foreach (string receiverName in _transportOptions.Receivers)
             {
@@ -44,78 +43,105 @@ namespace Meceqs.AspNetCore.Swagger
 
                 foreach (var messageType in receiverOptions.MessageTypes.OrderBy(x => x.MessageType.FullName))
                 {
-                    AddMessageType(messageType, swaggerDoc, context.SchemaRegistry, receiverOptions);
+                    AddMessageType(messageType, swaggerDoc, context.SchemaGenerator, context.SchemaRepository, receiverOptions);
                 }
             }
 
-            swaggerDoc.Definitions = context.SchemaRegistry.Definitions;
+            swaggerDoc.Components.Schemas = context.SchemaRepository.Schemas;
         }
 
-        private void AddMessageType(MessageMetadata messageType, SwaggerDocument document, ISchemaRegistry schemaRegistry, AspNetCoreReceiverOptions receiverOptions)
+        private void AddMessageType(
+            MessageMetadata messageType, 
+            OpenApiDocument document, 
+            ISchemaGenerator schemaGenerator, 
+            SchemaRepository schemaRepository, 
+            AspNetCoreReceiverOptions receiverOptions)
         {
             if (document.Paths == null)
             {
-                document.Paths = new Dictionary<string, PathItem>();
+                document.Paths = new OpenApiPaths();
             }
 
-            var operation = new Operation
+            var operation = new OpenApiOperation
             {
-                Parameters = new List<IParameter>(),
-                Responses = new Dictionary<string, Response>()
+                Parameters = new List<OpenApiParameter>(),
+                Responses = new OpenApiResponses()
             };
 
-            // Content Types
+            // Request body
 
-            operation.Consumes = GetOrderedContentTypes(messageType.MessageType);
-
-            if (messageType.ResponseType != typeof(void))
+            operation.RequestBody = new OpenApiRequestBody
             {
-                operation.Produces = GetOrderedContentTypes(messageType.ResponseType);
-            }
-
-            // Parameters
-
-            operation.Parameters.Add(new BodyParameter
-            {
-                Name = "message",
                 Required = true,
-                Schema = schemaRegistry.GetOrRegister(messageType.MessageType),
-            });
+                Content = GetOrderedContentTypes(messageType.MessageType).ToDictionary(x => x, _ => new OpenApiMediaType
+                {
+                    Schema = new OpenApiSchema
+                    {
+                        Reference = schemaGenerator.GenerateSchema(messageType.MessageType, schemaRepository).Reference
+                    }
+                })
+            };
+            
+            // Other parameters
 
-            operation.Parameters.Add(new NonBodyParameter
+            operation.Parameters.Add(new OpenApiParameter
             {
                 Name = TransportHeaderNames.MessageId,
-                In = "header",
-                Type = "string",
-                Format = "uuid"
+                In = ParameterLocation.Header,
+                Schema = new OpenApiSchema
+                {
+                    Type = "string",
+                    Format = "uuid"
+                }
             });
 
-            operation.Parameters.Add(new NonBodyParameter
+            operation.Parameters.Add(new OpenApiParameter
             {
                 Name = TransportHeaderNames.CorrelationId,
-                In = "header",
-                Type = "string",
-                Format = "uuid"
+                In = ParameterLocation.Header,
+                Schema = new OpenApiSchema
+                {
+                    Type = "string",
+                    Format = "uuid"
+                }
             });
 
             // Response
 
-            operation.Responses.Add("200", new Response
+            operation.Responses.Add("200", new OpenApiResponse
             {
                 Description = "OK",
-                Schema = messageType.ResponseType != typeof(void) ? schemaRegistry.GetOrRegister(messageType.ResponseType) : null
+                Content = messageType.ResponseType == typeof(void) 
+                    ? null 
+                    : GetOrderedContentTypes(messageType.ResponseType).ToDictionary(x => x, _ => new OpenApiMediaType
+                    {
+                        Schema = new OpenApiSchema
+                        {
+                            Reference = schemaGenerator.GenerateSchema(messageType.ResponseType, schemaRepository).Reference
+                        }
+                    })
             });
 
             if (!string.IsNullOrEmpty(_meceqsOptions.SecurityDefinition))
             {
-                operation.Responses.Add("401", new Response { Description = "Unauthorized" });
-                operation.Responses.Add("403", new Response { Description = "Forbidden" });
+                operation.Responses.Add("401", new OpenApiResponse { Description = "Unauthorized" });
+                operation.Responses.Add("403", new OpenApiResponse { Description = "Forbidden" });
 
-                operation.Security = new List<IDictionary<string, IEnumerable<string>>>
+                operation.Security = new List<OpenApiSecurityRequirement>
                 {
-                    new Dictionary<string, IEnumerable<string>>
+                    new OpenApiSecurityRequirement
                     {
-                        { _meceqsOptions.SecurityDefinition, Enumerable.Empty<string>() }
+                        {
+                            new OpenApiSecurityScheme
+                            {
+                                Reference = new OpenApiReference
+                                {
+                                    Type = ReferenceType.SecurityScheme,
+                                    Id = _meceqsOptions.SecurityDefinition
+                                }
+                            },
+                            new List<string>()
+                        }
                     }
                 };
             }
@@ -123,9 +149,12 @@ namespace Meceqs.AspNetCore.Swagger
             string path = _messagePathConvention.GetPathForMessage(messageType.MessageType);
             path = AspNetCoreReceiverUtils.CombineRoutePrefixAndMessagePath(receiverOptions.RoutePrefix, path);
 
-            document.Paths.Add(path, new PathItem
+            document.Paths.Add(path, new OpenApiPathItem
             {
-                Post = operation
+                Operations =
+                {
+                    { OperationType.Post, operation }
+                }
             });
         }
 

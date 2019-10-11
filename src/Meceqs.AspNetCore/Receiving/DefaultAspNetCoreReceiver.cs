@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using Meceqs.Receiving;
 using Meceqs.Transport;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Options;
 
 namespace Meceqs.AspNetCore.Receiving
@@ -32,6 +33,16 @@ namespace Meceqs.AspNetCore.Receiving
 
         public async Task ReceiveAsync(HttpContext httpContext, string receiverName, MessageMetadata metadata)
         {
+            // We currently use the synchronous stream methods when serializing/deserializing with Newtonsoft.Json so we need to enable this.
+            // https://docs.microsoft.com/en-us/aspnet/core/migration/22-to-30?view=aspnetcore-3.0&tabs=visual-studio#allowsynchronousio-disabled
+            var syncIOFeature = httpContext.Features.Get<IHttpBodyControlFeature>();
+
+            if (syncIOFeature != null)
+            {
+                syncIOFeature.AllowSynchronousIO = true;
+            }
+
+
             // TODO error handling etc.
 
             var options = _optionsMonitor.Get(receiverName);

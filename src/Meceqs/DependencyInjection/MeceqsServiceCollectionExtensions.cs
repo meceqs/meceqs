@@ -28,7 +28,7 @@ namespace Microsoft.Extensions.DependencyInjection
             var meceqsBuilder = new MeceqsBuilder(services, configuration);
 
             // Default Configuration
-            meceqsBuilder.AddJsonSerializer();
+            meceqsBuilder.AddNewtonsoftJsonSerializer();
 
             return meceqsBuilder;
         }

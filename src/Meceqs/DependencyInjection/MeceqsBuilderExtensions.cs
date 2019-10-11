@@ -4,6 +4,7 @@ using Meceqs;
 using Meceqs.Internal;
 using Meceqs.Pipeline;
 using Meceqs.Serialization;
+using Meceqs.Serialization.NewtonsoftJson;
 using Newtonsoft.Json;
 
 namespace Microsoft.Extensions.DependencyInjection
@@ -69,15 +70,15 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <summary>
         /// Adds a Json serializer that uses Newtonsoft.Json.
         /// </summary>
-        public static IMeceqsBuilder AddJsonSerializer(this IMeceqsBuilder builder, JsonSerializerSettings settings = null)
+        public static IMeceqsBuilder AddNewtonsoftJsonSerializer(this IMeceqsBuilder builder, JsonSerializerSettings settings = null)
         {
             Guard.NotNull(builder, nameof(builder));
 
-            var serializer = new Meceqs.Serialization.Json.JsonSerializer(settings);
+            var serializer = new NewtonsoftJsonSerializer(settings);
 
             builder.Services.Configure<SerializationOptions>(options =>
             {
-                options.Serializers.RemoveType<Meceqs.Serialization.Json.JsonSerializer>();
+                options.Serializers.RemoveType<NewtonsoftJsonSerializer>();
                 options.Serializers.Add(serializer);
             });
 

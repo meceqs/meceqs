@@ -2,19 +2,18 @@ using System;
 using System.IO;
 using System.Text;
 using Newtonsoft.Json;
-using NewtonsoftJsonSerializer = Newtonsoft.Json.JsonSerializer;
 
-namespace Meceqs.Serialization.Json
+namespace Meceqs.Serialization.NewtonsoftJson
 {
-    public class JsonSerializer : ISerializer
+    public class NewtonsoftJsonSerializer : ISerializer
     {
-        private readonly NewtonsoftJsonSerializer _jsonSerializer;
+        private readonly JsonSerializer _jsonSerializer;
 
         public string ContentType { get; } = "application/json";
 
-        public JsonSerializer(JsonSerializerSettings settings = null)
+        public NewtonsoftJsonSerializer(JsonSerializerSettings settings = null)
         {
-            _jsonSerializer = NewtonsoftJsonSerializer.Create(settings ?? JsonDefaults.DefaultSerializerSettings);
+            _jsonSerializer = JsonSerializer.Create(settings ?? NewtonsoftJsonDefaults.DefaultSerializerSettings);
 
         }
 

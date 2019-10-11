@@ -1,9 +1,5 @@
-﻿using System;
-using System.IO;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using SampleConfig;
 
 namespace Sales.Hosts.ProcessOrders
@@ -17,41 +13,9 @@ namespace Sales.Hosts.ProcessOrders
 
         public static IHostBuilder CreateHostBuilder(string[] args)
         {
-            // The generic HostBuilder does not have logic for automatically reading the environment.
-            string environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-            if (string.IsNullOrWhiteSpace(environment))
-            {
-                environment = "Production";
-            }
-
-            // Based on https://github.com/aspnet/MetaPackages/blob/dev/src/Microsoft.AspNetCore/WebHost.cs
-            return new HostBuilder()
-                .UseEnvironment(environment)
-                .UseContentRoot(Directory.GetCurrentDirectory())
-                .ConfigureAppConfiguration((hostingContext, config) =>
+            return Host.CreateDefaultBuilder(args)
+                .ConfigureServices((hostContext, services) =>
                 {
-                    var env = hostingContext.HostingEnvironment;
-
-                    config.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                          .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: true);
-
-                    config.AddEnvironmentVariables();
-
-                    if (args != null)
-                    {
-                        config.AddCommandLine(args);
-                    }
-                })
-                .ConfigureLogging((hostingContext, logging) =>
-                {
-                    logging.AddConfiguration(hostingContext.Configuration.GetSection("Logging"));
-                    logging.AddConsole();
-                    logging.AddDebug();
-                })
-                .ConfigureServices((hostingContext, services) =>
-                {
-                    services.AddHostedService<ServiceBusProcessorService>();
-
                     services.AddMeceqs(builder =>
                     {
                         builder
@@ -62,7 +26,7 @@ namespace Sales.Hosts.ProcessOrders
                                     options.Handlers.AddFromAssembly<Program>();
                                 });
 
-                                if (hostingContext.HostingEnvironment.IsDevelopment())
+                                if (hostContext.HostingEnvironment.IsDevelopment())
                                 {
                                     // Will read messages from local file system.
                                     receiver.UseFileFake(options =>
@@ -73,6 +37,8 @@ namespace Sales.Hosts.ProcessOrders
                                 }
                             });
                     });
+
+                    services.AddHostedService<ServiceBusProcessorService>();
                 });
         }
     }
