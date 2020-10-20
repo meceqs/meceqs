@@ -6,7 +6,7 @@
     <ProjectReference Include="..\Meceqs.AspNetCore\Meceqs.AspNetCore.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="SwashBuckle.AspNetCore.SwaggerGen" Version="5.4.1" />
-    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUi" Version="5.4.1" />
+    <PackageReference Include="SwashBuckle.AspNetCore.SwaggerGen" Version="5.6.3" />
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUi" Version="5.6.3" />
   </ItemGroup>
 </Project>
