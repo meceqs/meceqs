@@ -58,6 +58,8 @@ Task "install-dotnet" $true {
         (New-Object System.Net.WebClient).DownloadFile($urlCurrent, "dotnet.zip")
         Write-Host "Unzipping to $env:DOTNET_INSTALL_DIR"
         Add-Type -AssemblyName System.IO.Compression.FileSystem; [System.IO.Compression.ZipFile]::ExtractToDirectory("dotnet.zip", $env:DOTNET_INSTALL_DIR)
+
+        $env:PATH = "$env:DOTNET_INSTALL_DIR;$env:PATH"
     }
 }
 
