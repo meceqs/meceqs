@@ -49,7 +49,7 @@ namespace Meceqs.HttpSender
             var request = _httpRequestMessageConverter.ConvertToRequestMessage(context.Envelope, absoluteUri);
 
             // Gives DelegatingHandlers a chance to access the Meceqs context
-            request.Properties["Meceqs-MessageContext"] = context;
+            request.Options.TryAdd("Meceqs-MessageContext", context);
 
             var response = await httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, context.Cancellation);
 
